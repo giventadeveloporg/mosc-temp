@@ -6,6 +6,10 @@
  */
 
 import { fetchStrapi, getStrapiTenantDocumentId, getStrapiUrl, getStrapiTenantId } from '@/lib/strapi';
+import {
+  STRAPI_NEWS_CATEGORY_SLUGS,
+  buildCategorySlugFilter,
+} from '@/lib/strapi/newsCategorySlugs';
 import type { BlocksContent } from '@strapi/blocks-react-renderer';
 import type { NewsHomePageData, NewsArticle, FlashNews, FlashNewsItemUI, SidebarPromoBlock, AdSlot } from './types';
 
@@ -104,6 +108,15 @@ async function buildTenantFilterQuery(tenantId: string): Promise<string> {
     ].join('&');
   }
   return `filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}`;
+}
+
+function getArticleCountFromResult(result: NewsHomePageData): number {
+  return (
+    result.featured.length +
+    result.mainNews.length +
+    result.pressRelease.length +
+    result.mostRead.length
+  );
 }
 
 function normalizeArticle(raw: { id?: number; documentId?: string; attributes?: Record<string, unknown> }): NewsArticle {
@@ -284,89 +297,132 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
     return empty;
   }
 
+  const tenantDocumentId = await getStrapiTenantDocumentId();
   const tenantFilterQuery = await buildTenantFilterQuery(tenantId);
-  const flashNewsPath = `/flash-news-items?${tenantFilterQuery}&filters[publishedAt][$notNull]=true&sort=order:asc,publishedAt:desc&populate[0]=article&pagination[limit]=20`;
-  const adsPath = `/advertisement-slots?filters[$or][0][position][$eq]=sidebar&filters[$or][1][position][$eq]=top&filters[$or][2][position][$eq]=between_sections&${tenantFilterQuery}&populate=media`;
 
   let lastResult: NewsHomePageData = empty;
   let lastError: unknown;
 
   for (let attempt = 1; attempt <= MAX_STRAPI_ATTEMPTS; attempt++) {
     try {
-      console.info(`[STRAPI-NEWS] Fetching news homepage data (tenant: ${tenantId}, Strapi: ${strapiUrl}) attempt ${attempt}/${MAX_STRAPI_ATTEMPTS}`);
+      console.info(
+        `[STRAPI-NEWS] Fetching news homepage data attempt ${attempt}/${MAX_STRAPI_ATTEMPTS}`,
+        {
+          tenantId,
+          tenantDocumentId: tenantDocumentId ?? null,
+          strapiUrl,
+          tenantFilterQuery,
+        }
+      );
 
-      // Article lists: tenant filter only (no fallback). Same as bishops — only show data scoped to tenant.
-      const [
-        homepageRes,
-        flashRes,
-        featuredRes,
-        mainRes,
-        pressRes,
-        mostReadRes,
-        sidebarRes,
-        adsRes,
-      ] = await Promise.all([
-        fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/homepage?populate=*'),
-        fetchStrapi<unknown[]>(flashNewsPath),
-        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=featured-news', 'publishedAt:desc', 6, tenantFilterQuery)),
-        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=main-news', 'publishedAt:desc', 10, tenantFilterQuery)),
-        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=press-release', 'publishedAt:desc', 10, tenantFilterQuery)),
-        fetchStrapi<unknown[]>(buildArticleQuery('', 'views:desc', 5, tenantFilterQuery)),
-        fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/sidebar-promotional-block?populate=*'),
-        fetchStrapi<unknown[]>(adsPath),
-      ]);
+      const loadWithFilter = async (filterLabel: string, activeTenantFilter: string) => {
+        const flashNewsPath = `/flash-news-items?${activeTenantFilter}&filters[publishedAt][$notNull]=true&sort=order:asc,publishedAt:desc&populate[0]=article&pagination[limit]=20`;
+        const adsPath = `/advertisement-slots?filters[$or][0][position][$eq]=sidebar&filters[$or][1][position][$eq]=top&filters[$or][2][position][$eq]=between_sections&${activeTenantFilter}&populate=media`;
 
-      const featuredList = Array.isArray(featuredRes?.data) ? featuredRes.data : [];
-      const mainList = Array.isArray(mainRes?.data) ? mainRes.data : [];
-      const pressList = Array.isArray(pressRes?.data) ? pressRes.data : [];
-      const mostReadList = Array.isArray(mostReadRes?.data) ? mostReadRes.data : [];
+        const [
+          homepageRes,
+          flashRes,
+          featuredRes,
+          mainRes,
+          pressRes,
+          mostReadRes,
+          sidebarRes,
+          adsRes,
+        ] = await Promise.all([
+          fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/homepage?populate=*'),
+          fetchStrapi<unknown[]>(flashNewsPath),
+          fetchStrapi<unknown[]>(buildArticleQuery(buildCategorySlugFilter(STRAPI_NEWS_CATEGORY_SLUGS.featuredNews), 'publishedAt:desc', 6, activeTenantFilter)),
+          fetchStrapi<unknown[]>(buildArticleQuery(buildCategorySlugFilter(STRAPI_NEWS_CATEGORY_SLUGS.mainNews), 'publishedAt:desc', 10, activeTenantFilter)),
+          fetchStrapi<unknown[]>(buildArticleQuery(buildCategorySlugFilter(STRAPI_NEWS_CATEGORY_SLUGS.pressRelease), 'publishedAt:desc', 10, activeTenantFilter)),
+          fetchStrapi<unknown[]>(buildArticleQuery('', 'views:desc', 5, activeTenantFilter)),
+          fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/sidebar-promotional-block?populate=*'),
+          fetchStrapi<unknown[]>(adsPath),
+        ]);
 
-      // Single types (homepage, sidebar-promotional-block) may not exist in every Strapi project (e.g. prod 404).
-      // Only treat collection endpoint failures as hard errors for retries. Article lists are tenant-only (no fallback).
-      const hadOptionalMissing = homepageRes == null || sidebarRes == null;
-      if (hadOptionalMissing) {
-        console.info('[STRAPI-NEWS] Optional single-type(s) missing (homepage and/or sidebar-promotional-block). Add them in Strapi if needed; continuing with other data.');
-      }
-      const hadRequiredError = flashRes == null || adsRes == null;
-      const hadError = hadRequiredError;
+        const featuredList = Array.isArray(featuredRes?.data) ? featuredRes.data : [];
+        const mainList = Array.isArray(mainRes?.data) ? mainRes.data : [];
+        const pressList = Array.isArray(pressRes?.data) ? pressRes.data : [];
+        const mostReadList = Array.isArray(mostReadRes?.data) ? mostReadRes.data : [];
 
-      const flashList = Array.isArray(flashRes?.data) ? flashRes.data : [];
-      const adsList = Array.isArray(adsRes?.data) ? adsRes.data : [];
+        // Single types (homepage, sidebar-promotional-block) may not exist in every Strapi project (e.g. prod 404).
+        // Only treat collection endpoint failures as hard errors for retries.
+        const hadOptionalMissing = homepageRes == null || sidebarRes == null;
+        if (hadOptionalMissing) {
+          console.info('[STRAPI-NEWS] Optional single-type(s) missing (homepage and/or sidebar-promotional-block). Add them in Strapi if needed; continuing with other data.');
+        }
+        const hadRequiredError = flashRes == null || adsRes == null;
+        const hadError = hadRequiredError;
 
-      const allFlashItems = (flashList ?? [])
-        .map((f) => normalizeFlashNewsItem(f as RawFlashNewsItem))
-        .filter((f) => f.content && f.content.length > 0);
-      const flashNewsItems = filterFlashNewsByDate(allFlashItems);
+        const flashList = Array.isArray(flashRes?.data) ? flashRes.data : [];
+        const adsList = Array.isArray(adsRes?.data) ? adsRes.data : [];
 
-      const allAds = (adsList ?? []).map((a) => normalizeAdSlot(a as { id?: number; attributes?: Record<string, unknown> }));
-      const sidebarSlots = allAds.filter((a) => (a.position ?? '').toLowerCase() === 'sidebar');
-      const topSlots = allAds.filter((a) => (a.position ?? '').toLowerCase() === 'top');
-      const betweenSectionsSlots = allAds.filter((a) => (a.position ?? '').toLowerCase().replace(/-/g, '_') === 'between_sections');
+        const allFlashItems = (flashList ?? [])
+          .map((f) => normalizeFlashNewsItem(f as RawFlashNewsItem))
+          .filter((f) => f.content && f.content.length > 0);
+        const flashNewsItems = filterFlashNewsByDate(allFlashItems);
 
-      const result: NewsHomePageData = {
-        flash: normalizeHomepage(homepageRes?.data ?? null),
-        flashNewsItems,
-        featured: (featuredList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
-        mainNews: (mainList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
-        pressRelease: (pressList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
-        mostRead: (mostReadList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
-        sidebarPromo: normalizeSidebarPromo(sidebarRes?.data ?? null),
-        adSlots: sidebarSlots,
-        topAdSlots: topSlots,
-        betweenSectionsAdSlots: betweenSectionsSlots,
+        const allAds = (adsList ?? []).map((a) => normalizeAdSlot(a as { id?: number; attributes?: Record<string, unknown> }));
+        const sidebarSlots = allAds.filter((a) => (a.position ?? '').toLowerCase() === 'sidebar');
+        const topSlots = allAds.filter((a) => (a.position ?? '').toLowerCase() === 'top');
+        const betweenSectionsSlots = allAds.filter((a) => (a.position ?? '').toLowerCase().replace(/-/g, '_') === 'between_sections');
+
+        const result: NewsHomePageData = {
+          flash: normalizeHomepage(homepageRes?.data ?? null),
+          flashNewsItems,
+          featured: (featuredList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
+          mainNews: (mainList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
+          pressRelease: (pressList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
+          mostRead: (mostReadList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
+          sidebarPromo: normalizeSidebarPromo(sidebarRes?.data ?? null),
+          adSlots: sidebarSlots,
+          topAdSlots: topSlots,
+          betweenSectionsAdSlots: betweenSectionsSlots,
+        };
+
+        const totalArticles = getArticleCountFromResult(result);
+        console.info(`[STRAPI-NEWS] (${filterLabel}) Homepage data loaded: ${totalArticles} articles, flash=${!!result.flash?.active}, flashItems=${result.flashNewsItems.length}, sidebar=${!!result.sidebarPromo}, sidebarAds=${result.adSlots.length}, topAds=${result.topAdSlots.length}, betweenSectionsAds=${result.betweenSectionsAdSlots.length}`);
+        if (totalArticles === 0 && !hadError) {
+          console.info(`[STRAPI-NEWS] (${filterLabel}) 0 articles with successful responses.`);
+        }
+
+        return { result, hadError };
       };
 
-      const totalArticles = result.featured.length + result.mainNews.length + result.pressRelease.length + result.mostRead.length;
-      console.info(`[STRAPI-NEWS] Homepage data loaded: ${totalArticles} articles, flash=${!!result.flash?.active}, flashItems=${result.flashNewsItems.length}, sidebar=${!!result.sidebarPromo}, sidebarAds=${result.adSlots.length}, topAds=${result.topAdSlots.length}, betweenSectionsAds=${result.betweenSectionsAdSlots.length}`);
-      if (totalArticles === 0 && !hadError) {
-        console.info('[STRAPI-NEWS] Tip: Only published articles are shown. If you see 0 articles, ensure entries are Published (not Draft) in Strapi and have the correct category and tenant.');
+      // Strategy 1: primary tenant query
+      let loaded = await loadWithFilter('tenant-primary', tenantFilterQuery);
+      let totalArticles = getArticleCountFromResult(loaded.result);
+      if (totalArticles > 0 && !loaded.hadError) {
+        return loaded.result;
       }
 
-      if (!hadError) {
-        return result;
+      // Strategy 2: strict documentId relation query if available
+      if (tenantDocumentId) {
+        const documentIdFilter = `filters[tenant][documentId][$eq]=${encodeURIComponent(tenantDocumentId)}`;
+        console.warn('[STRAPI-NEWS] tenant-primary returned empty/partial, trying tenant-documentId fallback.', {
+          tenantDocumentId,
+        });
+        loaded = await loadWithFilter('tenant-documentId', documentIdFilter);
+        totalArticles = getArticleCountFromResult(loaded.result);
+        if (totalArticles > 0 && !loaded.hadError) {
+          return loaded.result;
+        }
       }
 
-      lastResult = result;
+      // Strategy 3: no-tenant fallback (last resort; keeps site usable in misconfigured production)
+      // NOTE: This should be temporary until tenant relations are corrected in Strapi data.
+      console.warn('[STRAPI-NEWS] Tenant-scoped strategies returned empty/partial. Trying no-tenant fallback.');
+      loaded = await loadWithFilter('no-tenant', '');
+      totalArticles = getArticleCountFromResult(loaded.result);
+      if (totalArticles > 0 && !loaded.hadError) {
+        console.warn('[STRAPI-NEWS] no-tenant fallback returned articles. Verify tenant relation mapping in Strapi production data.');
+        return loaded.result;
+      }
+
+      lastResult = loaded.result;
+      if (!loaded.hadError && totalArticles === 0) {
+        return loaded.result;
+      }
+
       if (attempt < MAX_STRAPI_ATTEMPTS) {
         console.warn(`[STRAPI-NEWS] Some Strapi requests failed (attempt ${attempt}/${MAX_STRAPI_ATTEMPTS}). Retrying in ${RETRY_DELAY_MS}ms.`);
         await sleep(RETRY_DELAY_MS);

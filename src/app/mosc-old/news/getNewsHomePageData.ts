@@ -6,6 +6,10 @@
  */
 
 import { fetchStrapi, getStrapiUrl, getStrapiTenantId } from '@/lib/strapi';
+import {
+  STRAPI_NEWS_CATEGORY_SLUGS,
+  buildCategorySlugFilter,
+} from '@/lib/strapi/newsCategorySlugs';
 import type { BlocksContent } from '@strapi/blocks-react-renderer';
 import type { NewsHomePageData, NewsArticle, FlashNews, FlashNewsItemUI, SidebarPromoBlock, AdSlot } from './types';
 
@@ -255,9 +259,9 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
   ] = await Promise.all([
     fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/homepage?populate=*'),
     fetchStrapi<unknown[]>(flashNewsPath),
-    fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=featured-news', 'publishedAt:desc', 6)),
-    fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=main-news', 'publishedAt:desc', 10)),
-    fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=press-release', 'publishedAt:desc', 10)),
+    fetchStrapi<unknown[]>(buildArticleQuery(buildCategorySlugFilter(STRAPI_NEWS_CATEGORY_SLUGS.featuredNews), 'publishedAt:desc', 6)),
+    fetchStrapi<unknown[]>(buildArticleQuery(buildCategorySlugFilter(STRAPI_NEWS_CATEGORY_SLUGS.mainNews), 'publishedAt:desc', 10)),
+    fetchStrapi<unknown[]>(buildArticleQuery(buildCategorySlugFilter(STRAPI_NEWS_CATEGORY_SLUGS.pressRelease), 'publishedAt:desc', 10)),
     fetchStrapi<unknown[]>(buildArticleQuery('', 'views:desc', 5)),
     fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/sidebar-promotional-block?populate=*'),
     fetchStrapi<unknown[]>(`/advertisement-slots?filters[$or][0][position][$eq]=sidebar&filters[$or][1][position][$eq]=top&filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&populate=media`),
