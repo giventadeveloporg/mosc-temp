@@ -1,6 +1,6 @@
 ---
 description: Strapi 5 REST API patterns for published state, populate parameters, and list-endpoint fallbacks
-globs: src/lib/strapi.ts, src/app/mosc/news/**/*.ts, src/app/mosc/directory/**/*.ts, src/app/syro/news/**/*.ts, src/app/syro/directory/**/*.ts
+globs: src/lib/strapi.ts, src/lib/strapi/**/*.ts, src/app/mosc/news/**/*.ts, src/app/mosc/directory/**/*.ts, src/app/mosc-redesign/**/news/**/*.ts, src/app/mosc-redesign/**/directory/**/*.ts, src/app/mosc-old/news/**/*.ts
 alwaysApply: false
 ---
 
@@ -14,7 +14,7 @@ This rule defines correct patterns for Strapi 5 Content API calls, particularly 
 
 - **status=published** – Can cause validation errors in Strapi 5 setups; use `filters[publishedAt][$notNull]=true` instead
 - **Comma-separated populate** – `populate=cover,category,author` triggers 400s; Strapi 5 expects array-style populate
-- **Category slug case mismatch** – Strapi may store slugs as `Main-News` while the filter uses `main-news`; use `$eqi` for case-insensitive match
+- **Category slug values** – Use canonical kebab slugs from [`src/lib/strapi/newsCategorySlugs.ts`](mdc:src/lib/strapi/newsCategorySlugs.ts); see [strapi_frontend_slug_contract.mdc](mdc:.cursor/rules/strapi_frontend_slug_contract.mdc)
 
 ## **Tenant Filtering (Required — No Fallback)**
 
@@ -80,41 +80,42 @@ const POPULATE = 'populate=cover,category,author';
 GET /api/articles?filters[isFeatured][$eq]=true&filters[tenant][tenantId][$eq]=tenant_demo_002&filters[publishedAt][$notNull]=true&populate[0]=cover&populate[1]=category&populate[2]=author&sort=publishedAt:desc&pagination[limit]=6
 ```
 
-### **Featured News** (use category slug like Main News, not isFeatured)
+### **Featured News** (category slug, not `isFeatured`)
 
 ```
-GET /api/articles?filters[category][slug][$eqi]=featured-news&filters[tenant][tenantId][$eq]=tenant_demo_002&filters[publishedAt][$notNull]=true&populate[0]=cover&populate[1]=category&populate[2]=author&sort=publishedAt:desc&pagination[limit]=6
+GET /api/articles?filters[category][slug][$eq]=featured-news&filters[tenant][tenantId][$eq]=tenant_demo_002&filters[publishedAt][$notNull]=true&populate[0]=cover&populate[1]=category&populate[2]=author&sort=publishedAt:desc&pagination[pageSize]=6
 ```
 
-If you have a "Featured News" category in Strapi (slug `Featured-News`), filter by category slug. The `isFeatured` boolean is an alternative; use category when articles are assigned to the Featured News category.
+Use `STRAPI_NEWS_CATEGORY_SLUGS.featuredNews` and `buildCategorySlugFilter()` from [`src/lib/strapi/newsCategorySlugs.ts`](mdc:src/lib/strapi/newsCategorySlugs.ts).
 
-### **Main News** (use `$eqi` for case-insensitive slug)
+### **Main News / Press Release / Most Read**
 
-```
-GET /api/articles?filters[category][slug][$eqi]=main-news&filters[tenant][tenantId][$eq]=tenant_demo_002&filters[publishedAt][$notNull]=true&populate[0]=cover&populate[1]=category&populate[2]=author&sort=publishedAt:desc&pagination[limit]=10
-```
+Same pattern: `$eq` on normalized category slugs, tenant filter, `publishedAt`, array-style populate.
 
-### **Press Release / Most Read**
+## **Category Slug Filter**
 
-Same pattern: use `filters[publishedAt][$notNull]=true` and `populate[0]=...&populate[1]=...&populate[2]=...`
+**Primary rule:** [strapi_frontend_slug_contract.mdc](mdc:.cursor/rules/strapi_frontend_slug_contract.mdc)
 
-## **Category Slug Filter (Case-Insensitive)**
-
-### **DO: Use $eqi for case-insensitive slug match**
-
-Strapi may store category slugs with different casing (e.g. `Main-News`, `Press-Release`) from the UI. Slug filters are case-sensitive; use `$eqi` to match regardless of case:
+### **DO: Use `$eq` + shared constants (production / post-backfill)**
 
 ```typescript
-// ✅ DO: Case-insensitive category slug filter
-'filters[category][slug][$eqi]=main-news'
-'filters[category][slug][$eqi]=press-release'
+import { STRAPI_NEWS_CATEGORY_SLUGS, buildCategorySlugFilter } from '@/lib/strapi/newsCategorySlugs';
+
+buildCategorySlugFilter(STRAPI_NEWS_CATEGORY_SLUGS.mainNews);
+// → filters[category][slug][$eq]=main-news
 ```
 
-### **DON'T: Use $eq for slugs (case-sensitive)**
+### **DO: Use `$eqi` only for legacy mixed-case Strapi data**
 
 ```typescript
-// ❌ DON'T: May not match "Main-News" when stored with different casing
-'filters[category][slug][$eq]=main-news'
+buildCategorySlugFilter(STRAPI_NEWS_CATEGORY_SLUGS.mainNews, { caseInsensitive: true });
+```
+
+### **DON'T**
+
+```typescript
+// ❌ DON'T: Hardcode slug strings or wrong casing in filters
+'filters[category][slug][$eq]=Main-News'
 ```
 
 ## **Article Detail Page (slug or id)**
@@ -276,6 +277,8 @@ Full specs: [`documentation/news_portal/strapi/image_upload_spec.md`](documentat
 
 ## **References**
 
-- Implementation: [`src/app/mosc/news/getNewsHomePageData.ts`](mdc:src/app/mosc/news/getNewsHomePageData.ts)
+- Slug contract: [strapi_frontend_slug_contract.mdc](mdc:.cursor/rules/strapi_frontend_slug_contract.mdc), [documentation/strapi/strapi_frontend_slug_contract.md](mdc:documentation/strapi/strapi_frontend_slug_contract.md)
+- Category constants: [`src/lib/strapi/newsCategorySlugs.ts`](mdc:src/lib/strapi/newsCategorySlugs.ts)
+- Implementation: [`src/app/mosc-redesign/(syro)/news/getNewsHomePageData.ts`](mdc:src/app/mosc-redesign/(syro)/news/getNewsHomePageData.ts), [`src/app/mosc/news/getNewsHomePageData.ts`](mdc:src/app/mosc/news/getNewsHomePageData.ts)
 - Strapi client: [`src/lib/strapi.ts`](mdc:src/lib/strapi.ts)
 - API reference: [`documentation/news_portal/strapi/api_reference.md`](mdc:documentation/news_portal/strapi/api_reference.md)
