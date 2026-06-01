@@ -57,7 +57,7 @@ const synodMembers: Array<{
     title: 'H.G. Zachariah Mar Nicholovos Metropolitan',
     excerpt:
       'His Grace, Metropolitan Zachariah Mar Nicholovos was born on August 13, 1959 to the famous Poothicote family in Mepral. His boyhood name was Cheriyachen, and was the fourth of five...',
-    image: '/images/holy-synod/Synod-6.jpg',
+    image: '/images/holy-synod/Synod-6.JPG',
     internalHref: '/mosc-redesign/holy-synod/h-g-zachariah-mar-nicholovos-metropolitan',
   },
   {
@@ -134,7 +134,7 @@ const synodMembers: Array<{
     title: 'H.G. Dr. Youhanon Mar Demetrios Metropolitan',
     excerpt:
       'His Grace was Born on 18-12-1952 as the son of Palamoottil Mathews and Mercy. Home parish is St. Thomas Orthodox Cathedral, Kollam Diocese. After completing the formal education, His Grace...',
-    image: '/images/holy-synod/Synod-17.jpg',
+    image: '/images/holy-synod/Synod-17.JPG',
     internalHref: '/mosc-redesign/holy-synod/h-g-dr-yuhanon-mar-demetrius-metropolitan',
   },
   {
@@ -162,7 +162,7 @@ const synodMembers: Array<{
     title: 'H.G. Dr. Zacharias Mar Aprem Metropolitan',
     excerpt:
       'His Grace was born as the son of E.K. Kuriakose and Sossama Kuriakose. His Grace is a member of St. George Valiyapally, Chungathara , Malabar Diocese. After taking his Bachelors...',
-    image: '/images/holy-synod/Synod-21.jpg',
+    image: '/images/holy-synod/Synod-21.JPG',
     internalHref: '/mosc-redesign/holy-synod/h-g-dr-zacharias-mar-aprem-metropolitan',
   },
   {
@@ -183,21 +183,21 @@ const synodMembers: Array<{
     title: 'H.G. Abraham Mar Stephanos Metropolitan',
     excerpt:
       'Born to Late Mr. K. A. Thomas and Mrs. Annamma, Kadakkamannil House, Mylapra in Pathanamthitta on June 11, His Grace belongs to the parish of St. George Orthodox Church (Valiyapalli),...',
-    image: '/images/holy-synod/Synod-24.jpg',
+    image: '/images/holy-synod/Synod-24.JPG',
     internalHref: '/mosc-redesign/holy-synod/h-g-abraham-mar-stephanos-metropolitan',
   },
   {
     title: 'H.G. Dr. Thomas Mar Ivanios Metropolitan',
     excerpt:
       'Born to of Late Mr. Thomas Chacko and Mrs. Annamma , in Pulluparampil house, Aleppey on 13 th December 1969, His Grace Thomas Mar Ivanios Metropolitan belongs to the parish...',
-    image: '/images/holy-synod/Synod-25.jpg',
+    image: '/images/holy-synod/Synod-25.JPG',
     internalHref: '/mosc-redesign/holy-synod/h-g-thomas-mar-ivanios-metropolitan',
   },
   {
     title: 'H.G. Dr. Geevarghese Mar Theophilos Metropolitan',
     excerpt:
       'Born as the son of Mr. P. C. Joshua and Mrs. P. C. Marykutty in Kizhakkemannil House, Chenneerkkara, Thumpamon on 8 th August 1971, His Grace belongs to the parish...',
-    image: '/images/holy-synod/Synod-26.jpg',
+    image: '/images/holy-synod/Synod-26.JPG',
     internalHref: '/mosc-redesign/holy-synod/hg-dr-geevarghese-mar-theophilos-metropolitan',
   },
   {
