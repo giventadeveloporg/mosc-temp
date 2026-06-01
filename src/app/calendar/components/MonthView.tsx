@@ -15,7 +15,20 @@ function getDays(year: number, month: number) {
   return cells;
 }
 
-export function MonthView({ events, year, month }: { events: CalendarEvent[]; year: number; month: number }) {
+export function MonthView({
+  events,
+  year,
+  month,
+  theme = 'default',
+  calendarBasePath = '/calendar',
+}: {
+  events: CalendarEvent[];
+  year: number;
+  month: number;
+  theme?: 'default' | 'syro';
+  calendarBasePath?: string;
+}) {
+  const isSyro = theme === 'syro';
   const [hoveredEvent, setHoveredEvent] = useState<CalendarEvent | null>(null);
   const [tooltipAnchor, setTooltipAnchor] = useState<DOMRect | null>(null);
 
@@ -52,15 +65,40 @@ export function MonthView({ events, year, month }: { events: CalendarEvent[]; ye
     );
   };
 
+  const dayHeaders = isSyro
+    ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
   return (
-    <div className="bg-white rounded-lg overflow-hidden">
-      {/* Calendar Grid */}
+    <div className={`bg-white rounded-lg overflow-hidden ${isSyro ? 'border border-gray-200' : ''}`}>
       <div className="grid grid-cols-7 gap-px bg-gray-200">
-        {/* Day Headers */}
-        {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map(h => (
-          <div key={h} className="bg-gradient-to-br from-indigo-50 to-indigo-100 text-xs sm:text-sm font-bold text-indigo-700 text-center py-3 px-1">
-            <span className="hidden sm:inline">{h}</span>
-            <span className="sm:hidden">{h.slice(0, 3)}</span>
+        {dayHeaders.map((h) => (
+          <div
+            key={h}
+            className={
+              isSyro
+                ? 'bg-[#f0f4f8] text-xs sm:text-sm font-bold text-syro-blue text-center py-3 px-1'
+                : 'bg-gradient-to-br from-indigo-50 to-indigo-100 text-xs sm:text-sm font-bold text-indigo-700 text-center py-3 px-1'
+            }
+          >
+            <span className="hidden sm:inline">
+              {isSyro
+                ? h === 'Sun'
+                  ? 'Sunday'
+                  : h === 'Mon'
+                    ? 'Monday'
+                    : h === 'Tue'
+                      ? 'Tuesday'
+                      : h === 'Wed'
+                        ? 'Wednesday'
+                        : h === 'Thu'
+                          ? 'Thursday'
+                          : h === 'Fri'
+                            ? 'Friday'
+                            : 'Saturday'
+                : h}
+            </span>
+            <span className="sm:hidden">{isSyro ? h : h.slice(0, 3)}</span>
           </div>
         ))}
 
@@ -75,15 +113,18 @@ export function MonthView({ events, year, month }: { events: CalendarEvent[]; ye
               key={idx}
               className={`min-h-[100px] sm:min-h-[120px] p-2 bg-white ${
                 !c.day ? 'bg-gray-50' : ''
-              } ${isTodayCell ? 'bg-gradient-to-br from-blue-50 to-purple-50' : ''} hover:bg-gray-50 transition-colors`}
+              } ${isTodayCell ? (isSyro ? 'bg-syro-red/5' : 'bg-gradient-to-br from-blue-50 to-purple-50') : ''} hover:bg-gray-50 transition-colors`}
             >
               {c.day && (
                 <>
-                  {/* Day Number */}
                   <div className={`text-xs sm:text-sm font-bold mb-1 ${
                     isTodayCell
-                      ? 'inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-600 text-white'
-                      : 'text-gray-700'
+                      ? isSyro
+                        ? 'inline-flex items-center justify-center w-7 h-7 rounded-full bg-syro-red text-white'
+                        : 'inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-600 text-white'
+                      : isSyro
+                        ? 'text-syro-dark-gray'
+                        : 'text-gray-700'
                   }`}>
                     {c.day}
                   </div>
@@ -94,12 +135,22 @@ export function MonthView({ events, year, month }: { events: CalendarEvent[]; ye
                       <Link
                         key={event.id}
                         href={`/events/${event.id}`}
-                        className="group text-xs truncate px-2 py-1.5 rounded-lg bg-gradient-to-br from-teal-50 to-teal-100 hover:from-teal-100 hover:to-teal-200 text-teal-800 transition-all duration-300 hover:scale-105 cursor-pointer shadow-sm"
+                        className={
+                          isSyro
+                            ? 'group text-xs truncate px-2 py-1.5 rounded-lg bg-syro-red/10 hover:bg-syro-red/20 text-syro-red transition-all duration-300 hover:scale-105 cursor-pointer shadow-sm text-left'
+                            : 'group text-xs truncate px-2 py-1.5 rounded-lg bg-gradient-to-br from-teal-50 to-teal-100 hover:from-teal-100 hover:to-teal-200 text-teal-800 transition-all duration-300 hover:scale-105 cursor-pointer shadow-sm'
+                        }
                         onMouseEnter={(e) => handleEventMouseEnter(event, e)}
                         onMouseLeave={handleEventMouseLeave}
                       >
                         <div className="flex items-center gap-1">
-                          <svg className="w-3 h-3 flex-shrink-0 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                          <svg
+                            className={`w-3 h-3 flex-shrink-0 ${isSyro ? 'text-syro-red' : 'text-teal-600'}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                          >
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           <span className="truncate font-medium">{event.title}</span>
@@ -108,8 +159,12 @@ export function MonthView({ events, year, month }: { events: CalendarEvent[]; ye
                     ))}
                     {evs.length > 3 && dateStr && (
                       <Link
-                        href={`/calendar?view=day&date=${dateStr}`}
-                        className="text-xs px-2 py-1 text-indigo-600 hover:text-indigo-800 font-semibold hover:underline transition-colors cursor-pointer flex items-center gap-1"
+                        href={`${calendarBasePath}?view=day&date=${dateStr}`}
+                        className={
+                          isSyro
+                            ? 'text-xs px-2 py-1 text-syro-blue hover:text-syro-red font-semibold hover:underline transition-colors cursor-pointer flex items-center gap-1'
+                            : 'text-xs px-2 py-1 text-indigo-600 hover:text-indigo-800 font-semibold hover:underline transition-colors cursor-pointer flex items-center gap-1'
+                        }
                       >
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />

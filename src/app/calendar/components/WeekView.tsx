@@ -11,7 +11,18 @@ function startOfWeek(d: Date) {
   return new Date(date.getFullYear(), date.getMonth(), diff);
 }
 
-export function WeekView({ events, anchorDate }: { events: CalendarEvent[]; anchorDate: Date }) {
+export function WeekView({
+  events,
+  anchorDate,
+  theme = 'default',
+  calendarBasePath = '/calendar',
+}: {
+  events: CalendarEvent[];
+  anchorDate: Date;
+  theme?: 'default' | 'syro';
+  calendarBasePath?: string;
+}) {
+  const isSyro = theme === 'syro';
   const [hoveredEvent, setHoveredEvent] = useState<CalendarEvent | null>(null);
   const [tooltipAnchor, setTooltipAnchor] = useState<DOMRect | null>(null);
 
@@ -44,8 +55,7 @@ export function WeekView({ events, anchorDate }: { events: CalendarEvent[]; anch
   };
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden">
-      {/* Week Grid */}
+    <div className={`bg-white rounded-lg overflow-hidden ${isSyro ? 'border border-gray-200' : ''}`}>
       <div className="grid grid-cols-7 gap-px bg-gray-200">
         {days.map((d, idx) => {
           const day = d.getDate();
@@ -57,24 +67,32 @@ export function WeekView({ events, anchorDate }: { events: CalendarEvent[]; anch
             <div
               key={idx}
               className={`min-h-[140px] sm:min-h-[160px] p-2 sm:p-3 bg-white ${
-                isTodayCell ? 'bg-gradient-to-br from-green-50 to-green-100' : ''
+                isTodayCell ? (isSyro ? 'bg-syro-red/5' : 'bg-gradient-to-br from-green-50 to-green-100') : ''
               } hover:bg-gray-50 transition-colors`}
             >
               {/* Day Header */}
               <div className="mb-2">
-                <div className={`text-xs sm:text-sm font-bold ${
-                  isTodayCell ? 'text-green-700' : 'text-gray-700'
-                }`}>
+                <div
+                  className={`text-xs sm:text-sm font-bold ${
+                    isTodayCell ? (isSyro ? 'text-syro-red' : 'text-green-700') : isSyro ? 'text-syro-dark-gray' : 'text-gray-700'
+                  }`}
+                >
                   {d.toLocaleDateString(undefined, { weekday: 'short' })}
                 </div>
-                <div className={`text-lg sm:text-xl font-bold ${
-                  isTodayCell
-                    ? 'inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-600 text-white'
-                    : 'text-gray-900'
-                }`}>
+                <div
+                  className={`text-lg sm:text-xl font-bold ${
+                    isTodayCell
+                      ? isSyro
+                        ? 'inline-flex items-center justify-center w-8 h-8 rounded-full bg-syro-red text-white'
+                        : 'inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-600 text-white'
+                      : isSyro
+                        ? 'text-syro-blue'
+                        : 'text-gray-900'
+                  }`}
+                >
                   {day}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className={`text-xs ${isSyro ? 'text-[#798daf]' : 'text-gray-500'}`}>
                   {d.toLocaleDateString(undefined, { month: 'short' })}
                 </div>
               </div>
@@ -85,12 +103,22 @@ export function WeekView({ events, anchorDate }: { events: CalendarEvent[]; anch
                   <Link
                     key={event.id}
                     href={`/events/${event.id}`}
-                    className="group text-xs truncate px-2 py-1.5 rounded-lg bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 text-green-800 transition-all duration-300 hover:scale-105 cursor-pointer shadow-sm"
+                    className={
+                      isSyro
+                        ? 'group text-xs truncate px-2 py-1.5 rounded-lg bg-syro-red/10 hover:bg-syro-red/20 text-syro-red transition-all duration-300 hover:scale-105 cursor-pointer shadow-sm'
+                        : 'group text-xs truncate px-2 py-1.5 rounded-lg bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 text-green-800 transition-all duration-300 hover:scale-105 cursor-pointer shadow-sm'
+                    }
                     onMouseEnter={(e) => handleEventMouseEnter(event, e)}
                     onMouseLeave={handleEventMouseLeave}
                   >
                     <div className="flex items-center gap-1">
-                      <svg className="w-3 h-3 flex-shrink-0 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <svg
+                        className={`w-3 h-3 flex-shrink-0 ${isSyro ? 'text-syro-red' : 'text-green-600'}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                      >
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <span className="truncate font-medium">{event.title}</span>
@@ -99,8 +127,12 @@ export function WeekView({ events, anchorDate }: { events: CalendarEvent[]; anch
                 ))}
                 {evs.length > 5 && (
                   <Link
-                    href={`/calendar?view=day&date=${dateStr}`}
-                    className="text-xs px-2 py-1 text-indigo-600 hover:text-indigo-800 font-semibold hover:underline transition-colors cursor-pointer flex items-center gap-1"
+                    href={`${calendarBasePath}?view=day&date=${dateStr}`}
+                    className={
+                      isSyro
+                        ? 'text-xs px-2 py-1 text-syro-blue hover:text-syro-red font-semibold hover:underline transition-colors cursor-pointer flex items-center gap-1'
+                        : 'text-xs px-2 py-1 text-indigo-600 hover:text-indigo-800 font-semibold hover:underline transition-colors cursor-pointer flex items-center gap-1'
+                    }
                   >
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />

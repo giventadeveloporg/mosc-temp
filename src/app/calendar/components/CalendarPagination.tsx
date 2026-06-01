@@ -4,13 +4,16 @@ export function CalendarPagination({
   totalCount,
   onPrevMonth,
   onNextMonth,
-  view = 'month'
+  view = 'month',
+  theme = 'default',
 }: {
   totalCount: number;
   onPrevMonth: () => void;
   onNextMonth: () => void;
   view?: 'month' | 'week' | 'day';
+  theme?: 'default' | 'syro';
 }) {
+  const isSyro = theme === 'syro';
   const page = 1;
   const totalPages = 1;
   const isPrevDisabled = false;
@@ -26,20 +29,42 @@ export function CalendarPagination({
       {/* Item Count Text - Moved to top */}
       <div className="text-center mb-4">
         {totalCount > 0 ? (
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg shadow-sm">
-            <svg className="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+          <div
+            className={
+              isSyro
+                ? 'inline-flex items-center gap-2 px-4 py-2 bg-[#f0f4f8] border-2 border-gray-200 rounded-lg shadow-sm'
+                : 'inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg shadow-sm'
+            }
+          >
+            <svg
+              className={`w-5 h-5 ${isSyro ? 'text-syro-red' : 'text-indigo-500'}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <span className="text-sm text-gray-700">
-              Showing <span className="font-bold text-indigo-700">{totalCount}</span> {totalCount === 1 ? 'event' : 'events'}
+            <span className={`text-sm ${isSyro ? 'text-syro-dark-gray font-syro-primary' : 'text-gray-700'}`}>
+              Showing{' '}
+              <span className={`font-bold ${isSyro ? 'text-syro-blue' : 'text-indigo-700'}`}>{totalCount}</span>{' '}
+              {totalCount === 1 ? 'event' : 'events'}
             </span>
           </div>
         ) : (
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg shadow-sm">
+          <div
+            className={
+              isSyro
+                ? 'inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm'
+                : 'inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg shadow-sm'
+            }
+          >
             <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="text-sm font-semibold text-orange-700">No events found</span>
+            <span className={`text-sm font-semibold ${isSyro ? 'text-orange-700 font-syro-primary' : 'text-orange-700'}`}>
+              No events found
+            </span>
           </div>
         )}
       </div>

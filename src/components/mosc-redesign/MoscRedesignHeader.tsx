@@ -12,10 +12,16 @@ import {
   MOSC_REDESIGN_SEARCH_DIRECTORY_NAV,
 } from './navConfig';
 import { ADMINISTRATION_PAGE_CARDS } from './administrationCards';
+import {
+  CALENDAR_MENU_ITEMS,
+  CALENDAR_QUICK_LINK_LABEL,
+  isCalendarNavActive,
+} from './calendarNav';
 
 const ADMINISTRATION_NAV_LABEL = 'Administration';
 const ADMINISTRATION_BASE_HREF = '/mosc-redesign/administration';
 const ADMIN_MENU_CLOSE_MS = 200;
+const CALENDAR_MENU_CLOSE_MS = 200;
 const SEARCH_DIRECTORY_ICON_SIZE = 24;
 
 function normalizePath(p: string | null): string {
@@ -43,12 +49,15 @@ export default function MoscRedesignHeader() {
   const adminNavActive = isTopNavActive(pathname, ADMINISTRATION_BASE_HREF);
 
   const adminTriggerRef = useRef<HTMLDivElement>(null);
+  const calendarTriggerRef = useRef<HTMLDivElement>(null);
   const mobileHeaderChromeRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const calendarCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mounted, setMounted] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   /** Desktop: portal menu (escapes html overflow:hidden on .syro-layout pages). */
   const [adminMenu, setAdminMenu] = useState<(AdminMenuPos & { open: true }) | null>(null);
+  const [calendarMenu, setCalendarMenu] = useState<(AdminMenuPos & { open: true }) | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -92,6 +101,36 @@ export default function MoscRedesignHeader() {
     setAdminMenu({ open: true, top: r.bottom + 4, left: r.left });
   }, [isDesktop, cancelCloseAdminMenu]);
 
+  const cancelCloseCalendarMenu = useCallback(() => {
+    if (calendarCloseTimerRef.current) {
+      clearTimeout(calendarCloseTimerRef.current);
+      calendarCloseTimerRef.current = null;
+    }
+  }, []);
+
+  const updateCalendarMenuPosition = useCallback(() => {
+    if (!calendarTriggerRef.current) return;
+    const r = calendarTriggerRef.current.getBoundingClientRect();
+    setCalendarMenu((m) =>
+      m?.open ? { open: true, top: r.bottom + 4, left: r.left } : m
+    );
+  }, []);
+
+  const scheduleCloseCalendarMenu = useCallback(() => {
+    if (calendarCloseTimerRef.current) clearTimeout(calendarCloseTimerRef.current);
+    calendarCloseTimerRef.current = setTimeout(() => {
+      setCalendarMenu(null);
+      calendarCloseTimerRef.current = null;
+    }, CALENDAR_MENU_CLOSE_MS);
+  }, []);
+
+  const openCalendarDesktopMenu = useCallback(() => {
+    if (!isDesktop || !calendarTriggerRef.current) return;
+    cancelCloseCalendarMenu();
+    const r = calendarTriggerRef.current.getBoundingClientRect();
+    setCalendarMenu({ open: true, top: r.bottom + 4, left: r.left });
+  }, [isDesktop, cancelCloseCalendarMenu]);
+
   useEffect(() => {
     if (!adminMenu?.open) return;
     const onScrollOrResize = () => updateAdminMenuPosition();
@@ -104,13 +143,26 @@ export default function MoscRedesignHeader() {
   }, [adminMenu?.open, updateAdminMenuPosition]);
 
   useEffect(() => {
+    if (!calendarMenu?.open) return;
+    const onScrollOrResize = () => updateCalendarMenuPosition();
+    window.addEventListener('scroll', onScrollOrResize, true);
+    window.addEventListener('resize', onScrollOrResize);
+    return () => {
+      window.removeEventListener('scroll', onScrollOrResize, true);
+      window.removeEventListener('resize', onScrollOrResize);
+    };
+  }, [calendarMenu?.open, updateCalendarMenuPosition]);
+
+  useEffect(() => {
     return () => {
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+      if (calendarCloseTimerRef.current) clearTimeout(calendarCloseTimerRef.current);
     };
   }, []);
 
   useEffect(() => {
     setAdminMenu(null);
+    setCalendarMenu(null);
   }, [pathname]);
 
   useLayoutEffect(() => {
@@ -156,7 +208,34 @@ export default function MoscRedesignHeader() {
 
   const adminMenuOpen = !!adminMenu?.open;
   const adminHoverOrOpen = adminNavActive || adminMenuOpen;
+  const calendarNavActive = isCalendarNavActive(pathname);
+  const calendarMenuOpen = !!calendarMenu?.open;
+  const calendarHoverOrOpen = calendarNavActive || calendarMenuOpen;
   const searchDirectoryActive = isTopNavActive(pathname, MOSC_REDESIGN_SEARCH_DIRECTORY_NAV.href);
+
+  const calendarDropdownPanel = (
+    <ul className="py-1.5">
+      {CALENDAR_MENU_ITEMS.map((item) => {
+        const subActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+        return (
+          <li key={item.href} role="none">
+            <Link
+              href={item.href}
+              role="menuitem"
+              aria-current={subActive ? 'page' : undefined}
+              className={`block px-3 py-2 text-[11px] transition-colors no-underline visited:no-underline whitespace-nowrap ${
+                subActive
+                  ? 'text-warmGold visited:text-warmGold bg-white/15 font-semibold'
+                  : 'text-white/95 visited:text-white/95 hover:text-warmGold hover:bg-white/10'
+              }`}
+            >
+              {item.label}
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
 
   const adminDropdownPanel = (
     <ul className="py-1.5">
@@ -333,6 +412,23 @@ export default function MoscRedesignHeader() {
           document.body
         )}
 
+      {mounted &&
+        isDesktop &&
+        calendarMenu?.open &&
+        createPortal(
+          <div
+            role="menu"
+            aria-label="Calendar sections"
+            className="fixed z-[10000] min-w-[14rem] rounded-md border border-white/20 bg-burgundy shadow-lg"
+            style={{ top: calendarMenu.top, left: calendarMenu.left }}
+            onMouseEnter={cancelCloseCalendarMenu}
+            onMouseLeave={scheduleCloseCalendarMenu}
+          >
+            {calendarDropdownPanel}
+          </div>,
+          document.body
+        )}
+
       {mobileMenuOpen && (
         <div
           className="fixed inset-x-0 bottom-0 z-[1001] flex min-h-0 flex-col border-t border-burgundy/20 bg-parchment-deep shadow-[0_8px_32px_rgba(61,13,13,0.12)] lg:hidden"
@@ -428,7 +524,7 @@ export default function MoscRedesignHeader() {
                       key={ql.label}
                       href={ql.href}
                       aria-current={quickActive ? 'page' : undefined}
-                      className={`text-xs py-2 px-2 rounded transition-all duration-200 no-underline visited:no-underline border-b border-burgundy/10 last:border-b-0 ${
+                      className={`text-xs py-2 px-2 rounded transition-all duration-200 no-underline visited:no-underline border-b border-burgundy/10 ${
                         quickActive
                           ? 'text-burgundy visited:text-burgundy font-semibold bg-burgundy/15'
                           : 'text-burgundy-dark visited:text-burgundy-dark hover:text-burgundy hover:bg-burgundy/10'
@@ -439,6 +535,37 @@ export default function MoscRedesignHeader() {
                     </Link>
                   );
                 })}
+                <div className="border-b border-burgundy/10 py-1">
+                  <p
+                    className={`text-xs font-semibold py-2 px-2 ${
+                      calendarNavActive ? 'text-burgundy' : 'text-burgundy-dark'
+                    }`}
+                  >
+                    {CALENDAR_QUICK_LINK_LABEL}
+                  </p>
+                  <ul className="pl-3 border-l-2 border-burgundy/25 space-y-0.5 mb-1">
+                    {CALENDAR_MENU_ITEMS.map((item) => {
+                      const subActive =
+                        pathname === item.href || pathname.startsWith(`${item.href}/`);
+                      return (
+                        <li key={item.href}>
+                          <Link
+                            href={item.href}
+                            aria-current={subActive ? 'page' : undefined}
+                            className={`block text-[11px] py-1.5 px-2 rounded transition-all duration-200 no-underline visited:no-underline ${
+                              subActive
+                                ? 'text-burgundy visited:text-burgundy font-semibold bg-burgundy/10'
+                                : 'text-burgundy-dark/90 visited:text-burgundy-dark/90 hover:text-burgundy hover:bg-burgundy/10'
+                            }`}
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {item.label}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
               </div>
             </div>
             </div>
@@ -454,12 +581,43 @@ export default function MoscRedesignHeader() {
               <Link
                 key={ql.label}
                 href={ql.href}
-                className="relative text-parchment-light visited:text-parchment-light font-semibold text-[12px] px-3 py-2 whitespace-nowrap border-r border-white/10 last:border-r-0 group overflow-hidden transition-colors duration-200 hover:text-warmGold no-underline visited:no-underline"
+                className="relative text-parchment-light visited:text-parchment-light font-semibold text-[12px] px-3 py-2 whitespace-nowrap border-r border-white/10 group overflow-hidden transition-colors duration-200 hover:text-warmGold no-underline visited:no-underline"
               >
                 <span className="absolute inset-0 bg-warmBrown scale-y-0 group-hover:scale-y-100 transition-transform duration-200 origin-bottom" />
                 <span className="relative z-10">{ql.label}</span>
               </Link>
             ))}
+            <div
+              ref={calendarTriggerRef}
+              className="relative border-r border-white/10 last:border-r-0"
+              onMouseEnter={openCalendarDesktopMenu}
+              onMouseLeave={scheduleCloseCalendarMenu}
+            >
+              <button
+                type="button"
+                aria-expanded={calendarMenuOpen}
+                aria-haspopup="menu"
+                className={`relative text-parchment-light font-semibold text-[12px] px-3 py-2 whitespace-nowrap group overflow-hidden transition-colors duration-200 hover:text-warmGold flex items-center gap-0.5 ${
+                  calendarHoverOrOpen ? 'text-warmGold' : ''
+                }`}
+              >
+                <span
+                  className={`absolute inset-0 bg-warmBrown transition-transform duration-200 origin-bottom ${
+                    calendarHoverOrOpen ? 'scale-y-100' : 'scale-y-0 group-hover:scale-y-100'
+                  }`}
+                />
+                <span className="relative z-10">{CALENDAR_QUICK_LINK_LABEL}</span>
+                <svg
+                  className={`relative z-10 w-3 h-3 ${calendarHoverOrOpen ? 'opacity-100' : 'opacity-80'}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>

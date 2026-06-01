@@ -102,7 +102,7 @@ const quickLinks: QuickLink[] = [
   { name: 'Publications', href: '/mosc-redesign/publications', icon: <BookIcon /> },
   { name: 'Spiritual Organisations', href: '/mosc-redesign/spiritual-organizations', icon: <HeartIcon /> },
   { name: 'Theological Seminaries', href: '/mosc-redesign/theological-seminaries', icon: <ChurchIcon /> },
-  { name: 'Calendar', href: '/mosc-redesign/calendar', icon: <CalendarIcon /> },
+  { name: 'Calendar', href: '/mosc-redesign/liturgical-calendar', icon: <CalendarIcon /> },
   { name: 'Lectionary', href: '/mosc-redesign/lectionary', icon: <BookOpenIcon /> },
   { name: 'News & Events', href: 'https://www.facebook.com/catholicatenews.in', icon: <NewspaperIcon />, external: true },
   { name: 'Online Resources', href: '/mosc-redesign/online-resources', icon: <GlobeIcon /> },
