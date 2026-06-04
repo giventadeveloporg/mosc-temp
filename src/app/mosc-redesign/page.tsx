@@ -6,6 +6,7 @@ import { Anek_Malayalam } from "next/font/google";
 import InteractiveWorldMap from "@/components/ui/InteractiveWorldMap";
 import MoscRedesignHeader from "@/components/mosc-redesign/MoscRedesignHeader";
 import MoscRedesignFooter from "@/components/mosc-redesign/MoscRedesignFooter";
+import ZohoSalesIqWidget from "@/components/mosc-redesign/ZohoSalesIqWidget";
 import type { LiturgyReading } from "@/app/mosc/components/SyroLiturgySection";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -611,6 +612,7 @@ export default function HomePage() {
 
       </main>
       <MoscRedesignFooter />
+      <ZohoSalesIqWidget />
     </div>);
 
 }
