@@ -34,9 +34,20 @@ DTO fields (camelCase): `thumbnailUrl`, `thumbnailPreSignedUrl`, `thumbnailPreSi
 
 `getEventMediaDisplayThumbnailUrl()` in [`src/lib/officialDocumentThumbnail.ts`](../../../src/lib/officialDocumentThumbnail.ts):
 
-1. If main file is `image/*` → use `fileUrl`
-2. Else if `thumbnailUrl` → use it
+1. If an uploaded thumbnail exists (valid presigned or stable `thumbnailUrl`) → use it
+2. Else if main file is `image/*` → use `fileUrl` (when not expired)
 3. Else → MIME/extension placeholder (public downloads)
+
+Public cards use `/api/public/official-documents/{id}/thumbnail` to mint fresh preview URLs (same pattern as download proxy).
+
+## Recommended card thumbnail size
+
+| Property | Value |
+|----------|--------|
+| Aspect ratio | **16:10** (matches `aspect-[16/10]` on download cards) |
+| Recommended upload | **800×500 px** (2× for retina; minimum **640×400 px**) |
+| Format | JPG or PNG |
+| Fit | `object-cover` — keep important content centered; edges may crop slightly |
 
 ## Deploy order
 

@@ -11,6 +11,7 @@ import { WeekView } from './components/WeekView';
 import { DayView } from './components/DayView';
 import { useCalendarNav } from './hooks/useCalendarNav';
 import { LiturgyViewSwitcher } from '@/app/mosc-redesign/(syro)/liturgical-calendar/components/LiturgyViewSwitcher';
+import pageStyles from './CalendarPage.module.css';
 
 export default function CalendarClient({
   initialEvents,
@@ -21,6 +22,7 @@ export default function CalendarClient({
   initialDate = new Date(),
   basePath = '/calendar',
   theme = 'default',
+  homepageDesign = false,
 }: {
   initialEvents: CalendarEventDTO[];
   initialYear: number;
@@ -32,6 +34,8 @@ export default function CalendarClient({
   basePath?: string;
   /** MOSC redesign shell — matches liturgical calendar Syro styling */
   theme?: 'default' | 'syro';
+  /** Homepage design system (/calendar) — particle background + glass shell */
+  homepageDesign?: boolean;
 }) {
   const isSyro = theme === 'syro';
   const searchParams = useSearchParams();
@@ -305,7 +309,9 @@ export default function CalendarClient({
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
             <span
-              className={`text-sm font-medium ${isSyro ? 'text-[#798daf] font-syro-primary' : 'text-gray-600'}`}
+              className={`text-sm font-medium ${
+                isSyro ? 'text-[#798daf] font-syro-primary' : homepageDesign ? pageStyles.loadingText : 'text-gray-600'
+              }`}
             >
               Loading events...
             </span>
@@ -332,6 +338,7 @@ export default function CalendarClient({
         onNextMonth={handleNext}
         view={displayView}
         theme={theme}
+        homepageDesign={homepageDesign}
       />
     </div>
   );

@@ -24,6 +24,7 @@ import Modal from '@/components/ui/Modal';
 import {
   getEventMediaDisplayThumbnailUrl,
   getOfficialDocumentPlaceholderKind,
+  OFFICIAL_DOCUMENT_CARD_THUMBNAIL_RECOMMENDED,
   placeholderGradient,
   placeholderLabel,
 } from '@/lib/officialDocumentThumbnail';
@@ -53,6 +54,60 @@ function resolveCoverPreviewUrl(
   if (nested) return nested;
   const doc = docs.find((x) => x.id === bundle.coverEventMediaId);
   return doc?.preSignedUrl || doc?.fileUrl || undefined;
+}
+
+function OfficialDocumentThumbnailUploadGuidance({ className = '' }: { className?: string }) {
+  return (
+    <div
+      className={`rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5 text-xs text-gray-700 space-y-2 ${className}`}
+      role="note"
+      aria-label="Recommended thumbnail size"
+    >
+      <p className="font-semibold text-blue-800">Recommended thumbnail size</p>
+      <p className="text-gray-600">
+        Download cards use a <span className="font-medium text-gray-800">16:10</span> preview frame (
+        <code className="text-[11px]">aspect-[16/10]</code>).
+      </p>
+      <table className="w-full border-collapse text-left">
+        <tbody>
+          <tr className="border-b border-blue-100">
+            <th scope="row" className="py-1 pr-3 font-semibold text-gray-800 align-top whitespace-nowrap">
+              Aspect ratio
+            </th>
+            <td className="py-1">16:10 (landscape)</td>
+          </tr>
+          <tr className="border-b border-blue-100">
+            <th scope="row" className="py-1 pr-3 font-semibold text-gray-800 align-top whitespace-nowrap">
+              Recommended upload
+            </th>
+            <td className="py-1">
+              {OFFICIAL_DOCUMENT_CARD_THUMBNAIL_RECOMMENDED.label} (good for retina; minimum 640×400 px)
+            </td>
+          </tr>
+          <tr className="border-b border-blue-100">
+            <th scope="row" className="py-1 pr-3 font-semibold text-gray-800 align-top whitespace-nowrap">
+              Format
+            </th>
+            <td className="py-1">JPG or PNG</td>
+          </tr>
+          <tr>
+            <th scope="row" className="py-1 pr-3 font-semibold text-gray-800 align-top whitespace-nowrap">
+              Display fit
+            </th>
+            <td className="py-1">
+              <code className="text-[11px]">object-cover</code> — center important content; edges may crop slightly
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p className="text-gray-600">
+        On desktop (~3 columns in <code className="text-[11px]">max-w-7xl</code>), each thumbnail is roughly{' '}
+        <span className="font-medium text-gray-800">360 px wide × 225 px tall</span>. Upload at{' '}
+        <span className="font-medium text-gray-800">{OFFICIAL_DOCUMENT_CARD_THUMBNAIL_RECOMMENDED.label}</span> so it
+        stays sharp on high-DPI screens.
+      </p>
+    </div>
+  );
 }
 
 type Props = {
@@ -739,6 +794,7 @@ export default function OfficialDocumentsClient({
               <p className="text-xs text-gray-500 mb-2">
                 Applied to every file in this batch (PDF/Office previews on the public downloads page).
               </p>
+              <OfficialDocumentThumbnailUploadGuidance className="mb-3" />
               <label className="inline-flex cursor-pointer items-center rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-sm font-medium text-violet-800 hover:bg-violet-100">
                 <input
                   ref={bulkThumbnailInputRef}
@@ -1167,12 +1223,17 @@ export default function OfficialDocumentsClient({
           {editing && (
             <div className="rounded-lg border border-gray-200 p-4 space-y-3">
               <p className="text-sm font-medium text-gray-800">Card thumbnail</p>
+              <OfficialDocumentThumbnailUploadGuidance />
               {(() => {
                 const previewUrl = getEventMediaDisplayThumbnailUrl({
                   fileUrl: editing.fileUrl,
-                  thumbnailUrl: editing.thumbnailPreSignedUrl || editing.thumbnailUrl,
+                  thumbnailUrl: editing.thumbnailUrl,
+                  thumbnailPreSignedUrl: editing.thumbnailPreSignedUrl,
                   fileDataContentType: editing.fileDataContentType || editing.contentType,
                   title: editing.title,
+                }, {
+                  thumbnailExpiresAtIso: editing.thumbnailPreSignedUrlExpiresAt,
+                  fileExpiresAtIso: editing.preSignedUrlExpiresAt,
                 });
                 const kind = getOfficialDocumentPlaceholderKind({
                   fileUrl: editing.fileUrl,
@@ -1317,12 +1378,19 @@ export default function OfficialDocumentsClient({
           </label>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Card thumbnail (optional)</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setQaThumbnailFile(e.target.files?.[0] ?? null)}
-              className="w-full text-sm"
-            />
+            <OfficialDocumentThumbnailUploadGuidance className="mb-3" />
+            <label className="inline-flex cursor-pointer items-center rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-sm font-medium text-violet-800 hover:bg-violet-100">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setQaThumbnailFile(e.target.files?.[0] ?? null)}
+                className="sr-only"
+              />
+              Choose thumbnail
+            </label>
+            {qaThumbnailFile && (
+              <p className="text-sm text-gray-700 mt-2">{qaThumbnailFile.name}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">File</label>

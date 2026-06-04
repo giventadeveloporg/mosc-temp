@@ -5,6 +5,7 @@ import { fetchMembershipPlansServer } from './plans/ApiServerActions';
 import { fetchUserSubscriptionServer } from './manage/ApiServerActions';
 import { fetchUserProfileServer } from '@/app/profile/ApiServerActions';
 import { MembershipClient } from './MembershipClient';
+import SubpageHomeDesignBackground from '@/components/SubpageHomeDesignBackground';
 import type { MembershipPlanDTO, MembershipSubscriptionDTO } from '@/types';
 
 export const metadata: Metadata = {
@@ -47,13 +48,17 @@ export default async function MembershipPage() {
   }
 
   return (
-    <MembershipClient
-      plans={plans}
-      error={error}
-      userSubscription={userSubscription}
-      isAuthenticated={isAuthenticated}
-      hasUserProfile={hasUserProfile}
-    />
+    <>
+      <SubpageHomeDesignBackground bodyClass="membership-page-background" />
+      <MembershipClient
+        plans={plans}
+        error={error}
+        userSubscription={userSubscription}
+        isAuthenticated={isAuthenticated}
+        hasUserProfile={hasUserProfile}
+        homepageDesign
+      />
+    </>
   );
 }
 

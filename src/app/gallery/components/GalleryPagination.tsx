@@ -1,5 +1,7 @@
 'use client';
 
+import pageStyles from '../GalleryPage.module.css';
+
 interface GalleryPaginationProps {
   currentPage: number;
   totalPages: number;
@@ -7,7 +9,7 @@ interface GalleryPaginationProps {
   pageSize: number;
   onPageChange: (page: number) => void;
   loading?: boolean;
-  itemType?: 'albums' | 'events'; // For display text
+  itemType?: 'albums' | 'events';
 }
 
 export function GalleryPagination({
@@ -19,7 +21,6 @@ export function GalleryPagination({
   loading = false,
   itemType = 'events',
 }: GalleryPaginationProps) {
-  // Convert 0-based to 1-based for display
   const displayPage = currentPage + 1;
   const hasResults = totalCount > 0;
   const startItem = hasResults ? currentPage * pageSize + 1 : 0;
@@ -40,16 +41,13 @@ export function GalleryPagination({
   const isPrevDisabled = currentPage === 0 || loading;
   const isNextDisabled = currentPage >= totalPages - 1 || loading;
 
-  // Always show pagination controls (like admin pages), even with few items
-
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center">
-        {/* Previous Button */}
         <button
           onClick={handlePrevPage}
           disabled={isPrevDisabled}
-          className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+          className={`${pageStyles.paginationButton} px-5 py-2.5 font-semibold rounded-lg shadow-sm border-2 flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md disabled:cursor-not-allowed disabled:hover:scale-100`}
           title="Previous Page"
           aria-label="Previous Page"
           type="button"
@@ -60,18 +58,17 @@ export function GalleryPagination({
           <span>Previous</span>
         </button>
 
-        {/* Page Info */}
-        <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
-          <span className="text-sm font-bold text-blue-700">
-            Page <span className="text-blue-600">{displayPage}</span> of <span className="text-blue-600">{totalPages}</span>
+        <div className={`${pageStyles.paginationInfo} px-4 py-2 border-2 rounded-lg shadow-sm`}>
+          <span className="text-sm font-bold">
+            Page <span className={pageStyles.paginationInfoAccent}>{displayPage}</span> of{' '}
+            <span className={pageStyles.paginationInfoAccent}>{totalPages}</span>
           </span>
         </div>
 
-        {/* Next Button */}
         <button
           onClick={handleNextPage}
           disabled={isNextDisabled}
-          className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+          className={`${pageStyles.paginationButton} px-5 py-2.5 font-semibold rounded-lg shadow-sm border-2 flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md disabled:cursor-not-allowed disabled:hover:scale-100`}
           title="Next Page"
           aria-label="Next Page"
           type="button"
@@ -83,16 +80,18 @@ export function GalleryPagination({
         </button>
       </div>
 
-      {/* Item Count Text */}
       <div className="text-center mt-3">
         {hasResults ? (
-          <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
-            <span className="text-sm text-gray-700">
-              Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> {itemType === 'albums' ? 'albums' : 'events'}
+          <div className={`${pageStyles.paginationCount} inline-flex items-center px-4 py-2 border-2 rounded-lg shadow-sm`}>
+            <span className="text-sm">
+              Showing <span className={`font-bold ${pageStyles.paginationCountAccent}`}>{startItem}</span> to{' '}
+              <span className={`font-bold ${pageStyles.paginationCountAccent}`}>{endItem}</span> of{' '}
+              <span className={`font-bold ${pageStyles.paginationCountAccent}`}>{totalCount}</span>{' '}
+              {itemType === 'albums' ? 'albums' : 'events'}
             </span>
           </div>
         ) : (
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50/90 border-2 border-orange-300 rounded-lg shadow-sm">
             <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>

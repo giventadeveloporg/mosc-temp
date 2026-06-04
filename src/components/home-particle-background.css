@@ -378,7 +378,13 @@ body.home-page-background .home-page-layout .homepage-glass-card .text-gray-700 
 body.team-page-background .header-glass,
 body.sponsors-page-background .header-glass,
 body.events-page-background .header-glass,
-body.polls-page-background .header-glass {
+body.polls-page-background .header-glass,
+body.gallery-page-background .header-glass,
+body.calendar-page-background .header-glass,
+body.focus-groups-page-background .header-glass,
+body.profile-page-background .header-glass,
+body.member-portal-page-background .header-glass,
+body.membership-page-background .header-glass {
   background: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -395,7 +401,13 @@ body.polls-page-background .header-glass {
 body.team-page-background .header-glass.header-glass--scrolled,
 body.sponsors-page-background .header-glass.header-glass--scrolled,
 body.events-page-background .header-glass.header-glass--scrolled,
-body.polls-page-background .header-glass.header-glass--scrolled {
+body.polls-page-background .header-glass.header-glass--scrolled,
+body.gallery-page-background .header-glass.header-glass--scrolled,
+body.calendar-page-background .header-glass.header-glass--scrolled,
+body.focus-groups-page-background .header-glass.header-glass--scrolled,
+body.profile-page-background .header-glass.header-glass--scrolled,
+body.member-portal-page-background .header-glass.header-glass--scrolled,
+body.membership-page-background .header-glass.header-glass--scrolled {
   background: linear-gradient(
     180deg,
     rgba(26, 10, 46, 0.95) 0%,
@@ -413,7 +425,13 @@ body.polls-page-background .header-glass.header-glass--scrolled {
 body.team-page-background .header-glass.header-glass--scrolled::after,
 body.sponsors-page-background .header-glass.header-glass--scrolled::after,
 body.events-page-background .header-glass.header-glass--scrolled::after,
-body.polls-page-background .header-glass.header-glass--scrolled::after {
+body.polls-page-background .header-glass.header-glass--scrolled::after,
+body.gallery-page-background .header-glass.header-glass--scrolled::after,
+body.calendar-page-background .header-glass.header-glass--scrolled::after,
+body.focus-groups-page-background .header-glass.header-glass--scrolled::after,
+body.profile-page-background .header-glass.header-glass--scrolled::after,
+body.member-portal-page-background .header-glass.header-glass--scrolled::after,
+body.membership-page-background .header-glass.header-glass--scrolled::after {
   content: '';
   position: absolute;
   left: 0;

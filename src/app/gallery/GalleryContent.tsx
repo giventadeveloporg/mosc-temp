@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { GalleryEventCard } from './components/GalleryEventCard';
 import { GalleryAlbumCard } from './components/GalleryAlbumCard';
 import { GalleryTabs } from './components/GalleryTabs';
@@ -8,6 +8,38 @@ import { GallerySearch } from './components/GallerySearch';
 import { GalleryPagination } from './components/GalleryPagination';
 import { fetchEventsForGallery, fetchAlbumsForGallery } from './ApiServerActions';
 import type { GalleryPageData, GalleryAlbumWithMedia } from './ApiServerActions';
+import pageStyles from './GalleryPage.module.css';
+
+function GalleryControlsPanel({ children }: { children: ReactNode }) {
+  return (
+    <div className="homepage-glass-card services-glass-card-face rounded-2xl p-6 sm:p-8 mb-8 space-y-6">
+      {children}
+    </div>
+  );
+}
+
+function GalleryGridShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{children}</div>
+    </div>
+  );
+}
+
+function GallerySkeletonCard() {
+  return (
+    <div
+      className="homepage-glass-card services-glass-card-face rounded-2xl overflow-hidden animate-pulse"
+      style={{ padding: 0 }}
+    >
+      <div className="h-48 bg-white/10" />
+      <div className="p-6 space-y-3">
+        <div className="h-4 bg-white/20 rounded w-3/4" />
+        <div className="h-3 bg-white/10 rounded w-1/2" />
+      </div>
+    </div>
+  );
+}
 
 const ITEMS_PER_PAGE = 12;
 
@@ -174,37 +206,23 @@ export function GalleryContent() {
   if (loading && initialLoad) {
     return (
       <div className="space-y-6">
-        <GalleryTabs
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          albumsCount={albumsCount}
-          eventsCount={eventsCount}
-          loading={true}
-        />
-        <GallerySearch onSearch={handleSearch} loading={loading} />
+        <GalleryControlsPanel>
+          <GalleryTabs
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            albumsCount={albumsCount}
+            eventsCount={eventsCount}
+            loading={true}
+          />
+          <GallerySearch onSearch={handleSearch} loading={loading} />
+        </GalleryControlsPanel>
 
-        {/* Grid Container with Bold Dark Gradient Background - Matching events page style */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 border border-white/10 shadow-2xl mb-8">
-          {/* Bold Dark Radial Gradient Overlay */}
-          <div className="absolute inset-0 pointer-events-none opacity-70" style={{ backgroundImage: 'radial-gradient(circle at top left, rgba(255,255,255,0.18), transparent 55%)' }} />
+        <GalleryGridShell>
+          {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+            <GallerySkeletonCard key={i} />
+          ))}
+        </GalleryGridShell>
 
-          {/* Grid Content */}
-          <div className="relative px-6 py-10 sm:px-10 lg:px-14">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
-                  <div className="h-48 bg-gray-200"></div>
-                  <div className="p-4">
-                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Always show pagination controls, even when loading */}
         <GalleryPagination
           currentPage={currentPage}
           totalPages={1}
@@ -225,20 +243,22 @@ export function GalleryContent() {
     if (!hasAlbums && !loading) {
       return (
         <div className="space-y-6">
-          <GalleryTabs
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-            albumsCount={albumsCount}
-            eventsCount={eventsCount}
-            loading={loading}
-          />
-          <GallerySearch onSearch={handleSearch} loading={loading} />
+          <GalleryControlsPanel>
+            <GalleryTabs
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+              albumsCount={albumsCount}
+              eventsCount={eventsCount}
+              loading={loading}
+            />
+            <GallerySearch onSearch={handleSearch} loading={loading} />
+          </GalleryControlsPanel>
           <div className="text-center py-12">
-            <div className="text-gray-400 text-6xl mb-4">📸</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className="text-6xl mb-4 opacity-70">📸</div>
+            <h3 className={`text-xl font-semibold mb-2 ${pageStyles.emptyStateTitle}`}>
               {hasFilters ? 'No albums found' : 'No albums available'}
             </h3>
-            <p className="text-gray-600">
+            <p className={pageStyles.emptyStateText}>
               {hasFilters
                 ? 'No albums match your search criteria. Try adjusting your filters.'
                 : 'Check back later for album photos and videos'
@@ -247,7 +267,7 @@ export function GalleryContent() {
             {hasFilters && (
               <button
                 onClick={() => handleSearch({ searchTerm: '', startDate: undefined, endDate: undefined })}
-                className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
+                className={`mt-4 font-medium ${pageStyles.emptyStateLink}`}
               >
                 Clear all filters
               </button>
@@ -269,46 +289,27 @@ export function GalleryContent() {
 
     return (
       <div className="space-y-6">
-        <GalleryTabs
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          albumsCount={albumsCount}
-          eventsCount={eventsCount}
-          loading={loading}
-        />
-        <GallerySearch onSearch={handleSearch} loading={loading} />
+        <GalleryControlsPanel>
+          <GalleryTabs
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            albumsCount={albumsCount}
+            eventsCount={eventsCount}
+            loading={loading}
+          />
+          <GallerySearch onSearch={handleSearch} loading={loading} />
+        </GalleryControlsPanel>
 
-        {/* Grid Container with Bold Dark Gradient Background - Matching events page style */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 border border-white/10 shadow-2xl mb-8">
-          {/* Bold Dark Radial Gradient Overlay */}
-          <div className="absolute inset-0 pointer-events-none opacity-70" style={{ backgroundImage: 'radial-gradient(circle at top left, rgba(255,255,255,0.18), transparent 55%)' }} />
-
-          {/* Grid Content */}
-          <div className="relative px-6 py-10 sm:px-10 lg:px-14">
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-                  <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
-                    <div className="h-48 bg-gray-200"></div>
-                    <div className="p-4">
-                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {albumsData?.albumsWithMedia?.map((albumWithMedia) => (
-                  <GalleryAlbumCard
-                    key={albumWithMedia.album.id}
-                    albumWithMedia={albumWithMedia}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        <GalleryGridShell>
+          {loading
+            ? Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => <GallerySkeletonCard key={i} />)
+            : albumsData?.albumsWithMedia?.map((albumWithMedia) => (
+                <GalleryAlbumCard
+                  key={albumWithMedia.album.id}
+                  albumWithMedia={albumWithMedia}
+                />
+              ))}
+        </GalleryGridShell>
 
         <GalleryPagination
           currentPage={currentPage}
@@ -330,20 +331,22 @@ export function GalleryContent() {
   if (!hasEvents && !loading) {
     return (
       <div className="space-y-6">
-        <GalleryTabs
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          albumsCount={albumsCount}
-          eventsCount={eventsCount}
-          loading={loading}
-        />
-        <GallerySearch onSearch={handleSearch} loading={loading} />
+        <GalleryControlsPanel>
+          <GalleryTabs
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            albumsCount={albumsCount}
+            eventsCount={eventsCount}
+            loading={loading}
+          />
+          <GallerySearch onSearch={handleSearch} loading={loading} />
+        </GalleryControlsPanel>
         <div className="text-center py-12">
-          <div className="text-gray-400 text-6xl mb-4">📸</div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <div className="text-6xl mb-4 opacity-70">📸</div>
+          <h3 className={`text-xl font-semibold mb-2 ${pageStyles.emptyStateTitle}`}>
             {hasFilters ? 'No events found' : 'No events available'}
           </h3>
-          <p className="text-gray-600">
+          <p className={pageStyles.emptyStateText}>
             {hasFilters
               ? 'No events match your search criteria. Try adjusting your filters.'
               : 'Check back later for event photos and videos'
@@ -352,7 +355,7 @@ export function GalleryContent() {
           {hasFilters && (
             <button
               onClick={() => handleSearch({ searchTerm: '', startDate: undefined, endDate: undefined })}
-              className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
+              className={`mt-4 font-medium ${pageStyles.emptyStateLink}`}
             >
               Clear all filters
             </button>
@@ -376,46 +379,27 @@ export function GalleryContent() {
 
   return (
     <div className="space-y-6">
-      <GalleryTabs
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        albumsCount={albumsCount}
-        eventsCount={eventsCount}
-        loading={loading}
-      />
-      <GallerySearch onSearch={handleSearch} loading={loading} />
+      <GalleryControlsPanel>
+        <GalleryTabs
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          albumsCount={albumsCount}
+          eventsCount={eventsCount}
+          loading={loading}
+        />
+        <GallerySearch onSearch={handleSearch} loading={loading} />
+      </GalleryControlsPanel>
 
-      {/* Grid Container with Bold Dark Gradient Background - Matching events page style */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 border border-white/10 shadow-2xl mb-8">
-        {/* Bold Dark Radial Gradient Overlay */}
-        <div className="absolute inset-0 pointer-events-none opacity-70" style={{ backgroundImage: 'radial-gradient(circle at top left, rgba(255,255,255,0.18), transparent 55%)' }} />
-
-        {/* Grid Content */}
-        <div className="relative px-6 py-10 sm:px-10 lg:px-14">
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
-                  <div className="h-48 bg-gray-200"></div>
-                  <div className="p-4">
-                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {eventsWithMedia?.map((eventWithMedia) => (
-                <GalleryEventCard
-                  key={eventWithMedia.event.id}
-                  eventWithMedia={eventWithMedia}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+      <GalleryGridShell>
+        {loading
+          ? Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => <GallerySkeletonCard key={i} />)
+          : eventsWithMedia?.map((eventWithMedia) => (
+              <GalleryEventCard
+                key={eventWithMedia.event.id}
+                eventWithMedia={eventWithMedia}
+              />
+            ))}
+      </GalleryGridShell>
 
       <GalleryPagination
         currentPage={currentPage}

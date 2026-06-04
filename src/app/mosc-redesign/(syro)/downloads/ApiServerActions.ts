@@ -5,6 +5,7 @@ import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { EventMediaDTO } from '@/types';
 import { parseHierarchyDescription } from '@/lib/officialDocumentHierarchy';
 import { resolveOfficialDocumentDownloadUrl } from '@/lib/officialDocumentDownload';
+import { getEventMediaDisplayThumbnailUrl } from '@/lib/officialDocumentThumbnail';
 
 /** Public tenant official documents for the downloads page (server-side JWT). */
 export async function fetchPublicOfficialDocumentsForDownloadsServer(): Promise<EventMediaDTO[]> {
@@ -140,7 +141,20 @@ export async function fetchPublicOfficialDocumentsTreeServer(input?: {
         priorityRanking: doc.displayPriority ?? parsed.priority ?? doc.priorityRanking ?? 999999,
         description: parsed.cleanDescription || null,
         downloadUrl: resolveOfficialDocumentDownloadUrl(doc),
-        thumbnailUrl: doc.thumbnailPreSignedUrl || doc.thumbnailUrl || null,
+        thumbnailUrl: getEventMediaDisplayThumbnailUrl(
+          {
+            fileUrl: doc.fileUrl,
+            thumbnailUrl: doc.thumbnailUrl,
+            thumbnailPreSignedUrl: doc.thumbnailPreSignedUrl,
+            fileDataContentType: doc.fileDataContentType || doc.contentType,
+            title: doc.title,
+            fileName: (doc.fileUrl || '').split('/').pop() || doc.title,
+          },
+          {
+            thumbnailExpiresAtIso: doc.thumbnailPreSignedUrlExpiresAt,
+            fileExpiresAtIso: doc.preSignedUrlExpiresAt,
+          }
+        ),
         fileUrl: doc.fileUrl || null,
         fileDataContentType: doc.fileDataContentType || doc.contentType || null,
         createdAt: doc.createdAt,

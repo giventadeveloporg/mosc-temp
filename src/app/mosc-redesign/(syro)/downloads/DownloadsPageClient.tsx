@@ -2,11 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import SyroPageBanner from '../components/SyroPageBanner';
 import {
-  getEventMediaDisplayThumbnailUrl,
+  getOfficialDocumentCardThumbnailSrc,
   getOfficialDocumentPlaceholderKind,
   placeholderGradient,
   placeholderLabel,
@@ -286,20 +285,22 @@ function DownloadCard({
     fileName: file.fileName,
     title: file.fileName,
   };
-  const displayThumb = getEventMediaDisplayThumbnailUrl(thumbInput);
   const placeholderKind = getOfficialDocumentPlaceholderKind(thumbInput);
+  const [thumbFailed, setThumbFailed] = React.useState(false);
+  const displayThumb = getOfficialDocumentCardThumbnailSrc(file.id, thumbInput);
 
   return (
     <article className="bg-white rounded-xl border border-syro-gold/25 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col h-full">
       <div className="relative w-full aspect-[16/10] bg-syro-bg-gray border-b border-syro-gold/20">
-        {displayThumb ? (
-          <Image
+        {displayThumb && !thumbFailed ? (
+          // Native img: proxy thumbnails use 302 redirects; Next/Image lazy loading can stall on redirect chains.
+          <img
             src={displayThumb}
             alt=""
-            fill
-            className="object-cover"
-            sizes="(min-width: 1024px) 280px, 50vw"
-            unoptimized
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="eager"
+            decoding="async"
+            onError={() => setThumbFailed(true)}
           />
         ) : (
           <div
@@ -478,10 +479,14 @@ function YearFilterBar({
   yearOptions,
   currentFilters,
   buildFilterHref,
+  searchQuery,
+  onSearchChange,
 }: {
   yearOptions: number[];
   currentFilters: { categoryId: number | null; year: number | null };
   buildFilterHref: (categoryId: number | null, year: number | null) => string;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
 }) {
   const router = useRouter();
   const currentCalendarYear = new Date().getFullYear();
@@ -547,6 +552,26 @@ function YearFilterBar({
             </select>
           </label>
         ) : null}
+
+        {/* Search documents — pushed to the right-most end of the filter row */}
+        <div className="ml-auto w-full sm:w-auto">
+          <label className="relative block">
+            <span className="sr-only">Search downloads</span>
+            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-syro-blue/50">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.35-5.4a6.75 6.75 0 11-13.5 0 6.75 6.75 0 0113.5 0z" />
+              </svg>
+            </span>
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Search documents…"
+              className="w-full sm:w-64 rounded-md border-2 border-syro-gold/40 bg-white py-1.5 pl-9 pr-3 text-xs font-semibold text-syro-blue placeholder:font-normal placeholder:text-gray-400 focus:border-syro-blue focus:outline-none focus:ring-2 focus:ring-syro-blue/30"
+              aria-label="Search documents on this page"
+            />
+          </label>
+        </div>
       </div>
     </div>
   );
@@ -639,6 +664,26 @@ export default function DownloadsPageClient({
   const [downloadingId, setDownloadingId] = React.useState<number | null>(null);
   const [downloadSuccess, setDownloadSuccess] = React.useState<DownloadSuccessState | null>(null);
   const [downloadError, setDownloadError] = React.useState<DownloadErrorState | null>(null);
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  const filteredDownloads = React.useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return sortedDownloads;
+    return sortedDownloads.filter((file) => {
+      const haystack = [
+        file.fileName,
+        file.description ?? '',
+        file.categoryLabel ?? '',
+        getFolderPath(file),
+        file.officialDocumentYear ? String(file.officialDocumentYear) : '',
+      ]
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [sortedDownloads, searchQuery]);
+
+  const isSearching = searchQuery.trim().length > 0;
 
   const handleDownload = React.useCallback(async (file: TreeItem) => {
     if (!file.downloadUrl) {
@@ -752,6 +797,8 @@ export default function DownloadsPageClient({
                 yearOptions={officialTreePage.yearOptions}
                 currentFilters={currentFilters}
                 buildFilterHref={queryWithFilter}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
               />
 
               <CategoryFilterBar
@@ -761,13 +808,23 @@ export default function DownloadsPageClient({
               />
             </div>
 
-            {officialTreePage.content.length === 0 ? (
+            {isSearching ? (
+              <div className="mb-4 text-sm text-gray-600">
+                Showing <span className="font-semibold">{filteredDownloads.length}</span> of{' '}
+                <span className="font-semibold">{sortedDownloads.length}</span> files on this page matching{' '}
+                <span className="font-semibold">&ldquo;{searchQuery.trim()}&rdquo;</span>.
+              </div>
+            ) : null}
+
+            {filteredDownloads.length === 0 ? (
               <div className="rounded-lg border border-syro-gold/25 bg-syro-bg-gray/50 px-5 py-6 text-sm text-gray-500">
-                No files available for the selected filters.
+                {isSearching
+                  ? `No files on this page match "${searchQuery.trim()}". Try a different search term or clear the search.`
+                  : 'No files available for the selected filters.'}
               </div>
             ) : (
               <DownloadsGrid
-                files={sortedDownloads}
+                files={filteredDownloads}
                 onDownload={handleDownload}
                 downloadingId={downloadingId}
               />
