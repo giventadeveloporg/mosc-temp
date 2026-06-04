@@ -18,6 +18,12 @@ export const SYRO_CATHOLICOS_LINKS: CatholicosLinkItem[] = [
   { name: 'H.H. Baselios Marthoma Mathews II', period: '1991–2005', description: 'The Sixth Catholicos of the East in Malankara', href: '/mosc-redesign/catholicate/his-holiness-baselios-marthoma-mathews-ii-sixth-catholicos-of-the-east-in-malankara' },
   { name: 'H.H. Baselios Marthoma Didymos I', period: '2005–2010', description: 'The Seventh Catholicos of the East in Malankara', href: '/mosc-redesign/catholicate/his-holiness-baselios-marthoma-didymos-i-seventh-catholicos-of-the-east-in-malankara' },
   { name: 'H.H. Baselios Marthoma Paulose II', period: '2010–2021', description: 'The Eighth Catholicos of the East in Malankara', href: '/mosc-redesign/catholicate/h-h-baselios-marthoma-paulose-ii' },
+  {
+    name: 'H.H. Baselios Marthoma Mathews III',
+    period: '2021–present',
+    description: 'The Ninth Catholicos of the East in Malankara (current Catholicos)',
+    href: '/mosc-redesign/holy-synod/his-holiness-baselios-marthoma-mathews-iii',
+  },
 ];
 
 /** Full sidebar list: Introduction, then all Catholicoi. Use for consistent right sidebar on all catholicate subpages. */
