@@ -261,6 +261,12 @@ export async function patchOfficialDocumentMediaServer(
       officialDocumentCategoryId: updates.officialDocumentCategoryId,
       eventMediaType: existing.eventMediaType || 'gallery',
       storageType: existing.storageType || 's3',
+      // Backend EventMediaDTO marks these as @NotNull; merge-patch validation rejects
+      // the request if they are absent, so carry them over from the existing record.
+      isHomePageHeroImage: existing.isHomePageHeroImage ?? false,
+      isFeaturedEventImage: existing.isFeaturedEventImage ?? false,
+      isLiveEventImage: existing.isLiveEventImage ?? false,
+      createdAt: existing.createdAt ?? new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
     const res = await fetchWithJwtRetry(url, {

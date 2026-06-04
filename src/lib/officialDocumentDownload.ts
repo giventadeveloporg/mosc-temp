@@ -57,6 +57,14 @@ export function getOfficialDocumentProxyDownloadPath(mediaId: number | null | un
   return `/api/public/official-documents/${mediaId}/download`;
 }
 
+/** Same-origin proxy route that resolves a fresh thumbnail/preview URL on each request. */
+export function getOfficialDocumentProxyThumbnailPath(mediaId: number | null | undefined): string | null {
+  if (mediaId == null || !Number.isFinite(mediaId) || mediaId <= 0) {
+    return null;
+  }
+  return `/api/public/official-documents/${mediaId}/thumbnail`;
+}
+
 /**
  * Pick a download URL for list/card display.
  * Prefer the proxy path so clicks never use expired DB presigned URLs.

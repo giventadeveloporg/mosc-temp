@@ -1,4 +1,9 @@
 import type { EventMediaDTO } from '@/types';
+import {
+  getOfficialDocumentProxyThumbnailPath,
+  isAwsPresignedQueryUrl,
+  isPresignedUrlExpired,
+} from '@/lib/officialDocumentDownload';
 
 export type EventMediaThumbnailInput = Pick<
   EventMediaDTO,
@@ -8,6 +13,16 @@ export type EventMediaThumbnailInput = Pick<
 };
 
 export type OfficialDocumentPlaceholderKind = 'pdf' | 'word' | 'excel' | 'image' | 'generic';
+
+/** Card preview frame on /mosc-redesign/downloads (Tailwind aspect-[16/10]). */
+export const OFFICIAL_DOCUMENT_CARD_THUMBNAIL_ASPECT = '16 / 10';
+
+/** Recommended upload size for download card thumbnails (2× desktop ~400px width). */
+export const OFFICIAL_DOCUMENT_CARD_THUMBNAIL_RECOMMENDED = {
+  width: 800,
+  height: 500,
+  label: '800×500 px (16:10)',
+} as const;
 
 function mimeFromMedia(media: EventMediaThumbnailInput): string {
   const mime = (media.fileDataContentType || media.contentType || '').toLowerCase();
@@ -25,17 +40,87 @@ export function isImageMime(mime: string): boolean {
   return mime.startsWith('image/');
 }
 
+function pickUsableUrl(
+  preSigned?: string | null,
+  stable?: string | null,
+  expiresAtIso?: string | null
+): string | null {
+  const pre = preSigned?.trim();
+  if (pre && !isPresignedUrlExpired(pre, expiresAtIso)) {
+    return pre;
+  }
+
+  const stableUrl = stable?.trim();
+  if (!stableUrl) {
+    return null;
+  }
+
+  if (isAwsPresignedQueryUrl(stableUrl)) {
+    return isPresignedUrlExpired(stableUrl, expiresAtIso) ? null : stableUrl;
+  }
+
+  return stableUrl;
+}
+
 /** Resolved URL for card/list preview, or null when a placeholder should be shown. */
-export function getEventMediaDisplayThumbnailUrl(media: EventMediaThumbnailInput): string | null {
+export function getEventMediaDisplayThumbnailUrl(
+  media: EventMediaThumbnailInput,
+  options?: {
+    thumbnailExpiresAtIso?: string | null;
+    fileExpiresAtIso?: string | null;
+  }
+): string | null {
+  const uploadedThumb = pickUsableUrl(
+    media.thumbnailPreSignedUrl,
+    media.thumbnailUrl,
+    options?.thumbnailExpiresAtIso
+  );
+  if (uploadedThumb) {
+    return uploadedThumb;
+  }
+
   const mime = mimeFromMedia(media);
   if (isImageMime(mime) && media.fileUrl) {
-    return media.fileUrl;
+    const fileUrl = media.fileUrl.trim();
+    if (isAwsPresignedQueryUrl(fileUrl)) {
+      return isPresignedUrlExpired(fileUrl, options?.fileExpiresAtIso) ? null : fileUrl;
+    }
+    return fileUrl;
   }
-  const thumb = media.thumbnailPreSignedUrl || media.thumbnailUrl;
-  if (thumb && thumb.trim().length > 0) {
-    return thumb;
-  }
+
   return null;
+}
+
+/** True when the record may have a preview image (uploaded thumb or image main file). */
+export function hasOfficialDocumentDisplayThumbnail(
+  media: EventMediaThumbnailInput,
+  options?: {
+    thumbnailExpiresAtIso?: string | null;
+    fileExpiresAtIso?: string | null;
+  }
+): boolean {
+  if (media.thumbnailUrl?.trim() || media.thumbnailPreSignedUrl?.trim()) {
+    return true;
+  }
+  return isImageMime(mimeFromMedia(media));
+}
+
+/**
+ * Prefer the same-origin thumbnail proxy when a media id is available so cards never
+ * rely on expired presigned URLs stored in event_media.
+ */
+export function getOfficialDocumentCardThumbnailSrc(
+  mediaId: number | null | undefined,
+  media: EventMediaThumbnailInput,
+  options?: {
+    thumbnailExpiresAtIso?: string | null;
+    fileExpiresAtIso?: string | null;
+  }
+): string | null {
+  if (mediaId != null && hasOfficialDocumentDisplayThumbnail(media, options)) {
+    return getOfficialDocumentProxyThumbnailPath(mediaId);
+  }
+  return getEventMediaDisplayThumbnailUrl(media, options);
 }
 
 export function getOfficialDocumentPlaceholderKind(

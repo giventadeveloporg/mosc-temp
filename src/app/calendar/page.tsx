@@ -1,12 +1,18 @@
 import { fetchEventsForMonthServer } from './ApiServerActions';
 import CalendarClient from './CalendarClient';
+import CalendarPageBackground from './CalendarPageBackground';
+import { HomeSectionTitle } from '@/components/HomeSectionTitle';
+import pageStyles from './CalendarPage.module.css';
 
-export default async function CalendarPage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+export default async function CalendarPage({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) {
   const today = new Date();
   let year = today.getFullYear();
   let month = today.getMonth() + 1;
 
-  // Parse date from query params if provided
   const dateParam = typeof searchParams?.date === 'string' ? searchParams.date : undefined;
   if (dateParam) {
     try {
@@ -15,7 +21,7 @@ export default async function CalendarPage({ searchParams }: { searchParams?: { 
         year = date.getFullYear();
         month = date.getMonth() + 1;
       }
-    } catch (e) {
+    } catch {
       // Invalid date, use today
     }
   }
@@ -26,31 +32,35 @@ export default async function CalendarPage({ searchParams }: { searchParams?: { 
   const initialEvents = await fetchEventsForMonthServer(year, month, focusGroup);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50" style={{ paddingTop: '120px' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Page Header */}
-        <div className="mb-4 sm:mb-6 md:mb-8">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center sm:text-left">
-            Event Calendar
-          </h1>
-          <p className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
-            Browse and explore upcoming events across all months
-          </p>
-        </div>
+    <>
+      <CalendarPageBackground />
+      <div
+        className={`${pageStyles.calendarPage} home-page-layout relative z-[1] min-h-screen w-full overflow-x-hidden`}
+      >
+        <div
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+          style={{ paddingTop: '120px', paddingBottom: '2rem' }}
+        >
+          <div className="text-center mb-8 sm:mb-10 md:mb-12">
+            <HomeSectionTitle className="mb-4">Event Calendar</HomeSectionTitle>
+            <p className={`${pageStyles.pageDescription} text-lg max-w-3xl mx-auto`}>
+              Browse and explore upcoming events across all months
+            </p>
+          </div>
 
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <CalendarClient
-            initialEvents={initialEvents}
-            initialYear={year}
-            initialMonth={month}
-            focusGroup={focusGroup}
-            initialView={initialView as 'month' | 'week' | 'day'}
-            initialDate={initialDate}
-          />
+          <div className="homepage-glass-card services-glass-card-face rounded-2xl p-6 sm:p-8">
+            <CalendarClient
+              initialEvents={initialEvents}
+              initialYear={year}
+              initialMonth={month}
+              focusGroup={focusGroup}
+              initialView={initialView as 'month' | 'week' | 'day'}
+              initialDate={initialDate}
+              homepageDesign
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
-
-

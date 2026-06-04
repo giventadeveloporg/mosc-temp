@@ -415,7 +415,7 @@ export default function HomePage() {
             <div className="lg:col-span-2 flex justify-center lg:justify-start">
               <div className="w-full max-w-[320px] rounded-2xl overflow-hidden aspect-[3/4] relative shadow-xl border border-burgundy/30 hover:border-burgundy/60 transition-all duration-300 hover:shadow-burgundy/30">
                 <Image
-                  src="/mosc/assets/images/mosc_images/Baselios_Marthoma_Mathews_III_Halo.jpg"
+                  src="/images/holy-synod/H.H-Baselios-Marthoma-Mathews-III.jpg"
                   alt="His Holiness Baselios Marthoma Mathews III, Catholicos of the East and Malankara Metropolitan, in full episcopal vestments"
                   fill
                   className="object-cover" />

@@ -128,7 +128,7 @@ The homepage uses a **single-column, vertically-stacked section layout** layered
 **Component:** `src/components/Header.tsx` (`'use client'`)
 
 | Property | Specification |
-|----------|---------------|
+|----------|---------------|DD
 | Position | Fixed top bar, height `--header-bar-height: 8rem` (128px) |
 | Background | Glassmorphic: `var(--homepage-section-bg-glass)` `rgba(240,253,244,0.94)` with `backdrop-filter: blur(20px) saturate(180%)` |
 | Scroll behavior | `.header-glass--scrolled` strengthens background to `rgba(240,253,244,0.98)` + adds `box-shadow 0 4px 20px rgba(15,23,42,0.08)` and a hairline bottom border (non-home pages) |

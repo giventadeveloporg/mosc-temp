@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { HomeSectionTitle } from '@/components/HomeSectionTitle';
+import subpageStyles from '@/components/SubpageHomeDesign.module.css';
 
 const publicKey = process.env.NEXT_PUBLIC_MEMBERSTACK_PUBLIC_KEY?.trim() || '';
 const freePlanId = process.env.NEXT_PUBLIC_MEMBERSTACK_FREE_PLAN_ID?.trim() || '';
@@ -23,7 +25,7 @@ type MemberstackInstance = {
   purchasePlansWithCheckout?: (params: { priceId: string; successUrl?: string; cancelUrl?: string }) => Promise<unknown>;
 };
 
-export default function MemberPortalClient() {
+export default function MemberPortalClient({ homepageDesign = false }: { homepageDesign?: boolean }) {
   const [memberstackReady, setMemberstackReady] = useState(false);
   const [currentMember, setCurrentMember] = useState<MemberstackMember | null | undefined>(undefined);
   const [initError, setInitError] = useState<string | null>(null);
@@ -96,23 +98,34 @@ export default function MemberPortalClient() {
     ms.openModal('PROFILE').then(() => refreshMember(ms));
   };
 
+  const pageTitle = homepageDesign ? (
+    <div className="text-center mb-6">
+      <HomeSectionTitle className="mb-4">Members</HomeSectionTitle>
+    </div>
+  ) : (
+    <h1 className="font-heading font-semibold text-2xl text-foreground mb-4">Members</h1>
+  );
+
   if (initError) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-12">
+      <>
+        {pageTitle}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
           <h2 className="font-heading font-semibold text-lg text-amber-800 mb-2">Members portal</h2>
           <p className="text-amber-700 text-sm">{initError}</p>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-12">
-      <div className="bg-card rounded-lg sacred-shadow p-6">
-        <h1 className="font-heading font-semibold text-2xl text-foreground mb-4">Members</h1>
+    <div>
+      {pageTitle}
+      <div className={homepageDesign ? '' : 'bg-card rounded-lg sacred-shadow p-6'}>
         {!memberstackReady ? (
-          <p className="text-muted-foreground">Loading member portal…</p>
+          <p className={homepageDesign ? subpageStyles.loadingText : 'text-muted-foreground'}>
+            Loading member portal…
+          </p>
         ) : (
           <>
             <p className="font-body text-muted-foreground mb-4">

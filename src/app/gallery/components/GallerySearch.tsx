@@ -43,13 +43,7 @@ export function GallerySearch({ onSearch, loading = false }: GallerySearchProps)
   const hasFilters = searchTerm || startDate || endDate;
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-background via-muted to-background border border-border/30 sacred-shadow-lg mb-8">
-      {/* Search Section Container with Conservative Gradient Background - Per media_gallery_grid_style.mdc */}
-      {/* Subtle Radial Gradient Overlay */}
-      <div className="absolute inset-0 pointer-events-none opacity-40" style={{ backgroundImage: 'radial-gradient(circle at top left, rgba(139, 125, 107, 0.08), transparent 55%)' }} />
-
-      {/* Search Content */}
-      <div className="relative px-6 py-10 sm:px-10 lg:px-14">
+    <div>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Main search input */}
           <div className="relative max-w-md">
@@ -180,7 +174,6 @@ export function GallerySearch({ onSearch, loading = false }: GallerySearchProps)
         <p className="mt-2 text-sm text-gray-600">
           Search by event title and optionally filter by date range to find specific events and their media
         </p>
-      </div>
     </div>
   );
 }

@@ -2696,6 +2696,63 @@ body.polls-page-background .home-page-layout .text-center.py-12 svg.text-gray-40
   color: rgba(226, 232, 240, 0.6) !important;
 }
 
+/* ── Gallery page: text readability on the homepage particle background ── */
+body.gallery-page-background .home-page-layout .services-glass-card-face .text-gray-700,
+body.gallery-page-background .home-page-layout .services-glass-card-face .text-gray-400,
+body.gallery-page-background .home-page-layout .homepage-glass-card .text-gray-700,
+body.gallery-page-background .home-page-layout .homepage-glass-card .text-gray-400 {
+  color: #312e81 !important;
+}
+
+body.gallery-page-background .home-page-layout .text-center > p.text-gray-600,
+body.gallery-page-background .home-page-layout .homepage-glass-card p.text-gray-600 {
+  color: #475569 !important;
+}
+
+/* ── Calendar page: text readability on the homepage particle background ── */
+body.calendar-page-background .home-page-layout .services-glass-card-face .text-gray-700,
+body.calendar-page-background .home-page-layout .services-glass-card-face .text-gray-400,
+body.calendar-page-background .home-page-layout .homepage-glass-card .text-gray-700,
+body.calendar-page-background .home-page-layout .homepage-glass-card .text-gray-400 {
+  color: #312e81 !important;
+}
+
+body.calendar-page-background .home-page-layout .text-center > p.text-gray-600,
+body.calendar-page-background .home-page-layout .homepage-glass-card p.text-gray-600 {
+  color: #475569 !important;
+}
+
+/* ── Focus groups, profile, member-portal, membership: glass text on particle background ── */
+body.focus-groups-page-background .home-page-layout .services-glass-card-face .text-gray-700,
+body.focus-groups-page-background .home-page-layout .services-glass-card-face .text-gray-400,
+body.focus-groups-page-background .home-page-layout .homepage-glass-card .text-gray-700,
+body.focus-groups-page-background .home-page-layout .homepage-glass-card .text-gray-400,
+body.profile-page-background .home-page-layout .services-glass-card-face .text-gray-700,
+body.profile-page-background .home-page-layout .services-glass-card-face .text-gray-400,
+body.profile-page-background .home-page-layout .homepage-glass-card .text-gray-700,
+body.profile-page-background .home-page-layout .homepage-glass-card .text-gray-400,
+body.member-portal-page-background .home-page-layout .services-glass-card-face .text-gray-700,
+body.member-portal-page-background .home-page-layout .services-glass-card-face .text-gray-400,
+body.member-portal-page-background .home-page-layout .homepage-glass-card .text-gray-700,
+body.member-portal-page-background .home-page-layout .homepage-glass-card .text-gray-400,
+body.membership-page-background .home-page-layout .services-glass-card-face .text-gray-700,
+body.membership-page-background .home-page-layout .services-glass-card-face .text-gray-400,
+body.membership-page-background .home-page-layout .homepage-glass-card .text-gray-700,
+body.membership-page-background .home-page-layout .homepage-glass-card .text-gray-400 {
+  color: #312e81 !important;
+}
+
+body.focus-groups-page-background .home-page-layout .text-center > p.text-gray-600,
+body.focus-groups-page-background .home-page-layout .homepage-glass-card p.text-gray-600,
+body.profile-page-background .home-page-layout .text-center > p.text-gray-600,
+body.profile-page-background .home-page-layout .homepage-glass-card p.text-gray-600,
+body.member-portal-page-background .home-page-layout .text-center > p.text-gray-600,
+body.member-portal-page-background .home-page-layout .homepage-glass-card p.text-gray-600,
+body.membership-page-background .home-page-layout .text-center > p.text-gray-600,
+body.membership-page-background .home-page-layout .homepage-glass-card p.text-gray-600 {
+  color: #475569 !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .services-glass-card-wrap {
     opacity: 1;

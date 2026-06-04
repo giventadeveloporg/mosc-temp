@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,8 @@ import { MembershipPaymentRequestButton } from '@/components/membership/Membersh
 import { createSubscriptionCheckoutSessionServer } from './subscribe/[planId]/ApiServerActions';
 import { cancelSubscriptionServer } from './manage/ApiServerActions';
 import type { MembershipPlanDTO, MembershipSubscriptionDTO } from '@/types';
+import { HomeSectionTitle } from '@/components/HomeSectionTitle';
+import subpageStyles from '@/components/SubpageHomeDesign.module.css';
 
 interface MembershipClientProps {
   plans: MembershipPlanDTO[];
@@ -27,9 +29,17 @@ interface MembershipClientProps {
   userSubscription?: MembershipSubscriptionDTO | null;
   isAuthenticated?: boolean;
   hasUserProfile?: boolean;
+  homepageDesign?: boolean;
 }
 
-export function MembershipClient({ plans, error, userSubscription, isAuthenticated: serverIsAuthenticated = false, hasUserProfile: serverHasUserProfile = false }: MembershipClientProps) {
+export function MembershipClient({
+  plans,
+  error,
+  userSubscription,
+  isAuthenticated: serverIsAuthenticated = false,
+  hasUserProfile: serverHasUserProfile = false,
+  homepageDesign = false,
+}: MembershipClientProps) {
   const router = useRouter();
   const { userId } = useAuth();
   const { user, isLoaded: isUserLoaded } = useUser();
@@ -202,28 +212,64 @@ export function MembershipClient({ plans, error, userSubscription, isAuthenticat
       !userSubscription.cancelAtPeriodEnd;
   };
 
-  if (error) {
-    return (
-      <div className="max-w-5xl mx-auto px-8 py-8">
-        <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-md">
-          {error}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-background pt-20">
-      <div className="max-w-5xl mx-auto px-8 py-8">
-        {/* Header Section */}
-        <div className="text-center mb-12">
+  const membershipHeader = (
+    <div className="text-center mb-12">
+      {homepageDesign ? (
+        <>
+          <HomeSectionTitle className="mb-4">Membership Plans</HomeSectionTitle>
+          <p className={`${subpageStyles.pageDescription} text-lg max-w-3xl mx-auto`}>
+            Join our community and unlock exclusive benefits, access to events, and more.
+          </p>
+        </>
+      ) : (
+        <>
           <h1 className="text-4xl font-heading font-bold text-foreground mb-4">
             Membership Plans
           </h1>
           <p className="text-lg font-body text-muted-foreground max-w-3xl mx-auto">
             Join our community and unlock exclusive benefits, access to events, and more.
           </p>
+        </>
+      )}
+    </div>
+  );
+
+  const wrapMembershipContent = (children: ReactNode) => {
+    if (!homepageDesign) {
+      return (
+        <div className="min-h-screen bg-background pt-20">
+          <div className="max-w-5xl mx-auto px-8 py-8">
+            {membershipHeader}
+            {children}
+          </div>
         </div>
+      );
+    }
+    return (
+      <div
+        className={`${subpageStyles.subpageRoot} home-page-layout relative z-[1] min-h-screen w-full overflow-x-hidden`}
+      >
+        <div
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+          style={{ paddingTop: '120px', paddingBottom: '2rem' }}
+        >
+          {membershipHeader}
+          <div className="homepage-glass-card services-glass-card-face rounded-2xl p-6 sm:p-8 max-w-5xl mx-auto">
+            {children}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  if (error) {
+    return wrapMembershipContent(
+      <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-md">{error}</div>
+    );
+  }
+
+  return wrapMembershipContent(
+    <>
 
         {/* Informational Box: Authentication & Registration Status */}
         {isUserLoaded && (
@@ -668,7 +714,6 @@ export function MembershipClient({ plans, error, userSubscription, isAuthenticat
             </div>
           </div>
         </div>
-      </div>
 
       {/* Cancel Subscription Confirmation Dialog */}
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
@@ -713,7 +758,7 @@ export function MembershipClient({ plans, error, userSubscription, isAuthenticat
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 }
 
