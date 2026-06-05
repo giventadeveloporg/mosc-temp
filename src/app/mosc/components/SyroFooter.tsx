@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTenantSettings } from '@/components/TenantSettingsProvider';
 import { InstagramIcon } from '@/components/icons/InstagramIcon';
+import { buildContactFormPayload } from '@/lib/contactForm';
 
 const QUICK_LINKS = [
   { name: 'CATHOLICATE NEWS', href: '/mosc/news' },
@@ -61,13 +62,12 @@ export default function SyroFooter() {
       ? `${message}\n\nPhone: ${formData.phone_number.trim()}`
       : message;
 
-    const payload = {
+    const payload = buildContactFormPayload({
       firstName,
       lastName,
       messageBody,
-      fromEmail: email,
-      toEmail: process.env.NEXT_PUBLIC_MOSC_CONTACT_TO_EMAIL || 'info@mosc.in',
-    };
+      senderEmail: email,
+    });
 
     try {
       const response = await fetch('/api/proxy/contact-form-email', {

@@ -19,6 +19,10 @@ export const CALENDAR_MENU_ITEMS: CalendarMenuItem[] = [
     label: 'MOSC Calendar',
     href: '/mosc-redesign/mosc-calendar',
   },
+  {
+    label: 'Holy Synod CMS',
+    href: '/mosc-redesign/holy-synod-cms',
+  },
 ];
 
 export function isCalendarNavActive(pathname: string): boolean {

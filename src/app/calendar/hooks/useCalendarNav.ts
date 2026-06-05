@@ -7,21 +7,21 @@ export function useCalendarNav(initialYear: number, initialMonth: number) {
   const [view, setView] = useState<CalendarView>('month');
 
   function prev() {
-    if (view === 'month') {
-      setMonth(m => {
-        const newMonth = m === 1 ? 12 : m - 1;
-        if (m === 1) setYear(y => y - 1);
-        return newMonth;
-      });
+    if (view !== 'month') return;
+    if (month === 1) {
+      setYear(year - 1);
+      setMonth(12);
+    } else {
+      setMonth(month - 1);
     }
   }
   function next() {
-    if (view === 'month') {
-      setMonth(m => {
-        const newMonth = m === 12 ? 1 : m + 1;
-        if (m === 12) setYear(y => y + 1);
-        return newMonth;
-      });
+    if (view !== 'month') return;
+    if (month === 12) {
+      setYear(year + 1);
+      setMonth(1);
+    } else {
+      setMonth(month + 1);
     }
   }
   function today() {

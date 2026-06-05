@@ -309,8 +309,8 @@
             <li><a href="#scope">3. Define scope (domain + path)</a></li>
             <li><a href="#scrapable">4. Make pages scrapable / readable</a></li>
             <li><a href="#discover">5. Discover all URLs</a></li>
-            <li><a href="#extract">6. Extract content for import</a></li>
-            <li><a href="#import">7. Import into SalesIQ Resources</a></li>
+            <li><a href="#extract">6. Extract content for import</a> — <a href="SALESIQ_ARTICLES_EXPORT_NODE_SCRIPT_GUIDE.html">Node CSV exporter</a></li>
+            <li><a href="#import">7. Import into SalesIQ Articles</a></li>
             <li><a href="#answer-bot">8. Configure Answer Bot</a></li>
             <li><a href="#zobot">9. Connect Zobot on the homepage</a> — <a href="#zobot-first-time">9a. First-time create</a> · <a href="#zobot-canvas">9c.1 Canvas / incomplete flow</a> · <a href="#zobot-flow">9c. Build flow</a></li>
             <li><a href="#verify">10. Test and maintain</a></li>
@@ -351,7 +351,7 @@ SalesIQ chat widget ──► Zobot (flow / triggers) ──► Answer Bot
                 <tr>
                     <td><strong>Resources → Articles</strong></td>
                     <td>Knowledge base storage (title, body, categories, source URL)</td>
-                    <td>Settings → Resources → Articles</td>
+                    <td>Settings → Articles (sidebar) → Add — portal: <a href="https://salesiq.zoho.com/giventainc/onboard" rel="noopener noreferrer">salesiq.zoho.com/giventainc/onboard</a></td>
                 </tr>
                 <tr>
                     <td><strong>Answer Bot</strong></td>
@@ -381,7 +381,9 @@ SalesIQ chat widget ──► Zobot (flow / triggers) ──► Answer Bot
             <div class="section-header prerequisites">Checklist before you start</div>
             <div class="section-body">
                 <ol class="steps">
-                    <li><strong>Zoho SalesIQ account</strong> for Giventa Inc. with admin access to <a href="https://salesiq.zoho.com/giventainc/settings/bot/zobot/" rel="noopener noreferrer">Zobot settings</a>.</li>
+                    <li><strong>Zoho SalesIQ account</strong> for Giventa Inc. — sign in at <a href="https://salesiq.zoho.com/giventainc/onboard" rel="noopener noreferrer">salesiq.zoho.com/giventainc/onboard</a> (admin access to Settings, Articles, Zobot).</li>
+                    <li><strong>Brand language</strong> — <strong>Settings → Brands → Giventa Inc. → General configurations → Languages</strong>: <strong>English</strong> selected and set as <strong>default language</strong> (see <a href="#import-brand-language">section 7 — brand language</a>).</li>
+                    <li><strong>Department</strong> — same General configurations page: assign <strong>MOSC Connect</strong> to the brand.</li>
                     <li><strong>Brand / website</strong> in SalesIQ mapped to <code class="code-highlight">www.mosc-temp.com</code> (or the exact hostname visitors use).</li>
                     <li><strong>Production site live</strong> at <a href="https://www.mosc-temp.com/mosc-redesign" rel="noopener noreferrer">https://www.mosc-temp.com/mosc-redesign</a> with public pages (no login required).</li>
                     <li><strong>Content owner</strong> who can review imported articles for accuracy (liturgical / doctrinal content should be verified).</li>
@@ -515,14 +517,52 @@ Allow: /mosc-redesign/
             <div class="section-header parameters">Where to run this command</div>
             <div class="section-body section-intro">
                 <p>Run these commands from the <strong>repository root</strong> — the folder that contains <code class="code-highlight">package.json</code> (for this clone: <code class="code-highlight">f:\project_workspace\mosc-temp</code>). Do <em>not</em> run them from <code class="code-highlight">src\app\mosc-redesign</code> or other subfolders unless you adjust paths yourself.</p>
+                <div class="warning">
+                    <strong>PowerShell only — not Command Prompt (CMD).</strong> Both copy buttons below paste <strong>PowerShell</strong> syntax (<code class="code-highlight">$RepoRoot</code>, <code class="code-highlight">Get-ChildItem</code>, etc.). If you run them in <strong>cmd.exe</strong>, you will see: <code class="code-highlight">'$RepoRoot' is not recognized as an internal or external command</code>.
+                </div>
+                <p><strong>How to tell which shell you have:</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Shell</th>
+                            <th>Prompt looks like</th>
+                            <th>Use this guide?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>PowerShell</strong></td>
+                            <td><code>PS F:\project_workspace\mosc-temp&gt;</code></td>
+                            <td>Yes — paste the copied command here</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Command Prompt (CMD)</strong></td>
+                            <td><code>F:\project_workspace\mosc-temp&gt;</code> (no <code>PS</code> prefix)</td>
+                            <td>No — type <code class="code-highlight">powershell</code> first (see below)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><strong>From CMD, switch to PowerShell:</strong></p>
+                <pre style="background:#e8f4f8;color:#0d3b66;border:1px solid #b8d4e3;border-radius:6px;padding:12px;margin:10px 0;">cd /d f:\project_workspace\mosc-temp
+powershell</pre>
+                <p>Or open <strong>Windows Terminal</strong> and choose a <strong>PowerShell</strong> profile (not “Command Prompt”).</p>
                 <ol class="steps">
                     <li>Open <strong>Windows Terminal</strong> (or PowerShell 7 / Windows PowerShell).</li>
                     <li>Change to the repo root, for example:
                         <pre style="background:#e8f4f8;color:#0d3b66;border:1px solid #b8d4e3;border-radius:6px;padding:12px;margin:10px 0;">cd f:\project_workspace\mosc-temp</pre>
                     </li>
-                    <li>Paste and run either the <strong>PowerShell</strong> script or the <strong>Windows single-line</strong> command below (both include <code class="code-highlight">Set-Location</code> to the repo root if your shell is already there, the script still works).</li>
-                    <li>Find output file <code class="script-name">mosc-redesign-urls.txt</code> in the <strong>same repo root folder</strong> (next to <code class="code-highlight">package.json</code>).</li>
+                    <li>Paste and run either the <strong>multi-line PowerShell</strong> script or the <strong>single-line PowerShell</strong> command below (both require PowerShell, not CMD).</li>
+                    <li>Find output file <code class="script-name">documentation/zoh_zobot_settings/mosc-redesign-urls.txt</code> (one URL per line, e.g. <code class="code-highlight">https://www.mosc-temp.com/mosc-redesign/saints/...</code> — not filesystem paths).</li>
                 </ol>
+                <div class="info">
+                    <strong>After you have the URL list — next steps (not Zobot import):</strong>
+                    <ol class="steps">
+                        <li><strong>Section 6:</strong> Fetch each URL and build an Articles spreadsheet (title, body, category, source URL).</li>
+                        <li><strong>Section 7:</strong> SalesIQ → <strong>Settings → Articles</strong> (sidebar) → <strong>Add</strong> → upload XLS/CSV (see mapping table in section 7).</li>
+                        <li><strong>Section 8:</strong> Configure <strong>Answer Bot</strong> to use those Articles.</li>
+                        <li><strong>Section 9:</strong> Your Zobot <strong>Answer bot Card</strong> reads from Answer Bot — no separate “URL file import” in Zobot.</li>
+                    </ol>
+                </div>
             </div>
         </div>
 
@@ -531,37 +571,77 @@ Allow: /mosc-redesign/
                 <span class="command-type">List all mosc-redesign routes from repo (PowerShell)</span>
                 <div>
                     <button type="button" class="copy-button" onclick="copyPowerShellScript('cb-list-routes-powershell')" title="Copy PowerShell script" aria-label="Copy PowerShell script">📋 Copy PowerShell</button>
-                    <button type="button" class="copy-button copy-button-template" onclick="copyWindowsCommand('cb-list-routes')" title="Copy Windows single-line command" aria-label="Copy Windows single-line command">📋 Copy Windows</button>
+                    <button type="button" class="copy-button copy-button-template" onclick="copyWindowsCommand('cb-list-routes')" title="Copy PowerShell single-line command" aria-label="Copy PowerShell single-line command">📋 Copy single-line</button>
                 </div>
             </div>
             <div class="command-single-line-label" style="padding: 12px 15px 0; background: #fff;">PowerShell (multi-line — paste into PowerShell at repo root)</div>
             <div class="command-content" style="white-space: pre-wrap; word-break: normal;" id="cb-list-routes-powershell"># Repository root (change if your clone path differs)
-$RepoRoot = "f:\project_workspace\mosc-temp"
+$RepoRoot = (Resolve-Path "f:\project_workspace\mosc-temp").Path
 Set-Location $RepoRoot
 
-$AppRoot = Join-Path $RepoRoot "src\app"
+$AppRoot = (Resolve-Path (Join-Path $RepoRoot "src\app")).Path
+$OutDir = Join-Path $RepoRoot "documentation\zoh_zobot_settings"
+$OutFile = Join-Path $OutDir "mosc-redesign-urls.txt"
+New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
+
 Get-ChildItem -Path (Join-Path $AppRoot "mosc-redesign") -Recurse -Filter "page.tsx" |
   ForEach-Object {
-    $rel = $_.DirectoryName.Replace($AppRoot, "").Replace("\", "/")
+    $dir = $_.DirectoryName
+    if ($dir.StartsWith($AppRoot, [StringComparison]::OrdinalIgnoreCase)) {
+      $rel = $dir.Substring($AppRoot.Length).Replace("\", "/")
+    } else {
+      $rel = $dir.Replace("\", "/")
+    }
     if ($rel -match "\(syro\)") { $rel = $rel -replace "/\(syro\)", "" }
+    if ($rel -match "\[[^\]]+\]") { return }
     $path = if ($rel -eq "/mosc-redesign") { "/mosc-redesign" } else { $rel }
     "https://www.mosc-temp.com$path"
   } |
   Sort-Object |
-  Out-File -FilePath (Join-Path $RepoRoot "mosc-redesign-urls.txt") -Encoding utf8
+  Out-File -FilePath $OutFile -Encoding utf8
 
-Write-Host "Wrote $(Join-Path $RepoRoot 'mosc-redesign-urls.txt')"</div>
+Write-Host "Wrote $OutFile"</div>
             <div class="command-single-line">
-                <div class="command-single-line-label">Windows single-line (same command, one line for CMD-style paste)</div>
-                <code id="cb-list-routes-single-code">$RepoRoot = "f:\project_workspace\mosc-temp"; Set-Location $RepoRoot; $AppRoot = Join-Path $RepoRoot "src\app"; Get-ChildItem -Path (Join-Path $AppRoot "mosc-redesign") -Recurse -Filter "page.tsx" | ForEach-Object { $rel = $_.DirectoryName.Replace($AppRoot, "").Replace("\", "/"); if ($rel -match "\(syro\)") { $rel = $rel -replace "/\(syro\)", "" }; $path = if ($rel -eq "/mosc-redesign") { "/mosc-redesign" } else { $rel }; "https://www.mosc-temp.com$path" } | Sort-Object | Out-File -FilePath (Join-Path $RepoRoot "mosc-redesign-urls.txt") -Encoding utf8; Write-Host "Wrote $(Join-Path $RepoRoot 'mosc-redesign-urls.txt')"</code>
+                <div class="command-single-line-label">PowerShell single-line (same script, one line — still requires PowerShell, not CMD)</div>
+                <code id="cb-list-routes-single-code">$RepoRoot = (Resolve-Path "f:\project_workspace\mosc-temp").Path; Set-Location $RepoRoot; $AppRoot = (Resolve-Path (Join-Path $RepoRoot "src\app")).Path; $OutFile = Join-Path (Join-Path $RepoRoot "documentation\zoh_zobot_settings") "mosc-redesign-urls.txt"; New-Item -ItemType Directory -Force -Path (Split-Path $OutFile) | Out-Null; Get-ChildItem -Path (Join-Path $AppRoot "mosc-redesign") -Recurse -Filter "page.tsx" | ForEach-Object { $dir = $_.DirectoryName; if ($dir.StartsWith($AppRoot, [StringComparison]::OrdinalIgnoreCase)) { $rel = $dir.Substring($AppRoot.Length).Replace("\", "/") } else { $rel = $dir.Replace("\", "/") }; if ($rel -match "\(syro\)") { $rel = $rel -replace "/\(syro\)", "" }; if ($rel -match "\[[^\]]+\]") { return }; $path = if ($rel -eq "/mosc-redesign") { "/mosc-redesign" } else { $rel }; "https://www.mosc-temp.com$path" } | Sort-Object | Out-File -FilePath $OutFile -Encoding utf8; Write-Host "Wrote $OutFile"</code>
             </div>
         </div>
 
         <div class="success">
-            <strong>Output:</strong> <code class="script-name">mosc-redesign-urls.txt</code> at the repository root — one absolute URL per line (~272 routes). Use this as the master crawl list for content extraction.
+            <strong>Output:</strong> <code class="script-name">documentation/zoh_zobot_settings/mosc-redesign-urls.txt</code> — one absolute URL per line (~265 routes; dynamic folders like <code>[documentId]</code> are excluded). Verify lines look like <code class="code-highlight">https://www.mosc-temp.com/mosc-redesign/...</code> (not <code class="code-highlight">...comF:/project_...</code>). Re-run the script if paths are wrong.
         </div>
 
         <h2 id="extract">6. Extract content for import</h2>
+
+        <div class="section-intro">
+            <strong>Automated option (recommended):</strong> Run the Node exporter
+            <code class="script-name">scripts/zoh-zobot-settings/export-salesiq-articles.mjs</code>
+            — full guide:
+            <a href="SALESIQ_ARTICLES_EXPORT_NODE_SCRIPT_GUIDE.html">SalesIQ Articles Export — Node Script</a>.
+            It reads <code class="script-name">documentation/zoh_zobot_settings/mosc-redesign-urls.txt</code>,
+            fetches each live page, and writes
+            <code class="script-name">documentation/zoh_zobot_settings/salesiq-articles-import.csv</code>
+            for SalesIQ <strong>Settings → Articles → Add</strong> (section 7).
+        </div>
+
+        <div class="command-block setup">
+            <div class="command-header">
+                <span class="command-type">Quick start — export Articles CSV (Node 18+)</span>
+                <div>
+                    <button type="button" class="copy-button" onclick="copyWindowsCommand('cb-zobot-export-test')" title="Copy test command">📋 Copy test (10 URLs)</button>
+                    <button type="button" class="copy-button copy-button-template" onclick="copyWindowsCommand('cb-zobot-export-full')" title="Copy full export">📋 Copy full export</button>
+                </div>
+            </div>
+            <div class="command-single-line-label" style="padding: 12px 15px 0; background: #fff;">Run at repository root in PowerShell or Windows Terminal (not CMD)</div>
+            <div class="command-single-line">
+                <div class="command-single-line-label">Test batch (10 pages)</div>
+                <code id="cb-zobot-export-test-single-code">cd f:\project_workspace\mosc-temp; npm run zobot:export-articles:test</code>
+            </div>
+            <div class="command-single-line">
+                <div class="command-single-line-label">Full export (~272 pages, several minutes)</div>
+                <code id="cb-zobot-export-full-single-code">cd f:\project_workspace\mosc-temp; npm run zobot:export-articles</code>
+            </div>
+        </div>
 
         <div class="section-container">
             <div class="section-header extract">Content extraction pipeline</div>
@@ -626,7 +706,7 @@ Write-Host "Wrote $(Join-Path $RepoRoot 'mosc-redesign-urls.txt')"</div>
                 </table>
 
                 <div class="warning">
-                    <strong>Import template columns vary by portal version.</strong> In SalesIQ, open <strong>Resources → Articles → Import</strong> and download Zoho’s <strong>sample spreadsheet</strong> for your org. Match your export columns to that file exactly.
+                    <strong>Import template columns vary by portal version.</strong> In SalesIQ, open <strong>Settings → Articles → Add</strong> and download Zoho’s <strong>sample spreadsheet</strong> for your org. Match your export columns to that file exactly.
                 </div>
 
                 <h3>Automation options (choose one)</h3>
@@ -659,21 +739,171 @@ Write-Host "Wrote $(Join-Path $RepoRoot 'mosc-redesign-urls.txt')"</div>
             </div>
         </div>
 
-        <h2 id="import">7. Import into SalesIQ Resources</h2>
+        <h2 id="import">7. Import into SalesIQ Articles</h2>
+
+        <div class="success" style="margin-bottom: 1.25rem;">
+            <strong>Recommended (API):</strong> After export + FAQ merge, use the <a href="ZOHO_SALESIQ_OPERATIONS_RUNBOOK.html#bulk-upload">Operations Runbook — §9 Bulk upload via REST API</a>:
+            <code>npm run zobot:bulk-upload-articles -- --confirm</code> from <code>mosc-temp</code> (OAuth with <code>SalesIQ.articles.CREATE</code> required). Portal CSV steps below are the <strong>alternative</strong> if API scopes are unavailable.
+        </div>
 
         <div class="section-container">
-            <div class="section-header salesiq">SalesIQ dashboard steps</div>
+            <div class="section-header salesiq">Open the Giventa SalesIQ portal</div>
+            <div class="section-body">
+                <p>Use this URL to sign in and reach Settings (gear) and the <strong>Articles</strong> menu in the left sidebar:</p>
+                <div class="command-block">
+                    <pre><code class="script-name">https://salesiq.zoho.com/giventainc/onboard</code></pre>
+                </div>
+                <p>After sign-in: <strong>Settings</strong> (gear, top) → <strong>Articles</strong> (Settings sidebar) → <strong>Add</strong> → upload CSV. Do not use <em>Controls → Import</em> on the Settings home page — that wizard is for other data.</p>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header salesiq" id="import-brand-language">Brand language &amp; department (fix “Invalid article language”)</div>
+            <div class="section-body">
+                <p>Article import uses the <strong>language labels configured on your brand</strong>, not ISO codes like <code>en</code> in the CSV alone. Confirm this <em>before</em> Validate:</p>
+                <ol class="steps">
+                    <li>From <a href="https://salesiq.zoho.com/giventainc/onboard" rel="noopener noreferrer">salesiq.zoho.com/giventainc/onboard</a>, open <strong>Settings</strong> → <strong>Brands</strong> → <strong>Giventa Inc.</strong> → <strong>General configurations</strong>.</li>
+                    <li><strong>Departments:</strong> under <em>Assign departments to your brand</em>, ensure <strong>MOSC Connect</strong> is selected (matches CSV <code>Department</code> column).</li>
+                    <li><strong>Languages:</strong> under <em>Choose language(s) for your live chat</em>, select <strong>English</strong>.</li>
+                    <li><strong>Set default language:</strong> choose <strong>English</strong> (not “Website language” unless every site locale is configured).</li>
+                    <li>Save. Re-export or patch CSV so <code>Language</code> column = <code>English</code> (not <code>en</code>).</li>
+                </ol>
+                <div class="command-block" style="margin-top: 1rem;">
+                    <pre><code class="script-name">node scripts/zoh-zobot-settings/patch-salesiq-import-csv.mjs --department "MOSC Connect" --language English</code></pre>
+                </div>
+                <p>Chat widget language API codes (<code>en</code>, <code>fr</code>, …) are documented in <a href="https://www.zoho.com/salesiq/help/developer-section/js-api-chat-language.html" rel="noopener noreferrer">.salesiq.language()</a> — article <strong>import</strong> expects the portal display name <strong>English</strong>.</p>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header salesiq" id="import-categories">Create article categories before bulk import</div>
+            <div class="section-body">
+                <p>If Validate fails or the <strong>Edit info</strong> popup shows <em>Select a Category</em> with no match, SalesIQ does not recognize the category strings in your CSV. Categories must exist in the portal <strong>before</strong> bulk Validate (or be picked manually per row in Edit info).</p>
+                <p><strong>Where categories live (Giventa portal):</strong> Articles is under the <strong>left sidebar</strong> (Resources) — <em>not</em> under Settings. On the Articles screen (your screenshot with <strong>Articles(0)</strong>), use one of these:</p>
+                <ol class="steps">
+                    <li><strong>Manage Categories icon</strong> — In the Articles page header (near <strong>Add</strong> and the <strong>English</strong> language dropdown), look for a <strong>folder / categories</strong> icon labeled <em>Manage categories</em> or similar. Click it → <strong>Add category</strong> → type the name exactly as in the CSV (e.g. <code>General</code>, <code>Administration</code>).</li>
+                    <li><strong>While adding one article</strong> — Click <strong>Add</strong> → <strong>Add article</strong> (not Import). In the article form, open the <strong>Category</strong> field → choose <strong>Add new category</strong> / type a new name → save. Repeat for each name you need (or use the shortcut below).</li>
+                    <li><strong>Search</strong> — On the Settings home screen, use the top <strong>Search</strong> bar and type <code>category</code> or <code>article category</code> if you cannot see the icon on Articles.</li>
+                </ol>
+                <div class="info" style="margin-top: 1rem;">
+                    <strong>Shortcut (recommended for first import):</strong> Create <strong>one</strong> category named <code>General</code>, then patch the CSV so every row uses that category: <code>npm run zobot:patch-import-csv -- --department "MOSC Connect" --language English --channels Web --category "General"</code>. You can split articles into more categories later in SalesIQ.
+                </div>
+                <p style="margin-top: 1rem;">Full export uses ~31 flattened names (<code>Administration</code>, <code>Saints</code>, <code>Directory</code>, …). To keep those in the CSV, create each name via Manage categories before upload. Flattened names come from:</p>
+                <div class="command-block">
+                    <pre><code class="script-name">node scripts/zoh-zobot-settings/patch-salesiq-import-csv.mjs --department "MOSC Connect" --language English --flatten-categories</code></pre>
+                </div>
+                <p>That keeps only the part after <code>MOSC Redesign &gt; </code> (e.g. <code>Administration</code>) — create those shorter names in SalesIQ instead.</p>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header salesiq">SalesIQ dashboard steps (Giventa portal)</div>
             <div class="section-body">
                 <ol class="steps">
-                    <li>Sign in to <a href="https://salesiq.zoho.com/giventainc/" rel="noopener noreferrer">SalesIQ — Giventa Inc.</a></li>
-                    <li>Go to <strong>Settings → Resources → Articles</strong>.</li>
-                    <li>Click <strong>Import</strong> (or ⋮ menu → Import articles).</li>
-                    <li>Download the <strong>sample XLS/CSV</strong> and copy your extracted columns to match.</li>
-                    <li>Upload the file; map columns (Title, Content, Category, etc.).</li>
-                    <li>Run a <strong>small test batch</strong> (5–10 pages) before importing all 272 URLs.</li>
+                    <li>Sign in at <a href="https://salesiq.zoho.com/giventainc/onboard" rel="noopener noreferrer">salesiq.zoho.com/giventainc/onboard</a>.</li>
+                    <li>Complete <a href="#import-brand-language">brand language &amp; department</a> and <a href="#import-categories">category setup</a> above.</li>
+                    <li>Open <strong>Articles</strong> from the <strong>left sidebar</strong> (Resources) — or use <strong>Settings → Controls → Import</strong> for bulk upload (both reach the same <strong>Add Articles</strong> mapping wizard).</li>
+                    <li>Click <strong>Add</strong> → <strong>Import</strong> (on the Articles page) or start from Settings Import; upload <code class="script-name">salesiq-articles-import.csv</code>.</li>
+                    <li>After upload, SalesIQ shows <strong>Settings → Import → Add Articles</strong> with <strong>Article status</strong> and <strong>Attribute mapping</strong> — use the table below.</li>
+                    <li>Click <strong>Validate</strong>, fix any errors, then complete the import.</li>
+                    <li>Run a <strong>small test batch</strong> first (<code>npm run zobot:export-articles:test</code>) before importing all ~265 URLs.</li>
                     <li>Publish articles and assign them to the <strong>website / brand</strong> for <code>www.mosc-temp.com</code>.</li>
                     <li>Repeat for <strong>FAQs</strong> if you want short Q&amp;A pairs (e.g. “Who is the Catholicos?” → link to catholicate page).</li>
                 </ol>
+
+                <h3 id="import-mapping" style="margin-top: 1.5rem;">Add Articles — attribute mapping (Validate requires every field)</h3>
+                <p>Giventa/SalesIQ will <strong>not enable Validate</strong> until every row in the mapping table has a sheet column selected. The dropdown only lists <strong>CSV headers</strong> — so you must add matching columns to the file first, then map each SalesIQ field to the column with the <strong>same name</strong>.</p>
+
+                <div class="warning" style="margin-top: 1rem;">
+                    <strong>Fix your current CSV (fast — no re-fetch):</strong> In SalesIQ, open <strong>Settings → Departments</strong> and copy the exact department name. From the repo root run (replace the department name):
+                    <div class="command-block" style="margin-top: 0.75rem;">
+                        <pre><code class="script-name">node scripts/zoh-zobot-settings/patch-salesiq-import-csv.mjs --department "MOSC Connect" --channels Web --language English --flatten-categories</code></pre>
+                    </div>
+                    Or: <code>npm run zobot:patch-import-csv -- --department "YOUR_DEPT_NAME"</code>. Re-upload the patched CSV via <strong>Settings → Articles → Add</strong>.
+                </div>
+
+                <p style="margin-top: 1rem;">After patching (or re-export with <code>--department</code>), CSV columns include:</p>
+                <p><code>Resource ID</code>, <code>Group ID</code>, <code>Title</code>, <code>Content</code>, <code>Department</code>, <code>Category</code>, <code>Channels</code>, <code>Is Public</code>, <code>Status</code>, <code>Language</code>, <code>Description</code>, <code>Source URL</code>, <code>Tags</code></p>
+
+                <table>
+                    <thead>
+                        <tr><th>Section / field</th><th>What to select</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Article status</strong></td>
+                            <td>Select <strong>Status in sheet</strong>, then map <strong>Status → Status</strong> (every row = <code>Published</code> from the patch script). Or select <strong>Publish</strong> and still map <strong>Status → Status</strong> if Validate requires it.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Resource ID</strong></td>
+                            <td>Map to <strong>Resource ID</strong> with <strong>empty</strong> cells for new articles (<code>Action</code> = Create). Do <em>not</em> enter numeric IDs in the CSV or in the post-Validate <strong>Edit info</strong> popup — numeric Resource IDs are for <strong>updating</strong> existing articles only. Leave the popup Resource ID field blank, set <strong>Language variant</strong> = English, <strong>Department</strong> = MOSC Connect, and pick a valid <strong>Category</strong>, then Validate again.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Group ID</strong></td>
+                            <td>Map to <strong>Group ID</strong> (empty cells for new articles)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Title</strong></td>
+                            <td>Map to <strong>Title</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Content</strong></td>
+                            <td>Map to <strong>Content</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Department</strong></td>
+                            <td>Map to <strong>Department</strong> (must match Settings → Departments exactly)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Category</strong></td>
+                            <td>Map to <strong>Category</strong>. Values must match categories already created under <strong>Settings → Articles → Categories</strong> (see <a href="#import-categories">category setup</a>). If Edit info shows <em>Select a Category</em>, choose an existing category or create it first, then re-Validate.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Channels</strong></td>
+                            <td>Map to <strong>Channels</strong>. Use <code>Web</code> (globe icon in Edit info) — <strong>not</strong> <code>Website</code>. Patch default: <code>--channels Web</code>. If Validate still opens Edit info with channels blank, click the globe or re-patch the CSV.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Is Public</strong></td>
+                            <td>Map to <strong>Is Public</strong> (default <code>true</code> from patch)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Status</strong></td>
+                            <td>Map to <strong>Status</strong> (default <code>Published</code> from patch)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Language</strong></td>
+                            <td>Map to <strong>Language</strong>. Value must be <strong>English</strong> (display name), not <code>en</code> — ISO codes cause <em>Invalid article language</em> on Validate.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="warning" style="margin-top: 1rem;">
+                    <strong>Validate error: &quot;Invalid article language&quot;</strong> — Fix CSV (<code>English</code> not <code>en</code>) and confirm brand language at <strong>Settings → Brands → Giventa Inc. → General configurations → Languages</strong> (see <a href="#import-brand-language">above</a>).
+                </div>
+
+                <div class="warning" style="margin-top: 1rem;">
+                    <strong>Edit info — Channels blank (globe not selected):</strong> CSV must use <code>Web</code>, not <code>Website</code>. Re-patch with <code>--channels Web</code>. In Edit info the globe icon is the Web channel; without it Validate fails even when Department and Language are correct.
+                </div>
+
+                <div class="warning" style="margin-top: 1rem;">
+                    <strong>Validate / Edit info — Category blank:</strong> Create matching categories in SalesIQ before import (<a href="#import-categories">category setup</a>), or select a category in Edit info. Category names must match the CSV exactly.
+                </div>
+
+                <div class="warning" style="margin-top: 1rem;">
+                    <strong>Edit info — Resource ID:</strong> For rows with <code>Action = Create</code>, leave <strong>Resource ID</strong> empty. Do not type a number unless you are updating an existing article that already has an ID in SalesIQ.
+                </div>
+
+                <div class="info" style="margin-top: 1rem;">
+                    <strong>Never map unrelated columns:</strong> Do not set Department → Language, Channels → Source URL, or Is Public → Tags. Each SalesIQ field must map to the column with the same name after you run the patch script.
+                </div>
+
+                <div class="info" style="margin-top: 1rem;">
+                    <strong>Columns not on the mapping screen:</strong> <code>Description</code>, <code>Source URL</code>, and <code>Tags</code> from our export are not always shown in SalesIQ’s importer. The main Answer Bot signal is <strong>Title + Content + Category</strong>. Keep <code>Source URL</code> in the CSV for your records; you can paste URLs into articles manually later if needed.
+                </div>
+
+                <div class="success" style="margin-top: 1rem;">
+                    <strong>When Validate passes:</strong> finish the wizard, open a few imported articles under <strong>Settings → Articles</strong>, confirm content looks correct, then proceed to section 8 (Answer Bot).
+                </div>
 
                 <div class="info">
                     <strong>Categorization tip:</strong> Mirror the eight sections from <code class="script-name">sitemapData.ts</code> (Main Navigation, Community &amp; Resources, Faith &amp; Teaching, Saints, Directory, Administration, Organisations &amp; Education, Contact). Visitors find answers faster when categories match the site IA.
@@ -1414,6 +1644,14 @@ export function SalesIQWidget() {
             </thead>
             <tbody>
                 <tr>
+                    <td>Giventa SalesIQ portal (sign-in)</td>
+                    <td><a href="https://salesiq.zoho.com/giventainc/onboard" rel="noopener noreferrer">salesiq.zoho.com/giventainc/onboard</a></td>
+                </tr>
+                <tr>
+                    <td>Chat language API codes</td>
+                    <td><a href="https://www.zoho.com/salesiq/help/developer-section/js-api-chat-language.html" rel="noopener noreferrer">.salesiq.language() — supported codes</a></td>
+                </tr>
+                <tr>
                     <td>Zobot builder (Giventa)</td>
                     <td><a href="https://salesiq.zoho.com/giventainc/settings/bot/zobot/" rel="noopener noreferrer">salesiq.zoho.com/giventainc/settings/bot/zobot/</a></td>
                 </tr>
@@ -1498,7 +1736,7 @@ export function SalesIQWidget() {
             const el = document.getElementById(commandId + '-single-code');
             if (!el) return;
             navigator.clipboard.writeText(el.textContent.trim()).then(function () {
-                alert('Windows single-line command copied.');
+                alert('PowerShell single-line command copied.');
             });
         }
 

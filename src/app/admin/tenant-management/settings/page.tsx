@@ -53,6 +53,24 @@ export default async function TenantSettingsPage() {
               <span className="font-semibold text-blue-700 dark:text-blue-300 text-xs sm:text-sm lg:text-base whitespace-nowrap">Create New Settings</span>
             </Link>
           </div>
+
+          <div className="mt-4 rounded-md bg-blue-50 border border-blue-100 p-3 sm:p-4 text-xs sm:text-sm text-blue-800">
+            <p className="font-semibold text-blue-900 mb-1.5">Outbound email sender configuration</p>
+            <p>
+              Platform <span className="font-semibold">From</span>, optional{' '}
+              <span className="font-semibold">Copy-To</span>, and optional{' '}
+              <span className="font-semibold">Reply-To</span> addresses (by type such as CONTACT, INFO, TICKETS) are
+              managed separately—not on this page. Use{' '}
+              <Link
+                href="/admin/tenant-email-addresses"
+                className="font-semibold text-blue-700 underline hover:text-blue-900"
+              >
+                Tenant Email Addresses
+              </Link>{' '}
+              to add or edit verified sender addresses, CC copies, and reply routing for contact forms and other
+              outbound mail.
+            </p>
+          </div>
         </div>
 
         {/* Error State */}

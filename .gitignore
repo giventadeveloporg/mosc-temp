@@ -75,3 +75,9 @@ TestSprite/admin-tests/screenshots/
 
 # All screenshot folders (catch-all pattern for any screenshots directory)
 **/screenshots/
+
+# Local scratch files (doc extraction, one-off analysis)
+.tmp_*.txt
+
+# Generated prod SQL dumps — may contain encrypted payment/Twilio credentials
+code_html_template/SQLS/corrected_event_media_inserts.ordered_PROD.sql
