@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zoho SalesIQ Operations Runbook — OAuth, Bulk Delete, FAQ CSV, Re-import</title>
+    <title>Zoho SalesIQ Operations Runbook — OAuth, Bulk Upload API, Bulk Delete, FAQ CSV</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -34,7 +34,8 @@
         .section-header.csv { background: linear-gradient(135deg, #ef6c00 0%, #e65100 100%); }
         .section-header.faq { background: linear-gradient(135deg, #00897b 0%, #00695c 100%); }
         .section-header.import { background: linear-gradient(135deg, #3949ab 0%, #283593 100%); }
-        .section-header.test { background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%); }
+        .section-header.upload { background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%); }
+        .section-header.test { background: linear-gradient(135deg, #558b2f 0%, #33691e 100%); }
         .section-body { background: #fff; padding: 20px 24px; border: 1px solid #ddd; border-top: none; }
         .toc { background: #fff; border: 2px solid #0066cc; border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
         .toc h2 { margin-top: 0; border: none; padding: 0; }
@@ -85,17 +86,17 @@
 </head>
 <body>
     <h1>Zoho SalesIQ Operations Runbook</h1>
-    <p><strong>OAuth refresh token · bulk delete · FAQ supplement CSV · merge · re-import · Answer Bot testing</strong></p>
+    <p><strong>OAuth refresh token · bulk upload (REST API) · bulk delete · FAQ supplement CSV · merge · Answer Bot testing</strong></p>
 
     <div class="section-intro">
-        <p>This runbook documents the <strong>repeatable operational workflow</strong> used to reset and reload the Giventa Inc. SalesIQ knowledge base for MOSC (<code class="code-highlight">giventainc</code> portal). It complements the architecture guide:
+        <p>This runbook documents the <strong>repeatable operational workflow</strong> used to reset and reload the Giventa Inc. SalesIQ knowledge base for MOSC (<code class="code-highlight">giventainc</code> portal). <strong>Recommended import path:</strong> post all articles from <code class="script-name">salesiq-articles-import.csv</code> using <code class="script-name">npm run zobot:bulk-upload-articles</code> (SalesIQ Articles REST API). Portal CSV import remains documented as an alternative. This runbook complements the architecture guide:
         <a href="ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html">Zoho SalesIQ Zobot — MOSC Redesign Knowledge Base Guide</a>
         and the export script guide:
         <a href="SALESIQ_ARTICLES_EXPORT_NODE_SCRIPT_GUIDE.html">SalesIQ Articles Export — Node Script</a>.</p>
         <p><strong>Repos involved:</strong></p>
         <ul>
             <li><code class="code-highlight">F:\project_workspace\event-site-manager</code> — hosts OAuth routes (<code>/oauth/zoho/start</code>, <code>/oauth/zoho/callback</code>)</li>
-            <li><code class="code-highlight">F:\project_workspace\mosc-temp</code> — export scripts, CSV files, bulk delete CLI</li>
+            <li><code class="code-highlight">F:\project_workspace\mosc-temp</code> — export scripts, CSV files, bulk upload/delete CLI</li>
         </ul>
     </div>
 
@@ -110,11 +111,12 @@
             <li><a href="#prepare-csv">6. Prepare import CSV (export + patch + FAQ)</a></li>
             <li><a href="#add-faq">7. Add new FAQ / curated articles</a></li>
             <li><a href="#merge-faq">8. Merge FAQ supplement into main CSV</a></li>
-            <li><a href="#import-salesiq">9. Import into SalesIQ portal</a></li>
-            <li><a href="#test-bot">10. Test Answer Bot / Zobot</a></li>
-            <li><a href="#npm-scripts">11. npm scripts reference</a></li>
-            <li><a href="#files">12. Key files</a></li>
-            <li><a href="#troubleshooting">13. Troubleshooting</a></li>
+            <li><a href="#bulk-upload">9. Bulk upload articles via REST API (recommended)</a></li>
+            <li><a href="#import-portal">10. Alternative: portal CSV import</a></li>
+            <li><a href="#test-bot">11. Test Answer Bot / Zobot</a></li>
+            <li><a href="#npm-scripts">12. npm scripts reference</a></li>
+            <li><a href="#files">13. Key files</a></li>
+            <li><a href="#troubleshooting">14. Troubleshooting</a></li>
         </ul>
     </nav>
 
@@ -122,16 +124,15 @@
         <h2 id="end-to-end">1. End-to-end workflow (summary)</h2>
         <div class="flow-diagram" aria-label="Operations flow">
 1. Run event-site-manager locally (OAuth host)
-2. Open http://localhost:3000/oauth/zoho/start → Zoho consent → copy ZOHO_REFRESH_TOKEN
-3. Save token + client id/secret in .env.local (event-site-manager and/or mosc-temp)
-4. From mosc-temp: npm run zobot:bulk-delete-articles -- --dry-run
-5. From mosc-temp: npm run zobot:bulk-delete-articles -- --confirm
-6. (Optional) Re-export pages: npm run zobot:export-articles
-7. Fix titles / patch columns: npm run zobot:fix-import-titles, npm run zobot:patch-import-csv
-8. Edit salesiq-faq-supplement.csv for curated Q&amp;A rows
-9. npm run zobot:merge-faq-supplement
-10. SalesIQ portal → Settings → Resources → Articles → Import CSV
-11. Re-train / refresh Answer Bot; test widget questions
+2. Open http://localhost:3000/oauth/zoho/start → Zoho consent (scopes incl. CREATE) → copy ZOHO_REFRESH_TOKEN
+3. Save token + client id/secret + SalesIQ IDs in .env.local (mosc-temp and event-site-manager)
+4. (Optional reset) npm run zobot:bulk-delete-articles -- --dry-run → --confirm
+5. (Optional) Re-export: npm run zobot:export-articles
+6. npm run zobot:fix-import-titles → npm run zobot:patch-import-csv → edit salesiq-faq-supplement.csv
+7. npm run zobot:merge-faq-supplement
+8. npm run zobot:list-portal-ids (verify category / department IDs)
+9. npm run zobot:bulk-upload-articles -- --dry-run → --confirm (posts all CSV rows via API)
+10. Re-train / refresh Answer Bot; test widget questions
         </div>
 
         <h2 id="prerequisites">2. Prerequisites</h2>
@@ -142,7 +143,7 @@
             <tbody>
                 <tr>
                     <td>Zoho API Console client</td>
-                    <td>Server-based OAuth client with scopes <code>SalesIQ.articles.READ</code>, <code>SalesIQ.articles.DELETE</code> (and CREATE if you add import via API later). Redirect URIs must include <strong>both</strong> production and localhost callbacks (see section 3).</td>
+                    <td>Server-based OAuth client with scopes <code>SalesIQ.articles.READ</code>, <code>SalesIQ.articles.CREATE</code>, <code>SalesIQ.articles.DELETE</code>. Optional: <code>SalesIQ.departments.READ</code> (not required if you set <code>ZOHO_SALESIQ_DEPARTMENT_ID</code>). Redirect URIs must include <strong>both</strong> production and localhost callbacks (see section 3).</td>
                 </tr>
                 <tr>
                     <td>SalesIQ portal</td>
@@ -180,8 +181,10 @@ http://localhost:3000/oauth/zoho/callback</pre>
                 <pre>ZOHO_CLIENT_ID=your_client_id
 ZOHO_CLIENT_SECRET=your_client_secret
 ZOHO_OAUTH_REDIRECT_URI=https://www.event-site-manager.com/oauth/zoho/callback
+ZOHO_OAUTH_SCOPES=SalesIQ.articles.READ,SalesIQ.articles.CREATE,SalesIQ.articles.DELETE,SalesIQ.departments.READ
 ZOHO_SALESIQ_SCREEN_NAME=giventainc
 # Optional: ZOHO_OAUTH_SETUP_SECRET=your-secret</pre>
+                <p><code class="code-highlight">ZOHO_OAUTH_SCOPES</code> must include <code>SalesIQ.articles.CREATE</code> for bulk upload. After changing scopes, <strong>re-run OAuth</strong> (section 3) and replace <code>ZOHO_REFRESH_TOKEN</code>.</p>
                 <p>Do <strong>not</strong> commit <code>.env.local</code> to git.</p>
             </div>
         </div>
@@ -236,7 +239,7 @@ ZOHO_SALESIQ_SCREEN_NAME=giventainc
         </div>
 
         <h2 id="env">4. Store credentials in .env.local</h2>
-        <p>Add the refresh token to <strong>either</strong> repo (bulk-delete loads the first file it finds):</p>
+        <p>Add credentials to <strong>both</strong> repos (scripts load the first <code>.env.local</code> found: mosc-temp, then event-site-manager):</p>
         <ul>
             <li><code>F:\project_workspace\mosc-temp\.env.local</code></li>
             <li><code>F:\project_workspace\event-site-manager\.env.local</code></li>
@@ -244,7 +247,16 @@ ZOHO_SALESIQ_SCREEN_NAME=giventainc
         <pre>ZOHO_CLIENT_ID=...
 ZOHO_CLIENT_SECRET=...
 ZOHO_REFRESH_TOKEN=...
-ZOHO_SALESIQ_SCREEN_NAME=giventainc</pre>
+ZOHO_SALESIQ_SCREEN_NAME=giventainc
+ZOHO_OAUTH_SCOPES=SalesIQ.articles.READ,SalesIQ.articles.CREATE,SalesIQ.articles.DELETE,SalesIQ.departments.READ
+
+# Bulk upload (optional — script resolves by category name if omitted)
+ZOHO_SALESIQ_CATEGORY_ID=1171471000000002104
+ZOHO_SALESIQ_DEPARTMENT_ID=1171471000000002013
+
+# Only if Node reports certificate errors (corporate proxy / SSL inspection)
+ZOHO_INSECURE_TLS=1</pre>
+        <p>Run <code>npm run zobot:list-portal-ids</code> to print current category and department IDs for your portal (IDs above are examples for <code>giventainc</code> / category <strong>General</strong>).</p>
         <div class="warning"><strong>Security:</strong> Never commit refresh tokens. Rotate if exposed. Revoke old tokens in Zoho Accounts if re-issuing.</div>
 
         <h2 id="bulk-delete">5. Bulk delete existing articles</h2>
@@ -313,6 +325,11 @@ npm run zobot:bulk-delete-articles -- --env-file F:/project_workspace/event-site
                     <td><code>npm run zobot:merge-faq-supplement</code></td>
                     <td>Appends rows from <code>salesiq-faq-supplement.csv</code> (see section 8)</td>
                 </tr>
+                <tr>
+                    <td>Upload to portal (API)</td>
+                    <td><code>npm run zobot:bulk-upload-articles -- --confirm</code></td>
+                    <td>POST each CSV row to SalesIQ — see section 9</td>
+                </tr>
             </tbody>
         </table>
         <p>See <a href="SALESIQ_ARTICLES_EXPORT_NODE_SCRIPT_GUIDE.html">SalesIQ Articles Export guide</a> for export script parameters (<code>--limit</code>, <code>--department</code>, etc.).</p>
@@ -373,7 +390,7 @@ npm run zobot:bulk-delete-articles -- --env-file F:/project_workspace/event-site
         <ol class="steps">
             <li>Open <code>salesiq-faq-supplement.csv</code> in Excel or VS Code (UTF-8).</li>
             <li>Add a new row at the bottom — wrap fields containing commas in double quotes; escape internal quotes as <code>""</code>.</li>
-            <li>Run merge (section 8) before import.</li>
+            <li>Run merge (section 8) before API upload (section 9).</li>
             <li>Do not duplicate titles already in the main CSV — merge skips existing titles.</li>
         </ol>
 
@@ -392,27 +409,125 @@ npm run zobot:bulk-delete-articles -- --env-file F:/project_workspace/event-site
         <pre>npm run zobot:merge-faq-supplement -- --dry-run</pre>
         <p>Script: <code class="script-name">scripts/zoh-zobot-settings/merge-salesiq-faq-supplement.mjs</code> — matches on <strong>Title</strong> (case-insensitive), appends only new rows.</p>
 
-        <h2 id="import-salesiq">9. Import into SalesIQ portal</h2>
+        <h2 id="bulk-upload">9. Bulk upload articles via REST API (recommended)</h2>
+        <p>Script: <code class="script-name">scripts/zoh-zobot-settings/bulk-upload-salesiq-articles.mjs</code>. Reads <code class="script-name">salesiq-articles-import.csv</code> and creates each article with:</p>
+        <pre>POST https://salesiq.zoho.com/api/v2/giventainc/articles</pre>
+        <p>Payload fields: <code>title</code>, <code>content</code> (HTML from CSV <strong>Content</strong>), <code>department_id</code>, <code>category_id</code>, <code>published: true</code>. Titles that are still generic site titles are auto-fixed using the <strong>Source URL</strong> slug (same logic as <code>zobot:fix-import-titles</code>).</p>
+
         <div class="section-container">
-            <div class="section-header import">Portal steps</div>
+            <div class="section-header upload">Prerequisites</div>
             <div class="section-body">
                 <ol class="steps">
-                    <li>Sign in to <a href="https://salesiq.zoho.com/giventainc" rel="noopener noreferrer">salesiq.zoho.com/giventainc</a>.</li>
-                    <li>Go to <strong>Settings → Resources → Articles</strong>.</li>
-                    <li>Click <strong>Add → Import</strong> (or bulk import — match your portal UI).</li>
-                    <li>Upload <code class="script-name">documentation/zoh_zobot_settings/salesiq-articles-import.csv</code>.</li>
-                    <li>Map columns if prompted (Title, Content, Source URL, Department, etc.).</li>
-                    <li>Confirm import; wait for processing to finish.</li>
-                    <li>Open <strong>Settings → Bots → Answer Bot</strong> and ensure connected Resources include imported Articles.</li>
-                    <li>If using a hybrid Zobot, verify the Answer Bot card still points at the same brand Resources.</li>
+                    <li><code>ZOHO_REFRESH_TOKEN</code> in <code>.env.local</code> with scope <code>SalesIQ.articles.CREATE</code> (re-run OAuth in section 3 if you only had READ/DELETE before).</li>
+                    <li>CSV ready: <code>npm run zobot:fix-import-titles</code> and <code>npm run zobot:merge-faq-supplement</code> completed.</li>
+                    <li>Category <strong>General</strong> (or your target category) exists in the portal — create in SalesIQ UI if missing.</li>
+                    <li>Optional: set <code>ZOHO_SALESIQ_CATEGORY_ID</code> and <code>ZOHO_SALESIQ_DEPARTMENT_ID</code> in <code>.env.local</code>, or let the script resolve by name (<code>MOSC Connect</code> / <code>General</code>).</li>
                 </ol>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header upload">Step A — List portal IDs (optional)</div>
+            <div class="section-body">
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">Print category and department IDs</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('list-ids')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="list-ids-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:list-portal-ids</code>
+                    </div>
+                </div>
+                <p>Script: <code class="script-name">scripts/zoh-zobot-settings/list-salesiq-portal-ids.mjs</code>. Copy IDs into <code>ZOHO_SALESIQ_CATEGORY_ID</code> / <code>ZOHO_SALESIQ_DEPARTMENT_ID</code>. Department ID also appears on each category from <code>GET /api/v2/{screen}/articlecategories</code> when <code>SalesIQ.departments.READ</code> is unavailable.</p>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header upload">Step B — Dry-run (preview)</div>
+            <div class="section-body">
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">Preview rows without POST</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('upload-dry')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="upload-dry-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-upload-articles -- --dry-run</code>
+                    </div>
+                </div>
+                <p>Shows how many rows would be created, resolved category/department IDs, and any rows skipped (duplicate title already in portal).</p>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header upload">Step C — Smoke test (5 articles)</div>
+            <div class="section-body">
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">Create first 5 articles</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('upload-smoke')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="upload-smoke-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-upload-articles -- --confirm --limit 5</code>
+                    </div>
+                </div>
+                <p>Verify new articles in <a href="https://salesiq.zoho.com/giventainc" rel="noopener noreferrer">SalesIQ → Resources → Articles</a> before the full run.</p>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header upload">Step D — Full upload (~272 articles)</div>
+            <div class="section-body">
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">POST all CSV rows (default delay 400 ms between requests)</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('upload-full')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="upload-full-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-upload-articles -- --confirm</code>
+                    </div>
+                </div>
+                <p>Expect ~6–8 minutes for ~272 rows. Console reports <code>created</code> / <code>failed</code> counts.</p>
+                <p><strong>Resume after interruption:</strong></p>
+                <pre>npm run zobot:bulk-upload-articles -- --confirm --start 50 --limit 20
+npm run zobot:bulk-upload-articles -- --confirm --start 70</pre>
+                <p><strong>Other flags:</strong></p>
+                <pre>npm run zobot:bulk-upload-articles -- --confirm --input documentation/zoh_zobot_settings/salesiq-articles-import.csv
+npm run zobot:bulk-upload-articles -- --confirm --department-name "MOSC Connect" --category-name General
+npm run zobot:bulk-upload-articles -- --confirm --department-id 1171471000000002013 --category-id 1171471000000002104
+npm run zobot:bulk-upload-articles -- --confirm --delay-ms 600
+npm run zobot:bulk-upload-articles -- --confirm --no-skip-existing
+npm run zobot:bulk-upload-articles -- --env-file F:/project_workspace/event-site-manager/.env.local --confirm</pre>
+                <div class="info">
+                    <strong>CSV row count vs portal count:</strong> The CSV has ~272 data rows. A prior portal-only import may have created fewer articles (e.g. 97) if Validate failed or titles were generic. Bulk delete removes <em>all</em> articles returned by the API, not “97 max.” After API upload, <code>zobot:bulk-delete-articles -- --dry-run</code> should list ~272 (or slightly more if manual articles exist).
+                </div>
                 <div class="success">
-                    <strong>After bulk delete + re-import:</strong> Article count should match CSV row count (currently ~272 including 7 FAQ rows). Train or refresh Answer Bot if the portal offers a re-index action.
+                    <strong>After upload:</strong> Open <strong>Settings → Bots → Answer Bot</strong>, ensure Resources include Articles, then re-train or refresh the knowledge base if the portal offers it.
                 </div>
             </div>
         </div>
 
-        <h2 id="test-bot">10. Test Answer Bot / Zobot</h2>
+        <h2 id="import-portal">10. Alternative: portal CSV import</h2>
+        <div class="section-container">
+            <div class="section-header import">Portal steps (if you cannot use API CREATE scope)</div>
+            <div class="section-body">
+                <p>Use this only when OAuth cannot include <code>SalesIQ.articles.CREATE</code>. Detailed mapping tables live in the <a href="../html-documentation-styling/ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html#import">main guide — Section 7</a>.</p>
+                <ol class="steps">
+                    <li>Sign in to <a href="https://salesiq.zoho.com/giventainc" rel="noopener noreferrer">salesiq.zoho.com/giventainc</a>.</li>
+                    <li>Create article <strong>Categories</strong> matching CSV <strong>Category</strong> column before import.</li>
+                    <li>Go to <strong>Settings → Articles</strong> (Settings sidebar) → <strong>Add → Import</strong>.</li>
+                    <li>Upload <code class="script-name">documentation/zoh_zobot_settings/salesiq-articles-import.csv</code>.</li>
+                    <li>On <strong>Add Articles</strong>: map columns 1:1; set status to <strong>Publish</strong>; run <strong>Validate</strong>, then finish import.</li>
+                    <li>Connect imported Articles to Answer Bot (section 11).</li>
+                </ol>
+                <div class="warning"><strong>Known issues with portal import:</strong> Generic titles, category mismatches, and language code <code>en</code> vs <code>English</code> — run <code>zobot:fix-import-titles</code> and <code>zobot:patch-import-csv --language English</code> before uploading.</div>
+            </div>
+        </div>
+
+        <h2 id="test-bot">11. Test Answer Bot / Zobot</h2>
         <p>On <code>https://www.mosc-temp.com</code>, open the chat widget and ask:</p>
         <table>
             <thead>
@@ -427,9 +542,9 @@ npm run zobot:bulk-delete-articles -- --env-file F:/project_workspace/event-site
                 <tr><td>Managing committee members list</td><td>FAQ + administration/the-managing-committee article</td></tr>
             </tbody>
         </table>
-        <p>If Answer Bot returns wrong Catholicos names (Paulose II, Didymos I), confirm FAQ rows imported and titles are specific — run <code>npm run zobot:fix-import-titles</code> before re-import.</p>
+        <p>If Answer Bot returns wrong Catholicos names (Paulose II, Didymos I), confirm FAQ rows are uploaded and titles are specific — run <code>npm run zobot:fix-import-titles</code> before <code>zobot:bulk-upload-articles -- --confirm</code>.</p>
 
-        <h2 id="npm-scripts">11. npm scripts reference</h2>
+        <h2 id="npm-scripts">12. npm scripts reference</h2>
         <p>All commands run from <code>F:\project_workspace\mosc-temp</code>:</p>
         <table>
             <thead>
@@ -441,12 +556,18 @@ npm run zobot:bulk-delete-articles -- --env-file F:/project_workspace/event-site
                 <tr><td><code>zobot:fix-import-titles</code></td><td>fix-salesiq-import-titles.mjs</td><td>Fix generic article titles</td></tr>
                 <tr><td><code>zobot:patch-import-csv</code></td><td>patch-salesiq-import-csv.mjs</td><td>Add Department / Channels / Status columns</td></tr>
                 <tr><td><code>zobot:merge-faq-supplement</code></td><td>merge-salesiq-faq-supplement.mjs</td><td>Append FAQ CSV rows to main import</td></tr>
+                <tr><td><code>zobot:list-portal-ids</code></td><td>list-salesiq-portal-ids.mjs</td><td>Print SalesIQ category / department IDs</td></tr>
+                <tr><td><code>zobot:bulk-upload-articles</code></td><td>bulk-upload-salesiq-articles.mjs</td><td>Create articles from CSV via POST API</td></tr>
                 <tr><td><code>zobot:bulk-delete-articles</code></td><td>bulk-delete-salesiq-articles.mjs</td><td>Delete articles via SalesIQ API</td></tr>
                 <tr><td><code>zobot:exchange-zoho-code</code></td><td>exchange-zoho-oauth-code.mjs</td><td>CLI OAuth code exchange</td></tr>
             </tbody>
         </table>
+        <p>Upload examples:</p>
+        <pre>npm run zobot:bulk-upload-articles -- --dry-run
+npm run zobot:bulk-upload-articles -- --confirm --limit 5
+npm run zobot:bulk-upload-articles -- --confirm</pre>
 
-        <h2 id="files">12. Key files</h2>
+        <h2 id="files">13. Key files</h2>
         <table>
             <thead>
                 <tr><th>Path</th><th>Role</th></tr>
@@ -456,14 +577,17 @@ npm run zobot:bulk-delete-articles -- --env-file F:/project_workspace/event-site
                 <tr><td><code>documentation/zoh_zobot_settings/salesiq-faq-supplement.csv</code></td><td>Curated FAQ rows (edit here first)</td></tr>
                 <tr><td><code>documentation/zoh_zobot_settings/mosc-redesign-urls.txt</code></td><td>URL list for export script</td></tr>
                 <tr><td><code>scripts/zoh-zobot-settings/load-zoho-env.mjs</code></td><td>Loads .env.local from mosc-temp or event-site-manager</td></tr>
-                <tr><td><code>scripts/zoh-zobot-settings/zoho-salesiq-api.mjs</code></td><td>SalesIQ REST helpers (list/delete articles)</td></tr>
+                <tr><td><code>scripts/zoh-zobot-settings/zoho-salesiq-api.mjs</code></td><td>SalesIQ REST helpers (list/create/delete articles, categories)</td></tr>
+                <tr><td><code>scripts/zoh-zobot-settings/bulk-upload-salesiq-articles.mjs</code></td><td>CSV → POST <code>/api/v2/giventainc/articles</code></td></tr>
+                <tr><td><code>scripts/zoh-zobot-settings/list-salesiq-portal-ids.mjs</code></td><td>Resolve category_id / department_id for .env.local</td></tr>
+                <tr><td><code>scripts/zoh-zobot-settings/salesiq-title-utils.mjs</code></td><td>Title slug fallback for generic CSV titles</td></tr>
                 <tr><td><code>event-site-manager/src/app/oauth/zoho/start/route.ts</code></td><td>Starts OAuth redirect</td></tr>
                 <tr><td><code>event-site-manager/src/app/oauth/zoho/callback/route.ts</code></td><td>Exchanges code; displays refresh token</td></tr>
                 <tr><td><code>event-site-manager/src/lib/zoho/salesiq-oauth.ts</code></td><td>OAuth URL + token exchange logic</td></tr>
             </tbody>
         </table>
 
-        <h2 id="troubleshooting">13. Troubleshooting</h2>
+        <h2 id="troubleshooting">14. Troubleshooting</h2>
         <table>
             <thead>
                 <tr><th>Symptom</th><th>Cause / fix</th></tr>
@@ -478,15 +602,31 @@ npm run zobot:bulk-delete-articles -- --env-file F:/project_workspace/event-site
                     <td>Revoke app in Zoho Accounts → run <code>/oauth/zoho/start</code> again (needs <code>prompt=consent</code> + <code>access_type=offline</code>).</td>
                 </tr>
                 <tr>
-                    <td><code>Missing ZOHO_REFRESH_TOKEN</code> in bulk delete</td>
+                    <td><code>Missing ZOHO_REFRESH_TOKEN</code> in bulk delete/upload</td>
                     <td>Add token to <code>.env.local</code> in mosc-temp or event-site-manager; or pass <code>--env-file</code>.</td>
                 </tr>
                 <tr>
-                    <td>Answer Bot wrong Catholicos</td>
-                    <td>Import FAQ supplement; run <code>zobot:fix-import-titles</code>; re-import. Old Paulose II / Didymos pages still exist but FAQ must win retrieval.</td>
+                    <td><code>Invalid OAuthScope</code> on upload</td>
+                    <td>Refresh token lacks <code>SalesIQ.articles.CREATE</code>. Add scope to <code>ZOHO_OAUTH_SCOPES</code>, restart event-site-manager, re-run <code>http://localhost:3000/oauth/zoho/start</code>, replace <code>ZOHO_REFRESH_TOKEN</code>.</td>
                 </tr>
                 <tr>
-                    <td>Import “Invalid article language”</td>
+                    <td><code>fetch failed</code> / <code>UNABLE_TO_VERIFY_LEAF_SIGNATURE</code></td>
+                    <td>TLS interception on your network. Set <code>ZOHO_INSECURE_TLS=1</code> in <code>.env.local</code> (dev only), or fix corporate root CA in Node.</td>
+                </tr>
+                <tr>
+                    <td>Upload skips all rows (“already exists”)</td>
+                    <td>Portal still has articles with same titles. Run <code>zobot:bulk-delete-articles -- --confirm</code> or use <code>--no-skip-existing</code> (may duplicate titles).</td>
+                </tr>
+                <tr>
+                    <td>Delete dry-run shows 97 but CSV has 272</td>
+                    <td>97 was articles <em>in the portal</em> before delete; 272 is local CSV rows. Portal CSV import often imported fewer rows. API upload targets all CSV rows.</td>
+                </tr>
+                <tr>
+                    <td>Answer Bot wrong Catholicos</td>
+                    <td>Merge FAQ supplement; run <code>zobot:fix-import-titles</code>; run <code>zobot:bulk-upload-articles -- --confirm</code>; re-train Answer Bot.</td>
+                </tr>
+                <tr>
+                    <td>Import “Invalid article language” (portal only)</td>
                     <td>Use <code>English</code> not <code>en</code> — run <code>zobot:patch-import-csv --language English</code>.</td>
                 </tr>
                 <tr>
@@ -504,8 +644,9 @@ npm run zobot:bulk-delete-articles -- --env-file F:/project_workspace/event-site
                     <li>☐ <code>npm run zobot:bulk-delete-articles -- --confirm</code> completed</li>
                     <li>☐ <code>salesiq-faq-supplement.csv</code> updated for new Q&amp;A</li>
                     <li>☐ <code>npm run zobot:merge-faq-supplement</code> run</li>
-                    <li>☐ CSV imported in SalesIQ portal</li>
-                    <li>☐ Answer Bot connected to Articles</li>
+                    <li>☐ <code>npm run zobot:fix-import-titles</code> run</li>
+                    <li>☐ <code>npm run zobot:bulk-upload-articles -- --dry-run</code> then <code>--confirm</code> (or portal CSV import)</li>
+                    <li>☐ Answer Bot connected to Articles / re-trained</li>
                     <li>☐ Six test questions verified in widget</li>
                 </ol>
             </div>

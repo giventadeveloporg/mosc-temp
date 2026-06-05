@@ -336,6 +336,18 @@ INSERT INTO public.official_document_category (id, tenant_id, slug, display_name
 
 INSERT INTO public.official_document_category (id, tenant_id, slug, display_name, description, sort_order, is_active, created_at, updated_at) VALUES (10222, 'tenant_demo_002', 'local-body-election-winners-award-ceremony-photos', 'local body Election winners award ceremony – Photos', 'Auto-seeded for mirror upload refactor', 360, true, '2026-03-26 14:40:49.756769', '2026-03-26 14:40:49.756769');
 
+INSERT INTO public.official_document_year_bundle (id, tenant_id, official_document_category_id, document_year, cover_event_media_id, created_at, updated_at) VALUES (10273, 'tenant_demo_002', 8472, 2023, NULL, '2026-03-26 19:43:52.937563', '2026-03-26 19:43:52.937563');
+
+INSERT INTO public.official_document_year_bundle (id, tenant_id, official_document_category_id, document_year, cover_event_media_id, created_at, updated_at) VALUES (10274, 'tenant_demo_002', 8522, 2023, NULL, '2026-03-26 19:51:27.240367', '2026-03-26 19:51:27.240367');
+
+INSERT INTO public.official_document_year_bundle (id, tenant_id, official_document_category_id, document_year, cover_event_media_id, created_at, updated_at) VALUES (10275, 'tenant_demo_002', 8572, 2021, NULL, '2026-03-26 19:51:29.253391', '2026-03-26 19:51:29.253391');
+
+INSERT INTO public.official_document_year_bundle (id, tenant_id, official_document_category_id, document_year, cover_event_media_id, created_at, updated_at) VALUES (10276, 'tenant_demo_002', 8622, 2025, NULL, '2026-03-26 19:51:30.123019', '2026-03-26 19:51:30.123019');
+
+INSERT INTO public.official_document_year_bundle (id, tenant_id, official_document_category_id, document_year, cover_event_media_id, created_at, updated_at) VALUES (10277, 'tenant_demo_002', 8672, 2023, NULL, '2026-03-26 19:51:30.523355', '2026-03-26 19:51:30.523355');
+
+INSERT INTO public.official_document_year_bundle (id, tenant_id, official_document_category_id, document_year, cover_event_media_id, created_at, updated_at) VALUES (11043, 'tenant_demo_002', 1150, 2026, NULL, '2026-06-03 15:26:02.82235', '2026-06-03 15:26:02.82235');
+
 INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, official_document_category_id, official_document_year, hierarchy_path, hierarchy_category_label, display_priority, pre_signed_url, pre_signed_url_expires_at, thumbnail_url, thumbnail_pre_signed_url, thumbnail_pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id, event_focus_group_id) VALUES (4150, 'tenant_demo_001', 'music_fest.jfif', '115943', 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/events/tenantId/tenant_demo_001/event-id/1/music_fest_1750026380991_16eac442.jfif', NULL, 'image/jpeg', 13369, true, false, false, false, NULL, NULL, NULL, NULL, NULL, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/events/tenantId/tenant_demo_001/event-id/1/music_fest_1750026380991_16eac442.jfif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250615T222621Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIATIT5HARDKCWNLQMU%2F20250615%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=fe05c34013a10da60e63df0cc7bcf34a493ff96dbd9a732408bebcff759afe96', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, false, false, '2025-01-12', '2025-06-15 22:26:21.112', '2025-06-15 22:26:21.112', 1, 1, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL, NULL);
 
 INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, official_document_category_id, official_document_year, hierarchy_path, hierarchy_category_label, display_priority, pre_signed_url, pre_signed_url_expires_at, thumbnail_url, thumbnail_pre_signed_url, thumbnail_pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id, event_focus_group_id) VALUES (4200, 'tenant_demo_001', 'mens_party.jfif', '115944', 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/events/tenantId/tenant_demo_001/event-id/1/mens_party_1750026380857_14c08f34.jfif', NULL, 'image/jpeg', 11908, true, false, false, false, NULL, NULL, NULL, NULL, NULL, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/events/tenantId/tenant_demo_001/event-id/1/mens_party_1750026380857_14c08f34.jfif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250615T222620Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDKCWNLQMU%2F20250615%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=9b8f1373e82b4c9ef900736e3955434b27150e958e7816aa6e65bd9ae42e1080', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, false, false, '2025-01-14', '2025-06-15 22:26:20.99', '2025-06-15 22:26:20.99', 1, 1, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL, NULL);
@@ -1074,11 +1086,21 @@ INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_im
 
 INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (8319, 'tenant_demo_002', 'GD', 'test3', '', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/focus-groups/focus-group-id/8319/cover_image_1772711100499_be47e165.webp', true, '2026-02-19 09:07:58.352404', '2026-03-05 11:45:27.536866');
 
+INSERT INTO public.focus_group_members (id, tenant_id, focus_group_id, user_profile_id, role, status, created_at, updated_at) VALUES (8397, 'tenant_demo_002', 8311, 5152, 'MEMBER', 'ACTIVE', '2026-03-06 04:20:48.145782', '2026-03-06 04:20:48.145782');
+
+INSERT INTO public.event_focus_groups (id, tenant_id, event_id, focus_group_id, created_at, updated_at) VALUES (8399, 'tenant_demo_002', 2, 8311, '2026-03-06 21:34:44.556787', '2026-03-06 21:34:44.556787');
+
+INSERT INTO public.event_focus_groups (id, tenant_id, event_id, focus_group_id, created_at, updated_at) VALUES (8401, 'tenant_demo_002', 4202, 8311, '2026-03-06 21:56:18.248678', '2026-03-06 21:56:18.248678');
+
+INSERT INTO public.event_focus_groups (id, tenant_id, event_id, focus_group_id, created_at, updated_at) VALUES (10534, 'tenant_demo_002', 2, 8319, '2026-04-30 13:14:28.634953', '2026-04-30 13:14:28.634953');
+
 INSERT INTO public.membership_plan (id, tenant_id, plan_name, plan_code, description, plan_type, billing_interval, price, currency, trial_days, is_active, max_events_per_month, max_attendees_per_event, features_json, stripe_price_id, stripe_product_id, created_at, updated_at) VALUES (4051, 'tenant_demo_002', 'plan 1', 'x', 'cxxcxc', 'SUBSCRIPTION', 'MONTHLY', 10.00, 'USD', 0, true, NULL, NULL, '{}', 'price_1SaRprK5BrggeAHM0ttspTpF', 'prod_TXWtwHhfpZZVFm', '2025-12-04 01:59:57.818855', '2025-12-03 20:59:57.82681');
 
 INSERT INTO public.membership_plan (id, tenant_id, plan_name, plan_code, description, plan_type, billing_interval, price, currency, trial_days, is_active, max_events_per_month, max_attendees_per_event, features_json, stripe_price_id, stripe_product_id, created_at, updated_at) VALUES (10686, 'tenant_demo_002', 'Plan 2', 'plan_2', 'Test plan 2 for membership subscription', 'SUBSCRIPTION', 'MONTHLY', 0.70, 'USD', 0, true, NULL, NULL, '{}', 'price_1TTZwHK5BrggeAHMgHoHsPHS', 'prod_USUw96nfcCgPGF', '2026-05-05 03:46:28.959546', '2026-05-05 03:46:28.961535');
 
 INSERT INTO public.membership_plan (id, tenant_id, plan_name, plan_code, description, plan_type, billing_interval, price, currency, trial_days, is_active, max_events_per_month, max_attendees_per_event, features_json, stripe_price_id, stripe_product_id, created_at, updated_at) VALUES (10687, 'tenant_demo_002', 'Plan 3', 'plan_3', 'Test plan 3 for membership subscription', 'SUBSCRIPTION', 'MONTHLY', 0.80, 'USD', 0, true, NULL, NULL, '{}', 'price_1TTZwJK5BrggeAHMnyST2Ty7', 'prod_USUww7edwsHc7x', '2026-05-05 03:46:31.274952', '2026-05-05 03:46:31.276854');
+
+INSERT INTO public.membership_subscription (id, tenant_id, user_profile_id, membership_plan_id, subscription_status, current_period_start, current_period_end, trial_start, trial_end, cancel_at_period_end, cancelled_at, cancellation_reason, stripe_subscription_id, stripe_customer_id, last_reconciliation_at, last_stripe_sync_at, reconciliation_status, reconciliation_error, payment_provider_config_id, created_at, updated_at) VALUES (8301, 'tenant_demo_002', 5152, 4051, 'ACTIVE', '2026-04-25', '2026-05-25', NULL, NULL, false, NULL, NULL, 'sub_1StVyvK5BrggeAHMZp7ftrtE', 'cus_TrERekicacV7Wg', '2026-05-20 23:59:59.650134', '2026-05-20 23:59:59.650136', 'SYNCED', NULL, NULL, '2026-01-25 16:16:37.085563', '2026-05-20 23:59:59.387286');
 
 INSERT INTO public.payment_provider_config (id, tenant_id, provider_name, payment_use_case, is_active, supports_acp, supports_zeffy, supports_zelle, supports_revolut, provider_api_key_encrypted, provider_secret_key_encrypted, webhook_secret_encrypted, payment_method_domain_id, publishable_key, fallback_order, configuration_json, created_at, updated_at) VALUES (7350, 'tenant_demo_002', 'STRIPE', NULL, true, false, false, false, false, NULL, 'HkEKaSSud4Z4GVrbkrcVi+we/MoghoxEckEs/aQ3yZE2vSLxcyXkGZIoNFmf6VPfaowY9MRlPLUla5lX99k/Nq8GuvVuITuxZymfRk+2jiy8RMjMAAr7EjLRH8IjBX26bs84sx63os5igsD9OYU/lAQ0EAt0ShwdoQEEp5w8yJnJIc605ZsB', 'o1wcxuWu4y1b/zYsXKfPda5s+zaS0NQJsD07ZIDVSbkFJu/1qnPmqi17gWXm8Pb+oQ9wVUJA3xYRqQ5iQS3t4ZR9', 'pmd_1SWrMSK5BrggeAHMmHxUd9F2', 'pk_test_51JoBNqK5BrggeAHMxgJ7OBl3MKNlJMG0fuxwwsqk6bXldsQKyUlP283EUgICwcd57D9GUSAUfRPa06GD7xcXqqyH00tc3RDr97', 0, NULL, '2025-12-10 01:48:01.528663', '2025-12-10 01:48:01.528663');
 
@@ -1174,1380 +1196,15 @@ INSERT INTO public.manual_payment_request (id, tenant_id, event_id, ticket_trans
 
 INSERT INTO public.manual_payment_request (id, tenant_id, event_id, ticket_transaction_id, requester_email, requester_first_name, requester_last_name, requester_phone, amount_due, payment_method_type, payment_handle, payment_instructions, status, proof_of_payment_file_key, proof_of_payment_file_url, proof_of_payment_uploaded_at, received_at, received_by, void_reason, created_at, updated_at) VALUES (8151, 'tenant_demo_002', 4201, 8201, 'giventauser@gmail.com', NULL, NULL, '3123430073', 0.70, 'ZELLE_MANUAL', NULL, NULL, 'REQUESTED', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-22 22:54:32.916682', '2026-01-22 22:54:32.916682');
 
+INSERT INTO public.manual_payment_summary_report (id, tenant_id, event_id, payment_method_type, status, total_amount, transaction_count, snapshot_date, created_at) VALUES (7602, 'tenant_demo_002', 4201, 'VENMO_MANUAL', 'REQUESTED', 0.60, 1, '2026-01-19', '2026-01-19 06:35:28.603723');
+
+INSERT INTO public.manual_payment_summary_report (id, tenant_id, event_id, payment_method_type, status, total_amount, transaction_count, snapshot_date, created_at) VALUES (7652, 'tenant_demo_002', 4201, 'ZELLE_MANUAL', 'REQUESTED', 0.70, 1, '2026-01-19', '2026-01-19 06:35:28.603723');
+
 INSERT INTO public.clerk_organization_role (id, clerk_org_id, clerk_role_name, application_role, permissions, created_at, updated_at) VALUES (4050, 'org_default', 'org:admin', 'ROLE_ORG_ADMIN', '{"canManageUsers": true, "canViewReports": true, "canManageEvents": true, "canManageSettings": true}', '2025-10-12 23:51:39.101705', '2025-10-12 23:51:39.101705');
 
 INSERT INTO public.clerk_organization_role (id, clerk_org_id, clerk_role_name, application_role, permissions, created_at, updated_at) VALUES (4100, 'org_default', 'org:member', 'ROLE_ORG_MEMBER', '{"canViewEvents": true, "canRegisterEvents": true, "canUpdateOwnProfile": true}', '2025-10-12 23:51:39.101705', '2025-10-12 23:51:39.101705');
 
 INSERT INTO public.clerk_organization_role (id, clerk_org_id, clerk_role_name, application_role, permissions, created_at, updated_at) VALUES (4150, 'org_default', 'org:viewer', 'ROLE_VIEWER', '{"canViewEvents": true}', '2025-10-12 23:51:39.101705', '2025-10-12 23:51:39.101705');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4001, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'FAILED', 'tenant_demo_002', '2026-01-14 03:42:29.112828', '2026-01-14 03:42:29.362447', 249, 0, 0, 1, 'No enum constant com.eventmanager.batch.domain.enumeration.TenantEmailType.INFO', 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4002, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'FAILED', 'tenant_demo_002', '2026-01-14 03:43:25.239245', '2026-01-14 03:43:25.264826', 25, 0, 0, 1, 'No enum constant com.eventmanager.batch.domain.enumeration.TenantEmailType.INFO', 'API', '{"tenantId":"tenant_demo_002","fromEmail":"giventauser@gmail.com","toEmail":"info@mosc.in"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4003, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'FAILED', 'tenant_demo_002', '2026-01-14 15:29:47.544969', '2026-01-14 15:29:47.67151', 126, 0, 0, 1, 'No enum constant com.eventmanager.batch.domain.enumeration.TenantEmailType.INFO', 'API', '{"tenantId":"tenant_demo_002","fromEmail":"giventauser@gmail.com","toEmail":"info@mosc.in"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4401, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-01-14 16:37:57.098722', '2026-01-14 16:37:58.426254', 1327, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"giventauser@gmail.com","toEmail":"info@mosc.in"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (2, 'manualPaymentSummaryJob', 'MANUAL_PAYMENT_SUMMARY', 'COMPLETED', 'tenant_demo_002', '2026-01-19 04:52:12.008914', '2026-01-19 04:52:12.183101', 174, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","eventId":4201,"snapshotDate":"2026-01-19"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (3, 'manualPaymentConfirmationEmailJob', 'MANUAL_PAYMENT_CONFIRMATION_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-01-19 06:17:12.965247', '2026-01-19 06:17:18.317466', 5352, 1, 1, 0, NULL, 'API', '{"paymentRequestId":7451,"eventId":4201,"tenantId":"tenant_demo_002","recipientEmail":"giventauser@gmail.com"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4, 'manualPaymentConfirmationEmailJob', 'MANUAL_PAYMENT_CONFIRMATION_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-01-19 06:29:37.573363', '2026-01-19 06:29:38.362996', 789, 1, 1, 0, NULL, 'API', '{"paymentRequestId":7452,"eventId":4201,"tenantId":"tenant_demo_002","recipientEmail":"giventauser@gmail.com"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5, 'manualPaymentSummaryJob', 'MANUAL_PAYMENT_SUMMARY', 'COMPLETED', 'tenant_demo_002', '2026-01-19 06:35:28.633011', '2026-01-19 06:35:28.683335', 50, 2, 2, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","eventId":4201,"snapshotDate":"2026-01-19"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4403, 'manualPaymentConfirmationEmailJob', 'MANUAL_PAYMENT_CONFIRMATION_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-01-22 22:55:27.545249', '2026-01-22 22:55:32.599837', 5054, 1, 1, 0, NULL, 'API', '{"paymentRequestId":8151,"eventId":4201,"tenantId":"tenant_demo_002","recipientEmail":"giventauser@gmail.com"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4405, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-01-25 19:12:13.561311', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4407, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-01-26 02:10:48.92341', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4409, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-02 09:58:03.313648', '2026-02-02 09:58:04.125704', 812, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4411, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-02 15:48:39.351004', '2026-02-02 15:48:39.689021', 338, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4413, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-02 17:57:22.052896', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4415, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-03 03:01:30.499843', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4417, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-03 06:06:40.605745', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4419, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-03 18:03:54.032852', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4421, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-04 02:44:33.041484', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4423, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-04 06:12:36.477875', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4425, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-04 20:05:51.596596', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4427, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-05 11:55:49.576051', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4429, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-05 12:00:01.050597', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4431, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-06 01:08:15.737531', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4433, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-06 12:51:52.772656', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4435, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-06 17:59:55.268235', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4437, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-07 00:00:40.653537', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4439, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-07 06:01:37.525625', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4441, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-07 18:11:51.5707', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4443, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-08 01:12:01.141275', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4445, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-08 06:32:01.743217', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4447, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-11 23:59:59.090299', '2026-02-11 23:59:59.212515', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4449, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 06:00:00.498941', '2026-02-12 06:00:00.766934', 267, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4451, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 11:59:59.156415', '2026-02-12 11:59:59.250289', 93, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4453, 'promotionTestEmailJob', 'PROMOTION_TEST_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-12 12:34:56.480306', '2026-02-12 12:34:57.980979', 1500, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","templateId":4102,"recipientEmail":"giventauser@gmail.com"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4455, 'promotionTestEmailJob', 'PROMOTION_TEST_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-12 12:41:18.590312', '2026-02-12 12:41:18.919643', 329, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","templateId":5052,"recipientEmail":"giventauser@gmail.com"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4457, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 17:59:58.839232', '2026-02-12 17:59:58.954106', 114, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4459, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 23:59:59.036595', '2026-02-12 23:59:59.18736', 150, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4461, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 05:59:59.080774', '2026-02-13 05:59:59.226064', 145, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4463, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 11:59:58.99783', '2026-02-13 11:59:59.121461', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4465, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 17:59:59.013298', '2026-02-13 17:59:59.140849', 127, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4467, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 23:59:59.060978', '2026-02-13 23:59:59.153627', 92, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4469, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 05:59:59.05423', '2026-02-14 05:59:59.16544', 111, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4471, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 11:59:58.984103', '2026-02-14 11:59:59.03505', 50, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4473, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 17:59:59.129185', '2026-02-14 17:59:59.253068', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4475, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 23:59:58.970393', '2026-02-14 23:59:59.084166', 113, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4477, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 05:59:59.073777', '2026-02-15 05:59:59.196247', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4479, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 11:59:59.119266', '2026-02-15 11:59:59.240567', 121, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(16) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4481, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 17:59:59.084056', '2026-02-15 17:59:59.222735', 138, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(17) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4483, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 23:59:59.141651', '2026-02-15 23:59:59.29987', 158, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(3) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4485, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 05:59:59.085766', '2026-02-16 05:59:59.216895', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4487, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 11:59:59.149212', '2026-02-16 11:59:59.290418', 141, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4489, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 17:59:59.155504', '2026-02-16 17:59:59.29312', 137, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4491, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 23:59:59.097441', '2026-02-16 23:59:59.237444', 140, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4493, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 05:59:59.04358', '2026-02-17 05:59:59.186304', 142, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4495, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 11:59:59.218792', '2026-02-17 11:59:59.402091', 183, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4497, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 17:59:59.039182', '2026-02-17 17:59:59.182704', 143, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4499, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 23:59:59.016341', '2026-02-17 23:59:59.096947', 80, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4501, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-18 04:24:41.064681', '2026-02-18 04:24:42.862082', 1797, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"gain@hotmail.com","toEmail":"info@mosc.in"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4503, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 05:59:59.604348', '2026-02-18 05:59:59.793864', 189, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4555, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-23 23:59:59.077234', '2026-02-23 23:59:59.20395', 126, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(50) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4505, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 11:59:59.243575', '2026-02-18 11:59:59.362902', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4565, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-25 06:00:00.560094', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4507, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 17:59:59.097355', '2026-02-18 17:59:59.199274', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4509, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-19 00:00:00.056614', '2026-02-19 00:00:00.538922', 482, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4511, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-19 05:59:59.076668', '2026-02-19 05:59:59.177905', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(16) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4513, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-19 11:59:58.444751', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4515, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-19 13:54:11.921075', '2026-02-19 13:54:13.626624', 1705, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4517, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-19 14:05:06.89022', '2026-02-19 14:05:07.439133', 548, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"gain@hotmail.com","toEmail":"info@mosc.in"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4519, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-19 14:06:32.064445', '2026-02-19 14:06:32.555988', 491, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4521, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-19 17:59:59.061375', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4523, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-19 23:59:58.955358', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4525, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-20 05:59:59.038529', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4527, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-20 11:59:59.111088', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4529, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-20 17:59:59.030725', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4531, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-20 23:59:59.010607', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4533, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-21 05:59:59.040009', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4535, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-21 11:59:59.050268', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4537, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-21 17:59:59.066477', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4539, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-21 23:59:59.033826', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4541, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-22 05:59:59.004504', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4543, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-22 11:59:59.021889', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4545, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-22 17:59:59.036196', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4547, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-22 23:59:59.029052', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4549, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-23 05:59:59.13856', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4551, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-23 11:59:59.000774', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4553, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-23 17:59:59.13965', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4557, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-24 05:59:59.165754', '2026-02-24 05:59:59.310217', 144, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(51) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4559, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-24 11:59:59.101711', '2026-02-24 11:59:59.234431', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(52) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4561, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-24 17:59:59.118241', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4563, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-24 23:59:59.027181', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4567, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-25 11:59:59.155614', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4569, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-25 14:48:05.520872', '2026-02-25 14:48:07.020477', 1499, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4571, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-25 15:12:32.071651', '2026-02-25 15:12:32.641831', 570, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4573, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-25 15:16:52.121598', '2026-02-25 15:16:52.72877', 607, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4575, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-25 17:59:59.209081', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4577, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-25 23:59:59.074313', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4579, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-26 05:59:59.106618', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4581, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-26 11:59:59.315342', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4583, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-26 17:59:59.203008', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4585, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-26 23:59:58.96887', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4587, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-27 03:48:17.717702', '2026-02-27 03:48:18.51004', 792, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4589, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-27 05:59:59.078717', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4591, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-27 11:59:59.089219', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4593, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-27 17:59:59.049328', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4595, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-27 23:59:59.075538', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4597, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 06:00:00.39427', '2026-03-01 06:00:00.834472', 440, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4599, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 11:59:58.965786', '2026-03-01 11:59:59.06753', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4601, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 17:59:59.013609', '2026-03-01 17:59:59.083007', 69, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4603, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 23:59:59.065287', '2026-03-01 23:59:59.173669', 108, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4605, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 05:59:58.970168', '2026-03-02 05:59:59.102805', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4607, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 11:59:59.067571', '2026-03-02 11:59:59.198777', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4609, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 17:59:59.055131', '2026-03-02 17:59:59.166968', 111, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4611, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 23:59:59.017073', '2026-03-02 23:59:59.136351', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4643, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 11:59:58.938551', '2026-03-07 11:59:58.986162', 47, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4613, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 05:59:58.997096', '2026-03-03 05:59:59.131709', 134, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4615, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 11:59:59.01668', '2026-03-03 11:59:59.132187', 115, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4617, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 17:59:58.919515', '2026-03-03 17:59:59.051274', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4619, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 23:59:59.068691', '2026-03-03 23:59:59.184947', 116, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4621, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 05:59:59.004038', '2026-03-04 05:59:59.13432', 130, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4623, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 11:59:58.953354', '2026-03-04 11:59:59.086181', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4625, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 17:59:58.97233', '2026-03-04 17:59:59.111082', 138, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4627, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 00:00:00.255272', '2026-03-05 00:00:00.518169', 262, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4629, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 05:59:59.217609', '2026-03-05 05:59:59.507303', 289, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(43) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4631, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 11:59:59.115486', '2026-03-05 11:59:59.218763', 103, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(44) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4633, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 05:59:59.164572', '2026-03-06 05:59:59.497754', 333, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4635, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 11:59:59.10985', '2026-03-06 11:59:59.246162', 136, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4637, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 17:59:59.153157', '2026-03-06 17:59:59.261476', 108, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4639, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 23:59:59.02013', '2026-03-06 23:59:59.146983', 126, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4641, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 05:59:59.001761', '2026-03-07 05:59:59.057117', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4929, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-26 18:00:00.304651', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4931, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-26 23:59:59.291979', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4645, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 17:59:59.011083', '2026-03-07 17:59:59.066131', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4647, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 23:59:58.957583', '2026-03-07 23:59:59.017701', 60, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4649, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 05:59:59.183861', '2026-03-08 05:59:59.306781', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4651, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 11:59:59.057128', '2026-03-08 11:59:59.156015', 98, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4653, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 17:59:59.03081', '2026-03-08 17:59:59.090814', 60, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4655, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 23:59:58.953587', '2026-03-08 23:59:58.99855', 44, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4657, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-09 06:00:00.431328', '2026-03-09 06:00:00.764318', 332, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4659, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-09 11:59:59.078209', '2026-03-09 11:59:59.190553', 112, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4661, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-10 00:00:00.444017', '2026-03-10 00:00:00.790049', 346, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4663, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-10 05:59:59.175491', '2026-03-10 05:59:59.305783', 130, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4665, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-10 11:59:59.126802', '2026-03-10 11:59:59.239084', 112, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4667, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-10 17:59:59.083242', '2026-03-10 17:59:59.197751', 114, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4669, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-10 23:59:58.993104', '2026-03-10 23:59:59.121356', 128, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4671, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-11 06:00:00.400795', '2026-03-11 06:00:00.746445', 345, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4673, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-11 11:59:59.106998', '2026-03-11 11:59:59.200861', 93, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4675, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-11 17:59:58.914064', '2026-03-11 17:59:59.006237', 92, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4677, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-11 23:59:59.117156', '2026-03-11 23:59:59.2218', 104, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4679, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-12 05:59:59.13956', '2026-03-12 05:59:59.237076', 97, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4681, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-12 11:59:59.084166', '2026-03-12 11:59:59.197509', 113, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4683, 'promotionTestEmailJob', 'PROMOTION_TEST_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-03-12 17:57:49.379157', '2026-03-12 17:57:51.117043', 1737, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","templateId":4102,"recipientEmail":"giventauser@gmail.com"}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4685, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-12 17:59:58.888527', '2026-03-12 17:59:58.935889', 47, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4687, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-26 17:50:45.682168', '2026-03-26 17:50:45.785', 102, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4689, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-26 17:59:57.758233', '2026-03-26 17:59:57.822526', 64, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4841, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-15 18:00:00.304923', '2026-04-15 18:00:00.643554', 338, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(27) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4691, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-27 06:00:00.395093', '2026-03-27 06:00:00.708831', 313, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4693, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-27 11:59:59.310264', '2026-03-27 11:59:59.434154', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4695, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-27 17:59:59.341512', '2026-03-27 17:59:59.43342', 91, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4697, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-27 23:59:59.342026', '2026-03-27 23:59:59.423347', 81, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4699, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-28 05:59:59.262029', '2026-03-28 05:59:59.318662', 56, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4701, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-28 11:59:59.282275', '2026-03-28 11:59:59.328692', 46, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4703, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-28 17:59:59.234413', '2026-03-28 17:59:59.279899', 45, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4705, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-28 23:59:59.328393', '2026-03-28 23:59:59.380762', 52, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4707, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-29 05:59:59.115217', '2026-03-29 05:59:59.152178', 36, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4709, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-29 11:59:59.563864', '2026-03-29 11:59:59.760232', 196, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4711, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-29 17:59:59.246369', '2026-03-29 17:59:59.352593', 106, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4713, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-29 23:59:59.168454', '2026-03-29 23:59:59.213488', 45, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4715, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-30 05:59:59.398126', '2026-03-30 05:59:59.529024', 130, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4717, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-30 11:59:59.413748', '2026-03-30 12:00:00.183845', 770, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4719, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-30 17:59:59.376253', '2026-03-30 17:59:59.508743', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(16) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4721, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-30 23:59:59.262261', '2026-03-30 23:59:59.362944', 100, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(17) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4723, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-31 05:59:59.251094', '2026-03-31 05:59:59.394885', 143, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(3) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4725, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-31 11:59:59.273968', '2026-03-31 11:59:59.413039', 139, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4727, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-31 17:59:59.320353', '2026-03-31 17:59:59.447383', 127, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4755, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-04 11:59:59.156035', '2026-04-04 11:59:59.199792', 43, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(34) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4729, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-31 23:59:59.704697', '2026-04-01 00:00:00.276635', 571, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4731, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-01 05:59:59.3941', '2026-04-01 05:59:59.545069', 150, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4733, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-01 11:59:59.490149', '2026-04-01 11:59:59.68383', 193, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4735, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-01 17:59:59.44392', '2026-04-01 17:59:59.579504', 135, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4737, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-01 23:59:59.228924', '2026-04-01 23:59:59.319291', 90, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4739, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-02 05:59:59.868702', '2026-04-02 06:00:00.004185', 135, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4741, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-02 11:59:59.524962', '2026-04-02 11:59:59.631626', 106, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4891, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-21 23:59:59.376818', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4743, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-02 17:59:59.499479', '2026-04-02 17:59:59.629178', 129, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4895, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-22 11:59:59.296435', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4745, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-03 05:59:59.228859', '2026-04-03 05:59:59.479233', 250, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4747, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-03 11:59:59.125658', '2026-04-03 11:59:59.175487', 49, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4749, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-03 17:59:59.168755', '2026-04-03 17:59:59.224149', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(16) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4751, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-03 23:59:59.219953', '2026-04-03 23:59:59.261567', 41, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(32) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4753, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-04 05:59:59.181047', '2026-04-04 06:00:00.4988', 1317, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(33) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4757, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-04 17:59:59.07361', '2026-04-04 17:59:59.112214', 38, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(35) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4759, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-04 23:59:59.083961', '2026-04-04 23:59:59.315846', 231, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(36) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4761, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-05 05:59:58.971126', '2026-04-05 05:59:59.282507', 311, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(37) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4933, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-27 06:00:00.367813', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4763, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-05 11:59:59.170704', '2026-04-05 11:59:59.208964', 38, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(38) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4765, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-05 17:59:59.918589', '2026-04-05 17:59:59.971004', 52, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(39) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4767, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-05 23:59:59.256764', '2026-04-05 23:59:59.300418', 43, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(40) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4769, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-06 05:59:59.275042', '2026-04-06 05:59:59.393427', 118, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(41) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4771, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-06 11:59:59.223568', '2026-04-06 11:59:59.290369', 66, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(42) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4897, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-22 17:59:59.164861', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4773, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-06 17:59:59.312848', '2026-04-06 17:59:59.433975', 121, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(43) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4775, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-06 23:59:59.110989', '2026-04-06 23:59:59.171267', 60, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(44) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4777, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-07 05:59:58.907067', '2026-04-07 05:59:58.959577', 52, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(45) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4779, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-07 11:59:59.479406', '2026-04-07 11:59:59.602808', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(46) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4781, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-07 17:59:59.16697', '2026-04-07 17:59:59.760906', 593, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(47) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4783, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-07 23:59:59.225898', '2026-04-07 23:59:59.56524', 339, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(48) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4785, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-08 05:59:59.151603', '2026-04-08 05:59:59.265556', 113, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(49) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4787, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-08 11:59:59.243075', '2026-04-08 11:59:59.37456', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(50) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4789, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-08 17:59:59.219871', '2026-04-08 17:59:59.355251', 135, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(51) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4791, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-08 23:59:59.224316', '2026-04-08 23:59:59.299101', 74, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(52) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4935, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-27 11:59:59.182564', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4793, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-09 05:59:59.042792', '2026-04-09 05:59:59.10701', 64, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(53) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4795, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-09 11:59:59.370266', '2026-04-09 11:59:59.48939', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(54) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4797, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-09 17:59:59.364818', '2026-04-09 17:59:59.491285', 126, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(55) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4799, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-09 23:59:59.170766', '2026-04-09 23:59:59.228058', 57, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(56) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4801, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-10 05:59:59.309887', '2026-04-10 05:59:59.421851', 111, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(57) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4803, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-10 11:59:59.19775', '2026-04-10 11:59:59.240425', 42, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(58) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4805, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-10 17:59:59.185466', '2026-04-10 17:59:59.309224', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(59) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4807, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-10 23:59:59.119324', '2026-04-10 23:59:59.196303', 76, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(60) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4809, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-11 05:59:59.167104', '2026-04-11 05:59:59.239546', 72, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(61) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4811, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-11 11:59:59.231388', '2026-04-11 11:59:59.277972', 46, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(62) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4813, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-11 17:59:59.210464', '2026-04-11 17:59:59.251262', 40, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(63) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4815, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-11 23:59:59.219592', '2026-04-11 23:59:59.256733', 37, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(64) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4817, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-12 05:59:59.184492', '2026-04-12 05:59:59.221912', 37, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(65) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4843, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-15 23:59:59.372824', '2026-04-15 23:59:59.422515', 49, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(28) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4819, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-12 11:59:59.219575', '2026-04-12 11:59:59.25979', 40, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(66) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4937, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-27 17:59:59.093936', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4939, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-27 23:59:58.994656', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4821, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-12 17:59:59.272464', '2026-04-12 17:59:59.311933', 39, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(17) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4823, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-12 23:59:59.271881', '2026-04-12 23:59:59.333942', 62, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(18) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4825, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-13 06:00:00.20594', '2026-04-13 06:00:00.628587', 422, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(19) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4827, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-13 11:59:59.313732', '2026-04-13 11:59:59.368871', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(20) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4829, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-13 17:59:59.287371', '2026-04-13 17:59:59.380604', 93, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(21) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4831, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-13 23:59:59.148447', '2026-04-13 23:59:59.204368', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(22) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4893, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-22 05:59:59.360711', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4833, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-14 05:59:59.116423', '2026-04-14 05:59:59.23615', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(23) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4899, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-22 23:59:59.236942', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4835, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-14 11:59:59.160907', '2026-04-14 11:59:59.270016', 109, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(24) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4837, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-14 17:59:59.125766', '2026-04-14 17:59:59.241101', 115, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(25) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4839, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-14 23:59:58.996919', '2026-04-14 23:59:59.062812', 65, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(26) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4845, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-16 05:59:59.328729', '2026-04-16 05:59:59.443141', 114, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(29) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4847, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-16 11:59:59.392137', '2026-04-16 11:59:59.51784', 125, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(30) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4941, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-28 05:59:59.116721', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4943, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-28 11:59:59.039747', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4849, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-16 17:59:59.364726', '2026-04-16 17:59:59.46831', 103, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(31) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4851, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-16 23:59:59.215797', '2026-04-16 23:59:59.28914', 73, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(32) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4853, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-17 05:59:59.27779', '2026-04-17 05:59:59.393476', 115, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(33) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4855, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-17 11:59:59.245482', '2026-04-17 11:59:59.347689', 102, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(34) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4857, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-17 17:59:59.31294', '2026-04-17 17:59:59.417734', 104, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(35) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4859, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-17 23:59:59.3195', '2026-04-17 23:59:59.402', 82, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(36) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4861, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-18 05:59:59.301131', '2026-04-18 05:59:59.405119', 103, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(37) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4863, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-18 11:59:59.234799', '2026-04-18 11:59:59.297831', 63, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(38) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4865, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-18 17:59:59.232981', '2026-04-18 17:59:59.282953', 49, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(39) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4867, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-18 23:59:59.226868', '2026-04-18 23:59:59.275262', 48, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(40) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4869, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-19 05:59:59.292553', '2026-04-19 05:59:59.338872', 46, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(41) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4871, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-19 11:59:59.254972', '2026-04-19 11:59:59.293972', 38, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(42) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4873, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-19 17:59:59.320734', '2026-04-19 17:59:59.368272', 47, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(43) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4945, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-28 17:59:59.112923', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4875, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-19 23:59:59.275333', '2026-04-19 23:59:59.320784', 45, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(44) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4877, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-20 05:59:59.334202', '2026-04-20 05:59:59.469674', 135, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(45) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4879, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-20 11:59:59.29871', '2026-04-20 11:59:59.4315', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(46) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4881, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-20 17:59:59.395501', '2026-04-20 17:59:59.524939', 129, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(47) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4883, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-20 23:59:59.271236', '2026-04-20 23:59:59.356645', 85, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(48) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4885, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-21 05:59:59.297473', '2026-04-21 05:59:59.427357', 129, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(49) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4887, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-21 11:59:59.191692', '2026-04-21 11:59:59.32266', 130, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(50) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4889, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-21 17:59:59.324546', '2026-04-21 17:59:59.449817', 125, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(51) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4901, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-23 05:59:59.318554', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4903, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-23 11:59:59.328519', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4905, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-23 17:59:59.333162', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4907, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-23 23:59:59.305586', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4909, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-24 05:59:59.290964', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4911, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-24 11:59:59.294741', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4913, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-24 17:59:59.348408', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4915, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-24 23:59:59.290535', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4917, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-25 05:59:59.217601', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4919, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-25 11:59:59.279302', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4921, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-25 17:59:59.234924', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4923, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-25 23:59:59.243561', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4925, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-26 05:59:59.209237', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4927, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-26 11:59:59.240439', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4947, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-28 23:59:59.069708', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4949, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-29 05:59:59.07777', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4951, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-29 11:59:59.105944', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4953, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-29 17:59:58.947458', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4955, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-29 23:59:58.861035', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4957, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-30 05:59:59.097897', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4959, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-30 11:59:59.09925', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4961, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-30 17:59:59.078842', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4963, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-30 23:59:59.039473', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4965, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-01 05:59:59.066289', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4967, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-01 11:59:58.995364', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4969, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-01 17:59:58.955145', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4971, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-01 23:59:58.939188', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4973, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-02 05:59:59.02214', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4975, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-02 11:59:59.030602', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4977, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-02 17:59:58.994901', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4979, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-02 23:59:58.942536', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4981, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-03 05:59:58.81963', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4983, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-03 11:59:58.972295', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4985, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-03 17:59:59.061746', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4987, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-03 23:59:58.869693', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4989, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-04 05:59:59.179991', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4991, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-04 11:59:59.023977', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4993, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-04 23:59:59.884837', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4995, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-05 05:59:59.380762', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4997, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-05 11:59:59.23212', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4999, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-05 17:59:59.28992', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5001, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-05 23:59:59.191361', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5003, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-06 05:59:59.268329', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5005, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-06 11:59:59.301301', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5007, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-06 17:59:59.340869', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5009, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-06 23:59:59.197822', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5011, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-07 05:59:59.346402', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5013, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-07 11:59:59.374466', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5015, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-07 17:59:59.390764', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5017, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-07 23:59:59.165', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5019, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-08 05:59:59.407189', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5021, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-08 11:59:59.261077', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5023, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-08 17:59:59.100197', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5025, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-08 23:59:59.158661', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5027, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-09 05:59:59.020462', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5029, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-09 11:59:59.192535', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5031, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-09 17:59:59.271389', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5033, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-09 23:59:59.353767', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5035, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-10 05:59:59.169715', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5037, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-10 11:59:59.213402', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5039, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-10 17:59:59.278755', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5041, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-10 23:59:59.249837', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5043, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-11 05:59:59.2688', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5045, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-11 11:59:59.213636', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5047, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-11 17:59:59.227009', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5049, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-11 23:59:59.02875', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5051, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-12 05:59:59.119357', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5053, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-12 11:59:59.211254', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5055, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-12 17:59:59.330209', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5057, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-12 23:59:59.294003', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5059, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-13 06:00:00.647828', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5061, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-13 11:59:59.354773', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5063, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-13 17:59:59.346818', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5065, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-13 23:59:59.343177', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5067, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-14 05:59:59.15477', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5069, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-14 11:59:59.295577', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5071, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-14 17:59:59.217591', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5073, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-14 23:59:59.116446', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5075, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-15 05:59:59.161648', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5077, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-15 11:59:59.177095', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5079, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-15 17:59:59.385754', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5081, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-15 23:59:59.366009', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5083, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-16 05:59:59.396881', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5085, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-16 11:59:59.26013', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5087, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-16 17:59:59.262912', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5089, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-17 00:00:00.106911', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5091, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-17 05:59:59.191735', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5093, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-17 11:59:59.236741', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5095, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-17 17:59:59.032315', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5097, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-17 23:59:59.19506', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5099, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-18 05:59:59.315985', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5101, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-18 11:59:59.262315', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5103, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-18 17:59:59.312215', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5105, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-18 23:59:59.336106', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5107, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-19 05:59:59.286317', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5109, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-19 11:59:59.196412', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5111, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-19 17:59:59.202991', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5113, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-19 23:59:59.32185', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5115, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-20 05:59:59.31562', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5117, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-20 11:59:59.270612', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5119, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-20 17:59:59.243276', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5121, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-20 23:59:59.268413', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5123, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-05-31 17:59:59.961389', '2026-05-31 18:00:00.205243', 243, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5125, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-05-31 23:59:59.352999', '2026-05-31 23:59:59.429159', 76, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5127, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-01 05:59:59.316635', '2026-06-01 05:59:59.416362', 99, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5129, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-01 11:59:59.360278', '2026-06-01 11:59:59.481084', 120, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5131, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-01 17:59:59.223613', '2026-06-01 17:59:59.36554', 141, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5133, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-01 23:59:59.084277', '2026-06-01 23:59:59.182803', 98, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5135, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-02 05:59:59.272667', '2026-06-02 05:59:59.389657', 116, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
-  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5137, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-02 11:59:59.116515', '2026-06-02 11:59:59.214836', 98, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5139, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-02 17:59:59.188775', '2026-06-02 17:59:59.283009', 94, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5141, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-02 23:59:59.106152', '2026-06-02 23:59:59.165457', 59, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5143, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-03 05:59:59.125088', '2026-06-03 05:59:59.223782', 98, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5145, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-03 11:59:59.130019', '2026-06-03 11:59:59.246964', 116, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5147, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-03 17:59:59.02807', '2026-06-03 17:59:59.16595', 137, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5149, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-03 23:59:58.99935', '2026-06-03 23:59:59.063366', 64, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5151, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-04 05:59:59.237413', '2026-06-04 05:59:59.36485', 127, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5153, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-04 11:59:59.396109', '2026-06-04 11:59:59.512959', 116, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5155, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-04 17:59:59.162127', '2026-06-04 17:59:59.288778', 126, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5157, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-04 23:59:59.155148', '2026-06-04 23:59:59.227872', 72, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
-  Detail: Key (job_instance_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 
 INSERT INTO public.batch_job_instance (job_instance_id, version, job_name, job_key) VALUES (1, 0, 'subscriptionRenewalJob', '6a7abbacc0380f19c0822f89e35b997e');
 
@@ -6165,31 +4822,1374 @@ INSERT INTO public.batch_step_execution_context (step_execution_id, short_contex
 
 INSERT INTO public.batch_step_execution_context (step_execution_id, short_context, serialized_context) VALUES (117, 'rO0ABXNyABFqYXZhLnV0aWwuSGFzaE1hcAUH2sHDFmDRAwACRgAKbG9hZEZhY3RvckkACXRocmVzaG9sZHhwP0AAAAAAAAx3CAAAABAAAAADdAARYmF0Y2gudGFza2xldFR5cGV0AD1vcmcuc3ByaW5nZnJhbWV3b3JrLmJhdGNoLmNvcmUuc3RlcC5pdGVtLkNodW5rT3JpZW50ZWRUYXNrbGV0dAANYmF0Y2gudmVyc2lvbnQABTUuMC4ydAAOYmF0Y2guc3RlcFR5cGV0ADdvcmcuc3ByaW5nZnJhbWV3b3JrLmJhdGNoLmNvcmUuc3RlcC50YXNrbGV0LlRhc2tsZXRTdGVweA==', NULL);
 
-INSERT INTO public.event_focus_groups (id, tenant_id, event_id, focus_group_id, created_at, updated_at) VALUES (8399, 'tenant_demo_002', 2, 8311, '2026-03-06 21:34:44.556787', '2026-03-06 21:34:44.556787');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4001, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'FAILED', 'tenant_demo_002', '2026-01-14 03:42:29.112828', '2026-01-14 03:42:29.362447', 249, 0, 0, 1, 'No enum constant com.eventmanager.batch.domain.enumeration.TenantEmailType.INFO', 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
 
-INSERT INTO public.event_focus_groups (id, tenant_id, event_id, focus_group_id, created_at, updated_at) VALUES (8401, 'tenant_demo_002', 4202, 8311, '2026-03-06 21:56:18.248678', '2026-03-06 21:56:18.248678');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4002, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'FAILED', 'tenant_demo_002', '2026-01-14 03:43:25.239245', '2026-01-14 03:43:25.264826', 25, 0, 0, 1, 'No enum constant com.eventmanager.batch.domain.enumeration.TenantEmailType.INFO', 'API', '{"tenantId":"tenant_demo_002","fromEmail":"giventauser@gmail.com","toEmail":"info@mosc.in"}');
 
-INSERT INTO public.event_focus_groups (id, tenant_id, event_id, focus_group_id, created_at, updated_at) VALUES (10534, 'tenant_demo_002', 2, 8319, '2026-04-30 13:14:28.634953', '2026-04-30 13:14:28.634953');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4003, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'FAILED', 'tenant_demo_002', '2026-01-14 15:29:47.544969', '2026-01-14 15:29:47.67151', 126, 0, 0, 1, 'No enum constant com.eventmanager.batch.domain.enumeration.TenantEmailType.INFO', 'API', '{"tenantId":"tenant_demo_002","fromEmail":"giventauser@gmail.com","toEmail":"info@mosc.in"}');
 
-INSERT INTO public.focus_group_members (id, tenant_id, focus_group_id, user_profile_id, role, status, created_at, updated_at) VALUES (8397, 'tenant_demo_002', 8311, 5152, 'MEMBER', 'ACTIVE', '2026-03-06 04:20:48.145782', '2026-03-06 04:20:48.145782');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4401, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-01-14 16:37:57.098722', '2026-01-14 16:37:58.426254', 1327, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"giventauser@gmail.com","toEmail":"info@mosc.in"}');
 
-INSERT INTO public.manual_payment_summary_report (id, tenant_id, event_id, payment_method_type, status, total_amount, transaction_count, snapshot_date, created_at) VALUES (7602, 'tenant_demo_002', 4201, 'VENMO_MANUAL', 'REQUESTED', 0.60, 1, '2026-01-19', '2026-01-19 06:35:28.603723');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (2, 'manualPaymentSummaryJob', 'MANUAL_PAYMENT_SUMMARY', 'COMPLETED', 'tenant_demo_002', '2026-01-19 04:52:12.008914', '2026-01-19 04:52:12.183101', 174, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","eventId":4201,"snapshotDate":"2026-01-19"}');
 
-INSERT INTO public.manual_payment_summary_report (id, tenant_id, event_id, payment_method_type, status, total_amount, transaction_count, snapshot_date, created_at) VALUES (7652, 'tenant_demo_002', 4201, 'ZELLE_MANUAL', 'REQUESTED', 0.70, 1, '2026-01-19', '2026-01-19 06:35:28.603723');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (3, 'manualPaymentConfirmationEmailJob', 'MANUAL_PAYMENT_CONFIRMATION_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-01-19 06:17:12.965247', '2026-01-19 06:17:18.317466', 5352, 1, 1, 0, NULL, 'API', '{"paymentRequestId":7451,"eventId":4201,"tenantId":"tenant_demo_002","recipientEmail":"giventauser@gmail.com"}');
 
-INSERT INTO public.membership_subscription (id, tenant_id, user_profile_id, membership_plan_id, subscription_status, current_period_start, current_period_end, trial_start, trial_end, cancel_at_period_end, cancelled_at, cancellation_reason, stripe_subscription_id, stripe_customer_id, last_reconciliation_at, last_stripe_sync_at, reconciliation_status, reconciliation_error, payment_provider_config_id, created_at, updated_at) VALUES (8301, 'tenant_demo_002', 5152, 4051, 'ACTIVE', '2026-04-25', '2026-05-25', NULL, NULL, false, NULL, NULL, 'sub_1StVyvK5BrggeAHMZp7ftrtE', 'cus_TrERekicacV7Wg', '2026-05-20 23:59:59.650134', '2026-05-20 23:59:59.650136', 'SYNCED', NULL, NULL, '2026-01-25 16:16:37.085563', '2026-05-20 23:59:59.387286');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4, 'manualPaymentConfirmationEmailJob', 'MANUAL_PAYMENT_CONFIRMATION_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-01-19 06:29:37.573363', '2026-01-19 06:29:38.362996', 789, 1, 1, 0, NULL, 'API', '{"paymentRequestId":7452,"eventId":4201,"tenantId":"tenant_demo_002","recipientEmail":"giventauser@gmail.com"}');
 
-INSERT INTO public.official_document_year_bundle (id, tenant_id, official_document_category_id, document_year, cover_event_media_id, created_at, updated_at) VALUES (10273, 'tenant_demo_002', 8472, 2023, NULL, '2026-03-26 19:43:52.937563', '2026-03-26 19:43:52.937563');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5, 'manualPaymentSummaryJob', 'MANUAL_PAYMENT_SUMMARY', 'COMPLETED', 'tenant_demo_002', '2026-01-19 06:35:28.633011', '2026-01-19 06:35:28.683335', 50, 2, 2, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","eventId":4201,"snapshotDate":"2026-01-19"}');
 
-INSERT INTO public.official_document_year_bundle (id, tenant_id, official_document_category_id, document_year, cover_event_media_id, created_at, updated_at) VALUES (10274, 'tenant_demo_002', 8522, 2023, NULL, '2026-03-26 19:51:27.240367', '2026-03-26 19:51:27.240367');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4403, 'manualPaymentConfirmationEmailJob', 'MANUAL_PAYMENT_CONFIRMATION_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-01-22 22:55:27.545249', '2026-01-22 22:55:32.599837', 5054, 1, 1, 0, NULL, 'API', '{"paymentRequestId":8151,"eventId":4201,"tenantId":"tenant_demo_002","recipientEmail":"giventauser@gmail.com"}');
 
-INSERT INTO public.official_document_year_bundle (id, tenant_id, official_document_category_id, document_year, cover_event_media_id, created_at, updated_at) VALUES (10275, 'tenant_demo_002', 8572, 2021, NULL, '2026-03-26 19:51:29.253391', '2026-03-26 19:51:29.253391');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4405, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-01-25 19:12:13.561311', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 
-INSERT INTO public.official_document_year_bundle (id, tenant_id, official_document_category_id, document_year, cover_event_media_id, created_at, updated_at) VALUES (10276, 'tenant_demo_002', 8622, 2025, NULL, '2026-03-26 19:51:30.123019', '2026-03-26 19:51:30.123019');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4407, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-01-26 02:10:48.92341', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 
-INSERT INTO public.official_document_year_bundle (id, tenant_id, official_document_category_id, document_year, cover_event_media_id, created_at, updated_at) VALUES (10277, 'tenant_demo_002', 8672, 2023, NULL, '2026-03-26 19:51:30.523355', '2026-03-26 19:51:30.523355');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4409, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-02 09:58:03.313648', '2026-02-02 09:58:04.125704', 812, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 
-INSERT INTO public.official_document_year_bundle (id, tenant_id, official_document_category_id, document_year, cover_event_media_id, created_at, updated_at) VALUES (11043, 'tenant_demo_002', 1150, 2026, NULL, '2026-06-03 15:26:02.82235', '2026-06-03 15:26:02.82235');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4411, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-02 15:48:39.351004', '2026-02-02 15:48:39.689021', 338, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4413, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-02 17:57:22.052896', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4415, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-03 03:01:30.499843', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4417, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-03 06:06:40.605745', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4419, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-03 18:03:54.032852', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4421, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-04 02:44:33.041484', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4423, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-04 06:12:36.477875', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4425, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-04 20:05:51.596596', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4427, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-05 11:55:49.576051', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4429, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-05 12:00:01.050597', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4431, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-06 01:08:15.737531', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4433, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-06 12:51:52.772656', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4435, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-06 17:59:55.268235', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4437, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-07 00:00:40.653537', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4439, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-07 06:01:37.525625', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4441, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-07 18:11:51.5707', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4443, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-08 01:12:01.141275', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4445, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-08 06:32:01.743217', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4447, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-11 23:59:59.090299', '2026-02-11 23:59:59.212515', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4449, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 06:00:00.498941', '2026-02-12 06:00:00.766934', 267, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4451, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 11:59:59.156415', '2026-02-12 11:59:59.250289', 93, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4453, 'promotionTestEmailJob', 'PROMOTION_TEST_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-12 12:34:56.480306', '2026-02-12 12:34:57.980979', 1500, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","templateId":4102,"recipientEmail":"giventauser@gmail.com"}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4455, 'promotionTestEmailJob', 'PROMOTION_TEST_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-12 12:41:18.590312', '2026-02-12 12:41:18.919643', 329, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","templateId":5052,"recipientEmail":"giventauser@gmail.com"}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4457, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 17:59:58.839232', '2026-02-12 17:59:58.954106', 114, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4459, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 23:59:59.036595', '2026-02-12 23:59:59.18736', 150, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4461, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 05:59:59.080774', '2026-02-13 05:59:59.226064', 145, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4463, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 11:59:58.99783', '2026-02-13 11:59:59.121461', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4465, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 17:59:59.013298', '2026-02-13 17:59:59.140849', 127, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4467, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 23:59:59.060978', '2026-02-13 23:59:59.153627', 92, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4469, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 05:59:59.05423', '2026-02-14 05:59:59.16544', 111, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4471, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 11:59:58.984103', '2026-02-14 11:59:59.03505', 50, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4473, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 17:59:59.129185', '2026-02-14 17:59:59.253068', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4475, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 23:59:58.970393', '2026-02-14 23:59:59.084166', 113, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4477, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 05:59:59.073777', '2026-02-15 05:59:59.196247', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4479, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 11:59:59.119266', '2026-02-15 11:59:59.240567', 121, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(16) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4481, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 17:59:59.084056', '2026-02-15 17:59:59.222735', 138, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(17) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4483, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 23:59:59.141651', '2026-02-15 23:59:59.29987', 158, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(3) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4485, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 05:59:59.085766', '2026-02-16 05:59:59.216895', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4487, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 11:59:59.149212', '2026-02-16 11:59:59.290418', 141, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4489, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 17:59:59.155504', '2026-02-16 17:59:59.29312', 137, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4491, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 23:59:59.097441', '2026-02-16 23:59:59.237444', 140, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4493, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 05:59:59.04358', '2026-02-17 05:59:59.186304', 142, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4495, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 11:59:59.218792', '2026-02-17 11:59:59.402091', 183, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4497, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 17:59:59.039182', '2026-02-17 17:59:59.182704', 143, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4499, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 23:59:59.016341', '2026-02-17 23:59:59.096947', 80, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4501, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-18 04:24:41.064681', '2026-02-18 04:24:42.862082', 1797, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"gain@hotmail.com","toEmail":"info@mosc.in"}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4503, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 05:59:59.604348', '2026-02-18 05:59:59.793864', 189, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4555, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-23 23:59:59.077234', '2026-02-23 23:59:59.20395', 126, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(50) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4505, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 11:59:59.243575', '2026-02-18 11:59:59.362902', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4565, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-25 06:00:00.560094', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4507, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 17:59:59.097355', '2026-02-18 17:59:59.199274', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4509, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-19 00:00:00.056614', '2026-02-19 00:00:00.538922', 482, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4511, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-19 05:59:59.076668', '2026-02-19 05:59:59.177905', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(16) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4513, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-19 11:59:58.444751', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4515, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-19 13:54:11.921075', '2026-02-19 13:54:13.626624', 1705, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4517, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-19 14:05:06.89022', '2026-02-19 14:05:07.439133', 548, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"gain@hotmail.com","toEmail":"info@mosc.in"}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4519, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-19 14:06:32.064445', '2026-02-19 14:06:32.555988', 491, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4521, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-19 17:59:59.061375', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4523, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-19 23:59:58.955358', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4525, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-20 05:59:59.038529', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4527, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-20 11:59:59.111088', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4529, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-20 17:59:59.030725', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4531, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-20 23:59:59.010607', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4533, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-21 05:59:59.040009', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4535, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-21 11:59:59.050268', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4537, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-21 17:59:59.066477', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4539, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-21 23:59:59.033826', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4541, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-22 05:59:59.004504', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4543, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-22 11:59:59.021889', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4545, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-22 17:59:59.036196', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4547, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-22 23:59:59.029052', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4549, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-23 05:59:59.13856', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4551, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-23 11:59:59.000774', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4553, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-23 17:59:59.13965', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4557, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-24 05:59:59.165754', '2026-02-24 05:59:59.310217', 144, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(51) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4559, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-24 11:59:59.101711', '2026-02-24 11:59:59.234431', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(52) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4561, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-24 17:59:59.118241', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4563, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-24 23:59:59.027181', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4567, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-25 11:59:59.155614', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4569, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-25 14:48:05.520872', '2026-02-25 14:48:07.020477', 1499, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4571, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-25 15:12:32.071651', '2026-02-25 15:12:32.641831', 570, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4573, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-25 15:16:52.121598', '2026-02-25 15:16:52.72877', 607, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4575, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-25 17:59:59.209081', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4577, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-25 23:59:59.074313', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4579, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-26 05:59:59.106618', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4581, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-26 11:59:59.315342', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4583, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-26 17:59:59.203008', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4585, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-26 23:59:58.96887', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4587, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-27 03:48:17.717702', '2026-02-27 03:48:18.51004', 792, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4589, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-27 05:59:59.078717', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4591, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-27 11:59:59.089219', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4593, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-27 17:59:59.049328', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4595, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-27 23:59:59.075538', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4597, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 06:00:00.39427', '2026-03-01 06:00:00.834472', 440, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4599, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 11:59:58.965786', '2026-03-01 11:59:59.06753', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4601, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 17:59:59.013609', '2026-03-01 17:59:59.083007', 69, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4603, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 23:59:59.065287', '2026-03-01 23:59:59.173669', 108, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4605, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 05:59:58.970168', '2026-03-02 05:59:59.102805', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4607, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 11:59:59.067571', '2026-03-02 11:59:59.198777', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4609, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 17:59:59.055131', '2026-03-02 17:59:59.166968', 111, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4611, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 23:59:59.017073', '2026-03-02 23:59:59.136351', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4643, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 11:59:58.938551', '2026-03-07 11:59:58.986162', 47, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4613, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 05:59:58.997096', '2026-03-03 05:59:59.131709', 134, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4615, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 11:59:59.01668', '2026-03-03 11:59:59.132187', 115, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4617, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 17:59:58.919515', '2026-03-03 17:59:59.051274', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4619, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 23:59:59.068691', '2026-03-03 23:59:59.184947', 116, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4621, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 05:59:59.004038', '2026-03-04 05:59:59.13432', 130, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4623, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 11:59:58.953354', '2026-03-04 11:59:59.086181', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4625, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 17:59:58.97233', '2026-03-04 17:59:59.111082', 138, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4627, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 00:00:00.255272', '2026-03-05 00:00:00.518169', 262, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4629, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 05:59:59.217609', '2026-03-05 05:59:59.507303', 289, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(43) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4631, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 11:59:59.115486', '2026-03-05 11:59:59.218763', 103, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(44) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4633, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 05:59:59.164572', '2026-03-06 05:59:59.497754', 333, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4635, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 11:59:59.10985', '2026-03-06 11:59:59.246162', 136, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4637, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 17:59:59.153157', '2026-03-06 17:59:59.261476', 108, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4639, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 23:59:59.02013', '2026-03-06 23:59:59.146983', 126, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4641, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 05:59:59.001761', '2026-03-07 05:59:59.057117', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4929, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-26 18:00:00.304651', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4931, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-26 23:59:59.291979', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4645, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 17:59:59.011083', '2026-03-07 17:59:59.066131', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4647, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 23:59:58.957583', '2026-03-07 23:59:59.017701', 60, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4649, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 05:59:59.183861', '2026-03-08 05:59:59.306781', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4651, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 11:59:59.057128', '2026-03-08 11:59:59.156015', 98, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4653, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 17:59:59.03081', '2026-03-08 17:59:59.090814', 60, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4655, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 23:59:58.953587', '2026-03-08 23:59:58.99855', 44, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4657, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-09 06:00:00.431328', '2026-03-09 06:00:00.764318', 332, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4659, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-09 11:59:59.078209', '2026-03-09 11:59:59.190553', 112, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4661, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-10 00:00:00.444017', '2026-03-10 00:00:00.790049', 346, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4663, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-10 05:59:59.175491', '2026-03-10 05:59:59.305783', 130, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4665, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-10 11:59:59.126802', '2026-03-10 11:59:59.239084', 112, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4667, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-10 17:59:59.083242', '2026-03-10 17:59:59.197751', 114, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4669, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-10 23:59:58.993104', '2026-03-10 23:59:59.121356', 128, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4671, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-11 06:00:00.400795', '2026-03-11 06:00:00.746445', 345, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4673, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-11 11:59:59.106998', '2026-03-11 11:59:59.200861', 93, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4675, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-11 17:59:58.914064', '2026-03-11 17:59:59.006237', 92, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4677, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-11 23:59:59.117156', '2026-03-11 23:59:59.2218', 104, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4679, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-12 05:59:59.13956', '2026-03-12 05:59:59.237076', 97, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4681, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-12 11:59:59.084166', '2026-03-12 11:59:59.197509', 113, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4683, 'promotionTestEmailJob', 'PROMOTION_TEST_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-03-12 17:57:49.379157', '2026-03-12 17:57:51.117043', 1737, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","templateId":4102,"recipientEmail":"giventauser@gmail.com"}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4685, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-12 17:59:58.888527', '2026-03-12 17:59:58.935889', 47, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4687, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-26 17:50:45.682168', '2026-03-26 17:50:45.785', 102, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4689, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-26 17:59:57.758233', '2026-03-26 17:59:57.822526', 64, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4841, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-15 18:00:00.304923', '2026-04-15 18:00:00.643554', 338, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(27) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4691, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-27 06:00:00.395093', '2026-03-27 06:00:00.708831', 313, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4693, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-27 11:59:59.310264', '2026-03-27 11:59:59.434154', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4695, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-27 17:59:59.341512', '2026-03-27 17:59:59.43342', 91, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4697, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-27 23:59:59.342026', '2026-03-27 23:59:59.423347', 81, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4699, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-28 05:59:59.262029', '2026-03-28 05:59:59.318662', 56, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4701, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-28 11:59:59.282275', '2026-03-28 11:59:59.328692', 46, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4703, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-28 17:59:59.234413', '2026-03-28 17:59:59.279899', 45, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4705, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-28 23:59:59.328393', '2026-03-28 23:59:59.380762', 52, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4707, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-29 05:59:59.115217', '2026-03-29 05:59:59.152178', 36, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4709, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-29 11:59:59.563864', '2026-03-29 11:59:59.760232', 196, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4711, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-29 17:59:59.246369', '2026-03-29 17:59:59.352593', 106, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4713, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-29 23:59:59.168454', '2026-03-29 23:59:59.213488', 45, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4715, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-30 05:59:59.398126', '2026-03-30 05:59:59.529024', 130, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4717, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-30 11:59:59.413748', '2026-03-30 12:00:00.183845', 770, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4719, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-30 17:59:59.376253', '2026-03-30 17:59:59.508743', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(16) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4721, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-30 23:59:59.262261', '2026-03-30 23:59:59.362944', 100, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(17) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4723, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-31 05:59:59.251094', '2026-03-31 05:59:59.394885', 143, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(3) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4725, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-31 11:59:59.273968', '2026-03-31 11:59:59.413039', 139, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4727, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-31 17:59:59.320353', '2026-03-31 17:59:59.447383', 127, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4755, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-04 11:59:59.156035', '2026-04-04 11:59:59.199792', 43, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(34) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4729, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-31 23:59:59.704697', '2026-04-01 00:00:00.276635', 571, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4731, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-01 05:59:59.3941', '2026-04-01 05:59:59.545069', 150, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4733, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-01 11:59:59.490149', '2026-04-01 11:59:59.68383', 193, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4735, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-01 17:59:59.44392', '2026-04-01 17:59:59.579504', 135, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4737, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-01 23:59:59.228924', '2026-04-01 23:59:59.319291', 90, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4739, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-02 05:59:59.868702', '2026-04-02 06:00:00.004185', 135, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4741, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-02 11:59:59.524962', '2026-04-02 11:59:59.631626', 106, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4891, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-21 23:59:59.376818', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4743, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-02 17:59:59.499479', '2026-04-02 17:59:59.629178', 129, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4895, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-22 11:59:59.296435', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4745, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-03 05:59:59.228859', '2026-04-03 05:59:59.479233', 250, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4747, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-03 11:59:59.125658', '2026-04-03 11:59:59.175487', 49, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4749, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-03 17:59:59.168755', '2026-04-03 17:59:59.224149', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(16) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4751, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-03 23:59:59.219953', '2026-04-03 23:59:59.261567', 41, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(32) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4753, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-04 05:59:59.181047', '2026-04-04 06:00:00.4988', 1317, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(33) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4757, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-04 17:59:59.07361', '2026-04-04 17:59:59.112214', 38, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(35) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4759, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-04 23:59:59.083961', '2026-04-04 23:59:59.315846', 231, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(36) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4761, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-05 05:59:58.971126', '2026-04-05 05:59:59.282507', 311, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(37) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4933, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-27 06:00:00.367813', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4763, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-05 11:59:59.170704', '2026-04-05 11:59:59.208964', 38, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(38) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4765, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-05 17:59:59.918589', '2026-04-05 17:59:59.971004', 52, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(39) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4767, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-05 23:59:59.256764', '2026-04-05 23:59:59.300418', 43, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(40) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4769, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-06 05:59:59.275042', '2026-04-06 05:59:59.393427', 118, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(41) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4771, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-06 11:59:59.223568', '2026-04-06 11:59:59.290369', 66, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(42) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4897, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-22 17:59:59.164861', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4773, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-06 17:59:59.312848', '2026-04-06 17:59:59.433975', 121, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(43) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4775, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-06 23:59:59.110989', '2026-04-06 23:59:59.171267', 60, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(44) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4777, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-07 05:59:58.907067', '2026-04-07 05:59:58.959577', 52, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(45) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4779, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-07 11:59:59.479406', '2026-04-07 11:59:59.602808', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(46) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4781, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-07 17:59:59.16697', '2026-04-07 17:59:59.760906', 593, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(47) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4783, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-07 23:59:59.225898', '2026-04-07 23:59:59.56524', 339, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(48) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4785, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-08 05:59:59.151603', '2026-04-08 05:59:59.265556', 113, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(49) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4787, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-08 11:59:59.243075', '2026-04-08 11:59:59.37456', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(50) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4789, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-08 17:59:59.219871', '2026-04-08 17:59:59.355251', 135, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(51) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4791, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-08 23:59:59.224316', '2026-04-08 23:59:59.299101', 74, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(52) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4935, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-27 11:59:59.182564', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4793, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-09 05:59:59.042792', '2026-04-09 05:59:59.10701', 64, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(53) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4795, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-09 11:59:59.370266', '2026-04-09 11:59:59.48939', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(54) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4797, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-09 17:59:59.364818', '2026-04-09 17:59:59.491285', 126, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(55) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4799, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-09 23:59:59.170766', '2026-04-09 23:59:59.228058', 57, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(56) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4801, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-10 05:59:59.309887', '2026-04-10 05:59:59.421851', 111, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(57) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4803, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-10 11:59:59.19775', '2026-04-10 11:59:59.240425', 42, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(58) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4805, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-10 17:59:59.185466', '2026-04-10 17:59:59.309224', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(59) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4807, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-10 23:59:59.119324', '2026-04-10 23:59:59.196303', 76, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(60) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4809, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-11 05:59:59.167104', '2026-04-11 05:59:59.239546', 72, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(61) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4811, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-11 11:59:59.231388', '2026-04-11 11:59:59.277972', 46, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(62) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4813, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-11 17:59:59.210464', '2026-04-11 17:59:59.251262', 40, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(63) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4815, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-11 23:59:59.219592', '2026-04-11 23:59:59.256733', 37, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(64) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4817, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-12 05:59:59.184492', '2026-04-12 05:59:59.221912', 37, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(65) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4843, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-15 23:59:59.372824', '2026-04-15 23:59:59.422515', 49, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(28) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4819, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-12 11:59:59.219575', '2026-04-12 11:59:59.25979', 40, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(66) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4937, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-27 17:59:59.093936', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4939, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-27 23:59:58.994656', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4821, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-12 17:59:59.272464', '2026-04-12 17:59:59.311933', 39, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(17) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4823, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-12 23:59:59.271881', '2026-04-12 23:59:59.333942', 62, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(18) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4825, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-13 06:00:00.20594', '2026-04-13 06:00:00.628587', 422, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(19) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4827, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-13 11:59:59.313732', '2026-04-13 11:59:59.368871', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(20) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4829, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-13 17:59:59.287371', '2026-04-13 17:59:59.380604', 93, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(21) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4831, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-13 23:59:59.148447', '2026-04-13 23:59:59.204368', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(22) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4893, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-22 05:59:59.360711', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4833, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-14 05:59:59.116423', '2026-04-14 05:59:59.23615', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(23) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4899, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-22 23:59:59.236942', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4835, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-14 11:59:59.160907', '2026-04-14 11:59:59.270016', 109, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(24) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4837, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-14 17:59:59.125766', '2026-04-14 17:59:59.241101', 115, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(25) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4839, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-14 23:59:58.996919', '2026-04-14 23:59:59.062812', 65, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(26) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4845, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-16 05:59:59.328729', '2026-04-16 05:59:59.443141', 114, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(29) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4847, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-16 11:59:59.392137', '2026-04-16 11:59:59.51784', 125, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(30) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4941, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-28 05:59:59.116721', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4943, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-28 11:59:59.039747', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4849, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-16 17:59:59.364726', '2026-04-16 17:59:59.46831', 103, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(31) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4851, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-16 23:59:59.215797', '2026-04-16 23:59:59.28914', 73, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(32) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4853, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-17 05:59:59.27779', '2026-04-17 05:59:59.393476', 115, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(33) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4855, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-17 11:59:59.245482', '2026-04-17 11:59:59.347689', 102, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(34) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4857, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-17 17:59:59.31294', '2026-04-17 17:59:59.417734', 104, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(35) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4859, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-17 23:59:59.3195', '2026-04-17 23:59:59.402', 82, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(36) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4861, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-18 05:59:59.301131', '2026-04-18 05:59:59.405119', 103, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(37) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4863, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-18 11:59:59.234799', '2026-04-18 11:59:59.297831', 63, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(38) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4865, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-18 17:59:59.232981', '2026-04-18 17:59:59.282953', 49, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(39) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4867, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-18 23:59:59.226868', '2026-04-18 23:59:59.275262', 48, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(40) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4869, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-19 05:59:59.292553', '2026-04-19 05:59:59.338872', 46, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(41) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4871, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-19 11:59:59.254972', '2026-04-19 11:59:59.293972', 38, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(42) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4873, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-19 17:59:59.320734', '2026-04-19 17:59:59.368272', 47, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(43) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4945, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-28 17:59:59.112923', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4875, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-19 23:59:59.275333', '2026-04-19 23:59:59.320784', 45, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(44) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4877, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-20 05:59:59.334202', '2026-04-20 05:59:59.469674', 135, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(45) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4879, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-20 11:59:59.29871', '2026-04-20 11:59:59.4315', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(46) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4881, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-20 17:59:59.395501', '2026-04-20 17:59:59.524939', 129, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(47) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4883, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-20 23:59:59.271236', '2026-04-20 23:59:59.356645', 85, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(48) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4885, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-21 05:59:59.297473', '2026-04-21 05:59:59.427357', 129, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(49) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4887, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-21 11:59:59.191692', '2026-04-21 11:59:59.32266', 130, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(50) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4889, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-04-21 17:59:59.324546', '2026-04-21 17:59:59.449817', 125, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(51) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4901, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-23 05:59:59.318554', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4903, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-23 11:59:59.328519', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4905, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-23 17:59:59.333162', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4907, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-23 23:59:59.305586', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4909, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-24 05:59:59.290964', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4911, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-24 11:59:59.294741', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4913, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-24 17:59:59.348408', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4915, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-24 23:59:59.290535', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4917, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-25 05:59:59.217601', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4919, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-25 11:59:59.279302', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4921, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-25 17:59:59.234924', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4923, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-25 23:59:59.243561', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4925, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-26 05:59:59.209237', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4927, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-26 11:59:59.240439', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4947, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-28 23:59:59.069708', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4949, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-29 05:59:59.07777', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4951, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-29 11:59:59.105944', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4953, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-29 17:59:58.947458', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4955, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-29 23:59:58.861035', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4957, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-30 05:59:59.097897', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4959, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-30 11:59:59.09925', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4961, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-30 17:59:59.078842', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4963, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-04-30 23:59:59.039473', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4965, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-01 05:59:59.066289', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4967, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-01 11:59:58.995364', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4969, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-01 17:59:58.955145', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4971, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-01 23:59:58.939188', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4973, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-02 05:59:59.02214', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4975, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-02 11:59:59.030602', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4977, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-02 17:59:58.994901', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4979, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-02 23:59:58.942536', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4981, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-03 05:59:58.81963', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4983, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-03 11:59:58.972295', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4985, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-03 17:59:59.061746', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4987, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-03 23:59:58.869693', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4989, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-04 05:59:59.179991', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4991, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-04 11:59:59.023977', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4993, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-04 23:59:59.884837', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4995, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-05 05:59:59.380762', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4997, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-05 11:59:59.23212', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4999, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-05 17:59:59.28992', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5001, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-05 23:59:59.191361', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5003, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-06 05:59:59.268329', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5005, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-06 11:59:59.301301', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5007, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-06 17:59:59.340869', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5009, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-06 23:59:59.197822', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5011, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-07 05:59:59.346402', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5013, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-07 11:59:59.374466', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5015, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-07 17:59:59.390764', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5017, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-07 23:59:59.165', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5019, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-08 05:59:59.407189', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5021, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-08 11:59:59.261077', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5023, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-08 17:59:59.100197', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5025, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-08 23:59:59.158661', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5027, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-09 05:59:59.020462', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5029, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-09 11:59:59.192535', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5031, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-09 17:59:59.271389', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5033, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-09 23:59:59.353767', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5035, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-10 05:59:59.169715', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5037, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-10 11:59:59.213402', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5039, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-10 17:59:59.278755', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5041, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-10 23:59:59.249837', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5043, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-11 05:59:59.2688', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5045, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-11 11:59:59.213636', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5047, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-11 17:59:59.227009', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5049, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-11 23:59:59.02875', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5051, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-12 05:59:59.119357', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5053, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-12 11:59:59.211254', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5055, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-12 17:59:59.330209', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5057, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-12 23:59:59.294003', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5059, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-13 06:00:00.647828', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5061, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-13 11:59:59.354773', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5063, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-13 17:59:59.346818', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5065, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-13 23:59:59.343177', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5067, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-14 05:59:59.15477', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5069, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-14 11:59:59.295577', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5071, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-14 17:59:59.217591', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5073, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-14 23:59:59.116446', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5075, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-15 05:59:59.161648', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5077, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-15 11:59:59.177095', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5079, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-15 17:59:59.385754', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5081, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-15 23:59:59.366009', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5083, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-16 05:59:59.396881', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5085, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-16 11:59:59.26013', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5087, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-16 17:59:59.262912', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5089, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-17 00:00:00.106911', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5091, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-17 05:59:59.191735', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5093, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-17 11:59:59.236741', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5095, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-17 17:59:59.032315', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5097, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-17 23:59:59.19506', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5099, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-18 05:59:59.315985', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5101, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-18 11:59:59.262315', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5103, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-18 17:59:59.312215', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5105, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-18 23:59:59.336106', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5107, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-19 05:59:59.286317', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5109, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-19 11:59:59.196412', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5111, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-19 17:59:59.202991', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5113, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-19 23:59:59.32185', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5115, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-20 05:59:59.31562', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5117, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-20 11:59:59.270612', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5119, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-20 17:59:59.243276', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5121, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-05-20 23:59:59.268413', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5123, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-05-31 17:59:59.961389', '2026-05-31 18:00:00.205243', 243, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5125, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-05-31 23:59:59.352999', '2026-05-31 23:59:59.429159', 76, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5127, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-01 05:59:59.316635', '2026-06-01 05:59:59.416362', 99, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5129, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-01 11:59:59.360278', '2026-06-01 11:59:59.481084', 120, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5131, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-01 17:59:59.223613', '2026-06-01 17:59:59.36554', 141, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5133, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-01 23:59:59.084277', '2026-06-01 23:59:59.182803', 98, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5135, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-02 05:59:59.272667', '2026-06-02 05:59:59.389657', 116, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5137, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-02 11:59:59.116515', '2026-06-02 11:59:59.214836', 98, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5139, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-02 17:59:59.188775', '2026-06-02 17:59:59.283009', 94, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5141, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-02 23:59:59.106152', '2026-06-02 23:59:59.165457', 59, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5143, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-03 05:59:59.125088', '2026-06-03 05:59:59.223782', 98, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5145, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-03 11:59:59.130019', '2026-06-03 11:59:59.246964', 116, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5147, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-03 17:59:59.02807', '2026-06-03 17:59:59.16595', 137, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5149, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-03 23:59:58.99935', '2026-06-03 23:59:59.063366', 64, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5151, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-04 05:59:59.237413', '2026-06-04 05:59:59.36485', 127, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5153, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-04 11:59:59.396109', '2026-06-04 11:59:59.512959', 116, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5155, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-04 17:59:59.162127', '2026-06-04 17:59:59.288778', 126, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5157, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-04 23:59:59.155148', '2026-06-04 23:59:59.227872', 72, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 
 INSERT INTO public.bulk_operation_log (id, tenant_id, operation_type, operation_name, performed_by, target_count, success_count, error_count, skipped_count, operation_details, error_details, execution_time_ms, created_at, completed_at) VALUES (1, 'tenant_demo_001', 'IMPORT', 'Import Users', 1, 100, 98, 1, 1, 'Imported users', NULL, 5000, '2025-06-22 11:31:27.770938', '2025-06-22 11:31:27.770938');
 

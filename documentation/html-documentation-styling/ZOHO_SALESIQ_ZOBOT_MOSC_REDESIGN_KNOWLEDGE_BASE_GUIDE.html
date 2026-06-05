@@ -737,6 +737,11 @@ Write-Host "Wrote $OutFile"</div>
 
         <h2 id="import">7. Import into SalesIQ Articles</h2>
 
+        <div class="success" style="margin-bottom: 1.25rem;">
+            <strong>Recommended (API):</strong> After export + FAQ merge, use the <a href="../zoh_zobot_settings/ZOHO_SALESIQ_OPERATIONS_RUNBOOK.html#bulk-upload">Operations Runbook — §9 Bulk upload via REST API</a>:
+            <code>npm run zobot:bulk-upload-articles -- --confirm</code> from <code>mosc-temp</code> (OAuth with <code>SalesIQ.articles.CREATE</code> required). Portal CSV steps below are the <strong>alternative</strong> if API scopes are unavailable.
+        </div>
+
         <div class="section-container">
             <div class="section-header salesiq">Open the Giventa SalesIQ portal</div>
             <div class="section-body">

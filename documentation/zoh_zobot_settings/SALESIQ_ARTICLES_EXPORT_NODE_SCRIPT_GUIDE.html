@@ -58,10 +58,9 @@
         <h1>SalesIQ Articles Export — Node Script (Step 2)</h1>
 
         <div class="section-intro">
-            This script automates <strong>Step 2</strong> of the Zoho SalesIQ knowledge-base pipeline: it reads your URL list, fetches each public <code>/mosc-redesign</code> page, extracts title and main content, and writes a <strong>CSV</strong> you upload via <strong>Settings → Articles → Add</strong> in SalesIQ.
-            It does <em>not</em> import into Zobot directly — see the main
-            <a href="ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html">Zobot knowledge base guide</a>
-            and the <a href="ZOHO_SALESIQ_OPERATIONS_RUNBOOK.html">Operations Runbook</a> (OAuth, bulk delete, FAQ merge).
+            This script automates <strong>Step 2</strong> of the Zoho SalesIQ knowledge-base pipeline: it reads your URL list, fetches each public <code>/mosc-redesign</code> page, extracts title and main content, and writes <code class="script-name">salesiq-articles-import.csv</code>.
+            <strong>Recommended next step:</strong> post articles via REST API — <a href="ZOHO_SALESIQ_OPERATIONS_RUNBOOK.html#bulk-upload">Operations Runbook §9 Bulk upload</a> (<code>npm run zobot:bulk-upload-articles -- --confirm</code>). Portal CSV import is documented as an alternative in the same runbook (§10) and main guide Section 7.
+            See also: <a href="../html-documentation-styling/ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html">Zobot knowledge base guide</a>.
         </div>
 
         <h2 id="overview">1. What it does</h2>
@@ -158,7 +157,7 @@
                     <tbody>
                         <tr>
                             <td><code class="script-name">salesiq-articles-import.csv</code></td>
-                            <td>Upload via <strong>Settings → Articles → Add</strong> (see main guide section 7 mapping table)</td>
+                            <td>Input for <code>zobot:bulk-upload-articles</code> (runbook §9) or portal import (runbook §10 / main guide §7)</td>
                         </tr>
                         <tr>
                             <td><code class="script-name">salesiq-articles-export-errors.json</code></td>
@@ -167,12 +166,46 @@
                     </tbody>
                 </table>
                 <div class="success">
-                    <strong>Next step:</strong> Open the main guide <strong>Section 7</strong> — import the CSV via <a href="https://salesiq.zoho.com/giventainc/onboard" rel="noopener noreferrer">salesiq.zoho.com/giventainc/onboard</a> → Settings → Articles → Add, then configure Answer Bot (Section 8) and publish Zobot (Section 9).
+                    <strong>Next step (recommended):</strong> <a href="ZOHO_SALESIQ_OPERATIONS_RUNBOOK.html#bulk-upload">Operations Runbook §9</a> — <code>npm run zobot:fix-import-titles</code>, <code>npm run zobot:merge-faq-supplement</code>, <code>npm run zobot:bulk-upload-articles -- --dry-run</code>, then <code>--confirm</code>. Then Answer Bot (main guide §8) and Zobot (§9).
                 </div>
             </div>
         </div>
 
-        <h2 id="salesiq-import">6. Import CSV into SalesIQ</h2>
+        <h2 id="salesiq-upload-api">6. Upload articles via REST API (recommended)</h2>
+        <div class="section-container">
+            <div class="section-header salesiq">Operations Runbook — full command list</div>
+            <div class="section-body">
+                <p>Follow <a href="ZOHO_SALESIQ_OPERATIONS_RUNBOOK.html">ZOHO_SALESIQ_OPERATIONS_RUNBOOK.html</a> sections 3–4 (OAuth + <code>.env.local</code>), then:</p>
+                <div class="command-block setup">
+                    <div class="command-single-line">
+                        <code>cd f:\project_workspace\mosc-temp; npm run zobot:fix-import-titles</code>
+                    </div>
+                </div>
+                <div class="command-block setup">
+                    <div class="command-single-line">
+                        <code>cd f:\project_workspace\mosc-temp; npm run zobot:merge-faq-supplement</code>
+                    </div>
+                </div>
+                <div class="command-block setup">
+                    <div class="command-single-line">
+                        <code>cd f:\project_workspace\mosc-temp; npm run zobot:list-portal-ids</code>
+                    </div>
+                </div>
+                <div class="command-block setup">
+                    <div class="command-single-line">
+                        <code>cd f:\project_workspace\mosc-temp; npm run zobot:bulk-upload-articles -- --dry-run</code>
+                    </div>
+                </div>
+                <div class="command-block setup">
+                    <div class="command-single-line">
+                        <code>cd f:\project_workspace\mosc-temp; npm run zobot:bulk-upload-articles -- --confirm</code>
+                    </div>
+                </div>
+                <p>Requires OAuth scope <code>SalesIQ.articles.CREATE</code>. API: <code>POST https://salesiq.zoho.com/api/v2/giventainc/articles</code>.</p>
+            </div>
+        </div>
+
+        <h2 id="salesiq-import">7. Alternative: portal CSV import</h2>
         <div class="section-container">
             <div class="section-header salesiq">Settings → Articles → Add</div>
             <div class="section-body">
@@ -189,7 +222,7 @@
             </div>
         </div>
 
-        <h2 id="troubleshoot">7. Troubleshooting</h2>
+        <h2 id="troubleshoot">8. Troubleshooting</h2>
         <table>
             <thead>
                 <tr><th>Issue</th><th>Cause</th><th>Fix</th></tr>
