@@ -12,7 +12,7 @@ export interface SyroPageBannerProps {
   /** When true, center the title and breadcrumb text (e.g. on saints subpages) */
   centerText?: boolean;
   /** Breadcrumb path: 'home' = Home / Title, 'gallery' = Gallery / Title, 'news' = News / Title, 'directory' = Directory / Title, etc. */
-  breadcrumbFrom?: 'home' | 'gallery' | 'downloads' | 'calendar' | 'liturgical-calendar' | 'mosc-calendar' | 'holy-synod' | 'saints' | 'the-church' | 'catholicate' | 'administration' | 'ecumenical' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'institutions' | 'training' | 'theological-seminaries' | 'lectionary' | 'news' | 'directory';
+  breadcrumbFrom?: 'home' | 'gallery' | 'downloads' | 'calendar' | 'liturgical-calendar' | 'mosc-calendar' | 'holy-synod' | 'holy-synod-cms' | 'saints' | 'the-church' | 'catholicate' | 'administration' | 'ecumenical' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'institutions' | 'training' | 'theological-seminaries' | 'lectionary' | 'news' | 'directory';
   /** Optional middle segment for 3-level breadcrumb (e.g. The Church / Theology / Christology). Used on the-church subpages under Theology, Spirituality, History, Liturgy. */
   breadcrumbParent?: { label: string; href: string };
   /** When true, omit the breadcrumb nav (e.g. diocese-scoped parish list where the parent “Directory” link is not desired). Title stays in the h2. */
@@ -44,6 +44,7 @@ const BREADCRUMB_CONFIG = {
   'liturgical-calendar': { href: '/mosc-redesign/liturgical-calendar', label: 'Liturgical Calendar' },
   'mosc-calendar': { href: '/mosc-redesign/mosc-calendar', label: 'MOSC Calendar' },
   'holy-synod': { href: '/mosc-redesign/holy-synod', label: 'Holy Synod' },
+  'holy-synod-cms': { href: '/mosc-redesign/holy-synod-cms', label: 'Holy Synod' },
   saints: { href: '/mosc-redesign/saints', label: 'Saints' },
   'the-church': { href: '/mosc-redesign/the-church', label: 'The Church' },
   catholicate: { href: '/mosc-redesign/catholicate', label: 'The Catholicate' },
