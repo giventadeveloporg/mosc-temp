@@ -15,6 +15,11 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { resolveArticleTitle } from './salesiq-title-utils.mjs';
+import {
+  deriveDescription,
+  sanitizeTextField,
+  scrubArticleContent,
+} from './salesiq-text-sanitize.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -133,6 +138,10 @@ export function normalizeMoscUrl(line) {
 }
 
 function decodeHtmlEntities(text) {
+  return sanitizeTextField(decodeHtmlEntitiesRaw(text));
+}
+
+function decodeHtmlEntitiesRaw(text) {
   return text
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
@@ -140,7 +149,9 @@ function decodeHtmlEntities(text) {
     .replace(/&gt;/gi, '>')
     .replace(/&#39;/gi, "'")
     .replace(/&quot;/gi, '"')
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+    .replace(/&#x27;/gi, "'")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(Number.parseInt(hex, 16)));
 }
 
 function stripHtml(html) {
@@ -292,7 +303,9 @@ export async function buildArticleRow(url, salesiqMeta) {
   const mainHtml = extractMainHtml(html);
   let content = stripHtml(mainHtml);
   const metaDescription = extractMetaDescription(html);
-  const title = extractTitle(html, mainHtml, content, url);
+  let title = extractTitle(html, mainHtml, content, url);
+  title = sanitizeTextField(title);
+  content = scrubArticleContent(content, title);
 
   if (content.length < 40) {
     content = [title, metaDescription, content]
@@ -301,11 +314,14 @@ export async function buildArticleRow(url, salesiqMeta) {
       .replace(/\s+/g, ' ')
       .replace(/\.\s*\./g, '.')
       .trim();
+    content = scrubArticleContent(content, title);
   }
 
-  const description =
-    metaDescription ||
-    content.slice(0, 280) + (content.length > 280 ? '…' : '');
+  const description = deriveDescription({
+    description: metaDescription,
+    content,
+    title,
+  });
 
   if (!content || content.length < 40) {
     throw new Error('Extracted content too short (check page HTML or selectors)');

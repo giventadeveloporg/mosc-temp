@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PostgreSQL data export, INSERT reordering, production user ID replacement, sequence sync, and import troubleshooting for event_site_manager_db.">
+  <title>Database Export, Reorder, and Import Guide</title>
+  <style>
+    :root {
+      --text: #333;
+      --code-bg: #e8f4f8;
+      --code-text: #0d3b66;
+      --code-border: #b8d4e3;
+      --blue-accent: #0066cc;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.5em;
+      border-bottom: 3px solid var(--blue-accent);
+      padding-bottom: 0.5rem;
+      margin-top: 0;
+    }
+    h2 {
+      font-size: 1.8em;
+      border-left: 4px solid var(--blue-accent);
+      padding-left: 15px;
+      margin-top: 2rem;
+    }
+    h3 { font-size: 1.2em; color: #555; margin-top: 1.25rem; }
+    .meta { color: #666; font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .toc {
+      background: linear-gradient(135deg, #f0f7ff 0%, #e6f2ff 100%);
+      border-left: 4px solid var(--blue-accent);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .toc ul { margin: 0.5rem 0; padding-left: 1.25rem; }
+    .toc a { color: var(--blue-accent); }
+    .section-intro {
+      background: linear-gradient(135deg, #e8f4f8 0%, #d1e7f0 100%);
+      border-left: 4px solid var(--blue-accent);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1);
+    }
+    .section-container {
+      background: linear-gradient(135deg, #f0f7ff 0%, #e6f2ff 100%);
+      border-left: 4px solid var(--blue-accent);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1);
+    }
+    .section-container.usage {
+      background: linear-gradient(135deg, #f0e6ff 0%, #e6ccff 100%);
+      border-left-color: #9c27b0;
+    }
+    .section-container.parameters {
+      background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%);
+      border-left-color: #ff9800;
+    }
+    .section-container.output {
+      background: linear-gradient(135deg, #e6ffe6 0%, #ccffcc 100%);
+      border-left-color: #28a745;
+    }
+    .section-header {
+      background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+      color: white;
+      padding: 12px 20px;
+      margin: -20px -20px 20px -20px;
+      border-radius: 8px 8px 0 0;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+    .section-header.usage {
+      background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+    }
+    .section-header.parameters {
+      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    }
+    .section-header.output {
+      background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    }
+    .info {
+      background: #d1ecf1;
+      border-left: 4px solid #0c5460;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 15px 0;
+    }
+    .warning {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 15px 0;
+    }
+    .success {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 15px 0;
+    }
+    .error {
+      background: #f8d7da;
+      border-left: 4px solid #dc3545;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 15px 0;
+    }
+    .info code, .warning code, .success code, .error code,
+    code.code-highlight {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      padding: 2px 6px;
+      border-radius: 3px;
+      border: 1px solid var(--code-border);
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+    code.script-name {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      border: none;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 15px 0;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+      color: white;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+    tr:nth-child(even) { background-color: #f8f9fa; }
+    tr:hover { background-color: #e3f2fd; }
+    td code {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      padding: 3px 8px;
+      border-radius: 3px;
+      border: 1px solid var(--code-border);
+      font-family: 'Courier New', monospace;
+    }
+    ol.steps { padding-left: 1.5rem; }
+    ol.steps li { margin: 0.75rem 0; }
+    .command-block {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      border: 2px solid #2196f3;
+      border-radius: 8px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    .command-block.expedite {
+      background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+      border-color: #9c27b0;
+    }
+    .command-block.advance {
+      background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+      border-color: #ff9800;
+    }
+    .command-block.verify {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      border-color: #4caf50;
+    }
+    .command-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      background: rgba(255,255,255,0.4);
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    .command-type { font-weight: bold; color: #333; }
+    .command-header-buttons { display: flex; gap: 8px; }
+    .copy-button, .copy-button-template {
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .copy-button { background-color: #0066cc; }
+    .copy-button-template { background-color: #6c757d; }
+    .copy-button:hover { background-color: #0052a3; }
+    .copy-button-template:hover { background-color: #5a6268; }
+    .copy-button.copied, .copy-button-template.copied { background-color: #28a745; }
+    .command-content {
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.95em;
+      color: var(--code-text);
+      word-break: break-all;
+    }
+    .command-parameters {
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.5);
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    .command-parameters h5 { margin: 0 0 12px 0; font-size: 0.9em; }
+    .parameter-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .parameter-group.single { grid-template-columns: 1fr; }
+    .parameter-input label { font-size: 0.8em; color: #555; font-weight: 600; }
+    .parameter-input input {
+      padding: 8px 12px;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .command-single-line {
+      padding: 12px 15px;
+      background: var(--code-bg);
+      border-top: 1px solid var(--code-border);
+    }
+    .command-single-line-label { font-size: 0.8em; color: #666; margin-bottom: 6px; }
+    .command-single-line code {
+      background: transparent;
+      color: var(--code-text);
+      padding: 0;
+      border: none;
+      font-family: 'Courier New', monospace;
+    }
+    pre.code-block {
+      background: #e8f4f8;
+      color: #0d3b66;
+      border: 1px solid #b8d4e3;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    footer.doc-footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid #ddd;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    a { color: var(--blue-accent); }
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+      .parameter-group { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Database Export, Reorder, and Import Guide</h1>
+    <p class="meta">
+      Location: <code class="code-highlight">documentation/database_export_import/DATABASE_EXPORT_IMPORT_GUIDE.html</code><br>
+      Related: <code class="code-highlight">code_html_template/SQLS/</code> ·
+      <code class="code-highlight">scripts/replace-user-profile-ids-in-sql.mjs</code> ·
+      <code class="code-highlight">code_html_template/SQLS/Current_Sqls/sync_sequence_after_inserts.sql</code>
+    </p>
+
+    <div class="section-intro">
+      <p>
+        This guide documents the full workflow for exporting PostgreSQL data from Docker,
+        reordering <code class="code-highlight">INSERT</code> statements for foreign-key safety,
+        preparing a production copy with Clerk user ID replacements, syncing primary-key sequences,
+        and troubleshooting partial imports in DBeaver or <code class="code-highlight">psql</code>.
+      </p>
+    </div>
+
+    <nav class="toc" aria-label="Table of contents">
+      <h2 style="margin-top:0;border:none;padding:0;font-size:1.3em;">Table of contents</h2>
+      <ul>
+        <li><a href="#quick-start">1. Quick-start workflow</a></li>
+        <li><a href="#export">2. Export data with pg_dump (Docker)</a></li>
+        <li><a href="#reorder">3. Reorder INSERT statements</a></li>
+        <li><a href="#prod">4. Production user ID replacement</a></li>
+        <li><a href="#pg-dump-comment">5. Comment out pg_dump header lines</a></li>
+        <li><a href="#import">6. Import the SQL file</a></li>
+        <li><a href="#sequences">7. Sync sequences after import</a></li>
+        <li><a href="#analysis">8. File integrity analysis (is the ordered SQL corrupted?)</a></li>
+        <li><a href="#troubleshooting">9. Troubleshooting partial imports</a></li>
+        <li><a href="#option-a">10. Option A — reorder script fix (implemented)</a></li>
+      </ul>
+    </nav>
+
+    <!-- Section 1 -->
+    <section id="quick-start" aria-labelledby="h-quick">
+      <h2 id="h-quick">1. Quick-start workflow</h2>
+      <div class="section-container usage">
+        <div class="section-header usage">📋 End-to-end steps</div>
+        <ol class="steps">
+          <li><code class="code-highlight">cd E:\project_workspace\mosc-temp\code_html_template\SQLS</code></li>
+          <li>Find Postgres container: <code class="code-highlight">docker ps | findstr postgres</code></li>
+          <li>Export: <code class="code-highlight">docker exec -it &lt;container_id&gt; pg_dump ... &gt; export.sql</code></li>
+          <li>Reorder: <code class="code-highlight">node reorder_sql_inserts_final.cjs</code> → <code class="code-highlight">corrected_event_media_inserts.ordered.sql</code></li>
+          <li>Prod IDs (repo root): <code class="code-highlight">node scripts/replace-user-profile-ids-in-sql.mjs</code> → <code class="code-highlight">corrected_event_media_inserts.ordered_PROD.sql</code></li>
+          <li>In generated SQL: Find/Replace <code class="code-highlight">pg_dump</code> → <code class="code-highlight">-- pg_dump</code> (comment out dump metadata lines)</li>
+          <li>Import ordered SQL into target database (empty schema first)</li>
+          <li>Run <code class="code-highlight">sync_sequence_after_inserts.sql</code> so new rows get IDs above the imported max</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Section 2 -->
+    <section id="export" aria-labelledby="h-export">
+      <h2 id="h-export">2. Export data with pg_dump (Docker)</h2>
+
+      <div class="command-block setup" data-command-base="cd E:\project_workspace\mosc-temp\code_html_template\SQLS" data-template-command="cd E:\project_workspace\mosc-temp\code_html_template\SQLS">
+        <div class="command-header">
+          <span class="command-type">Step 1 — Navigate to SQLS folder</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'cd-sqls')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'cd-sqls')" title="Copy command" aria-label="Copy command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-content" id="cd-sqls">cd E:\project_workspace\mosc-temp\code_html_template\SQLS</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="cd-sqls-single-code">cd E:\project_workspace\mosc-temp\code_html_template\SQLS</code>
+        </div>
+      </div>
+
+      <div class="command-block verify" data-command-base="docker ps | findstr postgres" data-template-command="docker ps | findstr postgres">
+        <div class="command-header">
+          <span class="command-type">Step 2 — Find PostgreSQL container ID</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'docker-ps')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'docker-ps')" title="Copy command" aria-label="Copy command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-content" id="docker-ps">docker ps | findstr postgres</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="docker-ps-single-code">docker ps | findstr postgres</code>
+        </div>
+      </div>
+
+      <div class="section-container parameters">
+        <div class="section-header parameters">⚙️ pg_dump parameters</div>
+        <table>
+          <thead>
+            <tr><th>Flag / argument</th><th>Value</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>-U</code></td><td><code>event_site_admin</code></td><td>Database user</td></tr>
+            <tr><td><code>-d</code></td><td><code>event_site_manager_db</code></td><td>Database name</td></tr>
+            <tr><td><code>--data-only</code></td><td>—</td><td>Data rows only (no CREATE TABLE)</td></tr>
+            <tr><td><code>--column-inserts</code></td><td>—</td><td>Explicit column names in each INSERT</td></tr>
+            <tr><td>Output</td><td><code>export.sql</code></td><td>Input for reorder script</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Local development (example container ID)</h3>
+      <div class="command-block setup"
+           data-command-base="docker exec -it CONTAINER_ID pg_dump -U event_site_admin -d event_site_manager_db --data-only --column-inserts"
+           data-template-command="docker exec -it a6fb865ce8e0 pg_dump -U event_site_admin -d event_site_manager_db --data-only --column-inserts &gt; export.sql">
+        <div class="command-header">
+          <span class="command-type">Step 3 — Export (local Docker)</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'pgdump-local')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'pgdump-local')" title="Copy customized command" aria-label="Copy customized command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-parameters">
+          <h5>🔧 Customize parameters:</h5>
+          <div class="parameter-group single">
+            <div class="parameter-input">
+              <label for="pgdump-local-container">Container ID:</label>
+              <input type="text" id="pgdump-local-container" placeholder="a6fb865ce8e0" value="a6fb865ce8e0" oninput="updatePgDump('pgdump-local', this.value)">
+            </div>
+          </div>
+        </div>
+        <div class="command-content" id="pgdump-local">docker exec -it a6fb865ce8e0 pg_dump -U event_site_admin -d event_site_manager_db --data-only --column-inserts &gt; export.sql</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="pgdump-local-single-code">docker exec -it a6fb865ce8e0 pg_dump -U event_site_admin -d event_site_manager_db --data-only --column-inserts &gt; export.sql</code>
+        </div>
+      </div>
+
+      <h3>Azure virtual desktop (example container ID)</h3>
+      <div class="command-block advance"
+           data-command-base="docker exec -it CONTAINER_ID pg_dump -U event_site_admin -d event_site_manager_db --data-only --column-inserts"
+           data-template-command="docker exec -it 752786b3431e pg_dump -U event_site_admin -d event_site_manager_db --data-only --column-inserts &gt; export.sql">
+        <div class="command-header">
+          <span class="command-type">Step 3 — Export (Azure VDI)</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'pgdump-azure')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'pgdump-azure')" title="Copy customized command" aria-label="Copy customized command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-parameters">
+          <h5>🔧 Customize parameters:</h5>
+          <div class="parameter-group single">
+            <div class="parameter-input">
+              <label for="pgdump-azure-container">Container ID:</label>
+              <input type="text" id="pgdump-azure-container" placeholder="752786b3431e" value="752786b3431e" oninput="updatePgDump('pgdump-azure', this.value)">
+            </div>
+          </div>
+        </div>
+        <div class="command-content" id="pgdump-azure">docker exec -it 752786b3431e pg_dump -U event_site_admin -d event_site_manager_db --data-only --column-inserts &gt; export.sql</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="pgdump-azure-single-code">docker exec -it 752786b3431e pg_dump -U event_site_admin -d event_site_manager_db --data-only --column-inserts &gt; export.sql</code>
+        </div>
+      </div>
+
+      <div class="warning">
+        <strong>⚠️ Replace the container ID</strong> with the value from <code class="code-highlight">docker ps | findstr postgres</code>. Example IDs above are placeholders from prior environments.
+      </div>
+    </section>
+
+    <!-- Section 3 -->
+    <section id="reorder" aria-labelledby="h-reorder">
+      <h2 id="h-reorder">3. Reorder INSERT statements</h2>
+
+      <div class="section-intro">
+        <p>
+          The script <code class="script-name">reorder_sql_inserts_final.cjs</code> reads
+          <code class="code-highlight">export.sql</code> from the same folder and writes
+          <code class="code-highlight">corrected_event_media_inserts.ordered.sql</code> with tables
+          ordered for foreign-key dependencies (parents before children).
+        </p>
+      </div>
+
+      <div class="command-block expedite" data-command-base="cd E:\project_workspace\mosc-temp\code_html_template\SQLS" data-template-command="cd E:\project_workspace\mosc-temp\code_html_template\SQLS">
+        <div class="command-header">
+          <span class="command-type">Navigate to SQLS</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'cd-reorder')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'cd-reorder')" title="Copy command" aria-label="Copy command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-content" id="cd-reorder">cd E:\project_workspace\mosc-temp\code_html_template\SQLS</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="cd-reorder-single-code">cd E:\project_workspace\mosc-temp\code_html_template\SQLS</code>
+        </div>
+      </div>
+
+      <div class="command-block expedite" data-command-base="node reorder_sql_inserts_final.cjs" data-template-command="node reorder_sql_inserts_final.cjs">
+        <div class="command-header">
+          <span class="command-type">Run reorder script</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'node-reorder')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'node-reorder')" title="Copy command" aria-label="Copy command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-content" id="node-reorder">node reorder_sql_inserts_final.cjs</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="node-reorder-single-code">node reorder_sql_inserts_final.cjs</code>
+        </div>
+      </div>
+
+      <div class="section-container output">
+        <div class="section-header output">📊 Expected console output</div>
+        <pre class="code-block">✅ Success! Output written to: ...\corrected_event_media_inserts.ordered.sql
+📊 Summary:
+   • Total INSERT statements: 2199
+   • Extra tables (not in order): none</pre>
+        <p>If <strong>Extra tables (not in order)</strong> is not <code class="code-highlight">none</code>, add those table names to <code class="code-highlight">TABLE_ORDER</code> in <code class="script-name">reorder_sql_inserts_final.cjs</code> (see <a href="#option-a">Section 10</a>).</p>
+      </div>
+    </section>
+
+    <!-- Section 4 -->
+    <section id="prod" aria-labelledby="h-prod">
+      <h2 id="h-prod">4. Production user ID replacement</h2>
+
+      <div class="section-intro">
+        <p>
+          From the <strong>repository root</strong>, run
+          <code class="script-name">replace-user-profile-ids-in-sql.mjs</code>. It copies
+          <code class="code-highlight">corrected_event_media_inserts.ordered.sql</code> to
+          <code class="code-highlight">corrected_event_media_inserts.ordered_PROD.sql</code> and replaces
+          Clerk <code class="code-highlight">user_id</code> / <code class="code-highlight">clerk_user_id</code> values
+          in <code class="code-highlight">user_profile</code> INSERT lines only.
+        </p>
+      </div>
+
+      <div class="command-block advance" data-command-base="cd E:\project_workspace\mosc-temp" data-template-command="cd E:\project_workspace\mosc-temp">
+        <div class="command-header">
+          <span class="command-type">Navigate to repo root</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'cd-root')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'cd-root')" title="Copy command" aria-label="Copy command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-content" id="cd-root">cd E:\project_workspace\mosc-temp</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="cd-root-single-code">cd E:\project_workspace\mosc-temp</code>
+        </div>
+      </div>
+
+      <div class="command-block advance" data-command-base="node scripts/replace-user-profile-ids-in-sql.mjs" data-template-command="node scripts/replace-user-profile-ids-in-sql.mjs">
+        <div class="command-header">
+          <span class="command-type">Generate PROD SQL file</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'node-prod')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'node-prod')" title="Copy command" aria-label="Copy command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-content" id="node-prod">node scripts/replace-user-profile-ids-in-sql.mjs</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="node-prod-single-code">node scripts/replace-user-profile-ids-in-sql.mjs</code>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>From (dev/staging Clerk ID)</th><th>To (production Clerk ID)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>user_2vVLxhPnsIPGYf6qpfozk383Slr</code></td><td><code>user_34rb3aLFAEudlfmG3xrDQIoX8Hg</code></td></tr>
+          <tr><td><code>user_38nbubO0LEVuh1coatR0Rh4MEEa</code></td><td><code>user_37qATlmYSakWtYH962TYumZT01k</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="info">
+        <strong>💡 Dry run:</strong> <code class="code-highlight">node scripts/replace-user-profile-ids-in-sql.mjs --dry-run</code> prints changed lines without writing files. Update mappings in the script when production Clerk IDs change.
+      </div>
+    </section>
+
+    <!-- Section 5 -->
+    <section id="pg-dump-comment" aria-labelledby="h-comment">
+      <h2 id="h-comment">5. Comment out pg_dump header lines</h2>
+      <div class="warning">
+        <strong>⚠️ Required before import in some clients:</strong> Generated files may contain lines starting with
+        <code class="code-highlight">pg_dump</code> (metadata comments). PostgreSQL will error if those run as SQL.
+      </div>
+      <ol class="steps">
+        <li>Open <code class="code-highlight">corrected_event_media_inserts.ordered.sql</code> (or the <code class="code-highlight">_PROD</code> variant) in your editor.</li>
+        <li><strong>Ctrl+H</strong> (Find and Replace).</li>
+        <li>Find: <code class="code-highlight">pg_dump</code></li>
+        <li>Replace: <code class="code-highlight">-- pg_dump</code></li>
+        <li>Replace all (review matches so you do not comment legitimate data values).</li>
+      </ol>
+    </section>
+
+    <!-- Section 6 -->
+    <section id="import" aria-labelledby="h-import">
+      <h2 id="h-import">6. Import the SQL file</h2>
+
+      <div class="section-container">
+        <div class="section-header">Prerequisites</div>
+        <ul>
+          <li>Target database has schema applied (empty tables).</li>
+          <li>Import into a <strong>truncated or fresh</strong> database to avoid duplicate primary-key errors.</li>
+          <li>For circular FK warnings on <code class="code-highlight">user_profile</code> / <code class="code-highlight">event_details</code>, consider wrapping import with:
+            <code class="code-highlight">SET session_replication_role = 'replica';</code> … import … <code class="code-highlight">SET session_replication_role = 'origin';</code>
+          </li>
+        </ul>
+      </div>
+
+      <div class="command-block verify"
+           data-command-base="docker exec -i CONTAINER_ID psql -U event_site_admin -d event_site_manager_db"
+           data-template-command="docker exec -i a6fb865ce8e0 psql -U event_site_admin -d event_site_manager_db &lt; corrected_event_media_inserts.ordered.sql">
+        <div class="command-header">
+          <span class="command-type">Import via psql (recommended)</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'psql-import')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'psql-import')" title="Copy customized command" aria-label="Copy customized command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-parameters">
+          <h5>🔧 Customize parameters:</h5>
+          <div class="parameter-group single">
+            <div class="parameter-input">
+              <label for="psql-import-container">Container ID:</label>
+              <input type="text" id="psql-import-container" value="a6fb865ce8e0" oninput="updatePsqlImport('psql-import', this.value)">
+            </div>
+          </div>
+        </div>
+        <div class="command-content" id="psql-import">docker exec -i a6fb865ce8e0 psql -U event_site_admin -d event_site_manager_db &lt; corrected_event_media_inserts.ordered.sql</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="psql-import-single-code">docker exec -i a6fb865ce8e0 psql -U event_site_admin -d event_site_manager_db &lt; corrected_event_media_inserts.ordered.sql</code>
+        </div>
+      </div>
+
+      <div class="info">
+        <strong>DBeaver:</strong> Open the SQL file, set statement delimiter to <code class="code-highlight">;</code>, enable <strong>continue on error</strong> if available, and execute against an empty schema. Stopping on the first FK error leaves later tables empty.
+      </div>
+    </section>
+
+    <!-- Section 7 -->
+    <section id="sequences" aria-labelledby="h-seq">
+      <h2 id="h-seq">7. Sync sequences after import</h2>
+
+      <div class="section-intro">
+        <p>
+          After manual INSERTs with explicit IDs, PostgreSQL sequences may still point at low values.
+          Run <code class="code-highlight">sync_sequence_after_inserts.sql</code> so the next auto-generated
+          primary key starts above the highest imported ID (typically <code class="code-highlight">MAX(id) + 50</code>).
+        </p>
+      </div>
+
+      <p>Canonical paths:</p>
+      <ul>
+        <li><code class="code-highlight">code_html_template/SQLS/Current_Sqls/sync_sequence_after_inserts.sql</code> (this repo)</li>
+        <li><code class="code-highlight">E:\project_workspace\malayalees-us-site-boot\src\main\resources\sqls\sync_sequence_after_inserts.sql</code> (backend boot project)</li>
+      </ul>
+
+      <div class="section-container output">
+        <div class="section-header output">📊 Run order</div>
+        <ol class="steps">
+          <li>Apply schema SQL</li>
+          <li>Run ordered INSERT file</li>
+          <li>Run <code class="code-highlight">sync_sequence_after_inserts.sql</code> in the same database</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Section 8 -->
+    <section id="analysis" aria-labelledby="h-analysis">
+      <h2 id="h-analysis">8. File integrity analysis (is the ordered SQL corrupted?)</h2>
+
+      <div class="success">
+        <strong>Conclusion:</strong> <code class="code-highlight">corrected_event_media_inserts.ordered.sql</code> is
+        <strong>not corrupted</strong>. Partial row counts after DBeaver import are explained by import order,
+        client error handling, and target DB state — not file damage.
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Check</th><th>Result</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Valid INSERT statements</td><td>2199 (semicolon-terminated)</td></tr>
+          <tr><td>Malformed INSERT / unbalanced quotes</td><td>0</td></tr>
+          <tr><td>Multiline INSERTs</td><td>273 (valid PostgreSQL)</td></tr>
+          <tr><td>Key table counts vs <code>export.sql</code></td><td>Match (e.g. <code>user_profile</code> 14, <code>official_document_category</code> 45, <code>event_media</code> 98)</td></tr>
+          <tr><td>Encoding notes</td><td>Some <code>event_details</code> description text shows mojibake in display; SQL syntax remains valid</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 9 -->
+    <section id="troubleshooting" aria-labelledby="h-trouble">
+      <h2 id="h-trouble">9. Troubleshooting partial imports</h2>
+
+      <table>
+        <thead>
+          <tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Some tables have fewer rows than export</td>
+            <td>Tables were in <strong>“extra tables”</strong> block at EOF (wrong FK order) before script fix</td>
+            <td>Regenerate with updated <code class="script-name">reorder_sql_inserts_final.cjs</code>; confirm <code class="code-highlight">Extra tables: none</code></td>
+          </tr>
+          <tr>
+            <td>Import stops mid-file</td>
+            <td>DBeaver stops on first error (FK violation, duplicate PK)</td>
+            <td>Use <code class="code-highlight">psql</code>, continue-on-error, or fix order; start from empty DB</td>
+          </tr>
+          <tr>
+            <td><code>official_document_year_bundle</code> empty</td>
+            <td>Was ~line 6182 before fix; child rows failed first</td>
+            <td>Now ~line 339 (after <code>official_document_category</code>)</td>
+          </tr>
+          <tr>
+            <td>Spring Batch tables incomplete</td>
+            <td><code>batch_job_instance</code> etc. were after thousands of log rows</td>
+            <td>Batch chain now ordered: instance → execution → context → params → step → step_context → log</td>
+          </tr>
+          <tr>
+            <td>Duplicate key on re-import</td>
+            <td>Target DB not empty</td>
+            <td>Truncate tables or use fresh schema before import</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="info">
+        <strong>Alternative import options:</strong>
+        <ul>
+          <li><strong>Option B:</strong> <code class="code-highlight">psql -v ON_ERROR_STOP=0</code> to log errors and continue</li>
+          <li><strong>Option C:</strong> DBeaver — delimiter <code class="code-highlight">;</code>, continue on error, empty target</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 10 -->
+    <section id="option-a" aria-labelledby="h-option-a">
+      <h2 id="h-option-a">10. Option A — reorder script fix (implemented)</h2>
+
+      <div class="section-intro">
+        <p>
+          <strong>Option A (best long-term):</strong> Extend <code class="code-highlight">TABLE_ORDER</code> in
+          <code class="script-name">reorder_sql_inserts_final.cjs</code> so every table from <code class="code-highlight">export.sql</code>
+          appears in FK-safe order. Tables not listed previously were appended near the end of the file, breaking dependency order.
+        </p>
+      </div>
+
+      <h3>Tables added to TABLE_ORDER (March 2026)</h3>
+      <table>
+        <thead>
+          <tr><th>Table</th><th>Placement</th><th>Approx. line after regenerate</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>official_document_year_bundle</code></td><td>After <code>official_document_category</code>, before <code>event_media</code></td><td>~339</td></tr>
+          <tr><td><code>focus_group_members</code></td><td>After <code>focus_group</code></td><td>~1089</td></tr>
+          <tr><td><code>event_focus_groups</code></td><td>After <code>focus_group_members</code></td><td>~1091</td></tr>
+          <tr><td><code>membership_subscription</code></td><td>After <code>membership_plan</code></td><td>~1103</td></tr>
+          <tr><td><code>manual_payment_summary_report</code></td><td>After <code>manual_payment_request</code></td><td>—</td></tr>
+          <tr><td><code>batch_job_instance</code></td><td>Start of Spring Batch chain</td><td>~1209</td></tr>
+          <tr><td><code>batch_job_execution</code></td><td>After instance</td><td>—</td></tr>
+          <tr><td><code>batch_job_execution_context</code></td><td>After execution</td><td>—</td></tr>
+          <tr><td><code>batch_job_execution_params</code></td><td>After context</td><td>—</td></tr>
+          <tr><td><code>batch_step_execution</code></td><td>After params</td><td>—</td></tr>
+          <tr><td><code>batch_step_execution_context</code></td><td>After step execution</td><td>—</td></tr>
+          <tr><td><code>batch_job_execution_log</code></td><td>After step context (unchanged position in chain)</td><td>—</td></tr>
+        </tbody>
+      </table>
+
+      <div class="success">
+        <strong>Verification:</strong> After running <code class="code-highlight">node reorder_sql_inserts_final.cjs</code>,
+        console reports <code class="code-highlight">Extra tables (not in order): none</code> and all 62 tables from
+        <code class="code-highlight">export.sql</code> are explicitly ordered.
+      </div>
+
+      <div class="warning">
+        <strong>When exports add new tables:</strong> Re-run the reorder script and check the summary line. Any new
+        table name listed under “Extra tables” must be inserted into <code class="code-highlight">TABLE_ORDER</code>
+        before its dependent child tables.
+      </div>
+    </section>
+
+    <footer class="doc-footer">
+      <p>Last updated: June 2026 · MOSC event_site_manager_db export/import workflow</p>
+      <p>See also: <code class="code-highlight">documentation/INSERT_TABLE_BULK_SQL_REORDERING_AND_PG_DUMP_GUIDE.md</code></p>
+    </footer>
+  </main>
+
+  <script>
+    function fallbackCopy(text, button) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        button.classList.add('copied');
+        const orig = button.textContent;
+        button.textContent = '✓ Copied!';
+        setTimeout(function () {
+          button.classList.remove('copied');
+          button.textContent = orig;
+        }, 2000);
+      } catch (e) {
+        console.error('Copy failed', e);
+      }
+      document.body.removeChild(ta);
+    }
+
+    function copyCommand(button, commandId) {
+      const el = document.getElementById(commandId);
+      if (!el) return;
+      const text = el.textContent.trim().replace(/&gt;/g, '>').replace(/&lt;/g, '<');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          button.classList.add('copied');
+          const orig = button.textContent;
+          button.textContent = '✓ Copied!';
+          setTimeout(function () {
+            button.classList.remove('copied');
+            button.textContent = orig;
+          }, 2000);
+        }).catch(function () { fallbackCopy(text, button); });
+      } else {
+        fallbackCopy(text, button);
+      }
+    }
+
+    function copyTemplateCommand(button, commandId) {
+      const block = button.closest('.command-block');
+      if (!block) return;
+      let text = block.getAttribute('data-template-command') || '';
+      text = text.replace(/&quot;/g, '"').replace(/&gt;/g, '>').replace(/&lt;/g, '<');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          button.classList.add('copied');
+          const orig = button.textContent;
+          button.textContent = '✓ Copied!';
+          setTimeout(function () {
+            button.classList.remove('copied');
+            button.textContent = orig;
+          }, 2000);
+        }).catch(function () { fallbackCopy(text, button); });
+      } else {
+        fallbackCopy(text, button);
+      }
+    }
+
+    function updatePgDump(commandId, containerId) {
+      const id = (containerId || 'CONTAINER_ID').trim();
+      const cmd = 'docker exec -it ' + id + ' pg_dump -U event_site_admin -d event_site_manager_db --data-only --column-inserts > export.sql';
+      const el = document.getElementById(commandId);
+      const single = document.getElementById(commandId + '-single-code');
+      if (el) el.textContent = cmd;
+      if (single) single.textContent = cmd;
+    }
+
+    function updatePsqlImport(commandId, containerId) {
+      const id = (containerId || 'CONTAINER_ID').trim();
+      const cmd = 'docker exec -i ' + id + ' psql -U event_site_admin -d event_site_manager_db < corrected_event_media_inserts.ordered.sql';
+      const el = document.getElementById(commandId);
+      const single = document.getElementById(commandId + '-single-code');
+      if (el) el.textContent = cmd;
+      if (single) single.textContent = cmd;
+    }
+  </script>
+</body>
+</html>

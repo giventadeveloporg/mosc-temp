@@ -24,6 +24,41 @@ const ADMIN_MENU_CLOSE_MS = 200;
 const CALENDAR_MENU_CLOSE_MS = 200;
 const SEARCH_DIRECTORY_ICON_SIZE = 24;
 
+/** Desktop main nav — crisp, slightly larger type on burgundy bar */
+const DESKTOP_NAV_LINK =
+  'mosc-header-nav-link relative font-semibold text-sm tracking-[0.03em] antialiased px-3.5 py-2 transition-all duration-200 whitespace-nowrap overflow-visible no-underline visited:no-underline';
+/** Match lower quick-links bar: parchment-light idle, white on hover/active */
+const DESKTOP_NAV_IDLE =
+  'text-parchment-light visited:text-parchment-light hover:text-white';
+const DESKTOP_NAV_ACTIVE = 'text-white visited:text-white mosc-header-nav-link--active';
+
+/** Desktop dropdown submenu — bright parchment active, gold left accent (not faded yellow) */
+const DESKTOP_SUBMENU_LINK =
+  'mosc-header-submenu-link block py-2.5 pl-4 pr-4 text-[13px] font-medium tracking-[0.02em] antialiased transition-all duration-200 no-underline visited:no-underline';
+const DESKTOP_SUBMENU_IDLE =
+  'text-parchment-light/95 visited:text-parchment-light/95 hover:text-white hover:bg-white/10';
+const DESKTOP_SUBMENU_ACTIVE =
+  'text-white visited:text-white font-semibold bg-white/20 border-l-[3px] border-warmGold-light shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]';
+
+const DESKTOP_DROPDOWN_PANEL =
+  'fixed z-[10000] min-w-[15rem] rounded-lg border border-white/25 bg-burgundy-dark/98 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-sm';
+
+/** Quick links bar + Calendar trigger */
+const QUICK_LINK =
+  'mosc-header-quick-link relative font-semibold text-[13px] tracking-[0.04em] antialiased px-3.5 py-2.5 whitespace-nowrap border-r border-white/12 no-underline visited:no-underline transition-all duration-200';
+const QUICK_LINK_IDLE = 'text-parchment-light visited:text-parchment-light hover:text-white';
+const QUICK_LINK_ACTIVE = 'text-white mosc-header-quick-link--active';
+
+/** Mobile nav */
+const MOBILE_NAV_LINK =
+  'block text-sm font-semibold tracking-wide antialiased py-2.5 px-2.5 rounded-md transition-all duration-200 no-underline visited:no-underline';
+const MOBILE_SUBMENU_LINK =
+  'block text-[13px] font-medium tracking-wide antialiased py-2 px-2.5 rounded-md transition-all duration-200 no-underline visited:no-underline';
+const MOBILE_SUB_ACTIVE =
+  'text-burgundy-dark visited:text-burgundy-dark font-bold bg-parchment-light border-l-[3px] border-warmGold-light';
+const MOBILE_SUB_IDLE =
+  'text-burgundy-dark/85 visited:text-burgundy-dark/85 hover:text-burgundy hover:bg-burgundy/8';
+
 function normalizePath(p: string | null): string {
   if (!p) return '';
   if (p.length > 1 && p.endsWith('/')) return p.slice(0, -1);
@@ -214,7 +249,7 @@ export default function MoscRedesignHeader() {
   const searchDirectoryActive = isTopNavActive(pathname, MOSC_REDESIGN_SEARCH_DIRECTORY_NAV.href);
 
   const calendarDropdownPanel = (
-    <ul className="py-1.5">
+    <ul className="py-2" role="none">
       {CALENDAR_MENU_ITEMS.map((item) => {
         const subActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
         return (
@@ -223,10 +258,8 @@ export default function MoscRedesignHeader() {
               href={item.href}
               role="menuitem"
               aria-current={subActive ? 'page' : undefined}
-              className={`block px-3 py-2 text-[11px] transition-colors no-underline visited:no-underline whitespace-nowrap ${
-                subActive
-                  ? 'text-warmGold visited:text-warmGold bg-white/15 font-semibold'
-                  : 'text-white/95 visited:text-white/95 hover:text-warmGold hover:bg-white/10'
+              className={`${DESKTOP_SUBMENU_LINK} whitespace-nowrap ${
+                subActive ? DESKTOP_SUBMENU_ACTIVE : DESKTOP_SUBMENU_IDLE
               }`}
             >
               {item.label}
@@ -238,7 +271,7 @@ export default function MoscRedesignHeader() {
   );
 
   const adminDropdownPanel = (
-    <ul className="py-1.5">
+    <ul className="py-2" role="none">
       {ADMINISTRATION_PAGE_CARDS.map((card) => {
         const subActive = pathname === card.href;
         return (
@@ -247,11 +280,7 @@ export default function MoscRedesignHeader() {
               href={card.href}
               role="menuitem"
               aria-current={subActive ? 'page' : undefined}
-              className={`block px-3 py-2 text-[11px] transition-colors no-underline visited:no-underline ${
-                subActive
-                  ? 'text-warmGold visited:text-warmGold bg-white/15 font-semibold'
-                  : 'text-white/95 visited:text-white/95 hover:text-warmGold hover:bg-white/10'
-              }`}
+              className={`${DESKTOP_SUBMENU_LINK} ${subActive ? DESKTOP_SUBMENU_ACTIVE : DESKTOP_SUBMENU_IDLE}`}
             >
               {card.shortTitle}
             </Link>
@@ -303,7 +332,7 @@ export default function MoscRedesignHeader() {
       </div>
 
       {/* Row 2: Main Nav */}
-      <div className="relative z-20 overflow-visible bg-burgundy-dark hidden lg:block">
+      <div className="mosc-redesign-header-main-nav relative z-20 overflow-visible bg-burgundy-dark hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16">
           <nav className="flex w-full items-center gap-0">
             <div className="flex min-w-0 flex-1 items-center justify-end gap-0">
@@ -320,15 +349,13 @@ export default function MoscRedesignHeader() {
                     href={link.href}
                     aria-current={adminNavActive ? 'page' : undefined}
                     aria-expanded={adminMenuOpen}
-                    className={`relative font-medium text-[13px] px-3 py-[7px] transition-all duration-200 whitespace-nowrap flex items-center gap-0.5 overflow-visible no-underline visited:no-underline ${
-                      adminHoverOrOpen
-                        ? 'text-white visited:text-white'
-                        : 'text-white/95 visited:text-white/95 hover:text-white'
-                    }`}
+                    className={`${DESKTOP_NAV_LINK} flex items-center gap-1 ${
+                      adminHoverOrOpen ? DESKTOP_NAV_ACTIVE : DESKTOP_NAV_IDLE
+                    } ${adminNavActive ? 'mosc-header-nav-link--active' : ''}`}
                   >
                     <span
-                      className={`absolute inset-0 bg-white/10 transition-transform duration-200 origin-left rounded-sm ${
-                        adminHoverOrOpen ? 'scale-x-100' : 'scale-x-0'
+                      className={`absolute inset-0 bg-warmBrown/90 transition-transform duration-200 origin-bottom rounded-sm ${
+                        adminHoverOrOpen ? 'scale-y-100' : 'scale-y-0'
                       }`}
                     />
                     <span className="relative z-10">{link.label}</span>
@@ -351,15 +378,13 @@ export default function MoscRedesignHeader() {
                       key={link.label}
                       href={link.href}
                       aria-current={navActive ? 'page' : undefined}
-                      className={`relative font-medium text-[13px] px-3 py-[7px] transition-all duration-200 whitespace-nowrap group overflow-hidden no-underline visited:no-underline ${
-                        navActive
-                          ? 'text-white visited:text-white font-semibold'
-                          : 'text-white/95 visited:text-white/95 hover:text-white'
+                      className={`${DESKTOP_NAV_LINK} group ${
+                        navActive ? DESKTOP_NAV_ACTIVE : DESKTOP_NAV_IDLE
                       }`}
                     >
                       <span
-                        className={`absolute inset-0 bg-white/10 transition-transform duration-200 origin-left rounded-sm ${
-                          navActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                        className={`absolute inset-0 bg-warmBrown/90 transition-transform duration-200 origin-bottom rounded-sm ${
+                          navActive ? 'scale-y-100' : 'scale-y-0 group-hover:scale-y-100'
                         }`}
                       />
                       <span className="relative z-10">{link.label}</span>
@@ -373,19 +398,19 @@ export default function MoscRedesignHeader() {
               <Link
                 href={MOSC_REDESIGN_SEARCH_DIRECTORY_NAV.href}
                 aria-current={searchDirectoryActive ? 'page' : undefined}
-                className={`group relative flex items-center gap-2 whitespace-nowrap px-3 py-[7px] text-[13px] font-medium no-underline visited:no-underline text-white visited:text-white hover:text-white ${
-                  searchDirectoryActive ? 'font-semibold' : ''
+                className={`${DESKTOP_NAV_LINK} group flex items-center gap-2 ${
+                  searchDirectoryActive ? DESKTOP_NAV_ACTIVE : DESKTOP_NAV_IDLE
                 }`}
               >
                 <span
-                  className={`absolute inset-0 rounded-sm bg-white/10 transition-transform duration-200 origin-left ${
-                    searchDirectoryActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                  className={`absolute inset-0 rounded-sm bg-warmBrown/90 transition-transform duration-200 origin-bottom ${
+                    searchDirectoryActive ? 'scale-y-100' : 'scale-y-0 group-hover:scale-y-100'
                   }`}
                 />
                 <Search
                   size={SEARCH_DIRECTORY_ICON_SIZE}
                   strokeWidth={2.25}
-                  className="relative z-10 shrink-0 text-white"
+                  className="relative z-10 shrink-0 text-current"
                   aria-hidden
                 />
                 <span className="relative z-10">{MOSC_REDESIGN_SEARCH_DIRECTORY_NAV.label}</span>
@@ -402,7 +427,7 @@ export default function MoscRedesignHeader() {
           <div
             role="menu"
             aria-label="Administration sections"
-            className="fixed z-[10000] min-w-[14rem] rounded-md border border-white/20 bg-burgundy-dark shadow-lg max-h-[min(70vh,28rem)] overflow-y-auto"
+            className={`${DESKTOP_DROPDOWN_PANEL} max-h-[min(70vh,28rem)] overflow-y-auto`}
             style={{ top: adminMenu.top, left: adminMenu.left }}
             onMouseEnter={cancelCloseAdminMenu}
             onMouseLeave={scheduleCloseAdminMenu}
@@ -419,7 +444,7 @@ export default function MoscRedesignHeader() {
           <div
             role="menu"
             aria-label="Calendar sections"
-            className="fixed z-[10000] min-w-[14rem] rounded-md border border-white/20 bg-burgundy shadow-lg"
+            className={DESKTOP_DROPDOWN_PANEL}
             style={{ top: calendarMenu.top, left: calendarMenu.left }}
             onMouseEnter={cancelCloseCalendarMenu}
             onMouseLeave={scheduleCloseCalendarMenu}
@@ -445,10 +470,10 @@ export default function MoscRedesignHeader() {
                   <Link
                     href={link.href}
                     aria-current={adminNavActive ? 'page' : undefined}
-                    className={`block text-xs font-semibold py-2 px-2 rounded transition-all duration-200 no-underline visited:no-underline ${
+                    className={`${MOBILE_NAV_LINK} ${
                       adminNavActive
-                        ? 'text-burgundy visited:text-burgundy bg-burgundy/15'
-                        : 'text-burgundy-dark visited:text-burgundy-dark hover:text-burgundy hover:bg-burgundy/10'
+                        ? 'text-burgundy-dark visited:text-burgundy-dark bg-parchment-light border-l-[3px] border-warmGold-light'
+                        : 'text-burgundy-dark visited:text-burgundy-dark hover:text-burgundy hover:bg-burgundy/8'
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -462,10 +487,8 @@ export default function MoscRedesignHeader() {
                           <Link
                             href={card.href}
                             aria-current={subActive ? 'page' : undefined}
-                            className={`block text-[11px] py-1.5 px-2 rounded transition-all duration-200 no-underline visited:no-underline ${
-                              subActive
-                                ? 'text-burgundy visited:text-burgundy font-semibold bg-burgundy/10'
-                                : 'text-burgundy-dark/90 visited:text-burgundy-dark/90 hover:text-burgundy hover:bg-burgundy/10'
+                            className={`${MOBILE_SUBMENU_LINK} ${
+                              subActive ? MOBILE_SUB_ACTIVE : MOBILE_SUB_IDLE
                             }`}
                             onClick={() => setMobileMenuOpen(false)}
                           >
@@ -484,10 +507,10 @@ export default function MoscRedesignHeader() {
                       key={link.label}
                       href={link.href}
                       aria-current={navActive ? 'page' : undefined}
-                      className={`block text-xs py-2 px-2 rounded transition-all duration-200 no-underline visited:no-underline ${
+                      className={`${MOBILE_NAV_LINK} ${
                         navActive
-                          ? 'text-burgundy visited:text-burgundy font-semibold bg-burgundy/15'
-                          : 'text-burgundy-dark visited:text-burgundy-dark hover:text-burgundy hover:bg-burgundy/10'
+                          ? 'text-burgundy-dark visited:text-burgundy-dark bg-parchment-light border-l-[3px] border-warmGold-light'
+                          : 'text-burgundy-dark visited:text-burgundy-dark hover:text-burgundy hover:bg-burgundy/8'
                       }`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -502,10 +525,10 @@ export default function MoscRedesignHeader() {
               <Link
                 href={MOSC_REDESIGN_SEARCH_DIRECTORY_NAV.href}
                 aria-current={searchDirectoryActive ? 'page' : undefined}
-                className={`flex items-center gap-2.5 rounded px-2 py-2.5 text-xs font-semibold no-underline visited:no-underline ${
+                className={`${MOBILE_NAV_LINK} flex items-center gap-2.5 ${
                   searchDirectoryActive
-                    ? 'bg-burgundy/15 text-burgundy visited:text-burgundy'
-                    : 'text-burgundy-dark visited:text-burgundy-dark hover:bg-burgundy/10 hover:text-burgundy'
+                    ? 'bg-parchment-light text-burgundy-dark visited:text-burgundy-dark border-l-[3px] border-warmGold-light'
+                    : 'text-burgundy-dark visited:text-burgundy-dark hover:bg-burgundy/8 hover:text-burgundy'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -524,10 +547,10 @@ export default function MoscRedesignHeader() {
                       key={ql.label}
                       href={ql.href}
                       aria-current={quickActive ? 'page' : undefined}
-                      className={`text-xs py-2 px-2 rounded transition-all duration-200 no-underline visited:no-underline border-b border-burgundy/10 ${
+                      className={`${MOBILE_NAV_LINK} border-b border-burgundy/10 ${
                         quickActive
-                          ? 'text-burgundy visited:text-burgundy font-semibold bg-burgundy/15'
-                          : 'text-burgundy-dark visited:text-burgundy-dark hover:text-burgundy hover:bg-burgundy/10'
+                          ? 'text-burgundy-dark visited:text-burgundy-dark bg-parchment-light border-l-[3px] border-warmGold-light'
+                          : 'text-burgundy-dark visited:text-burgundy-dark hover:text-burgundy hover:bg-burgundy/8'
                       }`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -537,8 +560,10 @@ export default function MoscRedesignHeader() {
                 })}
                 <div className="border-b border-burgundy/10 py-1">
                   <p
-                    className={`text-xs font-semibold py-2 px-2 ${
-                      calendarNavActive ? 'text-burgundy' : 'text-burgundy-dark'
+                    className={`${MOBILE_NAV_LINK} ${
+                      calendarNavActive
+                        ? 'text-burgundy-dark bg-parchment-light/80 border-l-[3px] border-warmGold-light'
+                        : 'text-burgundy-dark'
                     }`}
                   >
                     {CALENDAR_QUICK_LINK_LABEL}
@@ -552,10 +577,8 @@ export default function MoscRedesignHeader() {
                           <Link
                             href={item.href}
                             aria-current={subActive ? 'page' : undefined}
-                            className={`block text-[11px] py-1.5 px-2 rounded transition-all duration-200 no-underline visited:no-underline ${
-                              subActive
-                                ? 'text-burgundy visited:text-burgundy font-semibold bg-burgundy/10'
-                                : 'text-burgundy-dark/90 visited:text-burgundy-dark/90 hover:text-burgundy hover:bg-burgundy/10'
+                            className={`${MOBILE_SUBMENU_LINK} ${
+                              subActive ? MOBILE_SUB_ACTIVE : MOBILE_SUB_IDLE
                             }`}
                             onClick={() => setMobileMenuOpen(false)}
                           >
@@ -574,16 +597,16 @@ export default function MoscRedesignHeader() {
       )}
 
       {/* Row 3: Quick Links Bar (desktop only — mobile: inside hamburger above) */}
-      <div className="relative z-10 bg-burgundy overflow-x-auto border-t border-white/10 hidden lg:block">
+      <div className="mosc-redesign-header-quick-nav relative z-10 bg-burgundy overflow-x-auto border-t border-white/10 hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 lg:px-16">
           <div className="flex items-center gap-0 min-w-max justify-end ml-auto">
             {MOSC_REDESIGN_QUICK_LINKS.map((ql) => (
               <Link
                 key={ql.label}
                 href={ql.href}
-                className="relative text-parchment-light visited:text-parchment-light font-semibold text-[12px] px-3 py-2 whitespace-nowrap border-r border-white/10 group overflow-hidden transition-colors duration-200 hover:text-warmGold no-underline visited:no-underline"
+                className={`${QUICK_LINK} group overflow-hidden ${QUICK_LINK_IDLE}`}
               >
-                <span className="absolute inset-0 bg-warmBrown scale-y-0 group-hover:scale-y-100 transition-transform duration-200 origin-bottom" />
+                <span className="absolute inset-0 bg-warmBrown/90 scale-y-0 group-hover:scale-y-100 transition-transform duration-200 origin-bottom" />
                 <span className="relative z-10">{ql.label}</span>
               </Link>
             ))}
@@ -597,12 +620,12 @@ export default function MoscRedesignHeader() {
                 type="button"
                 aria-expanded={calendarMenuOpen}
                 aria-haspopup="menu"
-                className={`relative text-parchment-light font-semibold text-[12px] px-3 py-2 whitespace-nowrap group overflow-hidden transition-colors duration-200 hover:text-warmGold flex items-center gap-0.5 ${
-                  calendarHoverOrOpen ? 'text-warmGold' : ''
+                className={`${QUICK_LINK} group overflow-hidden flex items-center gap-1 ${
+                  calendarHoverOrOpen ? QUICK_LINK_ACTIVE : QUICK_LINK_IDLE
                 }`}
               >
                 <span
-                  className={`absolute inset-0 bg-warmBrown transition-transform duration-200 origin-bottom ${
+                  className={`absolute inset-0 bg-warmBrown/90 transition-transform duration-200 origin-bottom ${
                     calendarHoverOrOpen ? 'scale-y-100' : 'scale-y-0 group-hover:scale-y-100'
                   }`}
                 />

@@ -946,6 +946,21 @@ export interface PromotionEmailSentLogDTO {
 }
 
 /**
+ * Payload for public contact form submissions (footer, contact page).
+ * SES from/to addresses are resolved server-side from tenant_email_addresses by emailType.
+ */
+export interface ContactFormSubmitDTO {
+  firstName: string;
+  lastName: string;
+  messageBody: string;
+  /** Visitor email (Reply-To and confirmation recipient). */
+  senderEmail: string;
+  /** Tenant email type used to look up verified from/copy-to addresses (e.g. CONTACT). */
+  emailType: TenantEmailAddressDTO['emailType'];
+  tenantId?: string;
+}
+
+/**
  * DTO for tenant email addresses, matching `tenant_email_addresses` table / backend schema.
  * Stores per-tenant "from" addresses categorized by type (INFO, SALES, TICKETS, CONTACT, etc.).
  */
@@ -957,7 +972,13 @@ export interface TenantEmailAddressDTO {
    * Optional copy-to address that will be placed in the CC header for outgoing emails.
    * Maps to the `copy_to_email_address` column in the `tenant_email_addresses` table.
    */
-  copyToEmailAddress: string;
+  copyToEmailAddress?: string | null;
+  /**
+   * Optional Reply-To address for outbound emails of this type.
+   * When set, recipients reply to this address instead of the visitor/sender.
+   * Maps to the `reply_to_email_address` column in the `tenant_email_addresses` table.
+   */
+  replyToEmailAddress?: string | null;
   /**
    * Email address type:
    * INFO, SALES, TICKETS, CONTACT, SUPPORT, MARKETING, NOREPLY, ADMIN.

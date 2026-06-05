@@ -30,6 +30,7 @@ import {
   sleep,
 } from './zoho-salesiq-api.mjs';
 import { isGenericSiteTitle, resolveArticleTitle } from './salesiq-title-utils.mjs';
+import { sanitizeTextField } from './salesiq-text-sanitize.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -306,12 +307,14 @@ async function main() {
 
   const planned = [];
   for (const record of dataRows) {
-    const title = resolveArticleTitle({
-      title: record.Title,
-      content: record.Content,
-      sourceUrl: urlIdx >= 0 ? record['Source URL'] : '',
-      mainHtml: null,
-    });
+    const title = sanitizeTextField(
+      resolveArticleTitle({
+        title: record.Title,
+        content: record.Content,
+        sourceUrl: urlIdx >= 0 ? record['Source URL'] : '',
+        mainHtml: null,
+      }),
+    );
     if (!title.trim()) continue;
 
     const titleKey = title.trim().toLowerCase();

@@ -11,6 +11,7 @@ import { readFile, writeFile } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { isGenericSiteTitle, resolveArticleTitle } from './salesiq-title-utils.mjs';
+import { sanitizeTextField } from './salesiq-text-sanitize.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -118,15 +119,19 @@ async function main() {
     });
 
     const oldTitle = record.Title || '';
-    if (isGenericSiteTitle(oldTitle)) {
+    record.Title = sanitizeTextField(oldTitle);
+    record.Content = sanitizeTextField(record.Content || '');
+    record.Description = sanitizeTextField(record.Description || '');
+
+    if (isGenericSiteTitle(record.Title)) {
       const nextTitle = resolveArticleTitle({
         title: oldTitle,
         content: record.Content,
         sourceUrl: urlIdx >= 0 ? record['Source URL'] : '',
         mainHtml: null,
       });
-      if (nextTitle && !isGenericSiteTitle(nextTitle) && nextTitle !== oldTitle) {
-        record.Title = nextTitle;
+      if (nextTitle && !isGenericSiteTitle(nextTitle) && nextTitle !== record.Title) {
+        record.Title = sanitizeTextField(nextTitle);
         fixed++;
         if (samples.length < 8) {
           samples.push({ url: record['Source URL'], from: oldTitle, to: nextTitle });

@@ -60,7 +60,7 @@
         <div class="section-intro">
             This script automates <strong>Step 2</strong> of the Zoho SalesIQ knowledge-base pipeline: it reads your URL list, fetches each public <code>/mosc-redesign</code> page, extracts title and main content, and writes <code class="script-name">salesiq-articles-import.csv</code>.
             <strong>Recommended next step:</strong> post articles via REST API — <a href="ZOHO_SALESIQ_OPERATIONS_RUNBOOK.html#bulk-upload">Operations Runbook §9 Bulk upload</a> (<code>npm run zobot:bulk-upload-articles -- --confirm</code>). Portal CSV import is documented as an alternative in the same runbook (§10) and main guide Section 7.
-            See also: <a href="../html-documentation-styling/ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html">Zobot knowledge base guide</a>.
+            See also: <a href="ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html">Zobot knowledge base guide</a>.
         </div>
 
         <h2 id="overview">1. What it does</h2>
@@ -211,10 +211,10 @@
             <div class="section-body">
                 <ol class="steps">
                     <li>Sign in at <a href="https://salesiq.zoho.com/giventainc/onboard" rel="noopener noreferrer">salesiq.zoho.com/giventainc/onboard</a></li>
-                    <li>Confirm brand language: <strong>Settings → Brands → Giventa Inc. → General configurations → Languages</strong> — <strong>English</strong> selected and default (main guide <a href="../html-documentation-styling/ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html#import-brand-language">#import-brand-language</a>)</li>
-                    <li>Create article <strong>Categories</strong> matching the CSV before bulk import (main guide <a href="../html-documentation-styling/ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html#import-categories">#import-categories</a>)</li>
+                    <li>Confirm brand language: <strong>Settings → Brands → Giventa Inc. → General configurations → Languages</strong> — <strong>English</strong> selected and default (main guide <a href="ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html#import-brand-language">#import-brand-language</a>)</li>
+                    <li>Create article <strong>Categories</strong> matching the CSV before bulk import (main guide <a href="ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html#import-categories">#import-categories</a>)</li>
                     <li><strong>Settings</strong> → <strong>Articles</strong> (Settings sidebar) → <strong>Add</strong> → upload <code class="script-name">salesiq-articles-import.csv</code></li>
-                    <li>On <strong>Add Articles</strong> mapping: map every column 1:1; set <strong>Article status</strong> to <strong>Publish</strong> (or Status in sheet + map Status). See main guide <a href="../html-documentation-styling/ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html#import-mapping">section 7 mapping table</a>.</li>
+                    <li>On <strong>Add Articles</strong> mapping: map every column 1:1; set <strong>Article status</strong> to <strong>Publish</strong> (or Status in sheet + map Status). See main guide <a href="ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html#import-mapping">section 7 mapping table</a>.</li>
                     <li>Click <strong>Validate</strong>, then finish import</li>
                     <li>Import a <strong>test batch</strong> first (use <code>--limit 10</code> when exporting)</li>
                     <li>Review a few articles in the portal, then run the full export and import again</li>
@@ -286,7 +286,7 @@
             </tbody>
         </table>
 
-        <p style="margin-top: 32px;"><a href="../html-documentation-styling/ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html">← Back to Zobot knowledge base guide</a></p>
+        <p style="margin-top: 32px;"><a href="ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html">← Back to Zobot knowledge base guide</a></p>
     </main>
     <script>
         function copyCmd(id) {

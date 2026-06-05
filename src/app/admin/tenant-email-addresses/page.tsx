@@ -33,6 +33,7 @@ export default function TenantEmailAddressesPage() {
   const [formData, setFormData] = useState<FormState>({
     emailAddress: '',
     copyToEmailAddress: '',
+    replyToEmailAddress: '',
     emailType: 'INFO',
     displayName: '',
     isActive: true,
@@ -78,6 +79,7 @@ export default function TenantEmailAddressesPage() {
     setFormData({
       emailAddress: '',
       copyToEmailAddress: '',
+      replyToEmailAddress: '',
       emailType: 'INFO',
       displayName: '',
       isActive: true,
@@ -94,17 +96,25 @@ export default function TenantEmailAddressesPage() {
         setCreateFormMessage({ type: 'error', message: 'Email address is required' });
         return;
       }
-      if (!formData.copyToEmailAddress?.trim()) {
-        setCreateFormMessage({ type: 'error', message: 'Copy-to email address is required' });
-        return;
-      }
+      const copyToTrimmed = formData.copyToEmailAddress?.trim() || '';
+      const replyToTrimmed = formData.replyToEmailAddress?.trim() || '';
       if (
-        formData.emailAddress.trim().toLowerCase() ===
-        formData.copyToEmailAddress.trim().toLowerCase()
+        copyToTrimmed &&
+        formData.emailAddress.trim().toLowerCase() === copyToTrimmed.toLowerCase()
       ) {
         setCreateFormMessage({
           type: 'error',
-          message: 'From email and Copy-To email address must be different',
+          message: 'From email and Copy-To email address must be different when both are provided',
+        });
+        return;
+      }
+      if (
+        replyToTrimmed &&
+        formData.emailAddress.trim().toLowerCase() === replyToTrimmed.toLowerCase()
+      ) {
+        setCreateFormMessage({
+          type: 'error',
+          message: 'From email and Reply-To email address must be different when both are provided',
         });
         return;
       }
@@ -116,7 +126,8 @@ export default function TenantEmailAddressesPage() {
       setLoading(true);
       const payload = {
         emailAddress: formData.emailAddress!.trim(),
-        copyToEmailAddress: formData.copyToEmailAddress!.trim(),
+        copyToEmailAddress: copyToTrimmed || null,
+        replyToEmailAddress: replyToTrimmed || null,
         emailType: formData.emailType! as TenantEmailAddressDTO['emailType'],
         displayName: formData.displayName?.trim() || undefined,
         isActive: formData.isActive ?? true,
@@ -145,17 +156,25 @@ export default function TenantEmailAddressesPage() {
         setEditFormMessage({ type: 'error', message: 'Email address is required' });
         return;
       }
-      if (!formData.copyToEmailAddress?.trim()) {
-        setEditFormMessage({ type: 'error', message: 'Copy-to email address is required' });
-        return;
-      }
+      const copyToTrimmed = formData.copyToEmailAddress?.trim() || '';
+      const replyToTrimmed = formData.replyToEmailAddress?.trim() || '';
       if (
-        formData.emailAddress.trim().toLowerCase() ===
-        formData.copyToEmailAddress.trim().toLowerCase()
+        copyToTrimmed &&
+        formData.emailAddress.trim().toLowerCase() === copyToTrimmed.toLowerCase()
       ) {
         setEditFormMessage({
           type: 'error',
-          message: 'From email and Copy-To email address must be different',
+          message: 'From email and Copy-To email address must be different when both are provided',
+        });
+        return;
+      }
+      if (
+        replyToTrimmed &&
+        formData.emailAddress.trim().toLowerCase() === replyToTrimmed.toLowerCase()
+      ) {
+        setEditFormMessage({
+          type: 'error',
+          message: 'From email and Reply-To email address must be different when both are provided',
         });
         return;
       }
@@ -167,7 +186,8 @@ export default function TenantEmailAddressesPage() {
       setLoading(true);
       const patch: Partial<TenantEmailAddressDTO> = {
         emailAddress: formData.emailAddress!.trim(),
-        copyToEmailAddress: formData.copyToEmailAddress!.trim(),
+        copyToEmailAddress: copyToTrimmed || null,
+        replyToEmailAddress: replyToTrimmed || null,
         emailType: formData.emailType as TenantEmailAddressDTO['emailType'],
         displayName: formData.displayName?.trim() || undefined,
         isActive: formData.isActive ?? true,
@@ -223,6 +243,7 @@ export default function TenantEmailAddressesPage() {
     setFormData({
       emailAddress: item.emailAddress,
       copyToEmailAddress: item.copyToEmailAddress,
+      replyToEmailAddress: item.replyToEmailAddress,
       emailType: item.emailType,
       displayName: item.displayName,
       isActive: item.isActive,
@@ -275,8 +296,9 @@ export default function TenantEmailAddressesPage() {
 
   const columns: Column<TenantEmailAddressDTO>[] = [
     { key: 'emailType', label: 'Type', sortable: true },
-    { key: 'emailAddress', label: 'Email Address', sortable: true },
+    { key: 'emailAddress', label: 'From Email Address', sortable: true },
     { key: 'copyToEmailAddress', label: 'Copy-To Address', sortable: true },
+    { key: 'replyToEmailAddress', label: 'Reply-To Address', sortable: true },
     { key: 'displayName', label: 'Display Name', sortable: true },
     {
       key: 'isActive',
@@ -334,12 +356,31 @@ export default function TenantEmailAddressesPage() {
               Configure the verified “From” email addresses for this tenant, categorized by type (info, sales,
               support, noreply, etc.). These addresses are used when sending emails from the platform.
             </p>
-            <p className="mt-2 rounded-md bg-blue-50 border border-blue-100 p-2 text-xs text-blue-800">
-              Please provide both a <span className="font-semibold">From</span> email and a{' '}
-              <span className="font-semibold">Copy-To</span> email address for each entry, and they must be
-              different. Both addresses should be AWS SES verified email addresses. Please contact the platform
-              administrator to have these addresses added or configured in SES.
-            </p>
+            <div className="mt-2 rounded-md bg-blue-50 border border-blue-100 p-3 text-xs text-blue-800 space-y-2">
+              <p className="font-semibold text-blue-900">Email configuration guide</p>
+              <ul className="list-disc pl-4 space-y-1.5">
+                <li>
+                  <span className="font-semibold">From (required)</span> — The verified sender address shown in the
+                  &quot;From&quot; field when the platform sends email for this type (e.g. CONTACT, INFO). Must be an
+                  AWS SES verified address.
+                </li>
+                <li>
+                  <span className="font-semibold">Copy-To (optional)</span> — Leave empty if no extra copy is needed.
+                  When set, that address receives a duplicate of outbound messages (for example, a manager CC on contact
+                  form submissions). If provided, it must differ from the From address.
+                </li>
+                <li>
+                  <span className="font-semibold">Reply-To (optional)</span> — Leave empty to use the visitor&apos;s
+                  email as Reply-To on inbound notifications (typical for contact forms). When set, staff who click
+                  &quot;Reply&quot; in their mail client write to this address instead—for example a shared inbox like{' '}
+                  <span className="font-mono">support@yourorg.org</span>. If provided, it must differ from the From
+                  address.
+                </li>
+              </ul>
+              <p>
+                Contact the platform administrator to add or verify sender addresses in AWS SES before use.
+              </p>
+            </div>
             {totalCount !== null && (
               <p className="text-gray-500 text-xs mt-1">Total addresses: {totalCount}</p>
             )}
@@ -607,10 +648,11 @@ function TenantEmailAddressForm({
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email Address <span className="text-red-500">*</span>
+          <label htmlFor="tenant-email-from-address" className="block text-sm font-medium text-gray-700 mb-1">
+            [From] Email Address <span className="text-red-500">*</span>
           </label>
           <input
+            id="tenant-email-from-address"
             type="email"
             name="emailAddress"
             value={formData.emailAddress || ''}
@@ -621,16 +663,28 @@ function TenantEmailAddressForm({
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Copy-To Email Address <span className="text-red-500">*</span>
+            Copy-To Email Address
           </label>
           <input
             type="email"
             name="copyToEmailAddress"
             value={formData.copyToEmailAddress || ''}
             onChange={handleChange}
-            required
             className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="Optional CC / copy-to address"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Reply-To Email Address
+          </label>
+          <input
+            type="email"
+            name="replyToEmailAddress"
+            value={formData.replyToEmailAddress || ''}
+            onChange={handleChange}
+            className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Optional reply-to address"
           />
         </div>
       </div>
@@ -647,12 +701,13 @@ function TenantEmailAddressForm({
         </div>
       )}
 
-      <div className="mt-2 rounded-md bg-blue-50 border border-blue-100 p-3">
-        <p className="text-xs text-blue-800">
-          Please provide both a <span className="font-semibold">From</span> email and a{' '}
-          <span className="font-semibold">Copy-To</span> email address, and they must be different.
-          Both addresses should be AWS SES verified email addresses. Please contact the platform
-          administrator to have these addresses added or configured in SES.
+      <div className="mt-2 rounded-md bg-blue-50 border border-blue-100 p-3 text-xs text-blue-800 space-y-1.5">
+        <p>
+          <span className="font-semibold">From</span> is required and must be SES-verified.{' '}
+          <span className="font-semibold">Copy-To</span> and <span className="font-semibold">Reply-To</span> are
+          optional—leave either blank or fill in as needed (see the guide on this page). When set, Copy-To receives a
+          copy of sent mail; Reply-To controls where &quot;Reply&quot; goes. From must differ from any optional address
+          you provide.
         </p>
       </div>
 
@@ -665,6 +720,7 @@ function TenantEmailAddressForm({
             name="emailType"
             value={formData.emailType || 'INFO'}
             onChange={handleChange}
+            required
             className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="INFO">INFO</option>

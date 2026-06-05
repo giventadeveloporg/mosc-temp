@@ -72,14 +72,98 @@ function formatLiturgyDisplayDate(liturgyDate: string | null): string {
 }
 
 const slides = [
-{
-  image: "/mosc/assets/images/mosc_images/bava_thirumeni_pope_visit_8k.png",
-  alt: "His Holiness Baselios Marthoma Mathews III meeting with Pope Francis at the Vatican"
-},
-{
-  image: "/mosc/assets/images/mosc_images/Banner-image-of-Aramana-Slider_8k.png",
-  alt: "Banner image of Aramana, Malankara Orthodox Syrian Church"
-}];
+  {
+    image: "/mosc/assets/images/mosc_images/bava_thirumeni_pope_visit_8k.png",
+    alt: "His Holiness Baselios Marthoma Mathews III meeting with Pope Francis at the Vatican",
+  },
+  {
+    image: "/mosc/assets/images/mosc_images/Banner-image-of-Aramana-Slider_8k.png",
+    alt: "Banner image of Aramana, Malankara Orthodox Syrian Church",
+  },
+];
+
+interface AboutUsHeritageImage {
+  id: "hero" | "bishops" | "cross";
+  src: string;
+  alt: string;
+  label: string;
+  title: string;
+  imageClassName: string;
+  accent?: string;
+}
+
+const aboutUsHeritageImages: AboutUsHeritageImage[] = [
+  {
+    id: "hero",
+    src: "/images/logos/About US/Chirst-Thomas-AboutUs.jpg",
+    alt: "Christ commissioning St. Thomas the Apostle",
+    label: "Apostolic foundation",
+    title: "St. Thomas in India",
+    imageClassName: "object-cover object-center",
+    accent: "Since AD 52",
+  },
+  {
+    id: "bishops",
+    src: "/images/logos/About US/Bishops-image-AboutUs.jpg",
+    alt: "Bishops gathered in church sanctuary",
+    label: "Living ministry",
+    title: "Shepherds of the faithful",
+    imageClassName: "object-contain object-center",
+  },
+  {
+    id: "cross",
+    src: "/images/logos/About US/Cross-PlateOnly-AboutUs.png",
+    alt: "Orthodox cross on a sacred plate",
+    label: "Sacred tradition",
+    title: "Faith handed down",
+    imageClassName: "object-contain object-center",
+  },
+];
+
+function AboutUsHeritageFigure({
+  item,
+  slotClassName,
+}: {
+  item: AboutUsHeritageImage;
+  slotClassName: string;
+}) {
+  return (
+    <figure
+      className={`about-us-heritage-card about-us-heritage-card--${item.id} about-us-editorial__figure ${slotClassName}`}
+    >
+      <div className="about-us-heritage-card__frame">
+        <div className="about-us-heritage-card__media relative w-full h-full">
+          <Image
+            src={item.src}
+            alt={item.alt}
+            fill
+            sizes={
+              item.id === "hero"
+                ? "(min-width: 1024px) 28vw, 100vw"
+                : "(min-width: 1024px) 18vw, 50vw"
+            }
+            className={item.imageClassName}
+            priority={item.id === "hero"}
+          />
+        </div>
+        {item.accent ? (
+          <span className="about-us-heritage-card__accent" aria-hidden="true">
+            <span className="about-us-heritage-card__accent-dot" />
+            {item.accent}
+          </span>
+        ) : null}
+        <figcaption className="about-us-heritage-card__caption">
+          <span className="about-us-heritage-card__label">{item.label}</span>
+          <span className="about-us-heritage-card__title">{item.title}</span>
+        </figcaption>
+      </div>
+    </figure>
+  );
+}
+
+const aboutUsHeritageById = Object.fromEntries(
+  aboutUsHeritageImages.map((item) => [item.id, item]),
+) as Record<AboutUsHeritageImage["id"], AboutUsHeritageImage>;
 
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -260,86 +344,56 @@ export default function HomePage() {
       {/* ── ABOUT US (always visible — IntersectionObserver + opacity-0 caused empty gaps) ─ */}
       <section className="py-16 md:py-24 bg-parchment border-b border-burgundy/15">
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-14 items-center">
-            {/* Heritage narrative bento — left column on desktop */}
-            <div className="order-2 lg:order-1 about-us-heritage-mosaic">
-              <div className="about-us-mosaic-frame">
-                <figure className="about-us-mosaic-tile about-us-mosaic-tile--hero">
-                  <span className="about-us-mosaic-tile__accent">
-                    <span className="about-us-mosaic-tile__accent-dot" aria-hidden />
-                    Since AD 52
-                  </span>
-                  <div className="about-us-mosaic-tile__media">
-                    <Image
-                      src="/images/logos/About US/Chirst-Thomas-AboutUs.jpg"
-                      alt="Christ commissioning St. Thomas the Apostle"
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 42vw"
-                      className="object-cover object-center"
-                    />
-                  </div>
-                  <figcaption className="about-us-mosaic-tile__caption">
-                    <span className="about-us-mosaic-tile__label">Apostolic foundation</span>
-                    <span className="about-us-mosaic-tile__title">St. Thomas in India</span>
-                  </figcaption>
-                </figure>
-
-                <figure className="about-us-mosaic-tile about-us-mosaic-tile--bishops">
-                  <div className="about-us-mosaic-tile__media">
-                    <Image
-                      src="/images/logos/About US/Bishops-image-AboutUs.jpg"
-                      alt="Bishops gathered in church sanctuary"
-                      fill
-                      sizes="(max-width: 1024px) 50vw, 22vw"
-                      className="object-cover object-top"
-                    />
-                  </div>
-                  <figcaption className="about-us-mosaic-tile__caption">
-                    <span className="about-us-mosaic-tile__label">Living ministry</span>
-                    <span className="about-us-mosaic-tile__title">Shepherds of the faithful</span>
-                  </figcaption>
-                </figure>
-
-                <figure className="about-us-mosaic-tile about-us-mosaic-tile--cross">
-                  <div className="about-us-mosaic-tile__media">
-                    <Image
-                      src="/images/logos/About US/Cross-PlateOnly-AboutUs.png"
-                      alt="Orthodox cross on a sacred plate"
-                      fill
-                      sizes="(max-width: 1024px) 50vw, 22vw"
-                      className="object-contain object-center"
-                    />
-                  </div>
-                  <figcaption className="about-us-mosaic-tile__caption">
-                    <span className="about-us-mosaic-tile__label">Sacred tradition</span>
-                    <span className="about-us-mosaic-tile__title">Faith handed down</span>
-                  </figcaption>
-                </figure>
-              </div>
-            </div>
-
-            {/* Text — right column on desktop */}
-            <div className="order-1 lg:order-2">
+          <article
+            className="about-us-editorial"
+            aria-labelledby="about-us-heading"
+          >
+            <header className="about-us-editorial__header">
               <span className="inline-block text-burgundy text-xs font-bold tracking-widest uppercase mb-3 border border-burgundy/40 px-3 py-1 rounded-full bg-burgundy/10">
                 About Us
               </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-warmBrown-dark mb-6 leading-tight">
+              <h2
+                id="about-us-heading"
+                className="text-3xl md:text-4xl font-bold text-warmBrown-dark leading-tight max-w-3xl"
+              >
                 The Malankara Orthodox<br />
                 <span className="text-burgundy">Syrian Church</span>
               </h2>
-              <p className="text-warmGray-dark leading-relaxed mb-8 text-base">
+            </header>
+
+            <AboutUsHeritageFigure
+              item={aboutUsHeritageById.hero}
+              slotClassName="about-us-editorial__figure--hero"
+            />
+
+            <div className="about-us-editorial__intro">
+              <p className="text-warmGray-dark leading-relaxed text-base md:text-[1.0625rem]">
                 The Malankara Orthodox Syrian Church traces its origins to the Apostolic ministry of St. Thomas in India. We are a community rooted in ancient traditions, committed to preserving the faith handed down through generations while serving our members with love, compassion, and spiritual guidance.
               </p>
+            </div>
+
+            <AboutUsHeritageFigure
+              item={aboutUsHeritageById.cross}
+              slotClassName="about-us-editorial__figure--cross"
+            />
+
+            <div className="about-us-editorial__cta">
               <Link
                 href="/mosc-redesign/the-church/the-malankara-orthodox-syrian-church"
-                className="inline-flex items-center gap-2 bg-burgundy text-white font-semibold px-6 py-3 rounded-lg hover:bg-burgundy-light transition-all duration-300 text-sm hover:shadow-lg hover:shadow-burgundy/40 hover:-translate-y-0.5 transform">
+                className="inline-flex items-center gap-2 bg-burgundy text-white font-semibold px-6 py-3 rounded-lg hover:bg-burgundy-light transition-all duration-300 text-sm hover:shadow-lg hover:shadow-burgundy/40 hover:-translate-y-0.5 transform"
+              >
                 Know More
                 <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </Link>
             </div>
-          </div>
+
+            <AboutUsHeritageFigure
+              item={aboutUsHeritageById.bishops}
+              slotClassName="about-us-editorial__figure--bishops"
+            />
+          </article>
 
           {/* Saints Carousel */}
           <div className="mt-20">

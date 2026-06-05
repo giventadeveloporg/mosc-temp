@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useTenantSettings } from '@/components/TenantSettingsProvider';
 import { MOSC_REDESIGN_FOOTER_QUICK_LINKS } from './navConfig';
 import { InstagramIcon } from '@/components/icons/InstagramIcon';
+import { buildContactFormPayload } from '@/lib/contactForm';
 
 /** Primary CTA — mosc_re_design_latest_design_system.json `components.button.primary` + Liturgical Calendar active toggle */
 const FOOTER_SUBMIT_BUTTON_CLASS =
@@ -66,13 +67,12 @@ export default function MoscRedesignFooter() {
       ? `${message}\n\nPhone: ${formData.phone_number.trim()}`
       : message;
 
-    const payload = {
+    const payload = buildContactFormPayload({
       firstName,
       lastName,
       messageBody,
-      fromEmail: email,
-      toEmail: process.env.NEXT_PUBLIC_MOSC_CONTACT_TO_EMAIL || 'info@mosc.in',
-    };
+      senderEmail: email,
+    });
 
     try {
       const response = await fetch('/api/proxy/contact-form-email', {

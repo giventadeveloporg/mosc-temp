@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { buildContactFormPayload } from '@/lib/contactForm';
 
 interface FormData {
   name: string;
@@ -85,8 +86,7 @@ export default function ContactForm() {
     setSubmitStatus('idle');
     setSubmitMessage('');
 
-    // Map frontend form fields to backend ContactFormDTO
-    // Backend expects: firstName, lastName, messageBody, fromEmail, toEmail
+    // Map frontend form fields to backend ContactFormDTO (from/to resolved server-side by emailType)
     const [firstName, ...restNameParts] = formData.name.trim().split(' ');
     let lastName = restNameParts.join(' ');
     // Some backends treat lastName as @NotBlank; avoid sending an empty string
@@ -94,14 +94,12 @@ export default function ContactForm() {
       lastName = 'N/A';
     }
 
-    const payload = {
-      firstName: firstName || formData.name.trim(), // fallback to full name if parsing fails
-      lastName: lastName || '',
+    const payload = buildContactFormPayload({
+      firstName: firstName || formData.name.trim(),
+      lastName: lastName || 'N/A',
       messageBody: formData.message.trim(),
-      fromEmail: formData.email.trim(),
-      // Destination address for contact messages - configurable via env, falls back to site email
-      toEmail: process.env.NEXT_PUBLIC_MOSC_CONTACT_TO_EMAIL || 'info@mosc.in',
-    };
+      senderEmail: formData.email.trim(),
+    });
 
     try {
       // Public MOSC contact form submission.

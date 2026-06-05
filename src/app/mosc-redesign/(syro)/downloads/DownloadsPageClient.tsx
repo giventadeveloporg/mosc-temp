@@ -8,7 +8,6 @@ import {
   getOfficialDocumentCardThumbnailSrc,
   getOfficialDocumentPlaceholderKind,
   placeholderGradient,
-  placeholderLabel,
 } from '@/lib/officialDocumentThumbnail';
 import type { PublicOfficialDocumentTreePage } from './ApiServerActions';
 import {
@@ -288,15 +287,16 @@ function DownloadCard({
   const placeholderKind = getOfficialDocumentPlaceholderKind(thumbInput);
   const [thumbFailed, setThumbFailed] = React.useState(false);
   const displayThumb = getOfficialDocumentCardThumbnailSrc(file.id, thumbInput);
+  const showThumbnail = Boolean(displayThumb && !thumbFailed);
 
   return (
     <article className="bg-white rounded-xl border border-syro-gold/25 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col h-full">
       <div className="relative w-full aspect-[16/10] bg-syro-bg-gray border-b border-syro-gold/20">
-        {displayThumb && !thumbFailed ? (
+        {showThumbnail ? (
           // Native img: proxy thumbnails use 302 redirects; Next/Image lazy loading can stall on redirect chains.
           <img
-            src={displayThumb}
-            alt=""
+            src={displayThumb!}
+            alt={file.fileName}
             className="absolute inset-0 h-full w-full object-cover"
             loading="eager"
             decoding="async"
@@ -304,11 +304,12 @@ function DownloadCard({
           />
         ) : (
           <div
-            className={`absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br ${placeholderGradient(placeholderKind)}`}
-            aria-hidden="true"
+            className={`absolute inset-0 flex flex-col items-center justify-center px-4 py-5 bg-gradient-to-br ${placeholderGradient(placeholderKind)}`}
+            aria-label={file.fileName}
           >
-            <span className="text-2xl font-bold text-syro-blue/80">{placeholderLabel(placeholderKind)}</span>
-            <span className="text-xs text-gray-600 mt-1 uppercase tracking-wide">Document</span>
+            <p className="font-syro-display text-sm sm:text-base font-semibold text-syro-blue/90 text-center leading-snug line-clamp-4">
+              {file.fileName}
+            </p>
           </div>
         )}
         <span className="absolute top-2 left-2 inline-flex items-center rounded-md bg-white/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-syro-red shadow-sm">
@@ -317,10 +318,12 @@ function DownloadCard({
       </div>
 
       <div className="p-5 flex flex-col flex-1">
-      <h4 className="font-syro-display text-lg font-semibold text-syro-blue leading-snug line-clamp-2">
-        {file.fileName}
-      </h4>
-      <p className="text-xs text-gray-500 mt-2 line-clamp-2">{getFolderPath(file)}</p>
+      {showThumbnail ? (
+        <h4 className="font-syro-display text-lg font-semibold text-syro-blue leading-snug line-clamp-2">
+          {file.fileName}
+        </h4>
+      ) : null}
+      <p className={`text-xs text-gray-500 line-clamp-2 ${showThumbnail ? 'mt-2' : ''}`}>{getFolderPath(file)}</p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         <span className="inline-flex items-center rounded-full bg-syro-bg-gray px-2.5 py-1 text-[11px] font-semibold text-syro-blue">
@@ -666,10 +669,26 @@ export default function DownloadsPageClient({
   const [downloadError, setDownloadError] = React.useState<DownloadErrorState | null>(null);
   const [searchQuery, setSearchQuery] = React.useState('');
 
+  React.useEffect(() => {
+    setSearchQuery('');
+  }, [currentFilters.categoryId, currentFilters.year]);
+
+  const filterMatchedDownloads = React.useMemo(() => {
+    return sortedDownloads.filter((file) => {
+      if (currentFilters.categoryId != null && file.officialDocumentCategoryId !== currentFilters.categoryId) {
+        return false;
+      }
+      if (currentFilters.year != null && file.officialDocumentYear !== currentFilters.year) {
+        return false;
+      }
+      return true;
+    });
+  }, [sortedDownloads, currentFilters.categoryId, currentFilters.year]);
+
   const filteredDownloads = React.useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return sortedDownloads;
-    return sortedDownloads.filter((file) => {
+    if (!q) return filterMatchedDownloads;
+    return filterMatchedDownloads.filter((file) => {
       const haystack = [
         file.fileName,
         file.description ?? '',
@@ -681,9 +700,10 @@ export default function DownloadsPageClient({
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [sortedDownloads, searchQuery]);
+  }, [filterMatchedDownloads, searchQuery]);
 
   const isSearching = searchQuery.trim().length > 0;
+  const hasActiveFilters = currentFilters.categoryId != null || currentFilters.year != null;
 
   const handleDownload = React.useCallback(async (file: TreeItem) => {
     if (!file.downloadUrl) {
@@ -811,16 +831,42 @@ export default function DownloadsPageClient({
             {isSearching ? (
               <div className="mb-4 text-sm text-gray-600">
                 Showing <span className="font-semibold">{filteredDownloads.length}</span> of{' '}
-                <span className="font-semibold">{sortedDownloads.length}</span> files on this page matching{' '}
+                <span className="font-semibold">{filterMatchedDownloads.length}</span> files on this page matching{' '}
                 <span className="font-semibold">&ldquo;{searchQuery.trim()}&rdquo;</span>.
               </div>
             ) : null}
 
             {filteredDownloads.length === 0 ? (
-              <div className="rounded-lg border border-syro-gold/25 bg-syro-bg-gray/50 px-5 py-6 text-sm text-gray-500">
-                {isSearching
-                  ? `No files on this page match "${searchQuery.trim()}". Try a different search term or clear the search.`
-                  : 'No files available for the selected filters.'}
+              <div className="rounded-lg border border-syro-gold/25 bg-syro-bg-gray/50 px-5 py-6 text-sm text-gray-600 space-y-3">
+                {isSearching ? (
+                  <p>
+                    No files on this page match &ldquo;{searchQuery.trim()}&rdquo;. Try a different search term or{' '}
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="font-semibold text-syro-blue underline hover:text-syro-red"
+                    >
+                      clear the search
+                    </button>
+                    .
+                  </p>
+                ) : hasActiveFilters ? (
+                  <p>
+                    No files match the selected{' '}
+                    {currentFilters.categoryId && currentFilters.year
+                      ? 'category and year'
+                      : currentFilters.categoryId
+                        ? 'category'
+                        : 'year'}
+                    . Try another filter, or{' '}
+                    <Link href={queryWithFilter(null, null)} className="font-semibold text-syro-blue underline hover:text-syro-red">
+                      view all downloads
+                    </Link>
+                    .
+                  </p>
+                ) : (
+                  <p>No files are available right now. Please check back later.</p>
+                )}
               </div>
             ) : (
               <DownloadsGrid

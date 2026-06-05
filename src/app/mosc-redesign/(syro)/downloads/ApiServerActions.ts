@@ -56,27 +56,119 @@ export type PublicOfficialDocumentTreePage = {
   yearOptions: number[];
 };
 
-async function fetchPublicOfficialDocumentYearOptionsServer(): Promise<number[]> {
-  try {
+function mapEventMediaToTreeItem(doc: EventMediaDTO): PublicOfficialDocumentTreeItem {
+  const parsed = parseHierarchyDescription(doc.description);
+  const fallbackName = (doc.fileUrl || '').split('/').pop() || doc.title || 'file';
+  const treePath =
+    (doc.hierarchyPath && String(doc.hierarchyPath).trim()) ||
+    parsed.treePath ||
+    doc.title ||
+    fallbackName;
+  const pathSegments = treePath.split(/[\\/]+/).map((x) => x.trim()).filter(Boolean);
+  return {
+    id: doc.id ?? null,
+    title: doc.title,
+    fileName: pathSegments[pathSegments.length - 1] || fallbackName,
+    treePath,
+    pathSegments,
+    categoryLabel:
+      (doc.hierarchyCategoryLabel && String(doc.hierarchyCategoryLabel).trim()) ||
+      parsed.categoryLabel ||
+      null,
+    officialDocumentCategoryId: doc.officialDocumentCategoryId ?? null,
+    officialDocumentYear: doc.officialDocumentYear ?? null,
+    priorityRanking: doc.displayPriority ?? parsed.priority ?? doc.priorityRanking ?? 999999,
+    description: parsed.cleanDescription || null,
+    downloadUrl: resolveOfficialDocumentDownloadUrl(doc),
+    thumbnailUrl: getEventMediaDisplayThumbnailUrl(
+      {
+        fileUrl: doc.fileUrl,
+        thumbnailUrl: doc.thumbnailUrl,
+        thumbnailPreSignedUrl: doc.thumbnailPreSignedUrl,
+        fileDataContentType: doc.fileDataContentType || doc.contentType,
+        title: doc.title,
+        fileName: (doc.fileUrl || '').split('/').pop() || doc.title,
+      },
+      {
+        thumbnailExpiresAtIso: doc.thumbnailPreSignedUrlExpiresAt,
+        fileExpiresAtIso: doc.preSignedUrlExpiresAt,
+      }
+    ),
+    fileUrl: doc.fileUrl || null,
+    fileDataContentType: doc.fileDataContentType || doc.contentType || null,
+    createdAt: doc.createdAt,
+  };
+}
+
+function matchesOfficialDocumentFilters(
+  item: PublicOfficialDocumentTreeItem,
+  filters: { categoryId?: number; year?: number }
+): boolean {
+  if (filters.categoryId && item.officialDocumentCategoryId !== filters.categoryId) {
+    return false;
+  }
+  if (filters.year && item.officialDocumentYear !== filters.year) {
+    return false;
+  }
+  return true;
+}
+
+async function fetchAllPublicOfficialDocumentsRaw(): Promise<EventMediaDTO[]> {
+  const all: EventMediaDTO[] = [];
+  const batchSize = 100;
+  let page = 0;
+  let totalPages = 1;
+
+  while (page < totalPages && page < 50) {
     const params = new globalThis.URLSearchParams();
     params.append('tenantId.equals', getTenantId());
     params.append('isEventManagementOfficialDocument.equals', 'true');
     params.append('isPublic.equals', 'true');
-    params.append('size', '500');
-    params.append('sort', 'officialDocumentYear,desc');
+    params.append('sort', 'priorityRanking,asc');
+    params.append('sort', 'createdAt,desc');
+    params.append('page', String(page));
+    params.append('size', String(batchSize));
+
     const url = `${getApiBaseUrl()}/api/event-medias?${params.toString()}`;
     const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
-    if (!res.ok) return [];
+    if (!res.ok) break;
+
     const json = await res.json();
-    const raw = Array.isArray(json) ? json : Array.isArray(json?.content) ? json.content : [];
-    const years = new Set<number>();
-    for (const row of raw as EventMediaDTO[]) {
-      const y = row.officialDocumentYear;
-      if (typeof y === 'number' && Number.isFinite(y) && y >= 1900 && y <= 2100) {
-        years.add(y);
-      }
+    const batch = Array.isArray(json) ? json : Array.isArray(json?.content) ? json.content : [];
+    all.push(...(batch as EventMediaDTO[]));
+
+    if (Array.isArray(json)) {
+      break;
     }
-    return [...years].sort((a, b) => b - a);
+    totalPages = Math.max(1, Number(json?.totalPages ?? 1));
+    page += 1;
+    if (batch.length === 0) break;
+  }
+
+  return all;
+}
+
+function extractYearOptionsFromDocs(docs: EventMediaDTO[], categoryId?: number): number[] {
+  const years = new Set<number>();
+  for (const row of docs) {
+    if (categoryId && row.officialDocumentCategoryId !== categoryId) {
+      continue;
+    }
+    const y = row.officialDocumentYear;
+    if (typeof y === 'number' && Number.isFinite(y) && y >= 1900 && y <= 2100) {
+      years.add(y);
+    }
+  }
+  return [...years].sort((a, b) => b - a);
+}
+
+async function fetchPublicOfficialDocumentYearOptionsServer(input?: {
+  categoryId?: number;
+  docs?: EventMediaDTO[];
+}): Promise<number[]> {
+  try {
+    const docs = input?.docs ?? (await fetchAllPublicOfficialDocumentsRaw());
+    return extractYearOptionsFromDocs(docs, input?.categoryId);
   } catch {
     return [];
   }
@@ -90,76 +182,75 @@ export async function fetchPublicOfficialDocumentsTreeServer(input?: {
 }): Promise<PublicOfficialDocumentTreePage> {
   const page = Math.max(0, input?.page ?? 0);
   const size = Math.min(Math.max(1, input?.size ?? 24), 100);
+  const hasFilters = Boolean(input?.categoryId || input?.year);
 
   try {
-    const baseParams = new globalThis.URLSearchParams();
-    baseParams.append('tenantId.equals', getTenantId());
-    baseParams.append('isEventManagementOfficialDocument.equals', 'true');
-    baseParams.append('isPublic.equals', 'true');
-    if (input?.categoryId) baseParams.append('officialDocumentCategoryId.equals', String(input.categoryId));
-    if (input?.year) baseParams.append('officialDocumentYear.equals', String(input.year));
-    baseParams.append('sort', 'priorityRanking,asc');
-    baseParams.append('sort', 'createdAt,desc');
-    baseParams.append('page', String(page));
-    baseParams.append('size', String(size));
+    const [yearOptions, docsRaw, pagedMeta] = await (async () => {
+      if (hasFilters) {
+        const allRaw = await fetchAllPublicOfficialDocumentsRaw();
+        const yearOpts = extractYearOptionsFromDocs(allRaw, input?.categoryId);
+        return [yearOpts, allRaw, null] as const;
+      }
 
-    const docsUrl = `${getApiBaseUrl()}/api/event-medias?${baseParams.toString()}`;
-    const [docsRes, yearOptions] = await Promise.all([
-      fetchWithJwtRetry(docsUrl, { cache: 'no-store' }),
-      fetchPublicOfficialDocumentYearOptionsServer(),
-    ]);
-    if (!docsRes.ok) {
-      return { content: [], totalElements: 0, totalPages: 0, page, size, categoryOptions: [], yearOptions };
+      const yearOptsPromise = fetchPublicOfficialDocumentYearOptionsServer({
+        categoryId: input?.categoryId,
+      });
+
+      const baseParams = new globalThis.URLSearchParams();
+      baseParams.append('tenantId.equals', getTenantId());
+      baseParams.append('isEventManagementOfficialDocument.equals', 'true');
+      baseParams.append('isPublic.equals', 'true');
+      baseParams.append('sort', 'priorityRanking,asc');
+      baseParams.append('sort', 'createdAt,desc');
+      baseParams.append('page', String(page));
+      baseParams.append('size', String(size));
+
+      const docsUrl = `${getApiBaseUrl()}/api/event-medias?${baseParams.toString()}`;
+      const [docsRes, yearOpts] = await Promise.all([
+        fetchWithJwtRetry(docsUrl, { cache: 'no-store' }),
+        yearOptsPromise,
+      ]);
+      if (!docsRes.ok) {
+        return [yearOpts, [], { totalElements: 0, totalPages: 0, currentPage: page }] as const;
+      }
+      const docsJson = await docsRes.json();
+      const raw = Array.isArray(docsJson) ? docsJson : Array.isArray(docsJson?.content) ? docsJson.content : [];
+      const meta = Array.isArray(docsJson)
+        ? { totalElements: raw.length, totalPages: 1, currentPage: 0 }
+        : {
+            totalElements: Number(docsJson?.totalElements ?? raw.length),
+            totalPages: Number(docsJson?.totalPages ?? 1),
+            currentPage: Number(docsJson?.number ?? page),
+          };
+      return [yearOpts, raw as EventMediaDTO[], meta] as const;
+    })();
+
+    let content = (docsRaw as EventMediaDTO[]).map(mapEventMediaToTreeItem);
+
+    let totalElements: number;
+    let totalPages: number;
+    let currentPage: number;
+
+    if (hasFilters) {
+      const filtered = content.filter((item) =>
+        matchesOfficialDocumentFilters(item, {
+          categoryId: input?.categoryId,
+          year: input?.year,
+        })
+      );
+      totalElements = filtered.length;
+      totalPages = Math.max(1, Math.ceil(totalElements / size));
+      currentPage = Math.min(page, totalPages - 1);
+      content = filtered.slice(currentPage * size, currentPage * size + size);
+    } else if (pagedMeta) {
+      totalElements = pagedMeta.totalElements;
+      totalPages = pagedMeta.totalPages;
+      currentPage = pagedMeta.currentPage;
+    } else {
+      totalElements = 0;
+      totalPages = 0;
+      currentPage = page;
     }
-    const docsJson = await docsRes.json();
-    const docsRaw = Array.isArray(docsJson) ? docsJson : Array.isArray(docsJson?.content) ? docsJson.content : [];
-    const totalElements = Array.isArray(docsJson) ? docsRaw.length : Number(docsJson?.totalElements ?? docsRaw.length);
-    const totalPages = Array.isArray(docsJson) ? 1 : Number(docsJson?.totalPages ?? 1);
-    const currentPage = Array.isArray(docsJson) ? 0 : Number(docsJson?.number ?? page);
-
-    const content = (docsRaw as EventMediaDTO[]).map((doc) => {
-      const parsed = parseHierarchyDescription(doc.description);
-      const fallbackName = (doc.fileUrl || '').split('/').pop() || doc.title || 'file';
-      const treePath =
-        (doc.hierarchyPath && String(doc.hierarchyPath).trim()) ||
-        parsed.treePath ||
-        doc.title ||
-        fallbackName;
-      const pathSegments = treePath.split(/[\\/]+/).map((x) => x.trim()).filter(Boolean);
-      return {
-        id: doc.id ?? null,
-        title: doc.title,
-        fileName: pathSegments[pathSegments.length - 1] || fallbackName,
-        treePath,
-        pathSegments,
-        categoryLabel:
-          (doc.hierarchyCategoryLabel && String(doc.hierarchyCategoryLabel).trim()) ||
-          parsed.categoryLabel ||
-          null,
-        officialDocumentCategoryId: doc.officialDocumentCategoryId ?? null,
-        officialDocumentYear: doc.officialDocumentYear ?? null,
-        priorityRanking: doc.displayPriority ?? parsed.priority ?? doc.priorityRanking ?? 999999,
-        description: parsed.cleanDescription || null,
-        downloadUrl: resolveOfficialDocumentDownloadUrl(doc),
-        thumbnailUrl: getEventMediaDisplayThumbnailUrl(
-          {
-            fileUrl: doc.fileUrl,
-            thumbnailUrl: doc.thumbnailUrl,
-            thumbnailPreSignedUrl: doc.thumbnailPreSignedUrl,
-            fileDataContentType: doc.fileDataContentType || doc.contentType,
-            title: doc.title,
-            fileName: (doc.fileUrl || '').split('/').pop() || doc.title,
-          },
-          {
-            thumbnailExpiresAtIso: doc.thumbnailPreSignedUrlExpiresAt,
-            fileExpiresAtIso: doc.preSignedUrlExpiresAt,
-          }
-        ),
-        fileUrl: doc.fileUrl || null,
-        fileDataContentType: doc.fileDataContentType || doc.contentType || null,
-        createdAt: doc.createdAt,
-      } satisfies PublicOfficialDocumentTreeItem;
-    });
 
     const catParams = new globalThis.URLSearchParams();
     catParams.append('tenantId.equals', getTenantId());
@@ -181,7 +272,7 @@ export async function fetchPublicOfficialDocumentsTreeServer(input?: {
     return {
       content,
       totalElements,
-      totalPages,
+      totalPages: Math.max(totalPages, 1),
       page: currentPage,
       size,
       categoryOptions,

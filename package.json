@@ -34,6 +34,7 @@
     "zobot:export-articles:test": "node scripts/zoh-zobot-settings/export-salesiq-articles.mjs --limit 10",
     "zobot:patch-import-csv": "node scripts/zoh-zobot-settings/patch-salesiq-import-csv.mjs",
     "zobot:fix-import-titles": "node scripts/zoh-zobot-settings/fix-salesiq-import-titles.mjs",
+    "zobot:sanitize-import-csv": "node scripts/zoh-zobot-settings/sanitize-salesiq-import-csv.mjs",
     "zobot:merge-faq-supplement": "node scripts/zoh-zobot-settings/merge-salesiq-faq-supplement.mjs",
     "zobot:bulk-delete-articles": "node scripts/zoh-zobot-settings/bulk-delete-salesiq-articles.mjs",
     "zobot:bulk-upload-articles": "node scripts/zoh-zobot-settings/bulk-upload-salesiq-articles.mjs",
