@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import RegistrationWizard from '@/components/competitions/RegistrationWizard';
 import {
   fetchMyParticipantsServer,
+  fetchPublicCompetitionByIdServer,
   fetchPublicCompetitionDaysServer,
   fetchPublicCompetitionsServer,
   fetchPublicCompetitionSettingsServer,
@@ -11,24 +12,33 @@ import {
 } from '../ApiServerActions';
 
 export default async function CompetitionRegisterPage(props: {
-  params: Promise<{ id: string }> | { id: string };
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ competitionId?: string }>;
 }) {
-  const params = typeof props.params.then === 'function' ? await props.params : props.params;
+  const params = await props.params;
+  const searchParams = props.searchParams ? await props.searchParams : {};
   const eventId = params.id;
+  const preselectedCompetitionId = searchParams.competitionId
+    ? parseInt(searchParams.competitionId, 10)
+    : undefined;
 
   const clerkUserId = await getAuthenticatedClerkUserId();
+  const registerPath = preselectedCompetitionId
+    ? `/events/${eventId}/competitions/register?competitionId=${preselectedCompetitionId}`
+    : `/events/${eventId}/competitions/register`;
   if (!clerkUserId) {
-    redirect(`/sign-in?redirect_url=${encodeURIComponent(`/events/${eventId}/competitions/register`)}`);
+    redirect(`/sign-in?redirect_url=${encodeURIComponent(registerPath)}`);
   }
 
   const user = await currentUser();
   const userEmail = user?.emailAddresses?.[0]?.emailAddress;
 
-  const [settings, competitions, days, participants] = await Promise.all([
+  const [settings, competitions, days, participants, preselectedCompetition] = await Promise.all([
     fetchPublicCompetitionSettingsServer(eventId),
     fetchPublicCompetitionsServer(eventId),
     fetchPublicCompetitionDaysServer(eventId),
     fetchMyParticipantsServer(clerkUserId),
+    preselectedCompetitionId ? fetchPublicCompetitionByIdServer(preselectedCompetitionId) : Promise.resolve(null),
   ]);
 
   if (!settings) {
@@ -47,7 +57,13 @@ export default async function CompetitionRegisterPage(props: {
       <Link href={`/events/${eventId}/competitions`} className="text-sm text-primary hover:underline">
         ← Competitions
       </Link>
-      <h1 className="font-heading font-semibold text-3xl mt-2 mb-8">Register</h1>
+      <h1 className="font-heading font-semibold text-3xl mt-2 mb-2">Register</h1>
+      {preselectedCompetition && (
+        <p className="text-muted-foreground mb-8">
+          Registering for: <span className="font-semibold text-foreground">{preselectedCompetition.name}</span>
+        </p>
+      )}
+      {!preselectedCompetition && <div className="mb-8" />}
       <RegistrationWizard
         eventId={eventId}
         settings={settings}
@@ -56,6 +72,11 @@ export default async function CompetitionRegisterPage(props: {
         clerkUserId={clerkUserId}
         existingParticipants={participants}
         userEmail={userEmail}
+        preselectedCompetitionId={
+          preselectedCompetition?.id && preselectedCompetition.event?.id === parseInt(eventId, 10)
+            ? preselectedCompetition.id
+            : undefined
+        }
       />
     </div>
   );

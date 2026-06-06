@@ -196,6 +196,92 @@ export function findIdByName(items, name) {
   return null;
 }
 
+/**
+ * @param {string} screenName
+ * @param {Record<string, string | number | undefined>} [filters]
+ */
+export async function listAllFaqs(screenName, filters = {}) {
+  const faqs = [];
+  let page = 1;
+  const limit = 99;
+
+  while (true) {
+    const qs = new URLSearchParams();
+    qs.set('page', String(page));
+    qs.set('limit', String(limit));
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== undefined && value !== null && value !== '') {
+        qs.set(key, String(value));
+      }
+    }
+    const path = `/api/v3/${screenName}/faqs?${qs.toString()}`;
+    const { response, body } = await salesIqFetch(path);
+    if (!response.ok) {
+      const msg = body?.error?.message || JSON.stringify(body);
+      throw new Error(`List FAQs failed (page ${page}, ${response.status}): ${msg}`);
+    }
+
+    const batch = Array.isArray(body?.data) ? body.data : [];
+    faqs.push(...batch);
+    if (batch.length < limit) break;
+    page += 1;
+  }
+
+  return faqs;
+}
+
+export async function deleteFaq(screenName, faqId) {
+  const path = `/api/v3/${screenName}/faqs/${faqId}`;
+  const { response, body } = await salesIqFetch(path, { method: 'DELETE' });
+  if (!response.ok) {
+    const msg = body?.error?.message || JSON.stringify(body);
+    throw new Error(`Delete FAQ ${faqId} failed (${response.status}): ${msg}`);
+  }
+  return body;
+}
+
+/**
+ * @param {string} screenName
+ * @param {Record<string, unknown>} payload
+ */
+export async function createFaq(screenName, payload) {
+  const path = `/api/v3/${screenName}/faqs`;
+  const { response, body } = await salesIqFetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const msg = body?.error?.message || body?.message || JSON.stringify(body);
+    throw new Error(`Create FAQ failed (${response.status}): ${msg}`);
+  }
+  return body;
+}
+
+/**
+ * @param {string} screenName
+ */
+export async function listFaqCategories(screenName) {
+  const categories = [];
+  let page = 1;
+  const limit = 99;
+
+  while (true) {
+    const path = `/api/v3/${screenName}/faqcategories?sort_by=name&order=ascending&page=${page}&limit=${limit}`;
+    const { response, body } = await salesIqFetch(path);
+    if (!response.ok) {
+      const msg = body?.error?.message || JSON.stringify(body);
+      throw new Error(`List FAQ categories failed (page ${page}, ${response.status}): ${msg}`);
+    }
+    const batch = Array.isArray(body?.data) ? body.data : [];
+    categories.push(...batch);
+    if (batch.length < limit) break;
+    page += 1;
+  }
+
+  return categories;
+}
+
 export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

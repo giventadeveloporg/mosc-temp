@@ -275,7 +275,8 @@
     <h1>Database Export, Reorder, and Import Guide</h1>
     <p class="meta">
       Location: <code class="code-highlight">documentation/database_export_import/DATABASE_EXPORT_IMPORT_GUIDE.html</code><br>
-      Related: <code class="code-highlight">code_html_template/SQLS/</code> ·
+      Related: <code class="code-highlight">code_html_template/batch_files/database_export_import_refresh.bat</code> ·
+      <code class="code-highlight">code_html_template/SQLS/</code> ·
       <code class="code-highlight">scripts/replace-user-profile-ids-in-sql.mjs</code> ·
       <code class="code-highlight">code_html_template/SQLS/Current_Sqls/sync_sequence_after_inserts.sql</code>
     </p>
@@ -293,6 +294,7 @@
       <h2 style="margin-top:0;border:none;padding:0;font-size:1.3em;">Table of contents</h2>
       <ul>
         <li><a href="#quick-start">1. Quick-start workflow</a></li>
+        <li><a href="#batch-automation">1a. Automated batch script (all steps)</a></li>
         <li><a href="#export">2. Export data with pg_dump (Docker)</a></li>
         <li><a href="#reorder">3. Reorder INSERT statements</a></li>
         <li><a href="#prod">4. Production user ID replacement</a></li>
@@ -311,6 +313,7 @@
       <div class="section-container usage">
         <div class="section-header usage">📋 End-to-end steps</div>
         <ol class="steps">
+          <li><strong>Fast path:</strong> run <code class="script-name">database_export_import_refresh.bat</code> — see <a href="#batch-automation">§1a Automated batch script</a>.</li>
           <li><code class="code-highlight">cd E:\project_workspace\mosc-temp\code_html_template\SQLS</code></li>
           <li>Find Postgres container: <code class="code-highlight">docker ps | findstr postgres</code></li>
           <li>Export: <code class="code-highlight">docker exec -it &lt;container_id&gt; pg_dump ... &gt; export.sql</code></li>
@@ -320,6 +323,130 @@
           <li>Import ordered SQL into target database (empty schema first)</li>
           <li>Run <code class="code-highlight">sync_sequence_after_inserts.sql</code> so new rows get IDs above the imported max</li>
         </ol>
+      </div>
+    </section>
+
+    <!-- Section 1a: Batch automation -->
+    <section id="batch-automation" aria-labelledby="h-batch">
+      <h2 id="h-batch">1a. Automated batch script (all steps)</h2>
+
+      <div class="section-intro">
+        <p>
+          <code class="script-name">database_export_import_refresh.bat</code> runs the full export → reorder → PROD user-ID copy →
+          <code class="code-highlight">pg_dump</code> line cleanup → schema rebuild → data import → sequence sync workflow in one command.
+          Pass your workspace root (the parent folder of <code class="code-highlight">mosc-temp</code>), for example
+          <code class="code-highlight">F:\project_workspace</code> or <code class="code-highlight">E:\project_workspace</code>.
+        </p>
+      </div>
+
+      <div class="section-container usage">
+        <div class="section-header usage">📋 Steps the batch file runs</div>
+        <table>
+          <thead>
+            <tr><th>Step</th><th>Action</th><th>Output / target</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>0</td><td>Detect Postgres container (<code>docker ps | findstr postgres</code>) or use ID you pass</td><td>—</td></tr>
+            <tr><td>1</td><td><code>pg_dump --data-only --column-inserts</code></td><td><code>export.sql</code></td></tr>
+            <tr><td>2</td><td><code>node reorder_sql_inserts_final.cjs</code></td><td><code>corrected_event_media_inserts.ordered.sql</code></td></tr>
+            <tr><td>3</td><td><code>node scripts/replace-user-profile-ids-in-sql.mjs</code></td><td><code>corrected_event_media_inserts.ordered_PROD.sql</code></td></tr>
+            <tr><td>4</td><td>Comment lines starting with <code>pg_dump</code> in the import file</td><td>Import SQL patched</td></tr>
+            <tr><td>5</td><td>Apply <code>Latest_Schema_Post__Blob_Claude_12.sql</code></td><td><code>event_site_manager_db</code> schema rebuilt</td></tr>
+            <tr><td>6</td><td>Import ordered (or PROD) INSERT file</td><td>Data loaded</td></tr>
+            <tr><td>7</td><td>Run <code>sync_sequence_after_inserts.sql</code></td><td>Primary-key sequence synced</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="warning">
+        <strong>⚠️ Destructive steps:</strong> Steps 5–7 drop and recreate the schema and replace all data in
+        <code class="code-highlight">event_site_manager_db</code>. The script prompts you to type <code class="code-highlight">YES</code>
+        before continuing unless you pass <code class="code-highlight">/FORCE</code>. At the prompt, type <code class="code-highlight">Y</code> or <code class="code-highlight">YES</code>.
+        If you cancel, steps 1–4 still complete
+        (export, reorder, and PROD copy remain on disk).
+      </div>
+
+      <div class="command-block expedite"
+           data-command-base="WORKSPACE_ROOT\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat WORKSPACE_ROOT"
+           data-template-command="F:\project_workspace\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat F:\project_workspace">
+        <div class="command-header">
+          <span class="command-type">Run full workflow (Windows batch)</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'batch-full')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'batch-full')" title="Copy customized command" aria-label="Copy customized command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-parameters">
+          <h5>🔧 Customize parameters:</h5>
+          <div class="parameter-group">
+            <div class="parameter-input">
+              <label for="batch-full-workspace">Workspace root:</label>
+              <input type="text" id="batch-full-workspace" value="F:\project_workspace" placeholder="F:\project_workspace" oninput="updateBatchRefresh('batch-full')">
+            </div>
+            <div class="parameter-input">
+              <label for="batch-full-container">Container ID (optional):</label>
+              <input type="text" id="batch-full-container" value="" placeholder="Auto-detect if empty" oninput="updateBatchRefresh('batch-full')">
+            </div>
+          </div>
+          <div class="parameter-group single">
+            <div class="parameter-input">
+              <label for="batch-full-flags">Flags (optional):</label>
+              <input type="text" id="batch-full-flags" value="" placeholder="/FORCE /PROD /SKIP-EXPORT" oninput="updateBatchRefresh('batch-full')">
+            </div>
+          </div>
+        </div>
+        <div class="command-content" id="batch-full">F:\project_workspace\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat F:\project_workspace</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="batch-full-single-code">F:\project_workspace\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat F:\project_workspace</code>
+        </div>
+      </div>
+
+      <div class="command-block verify"
+           data-command-base="WORKSPACE_ROOT\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat WORKSPACE_ROOT CONTAINER_ID /FORCE"
+           data-template-command="F:\project_workspace\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat F:\project_workspace 752786b3431e /FORCE">
+        <div class="command-header">
+          <span class="command-type">Azure VM example (known container, skip prompt)</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'batch-azure')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'batch-azure')" title="Copy command" aria-label="Copy command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-content" id="batch-azure">F:\project_workspace\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat F:\project_workspace 752786b3431e /FORCE</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="batch-azure-single-code">F:\project_workspace\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat F:\project_workspace 752786b3431e /FORCE</code>
+        </div>
+      </div>
+
+      <div class="section-container parameters">
+        <div class="section-header parameters">⚙️ Batch parameters and flags</div>
+        <table>
+          <thead>
+            <tr><th>Argument</th><th>Required</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>WORKSPACE_ROOT</code></td><td>Yes</td><td>Parent of <code>mosc-temp</code> (e.g. <code>F:\project_workspace</code>)</td></tr>
+            <tr><td><code>CONTAINER_ID</code></td><td>No</td><td>Docker Postgres container ID; auto-detected via <code>docker ps | findstr postgres</code> if omitted</td></tr>
+            <tr><td><code>/FORCE</code></td><td>No</td><td>Skip the <code>Y</code> / <code>YES</code> confirmation before schema rebuild and import</td></tr>
+            <tr><td><code>/PROD</code></td><td>No</td><td>Import <code>corrected_event_media_inserts.ordered_PROD.sql</code> instead of <code>.ordered.sql</code></td></tr>
+            <tr><td><code>/SKIP-EXPORT</code></td><td>No</td><td>Skip <code>pg_dump</code>; reuse existing <code>export.sql</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-container output">
+        <div class="section-header output">📊 Prerequisites</div>
+        <ul>
+          <li><strong>Docker Desktop</strong> running with a Postgres container for <code class="code-highlight">event_site_manager_db</code></li>
+          <li><strong>Node.js</strong> on <code class="code-highlight">PATH</code> (for reorder and PROD ID scripts)</li>
+          <li>Sequence sync uses <code class="code-highlight">malayalees-us-site-boot/src/main/resources/sqls/sync_sequence_after_inserts.sql</code> when present; otherwise the copy under <code class="code-highlight">code_html_template/SQLS/Current_Sqls/</code></li>
+        </ul>
+      </div>
+
+      <div class="info">
+        <strong>💡 Help:</strong> <code class="code-highlight">database_export_import_refresh.bat --help</code> prints usage and examples.
+        Batch file path: <code class="code-highlight">code_html_template/batch_files/database_export_import_refresh.bat</code>.
       </div>
     </section>
 
@@ -836,6 +963,27 @@
       if (el) el.textContent = cmd;
       if (single) single.textContent = cmd;
     }
+
+    function updateBatchRefresh(commandId) {
+      const wsInput = document.getElementById(commandId + '-workspace');
+      const containerInput = document.getElementById(commandId + '-container');
+      const flagsInput = document.getElementById(commandId + '-flags');
+      const ws = (wsInput && wsInput.value.trim()) || 'F:\\project_workspace';
+      const container = containerInput ? containerInput.value.trim() : '';
+      const flags = flagsInput ? flagsInput.value.trim() : '';
+      const bat = ws + '\\mosc-temp\\code_html_template\\batch_files\\database_export_import_refresh.bat';
+      let cmd = bat + ' ' + ws;
+      if (container) cmd += ' ' + container;
+      if (flags) cmd += ' ' + flags;
+      const el = document.getElementById(commandId);
+      const single = document.getElementById(commandId + '-single-code');
+      if (el) el.textContent = cmd;
+      if (single) single.textContent = cmd;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      updateBatchRefresh('batch-full');
+    });
   </script>
 </body>
 </html>

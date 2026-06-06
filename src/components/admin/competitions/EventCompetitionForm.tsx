@@ -7,6 +7,7 @@ import type {
   EventCompetitionDayDTO,
   CompetitionType,
   CompetitionEligibleAudience,
+  CompetitionDisciplineCode,
 } from '@/types';
 import {
   createCompetitionServer,
@@ -36,6 +37,15 @@ const defaults: Omit<EventCompetitionDTO, 'id' | 'tenantId' | 'createdAt' | 'upd
   judgmentCriteriaJson: '',
   displayOrder: 0,
   isActive: true,
+  disciplineCode: null,
+  minAge: null,
+  maxAge: null,
+  minGrade: null,
+  maxGrade: null,
+  maxPlacements: null,
+  registrationDeadline: null,
+  rulesMarkdown: '',
+  requiresTeamName: false,
 };
 
 export default function EventCompetitionForm({ eventId, days, competition }: Props) {
@@ -150,7 +160,90 @@ export default function EventCompetitionForm({ eventId, days, competition }: Pro
           value={form.displayOrder}
           onChange={(e) => setForm((f) => ({ ...f, displayOrder: parseInt(e.target.value, 10) || 0 }))}
         />
+        <select
+          className="border border-gray-400 rounded-xl px-4 py-3"
+          value={form.disciplineCode ?? ''}
+          onChange={(e) =>
+            setForm((f) => ({
+              ...f,
+              disciplineCode: (e.target.value || null) as CompetitionDisciplineCode | null,
+            }))
+          }
+        >
+          <option value="">Discipline (optional)</option>
+          {(['SONG', 'SPEECH', 'DANCE', 'MUSIC', 'SPORTS', 'ART', 'OTHER'] as const).map((d) => (
+            <option key={d} value={d}>
+              {d}
+            </option>
+          ))}
+        </select>
+        <input
+          type="number"
+          placeholder="Min age"
+          className="border border-gray-400 rounded-xl px-4 py-3"
+          value={form.minAge ?? ''}
+          onChange={(e) => setForm((f) => ({ ...f, minAge: e.target.value ? parseInt(e.target.value, 10) : null }))}
+        />
+        <input
+          type="number"
+          placeholder="Max age"
+          className="border border-gray-400 rounded-xl px-4 py-3"
+          value={form.maxAge ?? ''}
+          onChange={(e) => setForm((f) => ({ ...f, maxAge: e.target.value ? parseInt(e.target.value, 10) : null }))}
+        />
+        <input
+          type="number"
+          placeholder="Min grade"
+          className="border border-gray-400 rounded-xl px-4 py-3"
+          value={form.minGrade ?? ''}
+          onChange={(e) => setForm((f) => ({ ...f, minGrade: e.target.value ? parseInt(e.target.value, 10) : null }))}
+        />
+        <input
+          type="number"
+          placeholder="Max grade"
+          className="border border-gray-400 rounded-xl px-4 py-3"
+          value={form.maxGrade ?? ''}
+          onChange={(e) => setForm((f) => ({ ...f, maxGrade: e.target.value ? parseInt(e.target.value, 10) : null }))}
+        />
+        <input
+          type="number"
+          placeholder="Max placements (podium depth)"
+          className="border border-gray-400 rounded-xl px-4 py-3"
+          value={form.maxPlacements ?? ''}
+          onChange={(e) =>
+            setForm((f) => ({ ...f, maxPlacements: e.target.value ? parseInt(e.target.value, 10) : null }))
+          }
+        />
+        {form.competitionType === 'GROUP' && (
+          <>
+            <input
+              type="number"
+              placeholder="Min team size"
+              className="border border-gray-400 rounded-xl px-4 py-3"
+              value={form.minGroupSize ?? ''}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, minGroupSize: e.target.value ? parseInt(e.target.value, 10) : null }))
+              }
+            />
+            <input
+              type="number"
+              placeholder="Max team size"
+              className="border border-gray-400 rounded-xl px-4 py-3"
+              value={form.maxGroupSize ?? ''}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, maxGroupSize: e.target.value ? parseInt(e.target.value, 10) : null }))
+              }
+            />
+          </>
+        )}
       </div>
+      <textarea
+        placeholder="Rules & regulations (markdown)"
+        rows={4}
+        className="w-full border border-gray-400 rounded-xl px-4 py-3"
+        value={form.rulesMarkdown ?? ''}
+        onChange={(e) => setForm((f) => ({ ...f, rulesMarkdown: e.target.value }))}
+      />
       <label className="flex items-center gap-2">
         <input
           type="checkbox"
@@ -167,6 +260,16 @@ export default function EventCompetitionForm({ eventId, days, competition }: Pro
         />
         Requires soundtrack
       </label>
+      {form.competitionType === 'GROUP' && (
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={!!form.requiresTeamName}
+            onChange={(e) => setForm((f) => ({ ...f, requiresTeamName: e.target.checked }))}
+          />
+          Requires team name
+        </label>
+      )}
       <button
         type="submit"
         disabled={isPending}
