@@ -28,6 +28,7 @@ out/
 # Other env-related files
 env-vars.json
 current-env.json
+code_html_template/batch_files/database_target.local.env
 
 # Editor directories and files
 .idea
