@@ -38,6 +38,8 @@
     "zobot:merge-faq-supplement": "node scripts/zoh-zobot-settings/merge-salesiq-faq-supplement.mjs",
     "zobot:bulk-delete-articles": "node scripts/zoh-zobot-settings/bulk-delete-salesiq-articles.mjs",
     "zobot:bulk-upload-articles": "node scripts/zoh-zobot-settings/bulk-upload-salesiq-articles.mjs",
+    "zobot:bulk-upload-faqs": "node scripts/zoh-zobot-settings/bulk-upload-salesiq-faqs.mjs",
+    "zobot:bulk-delete-faqs": "node scripts/zoh-zobot-settings/bulk-delete-salesiq-faqs.mjs",
     "zobot:list-portal-ids": "node scripts/zoh-zobot-settings/list-salesiq-portal-ids.mjs",
     "zobot:exchange-zoho-code": "node scripts/zoh-zobot-settings/exchange-zoho-oauth-code.mjs"
   },

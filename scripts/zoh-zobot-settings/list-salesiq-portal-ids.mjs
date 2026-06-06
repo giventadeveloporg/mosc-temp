@@ -7,7 +7,7 @@
  */
 
 import { loadZohoEnv, getSalesIqConfig } from './load-zoho-env.mjs';
-import { listArticleCategories, listDepartments } from './zoho-salesiq-api.mjs';
+import { listArticleCategories, listDepartments, listFaqCategories } from './zoho-salesiq-api.mjs';
 
 async function main() {
   const envPath = loadZohoEnv();
@@ -30,6 +30,24 @@ async function main() {
     const general = categories.find((c) => String(c.name || '').toLowerCase() === 'general');
     if (general?.department_id) console.log(`ZOHO_SALESIQ_DEPARTMENT_ID=${general.department_id}`);
     if (general?.id) console.log(`ZOHO_SALESIQ_CATEGORY_ID=${general.id}`);
+  } catch (error) {
+    console.error(`  Error: ${error instanceof Error ? error.message : error}`);
+  }
+
+  console.log('\nFAQ categories (requires SalesIQ.faqs.READ scope):');
+  try {
+    const faqCategories = await listFaqCategories(screenName);
+    if (!faqCategories.length) console.log('  (none)');
+    for (const c of faqCategories) {
+      console.log(
+        `  ${c.id}  ${c.name}${c.is_default === 'true' || c.is_default === true ? ' (default)' : ''}${c.faq_count != null ? `  faqs=${c.faq_count}` : ''}`,
+      );
+    }
+    const faqGeneral = faqCategories.find((c) => String(c.name || '').toLowerCase() === 'general');
+    if (faqGeneral?.id) {
+      console.log('\nSuggested FAQ .env.local line:');
+      console.log(`ZOHO_SALESIQ_FAQ_CATEGORY_ID=${faqGeneral.id}`);
+    }
   } catch (error) {
     console.error(`  Error: ${error instanceof Error ? error.message : error}`);
   }

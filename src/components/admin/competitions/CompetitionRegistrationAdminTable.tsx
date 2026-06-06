@@ -8,16 +8,24 @@ interface Props {
 }
 
 export default function CompetitionRegistrationAdminTable({ registrations }: Props) {
+  const sorted = [...registrations].sort((a, b) => {
+    const compA = a.competition?.name ?? '';
+    const compB = b.competition?.name ?? '';
+    if (compA !== compB) return compA.localeCompare(compB);
+    return (a.createdAt ?? '').localeCompare(b.createdAt ?? '');
+  });
+
   const exportCsv = () => {
-    const headers = ['ID', 'Competition', 'Participant', 'Status', 'Fee', 'Category', 'Created'];
-    const rows = registrations.map((r) => [
-      r.id,
+    const headers = ['Competition', 'Participant', 'Team Name', 'Status', 'Fee', 'Category', 'Created', 'ID'];
+    const rows = sorted.map((r) => [
       r.competition?.name ?? '',
       r.participantProfile?.displayName || `${r.participantProfile?.firstName ?? ''} ${r.participantProfile?.lastName ?? ''}`.trim(),
+      r.teamDisplayName || r.teamName || '',
       r.registrationStatus,
       r.feeAmount,
       r.effectiveCategory ?? '',
       r.createdAt ?? '',
+      r.id,
     ]);
     const csv = [headers, ...rows].map((row) => row.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -43,26 +51,28 @@ export default function CompetitionRegistrationAdminTable({ registrations }: Pro
             <tr>
               <th className="px-4 py-3 text-left">Competition</th>
               <th className="px-4 py-3 text-left">Participant</th>
+              <th className="px-4 py-3 text-left">Team</th>
               <th className="px-4 py-3 text-left">Status</th>
               <th className="px-4 py-3 text-left">Fee</th>
               <th className="px-4 py-3 text-left">Created</th>
             </tr>
           </thead>
           <tbody>
-            {registrations.length === 0 ? (
+            {sorted.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                   No registrations.
                 </td>
               </tr>
             ) : (
-              registrations.map((r) => (
+              sorted.map((r) => (
                 <tr key={r.id} className="border-b border-gray-100">
                   <td className="px-4 py-3">{r.competition?.name ?? '—'}</td>
                   <td className="px-4 py-3">
                     {r.participantProfile?.displayName ||
                       `${r.participantProfile?.firstName ?? ''} ${r.participantProfile?.lastName ?? ''}`.trim()}
                   </td>
+                  <td className="px-4 py-3">{r.teamDisplayName || r.teamName || '—'}</td>
                   <td className="px-4 py-3">{r.registrationStatus}</td>
                   <td className="px-4 py-3">{formatCurrency(Number(r.feeAmount) || 0)}</td>
                   <td className="px-4 py-3">{r.createdAt ? new Date(r.createdAt).toLocaleString() : '—'}</td>

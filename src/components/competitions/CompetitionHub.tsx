@@ -5,6 +5,7 @@ import type {
   EventCompetitionSettingsDTO,
 } from '@/types';
 import { formatCurrency } from '@/lib/formatCurrency';
+import { DISCIPLINE_LABELS } from '@/lib/competitionEligibility';
 
 interface Props {
   eventId: string;
@@ -83,15 +84,40 @@ export default function CompetitionHub({
           <p className="text-muted-foreground">Competitions will be listed here soon.</p>
         ) : (
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {competitions.map((c) => (
-              <li key={c.id} className="p-4 border border-border rounded-lg">
-                <p className="font-semibold">{c.name}</p>
-                {c.divisionLabel && <p className="text-sm text-muted-foreground">{c.divisionLabel}</p>}
-                <p className="text-sm font-medium text-primary mt-2">
-                  {formatCurrency(Number(c.feeAmount) || 0)}
-                </p>
-              </li>
-            ))}
+            {competitions.map((c) => {
+              const discipline = c.disciplineCode
+                ? DISCIPLINE_LABELS[c.disciplineCode] ?? c.disciplineCode
+                : c.track || null;
+              return (
+                <li key={c.id}>
+                  <Link
+                    href={`${base}/${c.id}`}
+                    className="block p-4 border border-border rounded-lg hover:border-primary hover:bg-primary/5 reverent-transition group"
+                  >
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {discipline && (
+                        <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                          {discipline}
+                        </span>
+                      )}
+                      <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs">
+                        {c.competitionType === 'GROUP' ? 'Team' : 'Individual'}
+                      </span>
+                    </div>
+                    <p className="font-semibold group-hover:text-primary">{c.name}</p>
+                    {c.divisionLabel && <p className="text-sm text-muted-foreground">{c.divisionLabel}</p>}
+                    <p className="text-sm font-medium text-primary mt-2">
+                      {formatCurrency(Number(c.feeAmount) || 0)}
+                    </p>
+                    {registrationOpen && (
+                      <span className="inline-block mt-3 text-sm font-semibold text-primary">
+                        View details & register →
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

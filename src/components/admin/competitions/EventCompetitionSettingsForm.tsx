@@ -15,6 +15,8 @@ const defaultSettings: Omit<EventCompetitionSettingsDTO, 'id' | 'tenantId' | 'cr
   pointsFirst: 10,
   pointsSecond: 7,
   pointsThird: 5,
+  pointsFourth: 0,
+  defaultMaxPlacements: 3,
   championEnabled: false,
   championExcludeGroupPoints: false,
   registrationDeadline: null,
@@ -133,20 +135,32 @@ export default function EventCompetitionSettingsForm({ eventId, initialSettings 
         ))}
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        {(['pointsFirst', 'pointsSecond', 'pointsThird'] as const).map((field, i) => (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {(['pointsFirst', 'pointsSecond', 'pointsThird', 'pointsFourth'] as const).map((field, i) => (
           <label key={field} className="block">
-            <span className="text-sm font-medium text-gray-700">{['1st', '2nd', '3rd'][i]} place points</span>
+            <span className="text-sm font-medium text-gray-700">{['1st', '2nd', '3rd', '4th'][i]} place points</span>
             <input
               type="number"
               min={0}
               className="mt-1 block w-full border border-gray-400 rounded-xl px-4 py-3"
-              value={form[field]}
+              value={form[field] ?? 0}
               onChange={(e) => setForm((f) => ({ ...f, [field]: parseInt(e.target.value, 10) || 0 }))}
             />
           </label>
         ))}
       </div>
+
+      <label className="block max-w-xs">
+        <span className="text-sm font-medium text-gray-700">Default max placements (new competitions)</span>
+        <input
+          type="number"
+          min={1}
+          max={10}
+          className="mt-1 block w-full border border-gray-400 rounded-xl px-4 py-3"
+          value={form.defaultMaxPlacements ?? 3}
+          onChange={(e) => setForm((f) => ({ ...f, defaultMaxPlacements: parseInt(e.target.value, 10) || 3 }))}
+        />
+      </label>
 
       <label className="block">
         <span className="text-sm font-medium text-gray-700">Eligibility text</span>

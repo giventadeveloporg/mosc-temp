@@ -6,6 +6,7 @@ import { parseApiListResponse } from '@/lib/parseApiListResponse';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { withTenantId } from '@/lib/withTenantId';
 import type {
+  CompetitionEligibilityCheckDTO,
   EventCompetitionContentBlockDTO,
   EventCompetitionDayDTO,
   EventCompetitionDTO,
@@ -13,6 +14,8 @@ import type {
   EventCompetitionRegistrationDTO,
   EventCompetitionResultDTO,
   EventCompetitionSettingsDTO,
+  TeamRegistrationRequestDTO,
+  EventCompetitionRegistrationDTO,
 } from '@/types';
 
 function getApiBase() {
@@ -69,6 +72,32 @@ export async function fetchPublicCompetitionsServer(eventId: string): Promise<Ev
     'event-competitions',
     `eventId.equals=${eventId}&isActive.equals=true&sort=displayOrder,asc`
   );
+}
+
+export async function fetchPublicCompetitionByIdServer(compId: number): Promise<EventCompetitionDTO | null> {
+  try {
+    const tenantId = getTenantId();
+    const url = `${getApiBase()}/api/event-competitions/${compId}?tenantId.equals=${tenantId}`;
+    const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
+    if (!res.ok) return null;
+    return (await res.json()) as EventCompetitionDTO;
+  } catch {
+    return null;
+  }
+}
+
+export async function checkEligibilityServer(
+  competitionId: number,
+  participantProfileId: number
+): Promise<CompetitionEligibilityCheckDTO> {
+  const tenantId = getTenantId();
+  const url = `${getApiBase()}/api/event-competitions/${competitionId}/eligibility-check?participantProfileId.equals=${participantProfileId}&tenantId.equals=${tenantId}`;
+  const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
+  if (!res.ok) {
+    const text = await res.text();
+    return { eligible: false, reasons: [text || 'Eligibility check failed'] };
+  }
+  return (await res.json()) as CompetitionEligibilityCheckDTO;
 }
 
 export async function fetchPublicContentBlocksServer(
@@ -130,6 +159,74 @@ export async function patchParticipantServer(
   });
 }
 
+export async function createBulkRegistrationsServer(
+  eventId: string,
+  registrations: Array<{
+    competitionId: number;
+    participantProfileId: number;
+    feeAmount: number;
+    effectiveCategory?: string;
+  }>
+): Promise<EventCompetitionRegistrationDTO[]> {
+  const now = new Date().toISOString();
+  const payload = registrations.map((r) =>
+    withTenantId({
+      id: null,
+      registrationStatus: 'PENDING_PAYMENT',
+      feeAmount: r.feeAmount,
+      effectiveCategory: r.effectiveCategory ?? '',
+      stripePaymentIntentId: '',
+      event: eventRef(eventId),
+      competition: { id: r.competitionId },
+      participantProfile: { id: r.participantProfileId },
+      createdAt: now,
+      updatedAt: now,
+    })
+  );
+  return proxyJson<EventCompetitionRegistrationDTO[]>('/event-competition-registrations/bulk', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function createTeamRegistrationServer(
+  eventId: string,
+  payload: {
+    competitionId: number;
+    captainParticipantId: number;
+    memberParticipantIds: number[];
+    feeAmount: number;
+    teamName: string;
+    teamDisplayName?: string;
+    effectiveCategory?: string;
+  }
+): Promise<EventCompetitionRegistrationDTO> {
+  const now = new Date().toISOString();
+  const teamPayload: TeamRegistrationRequestDTO = {
+    teamName: payload.teamName,
+    teamDisplayName: payload.teamDisplayName ?? payload.teamName,
+    memberParticipantIds: payload.memberParticipantIds,
+    leaderRegistration: withTenantId({
+      id: null,
+      registrationStatus: 'PENDING_PAYMENT' as const,
+      feeAmount: payload.feeAmount,
+      effectiveCategory: payload.effectiveCategory ?? '',
+      stripePaymentIntentId: '',
+      teamName: payload.teamName,
+      teamDisplayName: payload.teamDisplayName ?? payload.teamName,
+      event: eventRef(eventId),
+      competition: { id: payload.competitionId } as EventCompetitionRegistrationDTO['competition'],
+      participantProfile: { id: payload.captainParticipantId } as EventCompetitionRegistrationDTO['participantProfile'],
+      createdAt: now,
+      updatedAt: now,
+    }) as Partial<EventCompetitionRegistrationDTO>,
+  };
+  return proxyJson<EventCompetitionRegistrationDTO>('/event-competition-registrations/team', {
+    method: 'POST',
+    body: JSON.stringify(teamPayload),
+  });
+}
+
 export async function createRegistrationServer(
   eventId: string,
   payload: {
@@ -138,6 +235,8 @@ export async function createRegistrationServer(
     feeAmount: number;
     effectiveCategory?: string;
     groupLeaderRegistrationId?: number;
+    teamName?: string;
+    teamDisplayName?: string;
   }
 ): Promise<EventCompetitionRegistrationDTO> {
   const now = new Date().toISOString();
@@ -156,6 +255,8 @@ export async function createRegistrationServer(
         groupLeaderRegistration: payload.groupLeaderRegistrationId
           ? { id: payload.groupLeaderRegistrationId }
           : undefined,
+        teamName: payload.teamName ?? '',
+        teamDisplayName: payload.teamDisplayName ?? '',
         createdAt: now,
         updatedAt: now,
       })

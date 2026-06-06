@@ -1691,6 +1691,16 @@ export type CompetitionType = 'INDIVIDUAL' | 'GROUP';
 export type CompetitionEligibleAudience = 'YOUTH_ONLY' | 'ADULT_ONLY' | 'ALL';
 export type CompetitionParticipantType = 'CHILD' | 'ADULT' | 'TEAM_MEMBER';
 export type CompetitionRegistrationStatus = 'PENDING_PAYMENT' | 'CONFIRMED' | 'CANCELLED' | 'REFUNDED';
+export type CompetitionDisciplineCode =
+  | 'SONG'
+  | 'SPEECH'
+  | 'DANCE'
+  | 'MUSIC'
+  | 'SPORTS'
+  | 'ART'
+  | 'OTHER';
+export type CompetitionGroupMemberRole = 'CAPTAIN' | 'MEMBER';
+export type RegistrationActorMode = 'PARENT' | 'SELF' | 'TEAM_CAPTAIN';
 
 export interface EventCompetitionSettingsDTO {
   id?: number | null;
@@ -1703,11 +1713,14 @@ export interface EventCompetitionSettingsDTO {
   pointsFirst: number;
   pointsSecond: number;
   pointsThird: number;
+  pointsFourth?: number;
+  defaultMaxPlacements?: number;
   championEnabled: boolean;
   championExcludeGroupPoints: boolean;
   championMaxCategory?: number | null;
   resultsDisplayMode?: CompetitionResultsDisplayMode | null;
   eligibilityText?: string | null;
+  winnersPublishedEmailSentAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
   event?: EventDetailsDTO;
@@ -1744,6 +1757,15 @@ export interface EventCompetitionDTO {
   timeLimitMinutes?: number | null;
   requiresSoundtrack: boolean;
   judgmentCriteriaJson?: string | null;
+  disciplineCode?: CompetitionDisciplineCode | null;
+  minAge?: number | null;
+  maxAge?: number | null;
+  minGrade?: number | null;
+  maxGrade?: number | null;
+  maxPlacements?: number | null;
+  registrationDeadline?: string | null;
+  rulesMarkdown?: string | null;
+  requiresTeamName?: boolean;
   displayOrder: number;
   isActive: boolean;
   createdAt?: string;
@@ -1779,6 +1801,9 @@ export interface EventCompetitionRegistrationDTO {
   feeAmount: number;
   effectiveCategory?: string | null;
   stripePaymentIntentId?: string | null;
+  teamName?: string | null;
+  teamDisplayName?: string | null;
+  confirmationEmailSent?: boolean;
   createdAt?: string;
   updatedAt?: string;
   event?: EventDetailsDTO;
@@ -1786,6 +1811,29 @@ export interface EventCompetitionRegistrationDTO {
   participantProfile?: EventCompetitionParticipantDTO;
   groupLeaderRegistration?: EventCompetitionRegistrationDTO | null;
   registeredByUserProfile?: UserProfileDTO;
+}
+
+export interface EventCompetitionGroupMemberDTO {
+  id?: number | null;
+  tenantId?: string;
+  memberRole: CompetitionGroupMemberRole;
+  sortOrder: number;
+  createdAt?: string;
+  registration?: EventCompetitionRegistrationDTO;
+  participantProfile?: EventCompetitionParticipantDTO;
+}
+
+export interface CompetitionEligibilityCheckDTO {
+  eligible: boolean;
+  reasons: string[];
+}
+
+export interface TeamRegistrationRequestDTO {
+  leaderRegistration: Partial<EventCompetitionRegistrationDTO>;
+  memberParticipantIds: number[];
+  teamName?: string;
+  teamDisplayName?: string;
+  groupMembers?: EventCompetitionGroupMemberDTO[];
 }
 
 export interface EventCompetitionResultDTO {

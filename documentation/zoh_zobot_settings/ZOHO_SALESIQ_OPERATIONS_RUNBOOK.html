@@ -86,7 +86,7 @@
 </head>
 <body>
     <h1>Zoho SalesIQ Operations Runbook</h1>
-    <p><strong>OAuth refresh token · bulk upload (REST API) · bulk delete · FAQ supplement CSV · merge · Answer Bot testing</strong></p>
+    <p><strong>OAuth refresh token · bulk upload (REST API) · bulk delete · FAQ supplement CSV · FAQ cleanup · merge · Answer Bot testing</strong></p>
 
     <div class="section-intro">
         <p>This runbook documents the <strong>repeatable operational workflow</strong> used to reset and reload the Giventa Inc. SalesIQ knowledge base for MOSC (<code class="code-highlight">giventainc</code> portal). <strong>Recommended import path:</strong> post all articles from <code class="script-name">salesiq-articles-import.csv</code> using <code class="script-name">npm run zobot:bulk-upload-articles</code> (SalesIQ Articles REST API). Portal CSV import remains documented as an alternative. This runbook complements the architecture guide:
@@ -113,10 +113,15 @@
             <li><a href="#merge-faq">8. Merge FAQ supplement into main CSV</a></li>
             <li><a href="#bulk-upload">9. Bulk upload articles via REST API (recommended)</a></li>
             <li><a href="#import-portal">10. Alternative: portal CSV import</a></li>
-            <li><a href="#test-bot">11. Test Answer Bot / Zobot</a></li>
-            <li><a href="#npm-scripts">12. npm scripts reference</a></li>
-            <li><a href="#files">13. Key files</a></li>
-            <li><a href="#troubleshooting">14. Troubleshooting</a></li>
+            <li><a href="#faq-cleanup">11. FAQ cleanup and bulk upload (widget FAQs)</a></li>
+            <li><a href="#faq-brand-startup">11a. New brand startup — delete defaults, add MOSC FAQs (verified)</a></li>
+            <li><a href="#faq-widget-cache">11b. Widget Home FAQ strip stale (View All is correct) — clear cache</a></li>
+            <li><a href="#answer-bot-catholicos">11c. Answer Bot — “Who is the Catholicos?” wrong or missing</a></li>
+            <li><a href="#pre-chat-form">11d. Skip / suppress pre-chat name, email, phone</a></li>
+            <li><a href="#test-bot">12. Test Answer Bot / Zobot</a></li>
+            <li><a href="#npm-scripts">13. npm scripts reference</a></li>
+            <li><a href="#files">14. Key files</a></li>
+            <li><a href="#troubleshooting">15. Troubleshooting</a></li>
         </ul>
     </nav>
 
@@ -132,7 +137,11 @@
 7. npm run zobot:merge-faq-supplement
 8. npm run zobot:list-portal-ids (verify category / department IDs)
 9. npm run zobot:bulk-upload-articles -- --dry-run → --confirm (posts all CSV rows via API)
-10. Re-train / refresh Answer Bot; test widget questions
+10. npm run zobot:bulk-delete-faqs -- --dry-run → delete SalesIQ defaults → --confirm
+11. npm run zobot:bulk-delete-faqs -- --dry-run (list all) → delete any remaining Zoho stragglers
+12. npm run zobot:bulk-upload-faqs -- --dry-run → --confirm (7 MOSC curated FAQs)
+13. Re-train / refresh Answer Bot; verify widget (dashboard + View All + Home strip)
+14. If Home FAQ preview is stale but View All is correct → section 11b ($zoho.salesiq.reset() or incognito)
         </div>
 
         <h2 id="prerequisites">2. Prerequisites</h2>
@@ -143,7 +152,7 @@
             <tbody>
                 <tr>
                     <td>Zoho API Console client</td>
-                    <td>Server-based OAuth client with scopes <code>SalesIQ.articles.READ</code>, <code>SalesIQ.articles.CREATE</code>, <code>SalesIQ.articles.DELETE</code>. Optional: <code>SalesIQ.departments.READ</code> (not required if you set <code>ZOHO_SALESIQ_DEPARTMENT_ID</code>). Redirect URIs must include <strong>both</strong> production and localhost callbacks (see section 3).</td>
+                    <td>Server-based OAuth client with scopes <code>SalesIQ.articles.READ</code>, <code>SalesIQ.articles.CREATE</code>, <code>SalesIQ.articles.DELETE</code>, <code>SalesIQ.faqs.READ</code>, <code>SalesIQ.faqs.CREATE</code>, <code>SalesIQ.faqs.DELETE</code>. Optional: <code>SalesIQ.departments.READ</code> (not required if you set <code>ZOHO_SALESIQ_DEPARTMENT_ID</code>). Redirect URIs must include <strong>both</strong> production and localhost callbacks (see section 3).</td>
                 </tr>
                 <tr>
                     <td>SalesIQ portal</td>
@@ -181,10 +190,12 @@ http://localhost:3000/oauth/zoho/callback</pre>
                 <pre>ZOHO_CLIENT_ID=your_client_id
 ZOHO_CLIENT_SECRET=your_client_secret
 ZOHO_OAUTH_REDIRECT_URI=https://www.event-site-manager.com/oauth/zoho/callback
-ZOHO_OAUTH_SCOPES=SalesIQ.articles.READ,SalesIQ.articles.CREATE,SalesIQ.articles.DELETE,SalesIQ.departments.READ
+ZOHO_OAUTH_SCOPES=SalesIQ.articles.READ,SalesIQ.articles.CREATE,SalesIQ.articles.DELETE,SalesIQ.faqs.READ,SalesIQ.faqs.CREATE,SalesIQ.faqs.DELETE,SalesIQ.departments.READ
 ZOHO_SALESIQ_SCREEN_NAME=giventainc
+# Optional FAQ category (Resources → FAQs, not Articles):
+# ZOHO_SALESIQ_FAQ_CATEGORY_ID=...
 # Optional: ZOHO_OAUTH_SETUP_SECRET=your-secret</pre>
-                <p><code class="code-highlight">ZOHO_OAUTH_SCOPES</code> must include <code>SalesIQ.articles.CREATE</code> for bulk upload. After changing scopes, <strong>re-run OAuth</strong> (section 3) and replace <code>ZOHO_REFRESH_TOKEN</code>.</p>
+                <p><code class="code-highlight">ZOHO_OAUTH_SCOPES</code> must include <code>SalesIQ.articles.CREATE</code> for bulk article upload and <code>SalesIQ.faqs.CREATE</code> / <code>SalesIQ.faqs.DELETE</code> for FAQ scripts. After changing scopes, <strong>re-run OAuth</strong> (section 3) and replace <code>ZOHO_REFRESH_TOKEN</code>.</p>
                 <p>Do <strong>not</strong> commit <code>.env.local</code> to git.</p>
             </div>
         </div>
@@ -253,6 +264,9 @@ ZOHO_OAUTH_SCOPES=SalesIQ.articles.READ,SalesIQ.articles.CREATE,SalesIQ.articles
 # Bulk upload (optional — script resolves by category name if omitted)
 ZOHO_SALESIQ_CATEGORY_ID=1171471000000002104
 ZOHO_SALESIQ_DEPARTMENT_ID=1171471000000002013
+ZOHO_SALESIQ_CATEGORY_ID=1171471000000002104
+# FAQ category (Resources → FAQs — run zobot:list-portal-ids after faqs scopes added):
+# ZOHO_SALESIQ_FAQ_CATEGORY_ID=...
 
 # Only if Node reports certificate errors (corporate proxy / SSL inspection)
 ZOHO_INSECURE_TLS=1</pre>
@@ -527,7 +541,421 @@ npm run zobot:bulk-upload-articles -- --env-file F:/project_workspace/event-site
             </div>
         </div>
 
-        <h2 id="test-bot">11. Test Answer Bot / Zobot</h2>
+        <h2 id="faq-cleanup">11. FAQ cleanup and bulk upload (widget FAQs)</h2>
+        <div class="section-intro">
+            <p><strong>Articles ≠ FAQs.</strong> The ~272 rows uploaded via <code>zobot:bulk-upload-articles</code> are <strong>Articles</strong> (Resources → Articles). The chat widget <strong>Home → FAQs</strong> strip is a separate resource type (Resources → FAQs).</p>
+            <p><strong>New brand / Zobot startup:</strong> When you configure a new SalesIQ brand or enable the chat widget on a site like MOSC, Zoho often pre-seeds <strong>10 default marketing FAQs</strong> (SalesIQ product questions). These appear in the widget even after you upload Articles. You must <strong>delete the default FAQs</strong> and <strong>upload your own</strong> from <code class="script-name">salesiq-faq-supplement.csv</code> — the same workflow documented in <a href="#faq-brand-startup">section 11a (verified commands)</a>.</p>
+            <p>The curated MOSC Q&amp;A in <code class="script-name">salesiq-faq-supplement.csv</code> is also merged into the <em>articles</em> CSV for Answer Bot — that merge does <strong>not</strong> replace widget FAQs.</p>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header faq">Articles vs FAQs (quick reference)</div>
+            <div class="section-body">
+                <table>
+                    <thead>
+                        <tr><th>Resource</th><th>Portal path</th><th>API</th><th>Widget block</th><th>MOSC content today</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Articles</strong></td><td>Resources → Articles</td><td><code>POST /api/v2/{screen}/articles</code></td><td>Home → Articles</td><td>~272 mosc-redesign pages via <code>zobot:bulk-upload-articles</code></td></tr>
+                        <tr><td><strong>FAQs</strong></td><td>Resources → FAQs</td><td><code>POST /api/v3/{screen}/faqs</code></td><td>Home → FAQs</td><td>Default Zoho samples until cleaned up; upload MOSC rows with <code>zobot:bulk-upload-faqs</code></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header faq">Option A — Portal UI (no FAQ API scopes)</div>
+            <div class="section-body">
+                <ol class="steps">
+                    <li>Sign in to <a href="https://salesiq.zoho.com/giventainc" rel="noopener noreferrer">salesiq.zoho.com/giventainc</a>.</li>
+                    <li>Open <strong>Resources → FAQs</strong>.</li>
+                    <li>Delete default SalesIQ marketing FAQs (e.g. “Is my data secure with SalesIQ?”).</li>
+                    <li>Add MOSC FAQs manually, or skip to Option B for scripted upload from <code class="script-name">salesiq-faq-supplement.csv</code>.</li>
+                    <li>Optional: <strong>Settings → Brands → Personalization</strong> — hide the FAQ block on the widget Home tab if you only want Articles.</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header faq">Option B — REST API (recommended for repeatability)</div>
+            <div class="section-body">
+                <p><strong>Prerequisites:</strong> Re-authorize OAuth with <code>SalesIQ.faqs.READ</code>, <code>SalesIQ.faqs.CREATE</code>, <code>SalesIQ.faqs.DELETE</code> (section 3). Set <code>ZOHO_SALESIQ_FAQ_CATEGORY_ID</code> from <code>npm run zobot:list-portal-ids</code> (FAQ category <strong>General</strong> is separate from article category).</p>
+
+                <h3>Step 1 — Preview default FAQs to remove</h3>
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">Dry-run delete (filter Zoho sample questions)</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('faq-delete-dry')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="faq-delete-dry-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-delete-faqs -- --dry-run --question-contains SalesIQ</code>
+                    </div>
+                </div>
+                <p>Script: <code class="script-name">scripts/zoh-zobot-settings/bulk-delete-salesiq-faqs.mjs</code> — lists FAQs via <code>GET /api/v3/giventainc/faqs</code>, deletes with <code>DELETE /api/v3/giventainc/faqs/{id}</code>.</p>
+
+                <h3>Step 2 — Delete default FAQs</h3>
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">Confirm delete (destructive)</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('faq-delete-confirm')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="faq-delete-confirm-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-delete-faqs -- --confirm --question-contains SalesIQ</code>
+                    </div>
+                </div>
+                <p>To remove <em>all</em> FAQs before a clean upload: <code>npm run zobot:bulk-delete-faqs -- --confirm</code> (omit <code>--question-contains</code>).</p>
+                <div class="warning">
+                    <strong>Not all defaults contain “SalesIQ” in the question.</strong> One verified straggler was: <em>“Can I customize the chat widget's appearance to match my brand?”</em> — it survives the <code>--question-contains SalesIQ</code> filter. After the bulk SalesIQ delete, run <code>npm run zobot:bulk-delete-faqs -- --dry-run</code> (no filter), review the list, and delete remaining Zoho rows individually (see section 11a).
+                </div>
+
+                <h3>Step 2b — Delete non-SalesIQ stragglers (if any)</h3>
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">List all FAQs, then delete by keyword</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('faq-delete-straggler-list')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line — list all</div>
+                        <code id="faq-delete-straggler-list-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-delete-faqs -- --dry-run</code>
+                    </div>
+                </div>
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">Delete chat-widget branding FAQ (verified example)</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('faq-delete-widget')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="faq-delete-widget-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-delete-faqs -- --confirm --question-contains "customize the chat widget"</code>
+                    </div>
+                </div>
+
+                <h3>Step 3 — Dry-run MOSC FAQ upload</h3>
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">Preview 7 curated FAQ rows</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('faq-upload-dry')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="faq-upload-dry-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-upload-faqs -- --dry-run</code>
+                    </div>
+                </div>
+                <p>Script: <code class="script-name">scripts/zoh-zobot-settings/bulk-upload-salesiq-faqs.mjs</code> — reads <code class="script-name">salesiq-faq-supplement.csv</code>, parses <code>QUESTION:</code> / <code>ANSWER:</code> from <strong>Content</strong>, adds <strong>Tags</strong> as alternate question variants, POSTs to <code>/api/v3/giventainc/faqs</code> with <code>type: external</code>.</p>
+
+                <h3>Step 4 — Upload MOSC FAQs</h3>
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">Create FAQs from supplement CSV</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('faq-upload-confirm')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="faq-upload-confirm-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-upload-faqs -- --confirm</code>
+                    </div>
+                </div>
+                <p><strong>Other flags:</strong></p>
+                <pre>npm run zobot:bulk-upload-faqs -- --confirm --limit 2
+npm run zobot:bulk-upload-faqs -- --confirm --category-name General --department-name "MOSC Connect"
+npm run zobot:bulk-upload-faqs -- --confirm --category-id YOUR_FAQ_CATEGORY_ID --department-id YOUR_DEPT_ID
+npm run zobot:bulk-upload-faqs -- --confirm --no-skip-existing</pre>
+                <div class="info">
+                    <strong>Keep both pipelines:</strong> Continue using <code>zobot:merge-faq-supplement</code> + <code>zobot:bulk-upload-articles</code> so Answer Bot has long-form article content. Run <code>zobot:bulk-upload-faqs</code> separately so the widget <strong>FAQs</strong> strip shows MOSC questions (Catholicos, dioceses, Kalpana, etc.).
+                </div>
+                <div class="warning">
+                    <strong>Zoho limit:</strong> Each FAQ supports at most <strong>5 question variants</strong> (1 default + up to 4 alternates). The upload script caps tag-derived variants automatically. If you see <code>Cannot add more than 5 questions</code>, re-run <code>--confirm</code> after the script update — duplicates are skipped by default question text.
+                </div>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header faq">11a. New brand startup — verified command sequence (June 2026)</div>
+            <div class="section-body" id="faq-brand-startup">
+                <p>When standing up the MOSC chat widget on the <code>giventainc</code> portal, we confirmed this sequence. Run all commands from <code>F:\project_workspace\mosc-temp</code>. Requires FAQ OAuth scopes (section 3) and a fresh <code>ZOHO_REFRESH_TOKEN</code> after adding <code>SalesIQ.faqs.READ</code>, <code>SalesIQ.faqs.CREATE</code>, <code>SalesIQ.faqs.DELETE</code>.</p>
+
+                <h3>Phase 0 — OAuth (one time per scope change)</h3>
+                <ol class="steps">
+                    <li>Set <code>ZOHO_OAUTH_SCOPES</code> in both <code>mosc-temp/.env.local</code> and <code>event-site-manager/.env.local</code> to include FAQ scopes (see section 3).</li>
+                    <li>Start event-site-manager: <code>cd F:\project_workspace\event-site-manager; npm run dev</code></li>
+                    <li>Open <code>http://localhost:3000/oauth/zoho/start</code> (or port shown in terminal), approve consent, copy new <code>ZOHO_REFRESH_TOKEN</code> into both <code>.env.local</code> files.</li>
+                </ol>
+
+                <h3>Phase 1 — Preview and delete default Zoho FAQs</h3>
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">1. Preview upload CSV (optional)</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('brand-faq-upload-dry')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="brand-faq-upload-dry-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-upload-faqs -- --dry-run</code>
+                    </div>
+                </div>
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">2. Preview SalesIQ marketing FAQs to delete</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('brand-faq-delete-dry')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="brand-faq-delete-dry-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-delete-faqs -- --dry-run --question-contains SalesIQ</code>
+                    </div>
+                </div>
+                <p><strong>Verified result:</strong> 9 FAQs matched (e.g. “Is my data secure with SalesIQ?”, “What is SalesIQ, and how can it benefit my business?”, …).</p>
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">3. Delete those 9 default FAQs</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('brand-faq-delete-confirm')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="brand-faq-delete-confirm-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-delete-faqs -- --confirm --question-contains SalesIQ</code>
+                    </div>
+                </div>
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">4. List remaining FAQs (catch stragglers)</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('brand-faq-list-all')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="brand-faq-list-all-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-delete-faqs -- --dry-run</code>
+                    </div>
+                </div>
+                <p><strong>Verified straggler:</strong> 1 FAQ remained — <em>“Can I customize the chat widget's appearance to match my brand?”</em> (does not contain “SalesIQ”).</p>
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">5. Delete chat-widget branding FAQ</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('brand-faq-delete-widget')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="brand-faq-delete-widget-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-delete-faqs -- --confirm --question-contains "customize the chat widget"</code>
+                    </div>
+                </div>
+
+                <h3>Phase 2 — Upload MOSC curated FAQs</h3>
+                <div class="command-block">
+                    <div class="command-header">
+                        <span class="command-type">6. Upload all rows from salesiq-faq-supplement.csv</span>
+                        <button type="button" class="copy-button" onclick="copyWindowsCommand('brand-faq-upload-confirm')">Copy command</button>
+                    </div>
+                    <div class="command-single-line">
+                        <div class="command-single-line-label">Windows single-line</div>
+                        <code id="brand-faq-upload-confirm-single-code">cd F:\project_workspace\mosc-temp; npm run zobot:bulk-upload-faqs -- --confirm</code>
+                    </div>
+                </div>
+                <p>If the first run fails with <code>Cannot add more than 5 questions</code>, re-run the same command after updating the script (variants capped at 5). Skips already-created FAQs by default question text.</p>
+                <p><strong>Verified result:</strong> 7 MOSC FAQs created in Resources → FAQs / widget Home strip:</p>
+                <ul>
+                    <li>Current Catholicos — Mathews III</li>
+                    <li>Who is His Holiness Baselios Marthoma Mathews III?</li>
+                    <li>How many dioceses (30)</li>
+                    <li>Recent Kalpana from Bava</li>
+                    <li>Northeast America metropolitan</li>
+                    <li>Managing Committee members list</li>
+                    <li>Rev. Fr. Shibu Daniel</li>
+                </ul>
+
+                <h3>Phase 3 — Verify in widget</h3>
+                <ol class="steps">
+                    <li>Open <code>https://www.mosc-temp.com</code> (or your brand’s site).</li>
+                    <li>Confirm <strong>Resources → FAQs</strong> in the SalesIQ dashboard shows only MOSC rows.</li>
+                    <li>Open the chat widget → <strong>Home</strong> tab → <strong>FAQs</strong> preview strip.</li>
+                    <li>Tap <strong>View All</strong> in the FAQ block — this list should also show MOSC questions.</li>
+                    <li>If the dashboard and <strong>View All</strong> are correct but the <strong>Home preview strip</strong> still shows old SalesIQ text, that is <strong>visitor-side widget cache</strong> (not a failed upload). Follow <a href="#faq-widget-cache">section 11b</a> — verified fix: <code>$zoho.salesiq.reset()</code> in the browser console.</li>
+                </ol>
+
+                <div class="success">
+                    <strong>Env note:</strong> FAQ category ID (<code>General</code> → <code>1171471000000002048</code>) is <em>not</em> the same as article category ID (<code>ZOHO_SALESIQ_CATEGORY_ID</code>). Optional: set <code>ZOHO_SALESIQ_FAQ_CATEGORY_ID</code> in <code>.env.local</code>. The upload script resolves FAQ category from an existing FAQ when <code>GET /faqcategories</code> fails on this portal.
+                </div>
+
+                <h3>Full copy-paste block (after OAuth token updated)</h3>
+                <pre>cd F:\project_workspace\mosc-temp
+npm run zobot:bulk-upload-faqs -- --dry-run
+npm run zobot:bulk-delete-faqs -- --dry-run --question-contains SalesIQ
+npm run zobot:bulk-delete-faqs -- --confirm --question-contains SalesIQ
+npm run zobot:bulk-delete-faqs -- --dry-run
+npm run zobot:bulk-delete-faqs -- --confirm --question-contains "customize the chat widget"
+npm run zobot:bulk-upload-faqs -- --confirm
+npm run zobot:bulk-delete-faqs -- --dry-run</pre>
+                <p>The final dry-run should list <strong>7</strong> MOSC FAQs only.</p>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header faq">11b. Widget Home FAQ strip stale (View All is correct) — clear cache</div>
+            <div class="section-body" id="faq-widget-cache">
+                <p>After bulk FAQ delete/upload, the SalesIQ <strong>dashboard</strong> and the widget <strong>View All</strong> FAQ screen usually show the new MOSC content immediately. The <strong>Home tab FAQ preview strip</strong> (the short list shown when you first open chat) can still show <strong>old buffered SalesIQ questions</strong> until the visitor session cache is cleared. This is expected Zoho widget behavior — not a sign that <code>zobot:bulk-upload-faqs</code> failed.</p>
+
+                <h3>How to tell upload succeeded vs cache lag</h3>
+                <table>
+                    <thead>
+                        <tr><th>Where you look</th><th>Expected after upload</th><th>If wrong here</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>SalesIQ dashboard → <strong>Resources → FAQs</strong></td><td>7 MOSC FAQs only</td><td>Re-run section 11a (delete + upload), not a cache issue</td></tr>
+                        <tr><td>Widget → FAQ block → <strong>View All</strong></td><td>7 MOSC FAQs only</td><td>Usually still server-side; check dashboard first</td></tr>
+                        <tr><td>Widget → <strong>Home</strong> tab → FAQ preview strip</td><td>May still show old SalesIQ text</td><td><strong>Visitor cache</strong> — use fixes below (verified June 2026)</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="info">
+                    <strong>Why View All updates but Home does not:</strong> The Home preview is bundled with the initial widget bootstrap / visitor session. <strong>View All</strong> loads the live FAQ list from Zoho’s API when you open that screen. Two surfaces, two load paths — stale Home + fresh View All means your portal data is correct.
+                </div>
+
+                <h3>Fix 1 — Incognito / private window (quick test)</h3>
+                <ol class="steps">
+                    <li>Open your site (e.g. <code>https://www.mosc-temp.com</code>) in a <strong>private/incognito</strong> window.</li>
+                    <li>Open the chat widget → <strong>Home</strong> → FAQ preview.</li>
+                    <li>If MOSC FAQs appear here, the issue is only your normal browser session cache.</li>
+                </ol>
+
+                <h3>Fix 2 — Clear SalesIQ cookies (browser)</h3>
+                <ol class="steps">
+                    <li>Open DevTools → <strong>Application</strong> → <strong>Cookies</strong>.</li>
+                    <li>Clear cookies for your site (e.g. <code>www.mosc-temp.com</code>) and Zoho widget hosts (e.g. <code>salesiq.zohopublic.com</code>, <code>zoho.com</code>) — look for names starting with <code>zld</code>, <code>zsiq</code>, etc.</li>
+                    <li>Hard refresh: <strong>Ctrl+Shift+R</strong> (Windows) or <strong>Cmd+Shift+R</strong> (Mac).</li>
+                    <li>Reopen the widget and check the Home FAQ strip.</li>
+                </ol>
+
+                <h3>Fix 3 — <code>$zoho.salesiq.reset()</code> (verified — fastest forced refresh)</h3>
+                <p>Official SalesIQ JS API: clears cookies, reloads the widget iframe, and starts a new visitor session. Run in the browser console while the page with the widget is open:</p>
+                <pre>$zoho.salesiq.ready(function () {
+  $zoho.salesiq.reset();
+});</pre>
+                <p>Reference: <a href="https://www.zoho.com/salesiq/help/developer-section/js-api-salesiq-reset.html" rel="noopener noreferrer">Zoho SalesIQ — .salesiq.reset()</a>. <strong>Verified June 2026:</strong> After FAQ bulk upload, this cleared the stale Home preview and showed MOSC FAQs without re-running upload scripts.</p>
+                <div class="warning">
+                    <strong>Do not</strong> call <code>reset()</code> on every page load in site code — it ends active chats and creates a new visitor each time. Use only for testing or manual recovery.
+                </div>
+
+                <h3>Fix 4 — Republish brand widget (dashboard)</h3>
+                <ol class="steps">
+                    <li>SalesIQ → <strong>Settings → Brands</strong> → your brand (e.g. MOSC Connect).</li>
+                    <li>Open <strong>Installation</strong> or <strong>Personalization</strong>, review widget settings, click <strong>Save</strong> / <strong>Publish</strong> if offered.</li>
+                    <li>Hard-refresh the live site and retest the Home FAQ strip.</li>
+                </ol>
+
+                <h3>Production visitors — do you have to wait?</h3>
+                <ul>
+                    <li><strong>For you (testing):</strong> No long wait — incognito, cookie clear, or <code>reset()</code> should fix it immediately.</li>
+                    <li><strong>For returning visitors:</strong> They may see the old Home preview until their widget session expires or they get a fresh embed load. Some SalesIQ FAQ-related cookies can persist up to ~24 hours; most users see updates sooner on a normal revisit.</li>
+                    <li><strong>New visitors</strong> typically see current FAQs once Zoho’s edge cache has propagated (often minutes, sometimes a few hours).</li>
+                </ul>
+
+                <div class="success">
+                    <strong>What this is <em>not</em>:</strong> Re-running <code>zobot:bulk-upload-faqs</code>, Answer Bot re-training, or article upload. Dashboard + View All already prove the FAQ API data is correct.
+                </div>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header faq">11c. Answer Bot — “Who is the Catholicos?” wrong or missing</div>
+            <div class="section-body" id="answer-bot-catholicos">
+                <p>Widget <strong>FAQs</strong> (Home strip / View All) and <strong>Answer Bot</strong> (free-text AI chat) use the same Resources library but match questions differently. If “Who is the Catholicos?” does not name <strong>His Holiness Baselios Marthoma Mathews III</strong>, the portal may have the right FAQ rows while Answer Bot is matching older articles (Paulose II, Didymos I, Mathews I/II, etc.) or has not mapped the unanswered query yet.</p>
+
+                <h3>Confirm curated content exists</h3>
+                <p>In SalesIQ → <strong>Resources → FAQs</strong>, you should see at least:</p>
+                <ul>
+                    <li><strong>Current Catholicos — Baselios Marthoma Mathews III (2021–present)</strong></li>
+                    <li><strong>Who is His Holiness Baselios Marthoma Mathews III?</strong></li>
+                </ul>
+                <p>In <strong>Resources → Articles</strong>, the profile article <strong>H.H. Baselios Marthoma Mathews III, The Ninth Catholicos…</strong> should be <strong>Published</strong>. If FAQs are missing, run section <a href="#faq-brand-startup">11a</a> (<code>zobot:bulk-upload-faqs</code>).</p>
+
+                <h3>Fix 1 — Answer Bot settings (dashboard)</h3>
+                <ol class="steps">
+                    <li><strong>Settings → Bots → Answer Bot</strong> → select the <code>www.mosc-temp.com</code> brand.</li>
+                    <li><strong>Connect knowledge base</strong> — enable both <strong>Articles</strong> and <strong>FAQs</strong> (not Articles only).</li>
+                    <li>Enable <strong>Fetch answer from resource (powered by OpenAI)</strong> so the bot returns a short answer (e.g. “Mathews III, enthroned 2021”) instead of dumping a long historical article.</li>
+                    <li>Save and ensure Answer Bot is <strong>enabled</strong> for the brand.</li>
+                    <li>In your <strong>Zobot</strong> Codeless flow, confirm the <strong>Answer bot Card</strong> uses this brand’s Answer Bot (section 9 in the <a href="ZOHO_SALESIQ_ZOBOT_MOSC_REDESIGN_KNOWLEDGE_BASE_GUIDE.html">Knowledge Base Guide</a>).</li>
+                </ol>
+
+                <h3>Fix 2 — Map unanswered questions (high impact)</h3>
+                <ol class="steps">
+                    <li>Ask “Who is the Catholicos?” once in the live widget (or Zobot <strong>Test your bot</strong>).</li>
+                    <li>Go to <strong>Resources</strong> → <strong>Unanswered questions</strong> (or the Answer Bot unanswered log).</li>
+                    <li>Find that query → <strong>Assign</strong> or link it to FAQ <strong>Current Catholicos — Baselios Marthoma Mathews III</strong> (or the Mathews III profile article).</li>
+                    <li>Retest the same wording — Answer Bot learns from this mapping for similar phrasing.</li>
+                </ol>
+
+                <h3>Fix 3 — Reduce wrong “Catholicos” article matches</h3>
+                <p>~272 articles include many <em>former</em> Catholicos biographies (Paulose II, Didymos I, Geevarghese II, etc.). Semantic search may rank those for a vague “who is the catholicos?” question.</p>
+                <ul>
+                    <li>Prefer FAQ hits: ensure Fix 1 includes <strong>FAQs</strong> and Fix 2 maps the query to the curated FAQ row (explicit “current” / “NOT Paulose II” text is already in <code class="script-name">salesiq-faq-supplement.csv</code>).</li>
+                    <li>Optional: in Answer Bot category filters, prioritize category <strong>General</strong> where the curated FAQ lives.</li>
+                    <li>After bulk upload changes, clear visitor cache (<a href="#faq-widget-cache">section 11b</a>) and retest in incognito.</li>
+                </ul>
+
+                <h3>Fix 4 — Re-upload FAQ supplement to Articles (Answer Bot long-form)</h3>
+                <p>FAQ rows are also merged into <code class="script-name">salesiq-articles-import.csv</code> for Answer Bot article search:</p>
+                <pre>cd F:\project_workspace\mosc-temp
+npm run zobot:merge-faq-supplement
+npm run zobot:bulk-upload-articles -- --dry-run
+npm run zobot:bulk-upload-articles -- --confirm</pre>
+                <p>Skips duplicates by title; ensures “Current Catholicos — Baselios Marthoma Mathews III” exists as a published article with the explicit ANSWER block.</p>
+
+                <h3>Expected answer (test script)</h3>
+                <table>
+                    <thead>
+                        <tr><th>Visitor question</th><th>Should mention</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Who is the Catholicos?</td><td><strong>Baselios Marthoma Mathews III</strong>, Ninth Catholicos, enthroned <strong>15 October 2021</strong>, profile link</td></tr>
+                        <tr><td>Who is the current Catholicos?</td><td>Same — not Paulose II or Didymos I</td></tr>
+                        <tr><td>Who is His Holiness Baselios Marthoma Mathews III?</td><td>Biography FAQ / holy-synod profile article</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="warning">
+                    <strong>Not the same issue as widget FAQ cache (11b):</strong> If View All shows Mathews III but Answer Bot chat still answers wrong, focus on Answer Bot settings + unanswered mapping — not <code>zobot:bulk-delete-faqs</code>.
+                </div>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-header faq">11d. Skip / suppress pre-chat name, email, phone</div>
+            <div class="section-body" id="pre-chat-form">
+                <p>When a visitor starts a new chat, SalesIQ may show a <strong>pre-chat form</strong> (name, email, phone) before the Zobot / Answer Bot conversation. To let visitors ask questions immediately (especially for bot-only flows), change brand flow settings and/or hide fields in the embed code.</p>
+
+                <h3>Option A — Dashboard: Flow Control (recommended first)</h3>
+                <ol class="steps">
+                    <li>SalesIQ → <strong>Settings → Brands</strong> → select your MOSC brand (e.g. <code>www.mosc-temp.com</code>).</li>
+                    <li>Open <strong>Flow Control</strong> (or <strong>Flow</strong> / chat window flow — label varies by SalesIQ version).</li>
+                    <li><strong>Form style:</strong> choose <strong>Conversation</strong> or <strong>Inline</strong> instead of <strong>Traditional</strong> — visitors can start chatting first; contact fields can be collected later in the thread (see <a href="https://thoughtlogik.com/docs/zoho-knowledge-base/zoho-salesiq/setup-brand/how-to-setup-chat-window-flow/" rel="noopener noreferrer">Flow Control setup</a>).</li>
+                    <li>Or remove / disable fields you do not need: for each of <strong>Name</strong>, <strong>Email</strong>, <strong>Phone</strong>, uncheck <strong>Mark this field as mandatory</strong> or disable the field if the UI allows.</li>
+                    <li>Save / publish the brand widget settings.</li>
+                </ol>
+                <div class="info">
+                    <strong>Bot-only sites:</strong> For a homepage assistant that only uses Answer Bot (no live agent queue), Conversation/Inline style avoids blocking the first question behind email/phone.
+                </div>
+
+                <h3>Option B — Embed code: hide default fields (website)</h3>
+                <p>Zoho’s JavaScript API removes the default pre-chat fields from the visitor chat window. Add inside your existing <code>$zoho.salesiq.ready</code> handler (after the widget script loads):</p>
+                <pre>$zoho.salesiq.ready(function () {
+  $zoho.salesiq.field.clear(['siq_name', 'siq_email', 'siq_phonenumber']);
+});</pre>
+                <p>Reference: <a href="https://www.zoho.com/salesiq/help/developer-section/js-api-chat-clear-field.html" rel="noopener noreferrer">.field.clear() — SalesIQ JS API</a>.</p>
+                <p>In this repo, the embed lives in <code class="script-name">src/components/mosc-redesign/ZohoSalesIqWidget.tsx</code> — merge the <code>field.clear</code> call into the existing <code>SALESIQ_INIT_SCRIPT</code> <code>ready</code> callback if dashboard settings alone are not enough.</p>
+                <div class="warning">
+                    <strong>Trade-off:</strong> Without email/phone you cannot identify visitors for follow-up or CRM sync until they volunteer details or escalate to an agent. Use Flow Control to keep email optional (not mandatory) rather than removing it entirely if you still want lead capture on handoff.
+                </div>
+
+                <h3>Option C — Zobot flow: avoid Visitor Info cards before Answer Bot</h3>
+                <p>In the Codeless Zobot canvas, do not place a <strong>Visitor Info</strong> or <strong>Get User Input</strong> card for email/phone <em>before</em> the <strong>Answer bot Card</strong>. Flow should be: <strong>Welcome → Answer bot Card</strong> (see Knowledge Base Guide section 9c).</p>
+
+                <h3>Verify</h3>
+                <ol class="steps">
+                    <li>Open the site in incognito (or run <code>$zoho.salesiq.reset()</code> — section <a href="#faq-widget-cache">11b</a>).</li>
+                    <li>Open chat → you should reach the bot greeting / question input without mandatory email/phone.</li>
+                    <li>If fields still appear, confirm you edited the correct <strong>brand</strong> and saved Flow Control; then add Option B to the embed.</li>
+                </ol>
+            </div>
+        </div>
+
+        <h2 id="test-bot">12. Test Answer Bot / Zobot</h2>
         <p>On <code>https://www.mosc-temp.com</code>, open the chat widget and ask:</p>
         <table>
             <thead>
@@ -542,9 +970,9 @@ npm run zobot:bulk-upload-articles -- --env-file F:/project_workspace/event-site
                 <tr><td>Managing committee members list</td><td>FAQ + administration/the-managing-committee article</td></tr>
             </tbody>
         </table>
-        <p>If Answer Bot returns wrong Catholicos names (Paulose II, Didymos I), confirm FAQ rows are uploaded and titles are specific — run <code>npm run zobot:fix-import-titles</code> before <code>zobot:bulk-upload-articles -- --confirm</code>.</p>
+        <p>If Answer Bot returns wrong Catholicos names (Paulose II, Didymos I), confirm FAQ rows are uploaded and titles are specific — run <code>npm run zobot:fix-import-titles</code> before <code>zobot:bulk-upload-articles -- --confirm</code>. If the widget <strong>Home → FAQs</strong> strip still shows SalesIQ marketing text <em>and</em> the dashboard Resources → FAQs list is wrong, run section 11 (<code>zobot:bulk-delete-faqs</code> + <code>zobot:bulk-upload-faqs</code>). If the dashboard and <strong>View All</strong> are correct but only the Home preview is stale, see <a href="#faq-widget-cache">section 11b</a> (visitor cache).</p>
 
-        <h2 id="npm-scripts">12. npm scripts reference</h2>
+        <h2 id="npm-scripts">13. npm scripts reference</h2>
         <p>All commands run from <code>F:\project_workspace\mosc-temp</code>:</p>
         <table>
             <thead>
@@ -557,29 +985,36 @@ npm run zobot:bulk-upload-articles -- --env-file F:/project_workspace/event-site
                 <tr><td><code>zobot:patch-import-csv</code></td><td>patch-salesiq-import-csv.mjs</td><td>Add Department / Channels / Status columns</td></tr>
                 <tr><td><code>zobot:merge-faq-supplement</code></td><td>merge-salesiq-faq-supplement.mjs</td><td>Append FAQ CSV rows to main import</td></tr>
                 <tr><td><code>zobot:list-portal-ids</code></td><td>list-salesiq-portal-ids.mjs</td><td>Print SalesIQ category / department IDs</td></tr>
-                <tr><td><code>zobot:bulk-upload-articles</code></td><td>bulk-upload-salesiq-articles.mjs</td><td>Create articles from CSV via POST API</td></tr>
-                <tr><td><code>zobot:bulk-delete-articles</code></td><td>bulk-delete-salesiq-articles.mjs</td><td>Delete articles via SalesIQ API</td></tr>
+                <tr><td><code>zobot:bulk-upload-articles</code></td><td>bulk-upload-salesiq-articles.mjs</td><td>Create articles from CSV via POST API v2</td></tr>
+                <tr><td><code>zobot:bulk-delete-articles</code></td><td>bulk-delete-salesiq-articles.mjs</td><td>Delete articles via SalesIQ API v2</td></tr>
+                <tr><td><code>zobot:bulk-upload-faqs</code></td><td>bulk-upload-salesiq-faqs.mjs</td><td>Create FAQs from supplement CSV via POST API v3</td></tr>
+                <tr><td><code>zobot:bulk-delete-faqs</code></td><td>bulk-delete-salesiq-faqs.mjs</td><td>Delete FAQs via SalesIQ API v3</td></tr>
                 <tr><td><code>zobot:exchange-zoho-code</code></td><td>exchange-zoho-oauth-code.mjs</td><td>CLI OAuth code exchange</td></tr>
             </tbody>
         </table>
         <p>Upload examples:</p>
         <pre>npm run zobot:bulk-upload-articles -- --dry-run
 npm run zobot:bulk-upload-articles -- --confirm --limit 5
-npm run zobot:bulk-upload-articles -- --confirm</pre>
+npm run zobot:bulk-upload-articles -- --confirm
+npm run zobot:bulk-delete-faqs -- --dry-run --question-contains SalesIQ
+npm run zobot:bulk-upload-faqs -- --dry-run
+npm run zobot:bulk-upload-faqs -- --confirm</pre>
 
-        <h2 id="files">13. Key files</h2>
+        <h2 id="files">14. Key files</h2>
         <table>
             <thead>
                 <tr><th>Path</th><th>Role</th></tr>
             </thead>
             <tbody>
                 <tr><td><code>documentation/zoh_zobot_settings/salesiq-articles-import.csv</code></td><td>Main bulk import file (~272 rows after FAQ merge)</td></tr>
-                <tr><td><code>documentation/zoh_zobot_settings/salesiq-faq-supplement.csv</code></td><td>Curated FAQ rows (edit here first)</td></tr>
+                <tr><td><code>documentation/zoh_zobot_settings/salesiq-faq-supplement.csv</code></td><td>Curated FAQ rows — source for <code>zobot:bulk-upload-faqs</code> and merge into articles CSV</td></tr>
                 <tr><td><code>documentation/zoh_zobot_settings/mosc-redesign-urls.txt</code></td><td>URL list for export script</td></tr>
                 <tr><td><code>scripts/zoh-zobot-settings/load-zoho-env.mjs</code></td><td>Loads .env.local from mosc-temp or event-site-manager</td></tr>
-                <tr><td><code>scripts/zoh-zobot-settings/zoho-salesiq-api.mjs</code></td><td>SalesIQ REST helpers (list/create/delete articles, categories)</td></tr>
+                <tr><td><code>scripts/zoh-zobot-settings/zoho-salesiq-api.mjs</code></td><td>SalesIQ REST helpers (articles v2, FAQs v3, categories)</td></tr>
                 <tr><td><code>scripts/zoh-zobot-settings/bulk-upload-salesiq-articles.mjs</code></td><td>CSV → POST <code>/api/v2/giventainc/articles</code></td></tr>
-                <tr><td><code>scripts/zoh-zobot-settings/list-salesiq-portal-ids.mjs</code></td><td>Resolve category_id / department_id for .env.local</td></tr>
+                <tr><td><code>scripts/zoh-zobot-settings/bulk-upload-salesiq-faqs.mjs</code></td><td>FAQ supplement CSV → POST <code>/api/v3/giventainc/faqs</code></td></tr>
+                <tr><td><code>scripts/zoh-zobot-settings/bulk-delete-salesiq-faqs.mjs</code></td><td>DELETE <code>/api/v3/giventainc/faqs/{id}</code></td></tr>
+                <tr><td><code>scripts/zoh-zobot-settings/list-salesiq-portal-ids.mjs</code></td><td>Resolve article + FAQ category / department IDs for .env.local</td></tr>
                 <tr><td><code>scripts/zoh-zobot-settings/salesiq-title-utils.mjs</code></td><td>Title slug fallback for generic CSV titles</td></tr>
                 <tr><td><code>event-site-manager/src/app/oauth/zoho/start/route.ts</code></td><td>Starts OAuth redirect</td></tr>
                 <tr><td><code>event-site-manager/src/app/oauth/zoho/callback/route.ts</code></td><td>Exchanges code; displays refresh token</td></tr>
@@ -587,7 +1022,7 @@ npm run zobot:bulk-upload-articles -- --confirm</pre>
             </tbody>
         </table>
 
-        <h2 id="troubleshooting">14. Troubleshooting</h2>
+        <h2 id="troubleshooting">15. Troubleshooting</h2>
         <table>
             <thead>
                 <tr><th>Symptom</th><th>Cause / fix</th></tr>
@@ -630,8 +1065,44 @@ npm run zobot:bulk-upload-articles -- --confirm</pre>
                     <td>Use <code>English</code> not <code>en</code> — run <code>zobot:patch-import-csv --language English</code>.</td>
                 </tr>
                 <tr>
+                    <td>Widget Home shows SalesIQ FAQs, not MOSC</td>
+                    <td>Articles upload does not touch FAQs. Delete defaults (<code>zobot:bulk-delete-faqs</code>), upload supplement (<code>zobot:bulk-upload-faqs -- --confirm</code>), or hide FAQ block in brand personalization (section 11).</td>
+                </tr>
+                <tr>
+                    <td><code>Invalid OAuthScope</code> on FAQ upload/delete</td>
+                    <td>Add <code>SalesIQ.faqs.READ</code>, <code>SalesIQ.faqs.CREATE</code>, <code>SalesIQ.faqs.DELETE</code> to <code>ZOHO_OAUTH_SCOPES</code>, re-run OAuth, replace <code>ZOHO_REFRESH_TOKEN</code>.</td>
+                </tr>
+                <tr>
+                    <td>FAQ category not found</td>
+                    <td>FAQ categories are under Resources → FAQs (not Articles). Run <code>zobot:list-portal-ids</code> and set <code>ZOHO_SALESIQ_FAQ_CATEGORY_ID</code> for the <strong>General</strong> FAQ category.</td>
+                </tr>
+                <tr>
+                    <td>Widget still shows “customize chat widget” FAQ</td>
+                    <td>That question does not contain “SalesIQ”. Run <code>zobot:bulk-delete-faqs -- --dry-run</code>, then <code>--confirm --question-contains "customize the chat widget"</code> (section 11a).</td>
+                </tr>
+                <tr>
+                    <td><code>Cannot add more than 5 questions</code> on FAQ upload</td>
+                    <td>Zoho caps question variants at 5 per FAQ. Re-run <code>zobot:bulk-upload-faqs -- --confirm</code>; script skips rows already created.</td>
+                </tr>
+                <tr>
+                    <td><code>List FAQ categories failed</code> / department_id error</td>
+                    <td>Known on <code>giventainc</code> portal. Upload script falls back to FAQ category from existing FAQ records, or set <code>ZOHO_SALESIQ_FAQ_CATEGORY_ID</code> manually.</td>
+                </tr>
+                <tr>
                     <td>Merge says 0 rows appended</td>
                     <td>FAQ titles already exist in main CSV — change Title in supplement or delete duplicate from main CSV first.</td>
+                </tr>
+                <tr>
+                    <td>Dashboard + <strong>View All</strong> show new FAQs; <strong>Home</strong> preview still shows old SalesIQ text</td>
+                    <td>Visitor-side widget cache on the Home bootstrap payload — not a failed upload. See <a href="#faq-widget-cache">section 11b</a>: incognito test, clear SalesIQ cookies, or run <code>$zoho.salesiq.reset()</code> in the browser console (verified June 2026).</td>
+                </tr>
+                <tr>
+                    <td>“Who is the Catholicos?” — Answer Bot wrong name or no Mathews III</td>
+                    <td>Answer Bot ≠ widget FAQ strip. Enable Articles <strong>and</strong> FAQs in Answer Bot; map query under Resources → <strong>Unanswered questions</strong>; enable OpenAI “Fetch answer from resource”. See <a href="#answer-bot-catholicos">section 11c</a>.</td>
+                </tr>
+                <tr>
+                    <td>Chat asks for email / phone before bot answers</td>
+                    <td>Brand <strong>Flow Control</strong> → Conversation/Inline form style or non-mandatory fields; optional <code>field.clear(['siq_name','siq_email','siq_phonenumber'])</code> in embed. See <a href="#pre-chat-form">section 11d</a>.</td>
                 </tr>
             </tbody>
         </table>
@@ -646,7 +1117,14 @@ npm run zobot:bulk-upload-articles -- --confirm</pre>
                     <li>☐ <code>npm run zobot:merge-faq-supplement</code> run</li>
                     <li>☐ <code>npm run zobot:fix-import-titles</code> run</li>
                     <li>☐ <code>npm run zobot:bulk-upload-articles -- --dry-run</code> then <code>--confirm</code> (or portal CSV import)</li>
-                    <li>☐ Answer Bot connected to Articles / re-trained</li>
+                    <li>☐ Default SalesIQ FAQs removed (<code>zobot:bulk-delete-faqs -- --confirm --question-contains SalesIQ</code>)</li>
+                    <li>☐ Straggler FAQs removed (<code>zobot:bulk-delete-faqs -- --dry-run</code> then targeted delete — section 11a)</li>
+                    <li>☐ <code>npm run zobot:bulk-upload-faqs -- --confirm</code> (widget FAQ strip — 7 rows)</li>
+                    <li>☐ Widget verified: dashboard FAQs + <strong>View All</strong> show MOSC content</li>
+                    <li>☐ If Home preview strip is stale, cleared visitor cache (<a href="#faq-widget-cache">section 11b</a> — <code>$zoho.salesiq.reset()</code> or incognito)</li>
+                    <li>☐ Answer Bot: Articles + FAQs connected; “Fetch answer from resource” enabled (<a href="#answer-bot-catholicos">11c</a>)</li>
+                    <li>☐ “Who is the Catholicos?” maps to Mathews III FAQ (unanswered-questions log if needed)</li>
+                    <li>☐ Pre-chat email/phone suppressed or optional (<a href="#pre-chat-form">11d</a>)</li>
                     <li>☐ Six test questions verified in widget</li>
                 </ol>
             </div>
