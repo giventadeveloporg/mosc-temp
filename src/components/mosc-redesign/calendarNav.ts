@@ -23,6 +23,18 @@ export const CALENDAR_MENU_ITEMS: CalendarMenuItem[] = [
     label: 'Holy Synod CMS',
     href: '/mosc-redesign/holy-synod-cms',
   },
+  {
+    label: 'Catholicate CMS',
+    href: '/mosc-redesign/catholicate-cms',
+  },
+  {
+    label: 'Ecumenical CMS',
+    href: '/mosc-redesign/ecumenical-cms',
+  },
+  {
+    label: 'Saints CMS',
+    href: '/mosc-redesign/saints-cms',
+  },
 ];
 
 export function isCalendarNavActive(pathname: string): boolean {

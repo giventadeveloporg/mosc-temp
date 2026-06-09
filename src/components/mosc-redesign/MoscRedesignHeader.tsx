@@ -41,7 +41,7 @@ const DESKTOP_SUBMENU_ACTIVE =
   'text-white visited:text-white font-semibold bg-white/20 border-l-[3px] border-warmGold-light shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]';
 
 const DESKTOP_DROPDOWN_PANEL =
-  'fixed z-[10000] min-w-[15rem] rounded-lg border border-white/25 bg-burgundy-dark/98 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-sm';
+  'mosc-header-dropdown-panel fixed z-[10000] min-w-[15rem] rounded-lg border border-white/20 bg-burgundy-dark shadow-[0_12px_40px_rgba(0,0,0,0.45)]';
 
 /** Quick links bar + Calendar trigger */
 const QUICK_LINK =
