@@ -11,7 +11,7 @@ export interface SyroPageBannerProps {
   /** When true, center the title and breadcrumb text (e.g. on saints subpages) */
   centerText?: boolean;
   /** Breadcrumb path: 'home' = Home / Title, 'gallery' = Gallery / Title, 'news' = News / Title, 'directory' = Directory / Title, etc. */
-  breadcrumbFrom?: 'home' | 'gallery' | 'downloads' | 'calendar' | 'liturgical-calendar' | 'mosc-calendar' | 'holy-synod' | 'holy-synod-cms' | 'saints' | 'the-church' | 'catholicate' | 'administration' | 'ecumenical' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'institutions' | 'training' | 'theological-seminaries' | 'lectionary' | 'news' | 'directory';
+  breadcrumbFrom?: 'home' | 'gallery' | 'downloads' | 'calendar' | 'liturgical-calendar' | 'mosc-calendar' | 'holy-synod' | 'holy-synod-cms' | 'catholicate' | 'catholicate-cms' | 'saints' | 'saints-cms' | 'the-church' | 'administration' | 'ecumenical' | 'ecumenical-cms' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'institutions' | 'training' | 'theological-seminaries' | 'lectionary' | 'news' | 'directory';
   /** Optional middle segment for 3-level breadcrumb (e.g. The Church / Theology / Christology). Used on the-church subpages under Theology, Spirituality, History, Liturgy. */
   breadcrumbParent?: { label: string; href: string };
   /** When true, omit the breadcrumb nav. Title stays in the heading. */
@@ -37,10 +37,13 @@ const BREADCRUMB_CONFIG = {
   'holy-synod': { href: '/mosc-redesign/holy-synod', label: 'Holy Synod' },
   'holy-synod-cms': { href: '/mosc-redesign/holy-synod-cms', label: 'Holy Synod' },
   saints: { href: '/mosc-redesign/saints', label: 'Saints' },
+  'saints-cms': { href: '/mosc-redesign/saints-cms', label: 'Saints' },
   'the-church': { href: '/mosc-redesign/the-church', label: 'The Church' },
   catholicate: { href: '/mosc-redesign/catholicate', label: 'The Catholicate' },
+  'catholicate-cms': { href: '/mosc-redesign/catholicate-cms', label: 'The Catholicate' },
   administration: { href: '/mosc-redesign/administration', label: 'Administration' },
   ecumenical: { href: '/mosc-redesign/ecumenical', label: 'Ecumenical' },
+  'ecumenical-cms': { href: '/mosc-redesign/ecumenical-cms', label: 'Ecumenical' },
   dioceses: { href: '/mosc-redesign/dioceses', label: 'Dioceses' },
   'spiritual-organizations': { href: '/mosc-redesign/spiritual-organizations', label: 'Spiritual Organizations' },
   publications: { href: '/mosc-redesign/publications', label: 'Publications' },

@@ -235,6 +235,29 @@
       width: 100%;
       box-sizing: border-box;
     }
+    .flag-checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+      margin-top: 4px;
+    }
+    .flag-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9em;
+      cursor: pointer;
+      user-select: none;
+    }
+    .flag-checkbox input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--blue-accent);
+      cursor: pointer;
+    }
+    .flag-checkbox span code {
+      font-size: 0.95em;
+    }
     .command-single-line {
       padding: 12px 15px;
       background: var(--code-bg);
@@ -295,6 +318,7 @@
       <ul>
         <li><a href="#quick-start">1. Quick-start workflow</a></li>
         <li><a href="#batch-automation">1a. Automated batch script (all steps)</a></li>
+        <li><a href="#batch-remote-prod">1b. Import into production PostgreSQL (/REMOTE)</a></li>
         <li><a href="#export">2. Export data with pg_dump (Docker)</a></li>
         <li><a href="#reorder">3. Reorder INSERT statements</a></li>
         <li><a href="#prod">4. Production user ID replacement</a></li>
@@ -360,10 +384,11 @@
 
       <div class="warning">
         <strong>⚠️ Destructive steps:</strong> Steps 5–7 drop and recreate the schema and replace all data in
-        <code class="code-highlight">event_site_manager_db</code>. The script prompts you to type <code class="code-highlight">YES</code>
-        before continuing unless you pass <code class="code-highlight">/FORCE</code>. At the prompt, type <code class="code-highlight">Y</code> or <code class="code-highlight">YES</code>.
-        If you cancel, steps 1–4 still complete
-        (export, reorder, and PROD copy remain on disk).
+        <code class="code-highlight">event_site_manager_db</code>. For <strong>local Docker</strong>, type
+        <code class="code-highlight">Y</code> or <code class="code-highlight">YES</code> at the prompt (unless you pass
+        <code class="code-highlight">/FORCE</code>). For <strong>remote production</strong> (<code class="code-highlight">/REMOTE</code>),
+        you must type <code class="code-highlight">PRODUCTION</code> — even with <code class="code-highlight">/FORCE</code>, remote runs still require that confirmation.
+        If you cancel, steps 1–4 still complete (export, reorder, and PROD copy remain on disk).
       </div>
 
       <div class="command-block expedite"
@@ -390,8 +415,25 @@
           </div>
           <div class="parameter-group single">
             <div class="parameter-input">
-              <label for="batch-full-flags">Flags (optional):</label>
-              <input type="text" id="batch-full-flags" value="" placeholder="/FORCE /PROD /SKIP-EXPORT" oninput="updateBatchRefresh('batch-full')">
+              <label>Options (click to add flags to the command):</label>
+              <div class="flag-checkbox-group" id="batch-full-flags-group">
+                <label class="flag-checkbox">
+                  <input type="checkbox" id="batch-full-flag-force" onchange="updateBatchRefresh('batch-full')">
+                  <span><code>/FORCE</code> — skip local Y/YES prompt</span>
+                </label>
+                <label class="flag-checkbox">
+                  <input type="checkbox" id="batch-full-flag-prod" onchange="updateBatchRefresh('batch-full')">
+                  <span><code>/PROD</code> — import PROD user-ID SQL file</span>
+                </label>
+                <label class="flag-checkbox">
+                  <input type="checkbox" id="batch-full-flag-skip-export" onchange="updateBatchRefresh('batch-full')">
+                  <span><code>/SKIP-EXPORT</code> — reuse existing export.sql</span>
+                </label>
+                <label class="flag-checkbox">
+                  <input type="checkbox" id="batch-full-flag-remote" onchange="updateBatchRefresh('batch-full')">
+                  <span><code>/REMOTE</code> — schema + import on production Postgres</span>
+                </label>
+              </div>
             </div>
           </div>
         </div>
@@ -431,6 +473,7 @@
             <tr><td><code>/FORCE</code></td><td>No</td><td>Skip the <code>Y</code> / <code>YES</code> confirmation before schema rebuild and import</td></tr>
             <tr><td><code>/PROD</code></td><td>No</td><td>Import <code>corrected_event_media_inserts.ordered_PROD.sql</code> instead of <code>.ordered.sql</code></td></tr>
             <tr><td><code>/SKIP-EXPORT</code></td><td>No</td><td>Skip <code>pg_dump</code>; reuse existing <code>export.sql</code></td></tr>
+            <tr><td><code>/REMOTE</code></td><td>No</td><td>Run steps 5–7 against remote Postgres using <code>mosc-temp\.env.local</code> (auto-enables <code>/PROD</code>)</td></tr>
           </tbody>
         </table>
       </div>
@@ -438,8 +481,9 @@
       <div class="section-container output">
         <div class="section-header output">📊 Prerequisites</div>
         <ul>
-          <li><strong>Docker Desktop</strong> running with a Postgres container for <code class="code-highlight">event_site_manager_db</code></li>
+          <li><strong>Docker Desktop</strong> running with a Postgres container for local export (steps 0–1), unless you use <code class="code-highlight">/SKIP-EXPORT</code> with existing <code class="code-highlight">export.sql</code></li>
           <li><strong>Node.js</strong> on <code class="code-highlight">PATH</code> (for reorder and PROD ID scripts)</li>
+          <li>For <code class="code-highlight">/REMOTE</code>: <strong>psql</strong> on <code class="code-highlight">PATH</code> <em>or</em> <strong>Docker Desktop</strong> (batch uses <code class="code-highlight">postgres:16</code> image automatically if psql is missing). RDS settings in <code class="code-highlight">mosc-temp\.env.local</code> — see <a href="#batch-remote-prod">§1b</a>.</li>
           <li>Sequence sync uses <code class="code-highlight">malayalees-us-site-boot/src/main/resources/sqls/sync_sequence_after_inserts.sql</code> when present; otherwise the copy under <code class="code-highlight">code_html_template/SQLS/Current_Sqls/</code></li>
         </ul>
       </div>
@@ -449,6 +493,103 @@
         Batch file path: <code class="code-highlight">code_html_template/batch_files/database_export_import_refresh.bat</code>.
       </div>
     </section>
+
+    <section id="batch-remote-prod" aria-labelledby="h-batch-remote">
+      <h2 id="h-batch-remote">1b. Import into production PostgreSQL (/REMOTE)</h2>
+
+      <div class="section-intro">
+        <p>
+          By default, steps 5–7 target your <strong>local Docker</strong> Postgres. With <code class="code-highlight">/REMOTE</code>,
+          the batch file applies the schema, imports the <code class="code-highlight">corrected_event_media_inserts.ordered_PROD.sql</code> file,
+          and syncs sequences on your <strong>AWS RDS</strong> (or other remote Postgres) using the same variables already in
+          <code class="code-highlight">mosc-temp\.env.local</code>.
+        </p>
+        <p>
+          Steps 1–4 still run on your machine (export from Docker, reorder, PROD user-ID copy). Only the destructive apply/import/sync steps hit the remote database.
+        </p>
+      </div>
+
+      <div class="warning">
+        <strong>⚠️ Production safety:</strong> Remote mode rebuilds the entire schema and replaces data on the target database.
+        You must type <code class="code-highlight">PRODUCTION</code> at the confirmation prompt.
+        <code class="code-highlight">.env.local</code> is gitignored — never commit it.
+      </div>
+
+      <div class="section-container usage">
+        <div class="section-header usage">📋 Required variables in mosc-temp\.env.local</div>
+        <p>The batch file reads these keys (same names your app uses for RDS):</p>
+        <table>
+          <thead>
+            <tr><th>Key in .env.local</th><th>Maps to</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>RDS_ENDPOINT</code></td><td>PostgreSQL host</td><td><code>your-db.region.rds.amazonaws.com</code></td></tr>
+            <tr><td><code>DB_NAME</code></td><td>Database name</td><td><code>event_site_manager_db</code></td></tr>
+            <tr><td><code>DB_USERNAME</code></td><td>PostgreSQL user</td><td><code>postgres</code></td></tr>
+            <tr><td><code>DB_PASSWORD</code></td><td>Password</td><td>(your RDS password)</td></tr>
+            <tr><td><code>DB_PORT</code></td><td>Optional — port</td><td><code>5432</code> (default if omitted)</td></tr>
+            <tr><td><code>DB_SSLMODE</code></td><td>Optional — SSL</td><td><code>require</code> (default for RDS)</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:1rem;">
+          <code class="code-highlight">/REMOTE</code> automatically enables <code class="code-highlight">/PROD</code> so step 6 imports
+          <code class="code-highlight">corrected_event_media_inserts.ordered_PROD.sql</code> (Clerk production user IDs).
+        </p>
+      </div>
+
+      <pre class="code-block"># mosc-temp/.env.local (already used by the app — gitignored)
+RDS_ENDPOINT=your-db.region.rds.amazonaws.com
+DB_NAME=event_site_manager_db
+DB_USERNAME=postgres
+DB_PASSWORD=your_password_here
+# Optional:
+# DB_PORT=5432
+# DB_SSLMODE=require</pre>
+
+      <div class="info">
+        <strong>💡 Fallback:</strong> If <code class="code-highlight">.env.local</code> is missing, the batch looks for
+        <code class="code-highlight">code_html_template/batch_files/database_target.local.env</code>
+        (copy from <code class="code-highlight">database_target.local.env.example</code>) with
+        <code class="code-highlight">DB_HOST</code>, <code class="code-highlight">DB_USER</code>, etc.
+        Passwords containing <code class="code-highlight">#</code> or other special characters are supported via PowerShell parsing.
+        If <code class="code-highlight">psql</code> is not installed on Windows, ensure <strong>Docker Desktop</strong> is running — the batch file runs
+        <code class="code-highlight">psql</code> inside a <code class="code-highlight">postgres:16</code> container to connect to RDS.
+        Passwords with <code class="code-highlight">#</code> in them are handled via a temp credential file (Docker <code class="code-highlight">--env-file</code> would truncate at <code class="code-highlight">#</code>).
+      </div>
+
+      <div class="command-block advance"
+           data-command-base="WORKSPACE_ROOT\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat WORKSPACE_ROOT /SKIP-EXPORT /REMOTE"
+           data-template-command="F:\project_workspace\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat F:\project_workspace /SKIP-EXPORT /REMOTE">
+        <div class="command-header">
+          <span class="command-type">Typical production run (reuse export, remote apply)</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'batch-remote')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'batch-remote')" title="Copy command" aria-label="Copy command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-content" id="batch-remote">F:\project_workspace\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat F:\project_workspace /SKIP-EXPORT /REMOTE</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="batch-remote-single-code">F:\project_workspace\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat F:\project_workspace /SKIP-EXPORT /REMOTE</code>
+        </div>
+      </div>
+
+      <div class="section-container parameters">
+        <div class="section-header parameters">⚙️ Remote vs local behavior</div>
+        <table>
+          <thead>
+            <tr><th>Step</th><th>Local (default)</th><th>/REMOTE</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>0–1 Export</td><td>Docker <code>pg_dump</code></td><td>Same (or skip with <code>/SKIP-EXPORT</code>)</td></tr>
+            <tr><td>2–4 Prepare SQL</td><td>Node scripts on your PC</td><td>Same</td></tr>
+            <tr><td>5 Schema</td><td><code>docker exec … psql</code></td><td><code>psql -h … -f Latest_Schema…</code></td></tr>
+            <tr><td>6 Import</td><td>Docker <code>psql</code></td><td>Remote <code>psql</code> (+ auto <code>/PROD</code> file)</td></tr>
+            <tr><td>7 Sequences</td><td>Docker <code>psql</code></td><td>Remote <code>psql</code></td></tr>
+            <tr><td>Confirm</td><td><code>Y</code> or <code>YES</code></td><td><code>PRODUCTION</code> (required)</td></tr>
+          </tbody>
+        </table>
+      </div>
 
     <!-- Section 2 -->
     <section id="export" aria-labelledby="h-export">
@@ -967,14 +1108,21 @@
     function updateBatchRefresh(commandId) {
       const wsInput = document.getElementById(commandId + '-workspace');
       const containerInput = document.getElementById(commandId + '-container');
-      const flagsInput = document.getElementById(commandId + '-flags');
       const ws = (wsInput && wsInput.value.trim()) || 'F:\\project_workspace';
       const container = containerInput ? containerInput.value.trim() : '';
-      const flags = flagsInput ? flagsInput.value.trim() : '';
+      const flags = [];
+      const forceEl = document.getElementById(commandId + '-flag-force');
+      const prodEl = document.getElementById(commandId + '-flag-prod');
+      const skipEl = document.getElementById(commandId + '-flag-skip-export');
+      const remoteEl = document.getElementById(commandId + '-flag-remote');
+      if (forceEl && forceEl.checked) flags.push('/FORCE');
+      if (prodEl && prodEl.checked) flags.push('/PROD');
+      if (skipEl && skipEl.checked) flags.push('/SKIP-EXPORT');
+      if (remoteEl && remoteEl.checked) flags.push('/REMOTE');
       const bat = ws + '\\mosc-temp\\code_html_template\\batch_files\\database_export_import_refresh.bat';
       let cmd = bat + ' ' + ws;
       if (container) cmd += ' ' + container;
-      if (flags) cmd += ' ' + flags;
+      if (flags.length) cmd += ' ' + flags.join(' ');
       const el = document.getElementById(commandId);
       const single = document.getElementById(commandId + '-single-code');
       if (el) el.textContent = cmd;
