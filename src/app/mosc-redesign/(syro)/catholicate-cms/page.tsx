@@ -12,7 +12,7 @@ import {
   MOSC_REDESIGN_PRIMARY_BUTTON,
 } from '@/lib/mosc-redesign-design-tokens';
 import { getCatholicateEntriesData } from './getCatholicateEntriesData';
-import { isCatholicateIntroEntry } from './types';
+import { isCatholicateIntroEntry, sortCatholicateHubEntries } from './types';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,7 +36,9 @@ const ReadMoreIcon = () => (
 export default async function CatholicateCmsPage() {
   const { entries } = await getCatholicateEntriesData();
   const introEntry = entries.find((entry) => isCatholicateIntroEntry(entry));
-  const cardEntries = entries.filter((entry) => !isCatholicateIntroEntry(entry));
+  const cardEntries = sortCatholicateHubEntries(
+    entries.filter((entry) => !isCatholicateIntroEntry(entry))
+  );
 
   const introExcerpt = introEntry?.excerpt ?? STATIC_INTRO_EXCERPT;
   const introReadMoreHref = introEntry
