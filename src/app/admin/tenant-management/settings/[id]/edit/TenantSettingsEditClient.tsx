@@ -80,6 +80,9 @@ export default function TenantSettingsEditClient({
           emailFooterHtmlUrl: settings?.emailFooterHtmlUrl || '',
           emailHeaderImageUrl: settings?.emailHeaderImageUrl || '',
           logoImageUrl: settings?.logoImageUrl || '',
+          defaultHeroImageUrlsJson: settings?.defaultHeroImageUrlsJson || '',
+          defaultHeroDisplayMode: settings?.defaultHeroDisplayMode || 'slideshow',
+          defaultHeroIncludeWithEvents: settings?.defaultHeroIncludeWithEvents ?? true,
           // Contact and Address Fields
           addressLine1: settings?.addressLine1 || '',
           addressLine2: settings?.addressLine2 || '',

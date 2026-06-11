@@ -62,6 +62,12 @@ export interface TenantSettingsDTO {
   emailFooterHtmlUrl?: string; // S3 URL for email footer HTML file
   emailHeaderImageUrl?: string; // S3 URL for email header image
   logoImageUrl?: string; // S3 URL for tenant logo image
+  /** JSON array of HTTPS URLs for tenant default homepage hero slideshow */
+  defaultHeroImageUrlsJson?: string;
+  /** slideshow | random | single */
+  defaultHeroDisplayMode?: 'slideshow' | 'random' | 'single';
+  /** When true, append tenant default slides after upcoming event hero images */
+  defaultHeroIncludeWithEvents?: boolean;
   // Homepage edge cache version (cache-busting; bump to refresh CDN cache)
   homepageCacheVersion?: number;
   // Contact and Address Fields

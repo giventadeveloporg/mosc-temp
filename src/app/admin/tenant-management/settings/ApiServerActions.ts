@@ -420,3 +420,46 @@ export async function uploadEmailHeaderImageClient(
     url: result.emailHeaderImageUrl || result.url || '',
   };
 }
+
+function tenantUploadQuery(tenantIdForUpload?: string): string {
+  if (!tenantIdForUpload?.trim()) return '';
+  return `?tenantId=${encodeURIComponent(tenantIdForUpload.trim())}`;
+}
+
+/**
+ * Upload default homepage hero image (client-side function).
+ * Optional tenantIdForUpload scopes S3 path for super-admin editing another tenant.
+ */
+export async function uploadDefaultHeroImageClient(
+  file: File,
+  tenantIdForUpload?: string
+): Promise<{ url: string }> {
+  const baseUrl = getAppUrl();
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const url = `${baseUrl}/api/proxy/tenant-settings/upload/default-hero-image${tenantUploadQuery(tenantIdForUpload)}`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error(
+      `[Client] Error uploading default hero image: ${response.status} ${response.statusText}`,
+      errorBody
+    );
+    throw new Error(`Failed to upload hero image. Status: ${response.status}`);
+  }
+
+  const result = await response.json();
+  return {
+    url:
+      result.defaultHeroImageUrl ||
+      result.url ||
+      result.imageUrl ||
+      '',
+  };
+}

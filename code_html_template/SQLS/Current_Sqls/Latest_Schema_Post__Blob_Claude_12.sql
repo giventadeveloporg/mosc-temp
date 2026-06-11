@@ -2362,6 +2362,9 @@ CREATE TABLE public.tenant_settings (
                                         email_header_image_url VARCHAR(2048) NULL,
                                         email_footer_html_url VARCHAR(2048),
                                         logo_image_url VARCHAR(2048),
+                                        default_hero_image_urls_json text,
+                                        default_hero_display_mode character varying(32) DEFAULT 'slideshow',
+                                        default_hero_include_with_events boolean DEFAULT true,
                                         facebook_url varchar(1024) NULL,
                                         instagram_url varchar(1024) NULL,
                                         twitter_url varchar(1024) NULL,
@@ -2374,6 +2377,7 @@ CREATE TABLE public.tenant_settings (
                                         CONSTRAINT check_max_attendees_positive CHECK (((max_attendees_per_event IS NULL) OR (max_attendees_per_event > 0))),
                                         CONSTRAINT check_max_events_positive CHECK (((max_events_per_month IS NULL) OR (max_events_per_month > 0))),
                                         CONSTRAINT check_max_guests_positive CHECK (((max_guests_per_attendee IS NULL) OR (max_guests_per_attendee >= 0))),
+                                        CONSTRAINT chk_tenant_settings_default_hero_display_mode CHECK (((default_hero_display_mode IS NULL) OR (default_hero_display_mode IN ('slideshow', 'random', 'single')))),
                                         CONSTRAINT tenant_settings_pkey PRIMARY KEY (id),
                                         CONSTRAINT tenant_settings_tenant_id_key UNIQUE (tenant_id),
                                         CONSTRAINT fk_tenant_settings__tenant_id FOREIGN KEY (tenant_id) REFERENCES public.tenant_organization(tenant_id) ON DELETE CASCADE,
@@ -2402,6 +2406,12 @@ COMMENT ON COLUMN public.tenant_settings.youtube_url IS 'Organization YouTube ch
 COMMENT ON COLUMN public.tenant_settings.tiktok_url IS 'Organization TikTok profile URL for Follow our journey section';
 COMMENT ON COLUMN public.tenant_settings.show_executive_committee_section_in_home_page IS 'When true, homepage shows executive committee TeamSection';
 COMMENT ON COLUMN public.tenant_settings.show_team_members_section_in_home_page IS 'When true, homepage shows squad roster SquadRosterSection';
+
+COMMENT ON COLUMN public.tenant_settings.default_hero_image_urls_json IS 'JSON array of HTTPS URLs for tenant default homepage hero images, e.g. ["https://.../slide-01.webp"]. Order defines slideshow sequence.';
+
+COMMENT ON COLUMN public.tenant_settings.default_hero_display_mode IS 'How tenant default hero URLs are used when no event heroes or as trailing slides: slideshow | random | single.';
+
+COMMENT ON COLUMN public.tenant_settings.default_hero_include_with_events IS 'When TRUE, frontend may append tenant default slides after upcoming event hero images.';
 
 --
 -- TOC entry (class 1259 OID)
