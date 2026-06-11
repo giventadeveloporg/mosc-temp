@@ -5,7 +5,7 @@
 export const MOSC_REDESIGN_QUICK_LINKS = [
   { label: "Spiritual Organisations", href: "/mosc-redesign/spiritual-organizations" },
   { label: "Publications", href: "/mosc-redesign/publications-cms" },
-  { label: "Institutions", href: "/mosc-redesign/institutions" },
+  { label: "Institutions", href: "/mosc-redesign/institutions-cms" },
   { label: "Training", href: "/mosc-redesign/training" },
   { label: "Theological Seminaries", href: "/mosc-redesign/theological-seminaries-cms" },
   { label: "Lectionary", href: "/mosc-redesign/lectionary" },
