@@ -19,6 +19,10 @@ export const CALENDAR_MENU_ITEMS: CalendarMenuItem[] = [
     label: 'MOSC Calendar',
     href: '/mosc-redesign/mosc-calendar',
   },
+  {
+    label: 'Institutions CMS',
+    href: '/mosc-redesign/institutions-cms',
+  },
 ];
 
 export function isCalendarNavActive(pathname: string): boolean {
