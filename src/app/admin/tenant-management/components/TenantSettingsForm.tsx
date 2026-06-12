@@ -3,9 +3,20 @@
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import type { TenantSettingsDTO, TenantSettingsFormDTO, TenantOrganizationDTO } from '@/app/admin/tenant-management/types';
-import { uploadEmailFooterHtmlClient, uploadTenantLogoClient, uploadEmailHeaderImageClient } from '@/app/admin/tenant-management/settings/ApiServerActions';
-import { patchTenantSetting } from '@/app/admin/tenant-management/settings/ApiServerActions';
+import {
+  uploadEmailFooterHtmlClient,
+  uploadTenantLogoClient,
+  uploadEmailHeaderImageClient,
+  patchTenantSetting,
+} from '@/app/admin/tenant-management/settings/ApiServerActions';
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
+import TenantDefaultHeroManager from '@/app/admin/tenant-management/components/TenantDefaultHeroManager';
+import {
+  DEFAULT_HERO_MAX_DISPLAY_COUNT,
+  normalizeDefaultHeroDisplayMode,
+  normalizeMaxDisplayCount,
+  type DefaultHeroDisplayMode,
+} from '@/lib/hero/defaultHeroImages';
 
 interface TenantSettingsFormProps {
   initialData?: TenantSettingsDTO;
@@ -26,7 +37,9 @@ export default function TenantSettingsForm({
   availableOrganizations = [],
   settingsId: propSettingsId
 }: TenantSettingsFormProps) {
-  const [activeTab, setActiveTab] = useState<'general' | 'integrations' | 'limits' | 'customization'>('general');
+  const [activeTab, setActiveTab] = useState<
+    'general' | 'integrations' | 'limits' | 'homepageHero' | 'customization'
+  >('general');
   const [uploadingFooterHtml, setUploadingFooterHtml] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingHeaderImage, setUploadingHeaderImage] = useState(false);
@@ -85,6 +98,11 @@ export default function TenantSettingsForm({
       emailFooterHtmlUrl: initialData?.emailFooterHtmlUrl || '',
       emailHeaderImageUrl: initialData?.emailHeaderImageUrl || '',
       logoImageUrl: initialData?.logoImageUrl || '',
+      defaultHeroImageUrlsJson: initialData?.defaultHeroImageUrlsJson || '',
+      defaultHeroDisplayMode: normalizeDefaultHeroDisplayMode(initialData?.defaultHeroDisplayMode),
+      defaultHeroIncludeWithEvents: initialData?.defaultHeroIncludeWithEvents ?? true,
+      defaultHeroMaxDisplayCount:
+        initialData?.defaultHeroMaxDisplayCount ?? DEFAULT_HERO_MAX_DISPLAY_COUNT,
       // Contact and Address Fields
       addressLine1: initialData?.addressLine1 || '',
       addressLine2: initialData?.addressLine2 || '',
@@ -103,6 +121,10 @@ export default function TenantSettingsForm({
     }
   });
 
+  register('defaultHeroDisplayMode');
+  register('defaultHeroIncludeWithEvents');
+  register('defaultHeroMaxDisplayCount');
+
   // Get settings ID from prop or initialData (for edit mode)
   const settingsId = propSettingsId || initialData?.id;
 
@@ -111,6 +133,32 @@ export default function TenantSettingsForm({
   const emailFooterHtmlUrl = watch('emailFooterHtmlUrl');
   const emailHeaderImageUrl = watch('emailHeaderImageUrl');
   const logoImageUrl = watch('logoImageUrl');
+  const defaultHeroImageUrlsJson = watch('defaultHeroImageUrlsJson');
+  const defaultHeroDisplayMode = watch('defaultHeroDisplayMode');
+  const defaultHeroIncludeWithEvents = watch('defaultHeroIncludeWithEvents');
+  const defaultHeroMaxDisplayCount = watch('defaultHeroMaxDisplayCount');
+  const tenantIdForUpload =
+    watch('tenantId')?.trim() || initialData?.tenantId?.trim() || undefined;
+
+  const persistHeroSlides = async (json: string) => {
+    if (!settingsId) return;
+    setValue('defaultHeroImageUrlsJson', json);
+    const maxCount = normalizeMaxDisplayCount(
+      defaultHeroMaxDisplayCount ?? DEFAULT_HERO_MAX_DISPLAY_COUNT
+    );
+    await patchTenantSetting(settingsId, {
+      defaultHeroImageUrlsJson: json,
+      defaultHeroMaxDisplayCount: maxCount,
+    });
+  };
+
+  const handleMaxDisplayCountChange = async (count: number) => {
+    const normalized = normalizeMaxDisplayCount(count);
+    setValue('defaultHeroMaxDisplayCount', normalized);
+    if (settingsId) {
+      await patchTenantSetting(settingsId, { defaultHeroMaxDisplayCount: normalized });
+    }
+  };
 
   // Handle form submission
   const onFormSubmit = async (data: TenantSettingsFormDTO) => {
@@ -474,6 +522,14 @@ export default function TenantSettingsForm({
       color: 'purple',
       svgPath: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
     },
+    {
+      id: 'homepageHero',
+      label: 'Homepage Hero',
+      icon: 'photo',
+      color: 'teal',
+      svgPath:
+        'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z',
+    },
     { 
       id: 'customization', 
       label: 'Customization', 
@@ -523,6 +579,17 @@ export default function TenantSettingsForm({
                   iconTextInactive: 'text-purple-400',
                   textActive: 'text-purple-700',
                   textInactive: 'text-purple-500'
+                };
+              } else if (color === 'teal') {
+                return {
+                  active: 'bg-teal-100 text-teal-600 border-teal-500',
+                  inactive: 'bg-teal-50 text-teal-400 border-transparent hover:bg-teal-100 hover:text-teal-500',
+                  iconBgActive: 'bg-teal-100',
+                  iconBgInactive: 'bg-teal-50',
+                  iconTextActive: 'text-teal-500',
+                  iconTextInactive: 'text-teal-400',
+                  textActive: 'text-teal-700',
+                  textInactive: 'text-teal-500',
                 };
               } else {
                 return {
@@ -1302,6 +1369,32 @@ export default function TenantSettingsForm({
                 <p className="mt-1 text-sm text-gray-500">Platform fee as a percentage (e.g., 2.5 for 2.5%)</p>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Homepage Hero Tab */}
+        {activeTab === 'homepageHero' && (
+          <div className="space-y-6">
+            <input type="hidden" {...register('defaultHeroImageUrlsJson')} />
+            <input type="hidden" {...register('defaultHeroMaxDisplayCount')} />
+            <TenantDefaultHeroManager
+              settingsId={settingsId}
+              mode={mode}
+              tenantIdForUpload={tenantIdForUpload}
+              initialUrlsJson={defaultHeroImageUrlsJson}
+              displayMode={normalizeDefaultHeroDisplayMode(defaultHeroDisplayMode)}
+              includeWithEvents={defaultHeroIncludeWithEvents ?? true}
+              maxDisplayCount={
+                defaultHeroMaxDisplayCount ?? DEFAULT_HERO_MAX_DISPLAY_COUNT
+              }
+              onUrlsJsonChange={(json) => setValue('defaultHeroImageUrlsJson', json)}
+              onDisplayModeChange={(m: DefaultHeroDisplayMode) =>
+                setValue('defaultHeroDisplayMode', m)
+              }
+              onIncludeWithEventsChange={(v) => setValue('defaultHeroIncludeWithEvents', v)}
+              onMaxDisplayCountChange={(count) => void handleMaxDisplayCountChange(count)}
+              onPersistSlides={persistHeroSlides}
+            />
           </div>
         )}
 

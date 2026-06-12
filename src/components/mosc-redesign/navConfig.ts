@@ -4,10 +4,10 @@
  */
 export const MOSC_REDESIGN_QUICK_LINKS = [
   { label: "Spiritual Organisations", href: "/mosc-redesign/spiritual-organizations" },
-  { label: "Publications", href: "/mosc-redesign/publications" },
-  { label: "Institutions", href: "/mosc-redesign/institutions" },
+  { label: "Publications", href: "/mosc-redesign/publications-cms" },
+  { label: "Institutions", href: "/mosc-redesign/institutions-cms" },
   { label: "Training", href: "/mosc-redesign/training" },
-  { label: "Theological Seminaries", href: "/mosc-redesign/theological-seminaries" },
+  { label: "Theological Seminaries", href: "/mosc-redesign/theological-seminaries-cms" },
   { label: "Lectionary", href: "/mosc-redesign/lectionary" },
   { label: "Downloads", href: "/mosc-redesign/downloads" },
   { label: "Gallery", href: "/mosc-redesign/gallery" },
@@ -21,14 +21,14 @@ export const MOSC_REDESIGN_SEARCH_DIRECTORY_NAV = {
 
 export const MOSC_REDESIGN_NAV_LINKS = [
   { label: "Home", href: "/mosc-redesign" },
-  { label: "The Catholicate", href: "/mosc-redesign/catholicate" },
+  { label: "The Catholicate", href: "/mosc-redesign/catholicate-cms" },
   { label: "Administration", href: "/mosc-redesign/administration" },
   { label: "The Church", href: "/mosc-redesign/the-church" },
-  { label: "Holy Synod", href: "/mosc-redesign/holy-synod" },
-  { label: "Ecumenical", href: "/mosc-redesign/ecumenical" },
+  { label: "Holy Synod", href: "/mosc-redesign/holy-synod-cms" },
+  { label: "Ecumenical", href: "/mosc-redesign/ecumenical-cms" },
   { label: "Dioceses", href: "/mosc-redesign/dioceses" },
   { label: "News", href: "/mosc-redesign/news" },
-  { label: "Saints", href: "/mosc-redesign/saints" },
+  { label: "Saints", href: "/mosc-redesign/saints-cms" },
 ] as const;
 
 export const MOSC_REDESIGN_FOOTER_QUICK_LINKS = [

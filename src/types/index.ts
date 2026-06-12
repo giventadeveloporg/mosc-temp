@@ -691,6 +691,10 @@ export interface TenantSettingsDTO {
   showSponsorsSectionInHomePage?: boolean;
   isMembershipSubscriptionEnabled?: boolean;
   homepageCacheVersion?: number;
+  defaultHeroImageUrlsJson?: string;
+  defaultHeroDisplayMode?: 'slideshow' | 'random' | 'single';
+  defaultHeroIncludeWithEvents?: boolean;
+  defaultHeroMaxDisplayCount?: number;
   // Contact and Address Fields
   addressLine1?: string;
   addressLine2?: string;
