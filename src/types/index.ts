@@ -694,6 +694,7 @@ export interface TenantSettingsDTO {
   defaultHeroImageUrlsJson?: string;
   defaultHeroDisplayMode?: 'slideshow' | 'random' | 'single';
   defaultHeroIncludeWithEvents?: boolean;
+  defaultHeroMaxDisplayCount?: number;
   // Contact and Address Fields
   addressLine1?: string;
   addressLine2?: string;

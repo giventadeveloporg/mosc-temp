@@ -83,6 +83,7 @@ export default function TenantSettingsEditClient({
           defaultHeroImageUrlsJson: settings?.defaultHeroImageUrlsJson || '',
           defaultHeroDisplayMode: settings?.defaultHeroDisplayMode || 'slideshow',
           defaultHeroIncludeWithEvents: settings?.defaultHeroIncludeWithEvents ?? true,
+          defaultHeroMaxDisplayCount: settings?.defaultHeroMaxDisplayCount ?? 6,
           // Contact and Address Fields
           addressLine1: settings?.addressLine1 || '',
           addressLine2: settings?.addressLine2 || '',

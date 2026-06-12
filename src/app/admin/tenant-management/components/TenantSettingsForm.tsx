@@ -12,8 +12,9 @@ import {
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
 import TenantDefaultHeroManager from '@/app/admin/tenant-management/components/TenantDefaultHeroManager';
 import {
+  DEFAULT_HERO_MAX_DISPLAY_COUNT,
   normalizeDefaultHeroDisplayMode,
-  serializeDefaultHeroImageUrls,
+  normalizeMaxDisplayCount,
   type DefaultHeroDisplayMode,
 } from '@/lib/hero/defaultHeroImages';
 
@@ -100,6 +101,8 @@ export default function TenantSettingsForm({
       defaultHeroImageUrlsJson: initialData?.defaultHeroImageUrlsJson || '',
       defaultHeroDisplayMode: normalizeDefaultHeroDisplayMode(initialData?.defaultHeroDisplayMode),
       defaultHeroIncludeWithEvents: initialData?.defaultHeroIncludeWithEvents ?? true,
+      defaultHeroMaxDisplayCount:
+        initialData?.defaultHeroMaxDisplayCount ?? DEFAULT_HERO_MAX_DISPLAY_COUNT,
       // Contact and Address Fields
       addressLine1: initialData?.addressLine1 || '',
       addressLine2: initialData?.addressLine2 || '',
@@ -120,6 +123,7 @@ export default function TenantSettingsForm({
 
   register('defaultHeroDisplayMode');
   register('defaultHeroIncludeWithEvents');
+  register('defaultHeroMaxDisplayCount');
 
   // Get settings ID from prop or initialData (for edit mode)
   const settingsId = propSettingsId || initialData?.id;
@@ -132,14 +136,28 @@ export default function TenantSettingsForm({
   const defaultHeroImageUrlsJson = watch('defaultHeroImageUrlsJson');
   const defaultHeroDisplayMode = watch('defaultHeroDisplayMode');
   const defaultHeroIncludeWithEvents = watch('defaultHeroIncludeWithEvents');
+  const defaultHeroMaxDisplayCount = watch('defaultHeroMaxDisplayCount');
   const tenantIdForUpload =
     watch('tenantId')?.trim() || initialData?.tenantId?.trim() || undefined;
 
-  const persistHeroUrls = async (urls: string[]) => {
+  const persistHeroSlides = async (json: string) => {
     if (!settingsId) return;
-    const json = serializeDefaultHeroImageUrls(urls);
     setValue('defaultHeroImageUrlsJson', json);
-    await patchTenantSetting(settingsId, { defaultHeroImageUrlsJson: json });
+    const maxCount = normalizeMaxDisplayCount(
+      defaultHeroMaxDisplayCount ?? DEFAULT_HERO_MAX_DISPLAY_COUNT
+    );
+    await patchTenantSetting(settingsId, {
+      defaultHeroImageUrlsJson: json,
+      defaultHeroMaxDisplayCount: maxCount,
+    });
+  };
+
+  const handleMaxDisplayCountChange = async (count: number) => {
+    const normalized = normalizeMaxDisplayCount(count);
+    setValue('defaultHeroMaxDisplayCount', normalized);
+    if (settingsId) {
+      await patchTenantSetting(settingsId, { defaultHeroMaxDisplayCount: normalized });
+    }
   };
 
   // Handle form submission
@@ -1357,12 +1375,8 @@ export default function TenantSettingsForm({
         {/* Homepage Hero Tab */}
         {activeTab === 'homepageHero' && (
           <div className="space-y-6">
-            <h3 className="text-lg font-medium text-gray-900">Homepage Hero Images</h3>
-            <p className="text-sm text-gray-500">
-              Configure rotating default hero images for the public homepage when no event heroes are
-              available, or alongside them when enabled below.
-            </p>
             <input type="hidden" {...register('defaultHeroImageUrlsJson')} />
+            <input type="hidden" {...register('defaultHeroMaxDisplayCount')} />
             <TenantDefaultHeroManager
               settingsId={settingsId}
               mode={mode}
@@ -1370,12 +1384,16 @@ export default function TenantSettingsForm({
               initialUrlsJson={defaultHeroImageUrlsJson}
               displayMode={normalizeDefaultHeroDisplayMode(defaultHeroDisplayMode)}
               includeWithEvents={defaultHeroIncludeWithEvents ?? true}
+              maxDisplayCount={
+                defaultHeroMaxDisplayCount ?? DEFAULT_HERO_MAX_DISPLAY_COUNT
+              }
               onUrlsJsonChange={(json) => setValue('defaultHeroImageUrlsJson', json)}
               onDisplayModeChange={(m: DefaultHeroDisplayMode) =>
                 setValue('defaultHeroDisplayMode', m)
               }
               onIncludeWithEventsChange={(v) => setValue('defaultHeroIncludeWithEvents', v)}
-              onPersistUrls={persistHeroUrls}
+              onMaxDisplayCountChange={(count) => void handleMaxDisplayCountChange(count)}
+              onPersistSlides={persistHeroSlides}
             />
           </div>
         )}

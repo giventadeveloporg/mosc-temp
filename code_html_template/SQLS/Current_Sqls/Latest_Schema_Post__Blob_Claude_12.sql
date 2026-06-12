@@ -2365,6 +2365,7 @@ CREATE TABLE public.tenant_settings (
                                         default_hero_image_urls_json text,
                                         default_hero_display_mode character varying(32) DEFAULT 'slideshow',
                                         default_hero_include_with_events boolean DEFAULT true,
+                                        default_hero_max_display_count INTEGER null,
                                         facebook_url varchar(1024) NULL,
                                         instagram_url varchar(1024) NULL,
                                         twitter_url varchar(1024) NULL,
