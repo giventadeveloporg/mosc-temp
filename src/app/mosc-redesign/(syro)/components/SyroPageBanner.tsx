@@ -11,7 +11,7 @@ export interface SyroPageBannerProps {
   /** When true, center the title and breadcrumb text (e.g. on saints subpages) */
   centerText?: boolean;
   /** Breadcrumb path: 'home' = Home / Title, 'gallery' = Gallery / Title, 'news' = News / Title, 'directory' = Directory / Title, etc. */
-  breadcrumbFrom?: 'home' | 'gallery' | 'downloads' | 'calendar' | 'liturgical-calendar' | 'mosc-calendar' | 'holy-synod' | 'holy-synod-cms' | 'catholicate' | 'catholicate-cms' | 'saints' | 'saints-cms' | 'the-church' | 'administration' | 'ecumenical' | 'ecumenical-cms' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'publications-cms' | 'institutions' | 'institutions-cms' | 'training' | 'theological-seminaries' | 'theological-seminaries-cms' | 'lectionary' | 'news' | 'directory';
+  breadcrumbFrom?: 'home' | 'gallery' | 'downloads' | 'calendar' | 'liturgical-calendar' | 'mosc-calendar' | 'kalpana-cms' | 'holy-synod' | 'holy-synod-cms' | 'catholicate' | 'catholicate-cms' | 'saints' | 'saints-cms' | 'the-church' | 'administration' | 'ecumenical' | 'ecumenical-cms' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'publications-cms' | 'institutions' | 'institutions-cms' | 'training' | 'theological-seminaries' | 'theological-seminaries-cms' | 'lectionary' | 'news' | 'directory';
   /** Optional middle segment for 3-level breadcrumb (e.g. The Church / Theology / Christology). Used on the-church subpages under Theology, Spirituality, History, Liturgy. */
   breadcrumbParent?: { label: string; href: string };
   /** When true, omit the breadcrumb nav. Title stays in the heading. */
@@ -34,6 +34,7 @@ const BREADCRUMB_CONFIG = {
   calendar: { href: '/mosc-redesign/liturgical-calendar', label: 'Calendar' },
   'liturgical-calendar': { href: '/mosc-redesign/liturgical-calendar', label: 'Liturgical Calendar' },
   'mosc-calendar': { href: '/mosc-redesign/mosc-calendar', label: 'MOSC Calendar' },
+  'kalpana-cms': { href: '/mosc-redesign/kalpana-cms', label: 'Kalpana' },
   'holy-synod': { href: '/mosc-redesign/holy-synod', label: 'Holy Synod' },
   'holy-synod-cms': { href: '/mosc-redesign/holy-synod-cms', label: 'Holy Synod' },
   saints: { href: '/mosc-redesign/saints', label: 'Saints' },

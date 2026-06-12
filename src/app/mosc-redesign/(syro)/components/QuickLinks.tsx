@@ -95,7 +95,7 @@ const QuestionIcon = () => (
 );
 
 const quickLinks: QuickLink[] = [
-  { name: 'Kalpana', href: '/mosc-redesign/downloads/kalpana', icon: <DocumentIcon /> },
+  { name: 'Kalpana', href: '/mosc-redesign/kalpana-cms', icon: <DocumentIcon /> },
   { name: 'Downloads', href: '/mosc-redesign/downloads', icon: <DownloadIcon /> },
   { name: 'Institutions', href: '/mosc-redesign/institutions', icon: <BuildingIcon /> },
   { name: 'Training', href: '/mosc-redesign/training', icon: <AcademicIcon /> },
