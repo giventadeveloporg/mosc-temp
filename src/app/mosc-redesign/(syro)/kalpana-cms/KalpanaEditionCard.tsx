@@ -9,15 +9,26 @@ interface KalpanaEditionCardProps {
   defaultCardImage: string;
 }
 
+function isInternalHref(link: string): boolean {
+  return link.startsWith('/');
+}
+
 function formatExternalHref(link: string): string {
   const trimmed = link.trim();
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
   return `https://${trimmed.replace(/^\/\//, '')}`;
 }
 
+function resolveEditionHref(edition: KalpanaEdition): string | null {
+  const link = edition.externalLink?.trim();
+  if (link) return link;
+  if (edition.slug) return `/mosc-redesign/kalpana-cms/${edition.slug}`;
+  return null;
+}
+
 export default function KalpanaEditionCard({ edition, defaultCardImage }: KalpanaEditionCardProps) {
   const cardImageSrc = edition.cardImageUrl ?? defaultCardImage;
-  const hasExternalLink = Boolean(edition.externalLink?.trim());
+  const href = resolveEditionHref(edition);
 
   const cardContent = (
     <>
@@ -45,10 +56,21 @@ export default function KalpanaEditionCard({ edition, defaultCardImage }: Kalpan
     </>
   );
 
-  if (hasExternalLink && edition.available) {
+  if (edition.available && href) {
+    if (isInternalHref(href)) {
+      return (
+        <Link
+          href={href}
+          className="group bg-white rounded-lg shadow-syro-card hover:shadow-syro-card-hover transition-all duration-300 p-6 text-center"
+        >
+          {cardContent}
+        </Link>
+      );
+    }
+
     return (
       <Link
-        href={formatExternalHref(edition.externalLink!)}
+        href={formatExternalHref(href)}
         target="_blank"
         rel="noopener noreferrer"
         className="group bg-white rounded-lg shadow-syro-card hover:shadow-syro-card-hover transition-all duration-300 p-6 text-center"
