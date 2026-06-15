@@ -10,6 +10,16 @@ export interface KalpanaEdition {
   order: number;
 }
 
+export interface KalpanaDocument {
+  documentId: string;
+  title: string;
+  slug: string;
+  pdfUrl: string | null;
+  sourceUrl: string | null;
+  kalpanaNumber: string | null;
+  order: number;
+}
+
 export interface KalpanaPageContent {
   heroImageUrl: string;
   heroImageAlt: string | null;

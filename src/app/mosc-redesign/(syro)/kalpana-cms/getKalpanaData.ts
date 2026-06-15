@@ -30,19 +30,21 @@ const DEFAULT_ABOUT_FEATURES = [
   'Contact information for dioceses and institutions',
 ];
 
+const editionDetailPath = (year: string) => `/mosc-redesign/kalpana-cms/kalpana-${year}`;
+
 const DEFAULT_EDITIONS: KalpanaEdition[] = [
-  { documentId: '2026', title: 'Kalpana 2026', slug: 'kalpana-2026', year: '2026', externalLink: null, available: true, cardImageUrl: null, cardImageAlt: null, order: 12 },
-  { documentId: '2025', title: 'Kalpana 2025', slug: 'kalpana-2025', year: '2025', externalLink: null, available: true, cardImageUrl: null, cardImageAlt: null, order: 11 },
-  { documentId: '2024', title: 'Kalpana 2024', slug: 'kalpana-2024', year: '2024', externalLink: null, available: true, cardImageUrl: null, cardImageAlt: null, order: 10 },
-  { documentId: '2023', title: 'Kalpana 2023', slug: 'kalpana-2023', year: '2023', externalLink: null, available: true, cardImageUrl: null, cardImageAlt: null, order: 9 },
-  { documentId: '2022', title: 'Kalpana 2022', slug: 'kalpana-2022', year: '2022', externalLink: null, available: true, cardImageUrl: null, cardImageAlt: null, order: 8 },
-  { documentId: '2021', title: 'Kalpana- 2021', slug: 'kalpana-2021', year: '2021', externalLink: null, available: true, cardImageUrl: null, cardImageAlt: null, order: 7 },
-  { documentId: '2020', title: 'Kalpana 2020', slug: 'kalpana-2020', year: '2020', externalLink: null, available: true, cardImageUrl: null, cardImageAlt: null, order: 6 },
-  { documentId: '2019', title: 'Kalpana- 2019', slug: 'kalpana-2019', year: '2019', externalLink: null, available: true, cardImageUrl: null, cardImageAlt: null, order: 5 },
-  { documentId: '2018', title: 'Kalpana 2018', slug: 'kalpana-2018', year: '2018', externalLink: null, available: true, cardImageUrl: null, cardImageAlt: null, order: 4 },
-  { documentId: '2017', title: 'Kalpana 2017', slug: 'kalpana-2017', year: '2017', externalLink: null, available: true, cardImageUrl: null, cardImageAlt: null, order: 3 },
-  { documentId: '2016', title: 'Kalpana 2016', slug: 'kalpana-2016', year: '2016', externalLink: null, available: true, cardImageUrl: null, cardImageAlt: null, order: 2 },
-  { documentId: '2015', title: 'Kalpana 2015', slug: 'kalpana-2015', year: '2015', externalLink: null, available: true, cardImageUrl: null, cardImageAlt: null, order: 1 },
+  { documentId: '2026', title: 'Kalpana 2026', slug: 'kalpana-2026', year: '2026', externalLink: editionDetailPath('2026'), available: true, cardImageUrl: null, cardImageAlt: null, order: 12 },
+  { documentId: '2025', title: 'Kalpana 2025', slug: 'kalpana-2025', year: '2025', externalLink: editionDetailPath('2025'), available: true, cardImageUrl: null, cardImageAlt: null, order: 11 },
+  { documentId: '2024', title: 'Kalpana 2024', slug: 'kalpana-2024', year: '2024', externalLink: editionDetailPath('2024'), available: true, cardImageUrl: null, cardImageAlt: null, order: 10 },
+  { documentId: '2023', title: 'Kalpana 2023', slug: 'kalpana-2023', year: '2023', externalLink: editionDetailPath('2023'), available: true, cardImageUrl: null, cardImageAlt: null, order: 9 },
+  { documentId: '2022', title: 'Kalpana 2022', slug: 'kalpana-2022', year: '2022', externalLink: editionDetailPath('2022'), available: true, cardImageUrl: null, cardImageAlt: null, order: 8 },
+  { documentId: '2021', title: 'Kalpana- 2021', slug: 'kalpana-2021', year: '2021', externalLink: editionDetailPath('2021'), available: true, cardImageUrl: null, cardImageAlt: null, order: 7 },
+  { documentId: '2020', title: 'Kalpana 2020', slug: 'kalpana-2020', year: '2020', externalLink: editionDetailPath('2020'), available: true, cardImageUrl: null, cardImageAlt: null, order: 6 },
+  { documentId: '2019', title: 'Kalpana- 2019', slug: 'kalpana-2019', year: '2019', externalLink: editionDetailPath('2019'), available: true, cardImageUrl: null, cardImageAlt: null, order: 5 },
+  { documentId: '2018', title: 'Kalpana 2018', slug: 'kalpana-2018', year: '2018', externalLink: editionDetailPath('2018'), available: true, cardImageUrl: null, cardImageAlt: null, order: 4 },
+  { documentId: '2017', title: 'Kalpana 2017', slug: 'kalpana-2017', year: '2017', externalLink: editionDetailPath('2017'), available: true, cardImageUrl: null, cardImageAlt: null, order: 3 },
+  { documentId: '2016', title: 'Kalpana 2016', slug: 'kalpana-2016', year: '2016', externalLink: editionDetailPath('2016'), available: true, cardImageUrl: null, cardImageAlt: null, order: 2 },
+  { documentId: '2015', title: 'Kalpana 2015', slug: 'kalpana-2015', year: '2015', externalLink: editionDetailPath('2015'), available: true, cardImageUrl: null, cardImageAlt: null, order: 1 },
 ];
 
 const DEFAULT_PAGE: KalpanaPageContent = {
@@ -77,7 +79,10 @@ function parseEdition(raw: Record<string, unknown>, baseUrl: string): KalpanaEdi
   const title = typeof raw.title === 'string' ? raw.title : '';
   const slug = typeof raw.slug === 'string' ? raw.slug : '';
   const year = typeof raw.year === 'string' ? raw.year : '';
-  const externalLink = typeof raw.externalLink === 'string' && raw.externalLink.trim() ? raw.externalLink.trim() : null;
+  const externalLinkRaw =
+    typeof raw.externalLink === 'string' && raw.externalLink.trim() ? raw.externalLink.trim() : null;
+  const externalLink =
+    externalLinkRaw ?? (slug ? `/mosc-redesign/kalpana-cms/${slug}` : year ? editionDetailPath(year) : null);
   const available = typeof raw.available === 'boolean' ? raw.available : true;
   const order = typeof raw.order === 'number' ? raw.order : 0;
   const cardImage = raw.cardImage;
