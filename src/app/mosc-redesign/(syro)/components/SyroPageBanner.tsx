@@ -11,7 +11,7 @@ export interface SyroPageBannerProps {
   /** When true, center the title and breadcrumb text (e.g. on saints subpages) */
   centerText?: boolean;
   /** Breadcrumb path: 'home' = Home / Title, 'gallery' = Gallery / Title, 'news' = News / Title, 'directory' = Directory / Title, etc. */
-  breadcrumbFrom?: 'home' | 'gallery' | 'downloads' | 'calendar' | 'liturgical-calendar' | 'mosc-calendar' | 'kalpana-cms' | 'holy-synod' | 'holy-synod-cms' | 'catholicate' | 'catholicate-cms' | 'saints' | 'saints-cms' | 'the-church' | 'administration' | 'ecumenical' | 'ecumenical-cms' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'publications-cms' | 'institutions' | 'institutions-cms' | 'training' | 'theological-seminaries' | 'theological-seminaries-cms' | 'lectionary' | 'news' | 'directory';
+  breadcrumbFrom?: 'home' | 'gallery' | 'downloads' | 'calendar' | 'liturgical-calendar' | 'mosc-calendar' | 'kalpana-cms' | 'holy-synod' | 'holy-synod-cms' | 'catholicate' | 'catholicate-cms' | 'saints' | 'saints-cms' | 'the-church' | 'administration' | 'ecumenical' | 'ecumenical-cms' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'publications-cms' | 'institutions' | 'institutions-cms' | 'training' | 'training-cms' | 'theological-seminaries' | 'theological-seminaries-cms' | 'lectionary' | 'news' | 'directory';
   /** Optional middle segment for 3-level breadcrumb (e.g. The Church / Theology / Christology). Used on the-church subpages under Theology, Spirituality, History, Liturgy. */
   breadcrumbParent?: { label: string; href: string };
   /** When true, omit the breadcrumb nav. Title stays in the heading. */
@@ -52,6 +52,7 @@ const BREADCRUMB_CONFIG = {
   institutions: { href: '/mosc-redesign/institutions', label: 'Institutions' },
   'institutions-cms': { href: '/mosc-redesign/institutions-cms', label: 'Institutions' },
   training: { href: '/mosc-redesign/training', label: 'Training' },
+  'training-cms': { href: '/mosc-redesign/training-cms', label: 'Training' },
   'theological-seminaries': { href: '/mosc-redesign/theological-seminaries', label: 'Theological Seminaries' },
   'theological-seminaries-cms': { href: '/mosc-redesign/theological-seminaries-cms', label: 'Theological Seminaries' },
   lectionary: { href: '/mosc-redesign/lectionary', label: 'Lectionary' },
