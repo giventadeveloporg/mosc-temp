@@ -649,7 +649,7 @@ export default function HomePage() {
             </button>
             )}
             <Link
-              href="/mosc-redesign/dioceses"
+              href="/mosc-redesign/directory"
               className="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 border border-burgundy/30 text-warmBrown hover:border-burgundy hover:text-white hover:bg-burgundy hover:shadow-md hover:shadow-burgundy/30 hover:scale-105"
             >
               More Locations

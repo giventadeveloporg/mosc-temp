@@ -17,40 +17,67 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: 158741; Type: BLOB; Schema: -; Owner: event_site_app
+-- Name: 73734; Type: BLOB; Schema: -; Owner: event_site_admin
 --
 
-SELECT pg_catalog.lo_create('158741');
+SELECT pg_catalog.lo_create('73734');
 
 
-ALTER LARGE OBJECT 158741 OWNER TO event_site_app;
-
---
--- Name: 169783; Type: BLOB; Schema: -; Owner: event_site_app
---
-
-SELECT pg_catalog.lo_create('169783');
-
-
-ALTER LARGE OBJECT 169783 OWNER TO event_site_app;
+ALTER LARGE OBJECT 73734 OWNER TO event_site_admin;
 
 --
--- Name: 46182; Type: BLOB; Schema: -; Owner: event_site_app
+-- Name: 73735; Type: BLOB; Schema: -; Owner: event_site_admin
 --
 
-SELECT pg_catalog.lo_create('46182');
+SELECT pg_catalog.lo_create('73735');
 
 
-ALTER LARGE OBJECT 46182 OWNER TO event_site_app;
+ALTER LARGE OBJECT 73735 OWNER TO event_site_admin;
 
 --
--- Name: 56746; Type: BLOB; Schema: -; Owner: event_site_app
+-- Name: 73736; Type: BLOB; Schema: -; Owner: event_site_admin
 --
 
-SELECT pg_catalog.lo_create('56746');
+SELECT pg_catalog.lo_create('73736');
 
 
-ALTER LARGE OBJECT 56746 OWNER TO event_site_app;
+ALTER LARGE OBJECT 73736 OWNER TO event_site_admin;
+
+--
+-- Name: 73737; Type: BLOB; Schema: -; Owner: event_site_admin
+--
+
+SELECT pg_catalog.lo_create('73737');
+
+
+ALTER LARGE OBJECT 73737 OWNER TO event_site_admin;
+
+--
+-- Name: 73738; Type: BLOB; Schema: -; Owner: event_site_admin
+--
+
+SELECT pg_catalog.lo_create('73738');
+
+
+ALTER LARGE OBJECT 73738 OWNER TO event_site_admin;
+
+--
+-- Name: 73739; Type: BLOB; Schema: -; Owner: event_site_admin
+--
+
+SELECT pg_catalog.lo_create('73739');
+
+
+ALTER LARGE OBJECT 73739 OWNER TO event_site_admin;
+
+--
+-- Name: 73740; Type: BLOB; Schema: -; Owner: event_site_admin
+--
+
+SELECT pg_catalog.lo_create('73740');
+
+
+ALTER LARGE OBJECT 73740 OWNER TO event_site_admin;
 
 --
 -- Data for Name: batch_job_instance; Type: TABLE DATA; Schema: public; Owner: event_site_admin
@@ -2702,6 +2729,10 @@ INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tena
 	VALUES (?, ?, ?, ?)
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
   Detail: Key (job_instance_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (5159, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-06-12 00:00:00.073959', '2026-06-12 00:00:00.550803', 476, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 
 
 --
@@ -3499,7 +3530,7 @@ INSERT INTO public.clerk_organization_role (id, clerk_org_id, clerk_role_name, a
 
 
 --
--- Data for Name: clerk_session; Type: TABLE DATA; Schema: public; Owner: event_site_app
+-- Data for Name: clerk_session; Type: TABLE DATA; Schema: public; Owner: event_site_admin
 --
 
 
@@ -3511,7 +3542,7 @@ INSERT INTO public.clerk_organization_role (id, clerk_org_id, clerk_role_name, a
 
 
 --
--- Data for Name: clerk_webhook_event; Type: TABLE DATA; Schema: public; Owner: event_site_app
+-- Data for Name: clerk_webhook_event; Type: TABLE DATA; Schema: public; Owner: event_site_admin
 --
 
 
@@ -3750,12 +3781,12 @@ INSERT INTO public.event_admin_audit_log (id, tenant_id, action, table_name, rec
 -- Data for Name: event_attendee; Type: TABLE DATA; Schema: public; Owner: event_site_admin
 --
 
-INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (1, 'tenant_demo_001', 1, 1, 'CONFIRMED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'MEMBER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, 'ATTENDEE:1|EVENT:1|TENANT:tenant_demo_001|NAME:Alice Johnson|EVENT_TITLE:KHNJ Mega Onam 2025|TIMESTAMP:1780758879.549654|TYPE:MEMBER', true, '2026-06-06 15:14:39.549654', 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Alice', 'Johnson', 'alice.johnson@example.com', '555-1001', true);
-INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (2, 'tenant_demo_001', 1, 2, 'CONFIRMED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'ADMIN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NOT_CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, 'ATTENDEE:2|EVENT:1|TENANT:tenant_demo_001|NAME:Bob Smith|EVENT_TITLE:KHNJ Mega Onam 2025|TIMESTAMP:1780758879.561572|TYPE:ADMIN', true, '2026-06-06 15:14:39.561572', 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Bob', 'Smith', 'bob.smith@example.com', '555-1002', true);
+INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (1, 'tenant_demo_001', 1, 1, 'CONFIRMED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'MEMBER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, 'ATTENDEE:1|EVENT:1|TENANT:tenant_demo_001|NAME:Alice Johnson|EVENT_TITLE:KHNJ Mega Onam 2025|TIMESTAMP:1781206015.462912|TYPE:MEMBER', true, '2026-06-11 19:26:55.462912', 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Alice', 'Johnson', 'alice.johnson@example.com', '555-1001', true);
+INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (2, 'tenant_demo_001', 1, 2, 'CONFIRMED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'ADMIN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NOT_CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, 'ATTENDEE:2|EVENT:1|TENANT:tenant_demo_001|NAME:Bob Smith|EVENT_TITLE:KHNJ Mega Onam 2025|TIMESTAMP:1781206015.475931|TYPE:ADMIN', true, '2026-06-11 19:26:55.475931', 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Bob', 'Smith', 'bob.smith@example.com', '555-1002', true);
 INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (3, 'tenant_demo_001', 2, 3, 'PENDING', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'VOLUNTEER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NOT_CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Carol', 'Williams', 'carol.williams@example.com', '555-1003', false);
 INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (4, 'tenant_demo_001', 3, 4, 'WAITLISTED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'ORGANIZER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NOT_CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'David', 'Brown', 'david.brown@example.com', '555-1004', true);
 INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (5, 'tenant_demo_001', 4, 5, 'CANCELLED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'SUPER_ADMIN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NO_SHOW', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Eve', 'Davis', 'eve.davis@example.com', '555-1005', false);
-INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (6, 'tenant_demo_001', 5, 6, 'CONFIRMED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'MEMBER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, 'ATTENDEE:6|EVENT:5|TENANT:tenant_demo_001|NAME:Frank Miller|EVENT_TITLE:Summer Fest|TIMESTAMP:1780758879.566157|TYPE:MEMBER', true, '2026-06-06 15:14:39.566157', 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Frank', 'Miller', 'frank.miller@example.com', '555-1006', true);
+INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (6, 'tenant_demo_001', 5, 6, 'CONFIRMED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'MEMBER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, 'ATTENDEE:6|EVENT:5|TENANT:tenant_demo_001|NAME:Frank Miller|EVENT_TITLE:Summer Fest|TIMESTAMP:1781206015.506757|TYPE:MEMBER', true, '2026-06-11 19:26:55.506757', 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Frank', 'Miller', 'frank.miller@example.com', '555-1006', true);
 INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (4301, 'tenant_demo_002', 2, NULL, 'REGISTERED', '2025-11-13 23:21:56.135', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-13 23:21:56.135', '2025-11-13 23:21:56.135', 'Gain', 'Joseph', 'giventauser@gmail.com', '', NULL);
 INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (7151, 'tenant_demo_002', 7051, NULL, 'PENDING', '2025-11-22 04:21:17.89', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-22 04:21:17.89', '2025-11-22 04:21:46.608', 'Gain Joseph', 'Joseph', 'giventauser@gmail.com', '3123430073', NULL);
 INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (7152, 'tenant_demo_002', 7051, NULL, 'REGISTERED', '2025-11-22 04:40:54.909', NULL, NULL, NULL, NULL, '', '', '', '', '', '', 0, 0, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-22 04:40:54.909', '2025-11-22 00:01:19.109303', 'Gain Joseph', 'Joseph', 'giventauser@gmail.com', '3123430073', NULL);
@@ -4261,7 +4292,7 @@ INSERT INTO public.event_score_card_detail (id, score_card_id, team_name, player
 
 
 --
--- Data for Name: event_site_app_cache; Type: TABLE DATA; Schema: public; Owner: event_site_app
+-- Data for Name: event_site_app_cache; Type: TABLE DATA; Schema: public; Owner: event_site_admin
 --
 
 
@@ -4281,10 +4312,10 @@ INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, i
 INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (4051, 'tenant_demo_002', 'Demo', 'sdfsfdgsdfgsdfgsdfg', 100.00, false, 0.00, '234', 100, 0, 100, true, NULL, NULL, 1, 10, false, 0, '2026-01-14 09:01:19.23', '2026-01-14 09:01:19.23', 6901);
 INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (7352, 'tenant_demo_002', 'Silver Sponsor', 'zxzxzxzxzxzx', 0.60, false, 0.00, 'Silver_Sponsor', 100, 0, 100, true, NULL, NULL, 1, 10, false, 0, '2026-01-19 06:09:05.511', '2026-01-19 06:09:05.511', 4201);
 INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (7351, 'tenant_demo_002', 'Gold Sponsor', 'zzzxzxzxz', 0.70, false, 0.00, 'Gold_Sponsor', 123, 9, 114, true, NULL, NULL, 1, 10, false, 0, '2026-01-19 06:08:25.41', '2026-01-25 11:14:20.480911', 4201);
-INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (4152, 'tenant_demo_002', 'FirstClass', 'fdfddfdf', 0.60, false, 0.00, 'SPRING10', 117, 12, 110, true, NULL, NULL, 1, 10, false, 0, '2025-11-13 23:10:25.922', '2026-06-06 15:14:40.042401', 2);
-INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (7551, 'tenant_demo_002', 'Gold Sponsor', 'xzxzxzx', 0.70, false, 0.00, 'Gold_Sponsor', 142, 56, 111, true, NULL, NULL, 1, 10, false, 0, '2026-01-22 17:20:18.536', '2026-06-06 15:14:40.05425', 4202);
-INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (7552, 'tenant_demo_002', 'Silver Sponsor', 'ssdssssdss', 0.60, false, 0.00, 'Silver_Sponsor', 50, 15, 49, true, NULL, NULL, 1, 10, false, 0, '2026-01-22 17:21:15.843', '2026-06-06 15:14:40.055153', 4202);
-INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (4151, 'tenant_demo_002', 'Balcony', 'sdsdsdss', 0.70, true, 0.00, 'fdfdfd', 100, 90, 94, true, NULL, NULL, 1, 10, false, 0, '2025-11-13 23:09:56.934', '2026-06-06 15:14:40.057092', 2);
+INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (4152, 'tenant_demo_002', 'FirstClass', 'fdfddfdf', 0.60, false, 0.00, 'SPRING10', 117, 13, 110, true, NULL, NULL, 1, 10, false, 0, '2025-11-13 23:10:25.922', '2026-06-11 19:26:57.981058', 2);
+INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (7551, 'tenant_demo_002', 'Gold Sponsor', 'xzxzxzx', 0.70, false, 0.00, 'Gold_Sponsor', 142, 61, 111, true, NULL, NULL, 1, 10, false, 0, '2026-01-22 17:20:18.536', '2026-06-11 19:26:58.050273', 4202);
+INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (7552, 'tenant_demo_002', 'Silver Sponsor', 'ssdssssdss', 0.60, false, 0.00, 'Silver_Sponsor', 50, 16, 49, true, NULL, NULL, 1, 10, false, 0, '2026-01-22 17:21:15.843', '2026-06-11 19:26:58.057351', 4202);
+INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (4151, 'tenant_demo_002', 'Balcony', 'sdsdsdss', 0.70, true, 0.00, 'fdfdfd', 100, 96, 94, true, NULL, NULL, 1, 10, false, 0, '2025-11-13 23:09:56.934', '2026-06-11 19:26:58.071324', 2);
 
 
 --
@@ -4578,7 +4609,7 @@ INSERT INTO public.satellite_domain (id, satellite_key, domain, hostname, displa
 
 
 --
--- Data for Name: session_store; Type: TABLE DATA; Schema: public; Owner: event_site_app
+-- Data for Name: session_store; Type: TABLE DATA; Schema: public; Owner: event_site_admin
 --
 
 
@@ -4591,12 +4622,6 @@ INSERT INTO public.satellite_domain (id, satellite_key, domain, hostname, displa
 
 --
 -- Data for Name: team_members; Type: TABLE DATA; Schema: public; Owner: event_site_admin
---
-
-
-
---
--- Data for Name: tenant_email_address; Type: TABLE DATA; Schema: public; Owner: event_site_app
 --
 
 
@@ -4615,12 +4640,12 @@ INSERT INTO public.tenant_email_addresses (id, tenant_id, email_address, copy_to
 -- Data for Name: tenant_settings; Type: TABLE DATA; Schema: public; Owner: event_site_admin
 --
 
-INSERT INTO public.tenant_settings (id, tenant_id, tenant_organization_id, allow_user_registration, show_events_section_in_home_page, show_executive_committee_section_in_home_page, show_team_members_section_in_home_page, show_sponsors_section_in_home_page, is_membership_subscription_enabled, require_admin_approval, enable_whatsapp_integration, address_line_1, address_line_2, phone_number, zip_code, country, state_province, email, whatsapp_api_key, twilio_account_sid, twilio_auth_token, twilio_whatsapp_from, whatsapp_webhook_url, whatsapp_webhook_token, enable_email_marketing, homepage_cache_version, email_provider_config, custom_css, custom_js, max_events_per_month, max_attendees_per_event, enable_guest_registration, max_guests_per_attendee, default_event_capacity, platform_fee_percentage, email_header_image_url, email_footer_html_url, logo_image_url, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (1, 'tenant_demo_001', 1, true, false, false, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0, NULL, NULL, NULL, NULL, NULL, true, 5, 100, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-22 11:31:27.571', '2025-09-11 22:08:43.52');
-INSERT INTO public.tenant_settings (id, tenant_id, tenant_organization_id, allow_user_registration, show_events_section_in_home_page, show_executive_committee_section_in_home_page, show_team_members_section_in_home_page, show_sponsors_section_in_home_page, is_membership_subscription_enabled, require_admin_approval, enable_whatsapp_integration, address_line_1, address_line_2, phone_number, zip_code, country, state_province, email, whatsapp_api_key, twilio_account_sid, twilio_auth_token, twilio_whatsapp_from, whatsapp_webhook_url, whatsapp_webhook_token, enable_email_marketing, homepage_cache_version, email_provider_config, custom_css, custom_js, max_events_per_month, max_attendees_per_event, enable_guest_registration, max_guests_per_attendee, default_event_capacity, platform_fee_percentage, email_header_image_url, email_footer_html_url, logo_image_url, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (3, 'tenant_demo_003', 3, false, false, false, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, 0, NULL, NULL, NULL, NULL, NULL, false, 3, 50, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-22 11:31:27.571', '2025-09-11 22:08:43.52');
-INSERT INTO public.tenant_settings (id, tenant_id, tenant_organization_id, allow_user_registration, show_events_section_in_home_page, show_executive_committee_section_in_home_page, show_team_members_section_in_home_page, show_sponsors_section_in_home_page, is_membership_subscription_enabled, require_admin_approval, enable_whatsapp_integration, address_line_1, address_line_2, phone_number, zip_code, country, state_province, email, whatsapp_api_key, twilio_account_sid, twilio_auth_token, twilio_whatsapp_from, whatsapp_webhook_url, whatsapp_webhook_token, enable_email_marketing, homepage_cache_version, email_provider_config, custom_css, custom_js, max_events_per_month, max_attendees_per_event, enable_guest_registration, max_guests_per_attendee, default_event_capacity, platform_fee_percentage, email_header_image_url, email_footer_html_url, logo_image_url, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (4, 'tenant_demo_004', 4, true, false, false, false, false, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, 0, NULL, NULL, NULL, NULL, NULL, true, 8, 150, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-22 11:31:27.571', '2025-09-11 22:08:43.52');
-INSERT INTO public.tenant_settings (id, tenant_id, tenant_organization_id, allow_user_registration, show_events_section_in_home_page, show_executive_committee_section_in_home_page, show_team_members_section_in_home_page, show_sponsors_section_in_home_page, is_membership_subscription_enabled, require_admin_approval, enable_whatsapp_integration, address_line_1, address_line_2, phone_number, zip_code, country, state_province, email, whatsapp_api_key, twilio_account_sid, twilio_auth_token, twilio_whatsapp_from, whatsapp_webhook_url, whatsapp_webhook_token, enable_email_marketing, homepage_cache_version, email_provider_config, custom_css, custom_js, max_events_per_month, max_attendees_per_event, enable_guest_registration, max_guests_per_attendee, default_event_capacity, platform_fee_percentage, email_header_image_url, email_footer_html_url, logo_image_url, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (5, 'tenant_demo_005', 5, true, false, false, false, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, 0, NULL, NULL, NULL, NULL, NULL, false, 2, 75, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-22 11:31:27.571', '2025-09-11 22:08:43.52');
-INSERT INTO public.tenant_settings (id, tenant_id, tenant_organization_id, allow_user_registration, show_events_section_in_home_page, show_executive_committee_section_in_home_page, show_team_members_section_in_home_page, show_sponsors_section_in_home_page, is_membership_subscription_enabled, require_admin_approval, enable_whatsapp_integration, address_line_1, address_line_2, phone_number, zip_code, country, state_province, email, whatsapp_api_key, twilio_account_sid, twilio_auth_token, twilio_whatsapp_from, whatsapp_webhook_url, whatsapp_webhook_token, enable_email_marketing, homepage_cache_version, email_provider_config, custom_css, custom_js, max_events_per_month, max_attendees_per_event, enable_guest_registration, max_guests_per_attendee, default_event_capacity, platform_fee_percentage, email_header_image_url, email_footer_html_url, logo_image_url, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (6, 'tenant_demo_006', 6, false, false, false, false, false, false, true, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0, NULL, NULL, NULL, NULL, NULL, true, 6, 120, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-22 11:31:27.571', '2025-09-11 22:08:43.52');
-INSERT INTO public.tenant_settings (id, tenant_id, tenant_organization_id, allow_user_registration, show_events_section_in_home_page, show_executive_committee_section_in_home_page, show_team_members_section_in_home_page, show_sponsors_section_in_home_page, is_membership_subscription_enabled, require_admin_approval, enable_whatsapp_integration, address_line_1, address_line_2, phone_number, zip_code, country, state_province, email, whatsapp_api_key, twilio_account_sid, twilio_auth_token, twilio_whatsapp_from, whatsapp_webhook_url, whatsapp_webhook_token, enable_email_marketing, homepage_cache_version, email_provider_config, custom_css, custom_js, max_events_per_month, max_attendees_per_event, enable_guest_registration, max_guests_per_attendee, default_event_capacity, platform_fee_percentage, email_header_image_url, email_footer_html_url, logo_image_url, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (2, 'tenant_demo_002', 2, true, true, false, true, true, true, true, true, '165 Hopkins Ave, APT #7', '', '13123430073', '07306', 'United States', 'NJ', 'giventauser@gmail.com', '', '', '', NULL, '', '', false, 0, '{}', '', '', NULL, NULL, true, 10, 200, NULL, '', '', '', 'https://www.facebook.com', 'https://www.instagram.com/', 'https://x.com/', 'https://www.linkedin.com', 'https://www.youtube.com', '', '2025-06-22 11:31:27.571', '2026-02-20 10:01:51.614984');
+INSERT INTO public.tenant_settings (id, tenant_id, tenant_organization_id, allow_user_registration, show_events_section_in_home_page, show_executive_committee_section_in_home_page, show_team_members_section_in_home_page, show_sponsors_section_in_home_page, is_membership_subscription_enabled, require_admin_approval, enable_whatsapp_integration, address_line_1, address_line_2, phone_number, zip_code, country, state_province, email, whatsapp_api_key, twilio_account_sid, twilio_auth_token, twilio_whatsapp_from, whatsapp_webhook_url, whatsapp_webhook_token, enable_email_marketing, homepage_cache_version, email_provider_config, custom_css, custom_js, max_events_per_month, max_attendees_per_event, enable_guest_registration, max_guests_per_attendee, default_event_capacity, platform_fee_percentage, email_header_image_url, email_footer_html_url, logo_image_url, default_hero_image_urls_json, default_hero_display_mode, default_hero_include_with_events, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (1, 'tenant_demo_001', 1, true, false, false, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0, NULL, NULL, NULL, NULL, NULL, true, 5, 100, NULL, NULL, NULL, NULL, NULL, 'slideshow', true, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-22 11:31:27.571', '2025-09-11 22:08:43.52');
+INSERT INTO public.tenant_settings (id, tenant_id, tenant_organization_id, allow_user_registration, show_events_section_in_home_page, show_executive_committee_section_in_home_page, show_team_members_section_in_home_page, show_sponsors_section_in_home_page, is_membership_subscription_enabled, require_admin_approval, enable_whatsapp_integration, address_line_1, address_line_2, phone_number, zip_code, country, state_province, email, whatsapp_api_key, twilio_account_sid, twilio_auth_token, twilio_whatsapp_from, whatsapp_webhook_url, whatsapp_webhook_token, enable_email_marketing, homepage_cache_version, email_provider_config, custom_css, custom_js, max_events_per_month, max_attendees_per_event, enable_guest_registration, max_guests_per_attendee, default_event_capacity, platform_fee_percentage, email_header_image_url, email_footer_html_url, logo_image_url, default_hero_image_urls_json, default_hero_display_mode, default_hero_include_with_events, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (3, 'tenant_demo_003', 3, false, false, false, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, 0, NULL, NULL, NULL, NULL, NULL, false, 3, 50, NULL, NULL, NULL, NULL, NULL, 'slideshow', true, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-22 11:31:27.571', '2025-09-11 22:08:43.52');
+INSERT INTO public.tenant_settings (id, tenant_id, tenant_organization_id, allow_user_registration, show_events_section_in_home_page, show_executive_committee_section_in_home_page, show_team_members_section_in_home_page, show_sponsors_section_in_home_page, is_membership_subscription_enabled, require_admin_approval, enable_whatsapp_integration, address_line_1, address_line_2, phone_number, zip_code, country, state_province, email, whatsapp_api_key, twilio_account_sid, twilio_auth_token, twilio_whatsapp_from, whatsapp_webhook_url, whatsapp_webhook_token, enable_email_marketing, homepage_cache_version, email_provider_config, custom_css, custom_js, max_events_per_month, max_attendees_per_event, enable_guest_registration, max_guests_per_attendee, default_event_capacity, platform_fee_percentage, email_header_image_url, email_footer_html_url, logo_image_url, default_hero_image_urls_json, default_hero_display_mode, default_hero_include_with_events, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (4, 'tenant_demo_004', 4, true, false, false, false, false, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, 0, NULL, NULL, NULL, NULL, NULL, true, 8, 150, NULL, NULL, NULL, NULL, NULL, 'slideshow', true, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-22 11:31:27.571', '2025-09-11 22:08:43.52');
+INSERT INTO public.tenant_settings (id, tenant_id, tenant_organization_id, allow_user_registration, show_events_section_in_home_page, show_executive_committee_section_in_home_page, show_team_members_section_in_home_page, show_sponsors_section_in_home_page, is_membership_subscription_enabled, require_admin_approval, enable_whatsapp_integration, address_line_1, address_line_2, phone_number, zip_code, country, state_province, email, whatsapp_api_key, twilio_account_sid, twilio_auth_token, twilio_whatsapp_from, whatsapp_webhook_url, whatsapp_webhook_token, enable_email_marketing, homepage_cache_version, email_provider_config, custom_css, custom_js, max_events_per_month, max_attendees_per_event, enable_guest_registration, max_guests_per_attendee, default_event_capacity, platform_fee_percentage, email_header_image_url, email_footer_html_url, logo_image_url, default_hero_image_urls_json, default_hero_display_mode, default_hero_include_with_events, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (5, 'tenant_demo_005', 5, true, false, false, false, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, 0, NULL, NULL, NULL, NULL, NULL, false, 2, 75, NULL, NULL, NULL, NULL, NULL, 'slideshow', true, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-22 11:31:27.571', '2025-09-11 22:08:43.52');
+INSERT INTO public.tenant_settings (id, tenant_id, tenant_organization_id, allow_user_registration, show_events_section_in_home_page, show_executive_committee_section_in_home_page, show_team_members_section_in_home_page, show_sponsors_section_in_home_page, is_membership_subscription_enabled, require_admin_approval, enable_whatsapp_integration, address_line_1, address_line_2, phone_number, zip_code, country, state_province, email, whatsapp_api_key, twilio_account_sid, twilio_auth_token, twilio_whatsapp_from, whatsapp_webhook_url, whatsapp_webhook_token, enable_email_marketing, homepage_cache_version, email_provider_config, custom_css, custom_js, max_events_per_month, max_attendees_per_event, enable_guest_registration, max_guests_per_attendee, default_event_capacity, platform_fee_percentage, email_header_image_url, email_footer_html_url, logo_image_url, default_hero_image_urls_json, default_hero_display_mode, default_hero_include_with_events, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (6, 'tenant_demo_006', 6, false, false, false, false, false, false, true, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0, NULL, NULL, NULL, NULL, NULL, true, 6, 120, NULL, NULL, NULL, NULL, NULL, 'slideshow', true, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-22 11:31:27.571', '2025-09-11 22:08:43.52');
+INSERT INTO public.tenant_settings (id, tenant_id, tenant_organization_id, allow_user_registration, show_events_section_in_home_page, show_executive_committee_section_in_home_page, show_team_members_section_in_home_page, show_sponsors_section_in_home_page, is_membership_subscription_enabled, require_admin_approval, enable_whatsapp_integration, address_line_1, address_line_2, phone_number, zip_code, country, state_province, email, whatsapp_api_key, twilio_account_sid, twilio_auth_token, twilio_whatsapp_from, whatsapp_webhook_url, whatsapp_webhook_token, enable_email_marketing, homepage_cache_version, email_provider_config, custom_css, custom_js, max_events_per_month, max_attendees_per_event, enable_guest_registration, max_guests_per_attendee, default_event_capacity, platform_fee_percentage, email_header_image_url, email_footer_html_url, logo_image_url, default_hero_image_urls_json, default_hero_display_mode, default_hero_include_with_events, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (2, 'tenant_demo_002', 2, true, true, false, true, true, true, true, true, '165 Hopkins Ave, APT #7', '', '13123430073', '07306', 'United States', 'NJ', 'giventauser@gmail.com', '', '', '', NULL, '', '', false, 0, '{}', '', '', NULL, NULL, true, 10, 200, NULL, '', '', '', NULL, 'slideshow', true, 'https://www.facebook.com', 'https://www.instagram.com/', 'https://x.com/', 'https://www.linkedin.com', 'https://www.youtube.com', '', '2025-06-22 11:31:27.571', '2026-02-20 10:01:51.614984');
 
 
 --
@@ -4657,7 +4682,7 @@ INSERT INTO public.user_task (id, tenant_id, title, description, status, priorit
 -- Name: batch_job_execution_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: event_site_admin
 --
 
-SELECT pg_catalog.setval('public.batch_job_execution_log_id_seq', 1, true);
+SELECT pg_catalog.setval('public.batch_job_execution_log_id_seq', 5161, true);
 
 
 --
@@ -4671,7 +4696,7 @@ SELECT pg_catalog.setval('public.batch_job_execution_seq', 1, true);
 -- Name: batch_job_seq; Type: SEQUENCE SET; Schema: public; Owner: event_site_admin
 --
 
-SELECT pg_catalog.setval('public.batch_job_seq', 1, true);
+SELECT pg_catalog.setval('public.batch_job_seq', 2, true);
 
 
 --
@@ -4720,7 +4745,7 @@ SELECT pg_catalog.setval('public.event_score_card_id_seq', 1, true);
 -- Name: sequence_generator; Type: SEQUENCE SET; Schema: public; Owner: event_site_admin
 --
 
-SELECT pg_catalog.setval('public.sequence_generator', 10950, true);
+SELECT pg_catalog.setval('public.sequence_generator', 11043, true);
 
 
 --
@@ -4729,20 +4754,25 @@ SELECT pg_catalog.setval('public.sequence_generator', 10950, true);
 
 BEGIN;
 
-SELECT pg_catalog.lo_open('46182', 131072);
-SELECT pg_catalog.lowrite(0, '\x64736473');
+SELECT pg_catalog.lo_open('73734', 131072);
 SELECT pg_catalog.lo_close(0);
 
-SELECT pg_catalog.lo_open('56746', 131072);
-SELECT pg_catalog.lowrite(0, '\x64666466646664666466');
+SELECT pg_catalog.lo_open('73735', 131072);
 SELECT pg_catalog.lo_close(0);
 
-SELECT pg_catalog.lo_open('158741', 131072);
-SELECT pg_catalog.lowrite(0, '\x64666466646664666466');
+SELECT pg_catalog.lo_open('73736', 131072);
 SELECT pg_catalog.lo_close(0);
 
-SELECT pg_catalog.lo_open('169783', 131072);
-SELECT pg_catalog.lowrite(0, '\x66666667666766');
+SELECT pg_catalog.lo_open('73737', 131072);
+SELECT pg_catalog.lo_close(0);
+
+SELECT pg_catalog.lo_open('73738', 131072);
+SELECT pg_catalog.lo_close(0);
+
+SELECT pg_catalog.lo_open('73739', 131072);
+SELECT pg_catalog.lo_close(0);
+
+SELECT pg_catalog.lo_open('73740', 131072);
 SELECT pg_catalog.lo_close(0);
 
 COMMIT;
