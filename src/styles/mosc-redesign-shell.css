@@ -967,3 +967,73 @@
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22) !important;
   }
 }
+
+/* ── MOSC Redesign homepage: hero + quick-access fit first viewport ── */
+.mosc-redesign-home-shell {
+  --mosc-redesign-header-h: 4.5rem;
+}
+
+.mosc-redesign-home-shell #mainContent > .mosc-home-first-screen {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--mosc-redesign-header-h));
+  height: calc(100dvh - var(--mosc-redesign-header-h));
+  max-height: calc(100vh - var(--mosc-redesign-header-h));
+  max-height: calc(100dvh - var(--mosc-redesign-header-h));
+  min-height: 0;
+  overflow: hidden;
+}
+
+.mosc-home-first-screen > .mosc-home-hero-section {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.mosc-home-hero-section img {
+  object-fit: cover !important;
+}
+
+.mosc-home-hero-section img.mosc-home-hero-image--aramana {
+  object-position: center 18% !important;
+}
+
+.mosc-home-first-screen > .mosc-home-quick-access {
+  flex-shrink: 0;
+}
+
+@media (max-height: 700px) {
+  .mosc-home-quick-access a {
+    gap: 0.25rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .mosc-home-quick-access a svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .mosc-home-quick-access a span:last-child {
+    font-size: 0.625rem;
+    line-height: 1.15;
+  }
+}
+
+@media (max-height: 520px) {
+  .mosc-home-hero-section .absolute.bottom-4 {
+    bottom: 0.5rem;
+  }
+
+  .mosc-home-quick-access a {
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+  }
+
+  .mosc-home-quick-access a svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}

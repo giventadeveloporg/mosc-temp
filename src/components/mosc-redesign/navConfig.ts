@@ -3,7 +3,7 @@
  * Calendar submenu: see calendarNav.ts (Liturgical + MOSC calendars).
  */
 export const MOSC_REDESIGN_QUICK_LINKS = [
-  { label: "Spiritual Organisations", href: "/mosc-redesign/spiritual-organizations" },
+  { label: "Spiritual Organisations", href: "/mosc-redesign/spiritual-organizations-cms" },
   { label: "Publications", href: "/mosc-redesign/publications-cms" },
   { label: "Institutions", href: "/mosc-redesign/institutions-cms" },
   { label: "Training", href: "/mosc-redesign/training-cms" },
