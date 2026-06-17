@@ -116,7 +116,7 @@ export const MOSC_REDESIGN_SITEMAP: SitemapSection[] = [
     title: 'Organisations & Education',
     description: 'Spiritual organisations, training, and seminaries.',
     links: [
-      { name: 'Spiritual Organisations', href: `${BASE}/spiritual-organizations` },
+      { name: 'Spiritual Organisations', href: `${BASE}/spiritual-organizations-cms` },
       { name: 'Institutions', href: `${BASE}/institutions` },
       { name: 'Training Programmes', href: `${BASE}/training` },
       { name: 'St. Basil Bible School', href: `${BASE}/training/st-basil-bible-school` },

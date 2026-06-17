@@ -46,7 +46,7 @@ const BREADCRUMB_CONFIG = {
   ecumenical: { href: '/mosc-redesign/ecumenical', label: 'Ecumenical' },
   'ecumenical-cms': { href: '/mosc-redesign/ecumenical-cms', label: 'Ecumenical' },
   dioceses: { href: '/mosc-redesign/dioceses', label: 'Dioceses' },
-  'spiritual-organizations': { href: '/mosc-redesign/spiritual-organizations', label: 'Spiritual Organizations' },
+  'spiritual-organizations': { href: '/mosc-redesign/spiritual-organizations-cms', label: 'Spiritual Organizations' },
   'spiritual-organizations-cms': { href: '/mosc-redesign/spiritual-organizations-cms', label: 'Spiritual Organizations' },
   publications: { href: '/mosc-redesign/publications', label: 'Publications' },
   'publications-cms': { href: '/mosc-redesign/publications-cms', label: 'Publications' },
