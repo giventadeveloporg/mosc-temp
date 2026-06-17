@@ -7,6 +7,7 @@ import InteractiveWorldMap from "@/components/ui/InteractiveWorldMap";
 import MoscRedesignHeader from "@/components/mosc-redesign/MoscRedesignHeader";
 import MoscRedesignFooter from "@/components/mosc-redesign/MoscRedesignFooter";
 import ZohoSalesIqWidget from "@/components/mosc-redesign/ZohoSalesIqWidget";
+import MoscRedesignSaintsCarousel from "@/components/mosc-redesign/MoscRedesignSaintsCarousel";
 import type { LiturgyReading } from "@/app/mosc/components/SyroLiturgySection";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -174,7 +175,6 @@ export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeRegion, setActiveRegion] = useState("india");
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
-  const [saintIndex, setSaintIndex] = useState(0);
   const [readingLang, setReadingLang] = useState<"english" | "malayalam">("english");
   const [liturgyReadings, setLiturgyReadings] = useState<LiturgyReading[] | null>(null);
   const [liturgyDate, setLiturgyDate] = useState<string | null>(null);
@@ -250,8 +250,6 @@ export default function HomePage() {
       window.removeEventListener("resize", updateHeaderHeight);
     };
   }, []);
-
-  const visibleSaints = saints.slice(saintIndex, saintIndex + 3);
 
   return (
     <div
@@ -375,8 +373,8 @@ export default function HomePage() {
       </div>
 
       {/* ── ABOUT US (always visible — IntersectionObserver + opacity-0 caused empty gaps) ─ */}
-      <section className="py-16 md:py-24 bg-parchment border-b border-burgundy/15">
-        <div className="max-w-7xl mx-auto px-6 lg:px-16">
+      <section className="mosc-home-about-us py-16 md:py-24 bg-parchment border-b border-burgundy/15">
+        <div className="mosc-home-about-us__inner max-w-7xl mx-auto px-6 lg:px-16">
           <article
             className="about-us-editorial"
             aria-labelledby="about-us-heading"
@@ -428,60 +426,7 @@ export default function HomePage() {
             />
           </article>
 
-          {/* Saints Carousel */}
-          <div className="mt-20">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <span className="text-burgundy text-xs font-bold tracking-widest uppercase">Heritage</span>
-                <h3 className="text-2xl font-bold text-warmBrown-dark mt-1">Our Saints & Blesseds</h3>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSaintIndex(Math.max(0, saintIndex - 1))}
-                  disabled={saintIndex === 0}
-                  className="w-9 h-9 rounded-full border border-burgundy/40 flex items-center justify-center text-burgundy hover:bg-burgundy hover:text-white hover:border-burgundy disabled:opacity-30 transition-all duration-200"
-                  aria-label="Previous saint">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => setSaintIndex(Math.min(saints.length - 3, saintIndex + 1))}
-                  disabled={saintIndex >= saints.length - 3}
-                  className="w-9 h-9 rounded-full border border-burgundy/40 flex items-center justify-center text-burgundy hover:bg-burgundy hover:text-white hover:border-burgundy disabled:opacity-30 transition-all duration-200"
-                  aria-label="Next saint">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-              {visibleSaints.map((saint) =>
-              <Link
-                key={saint.name}
-                href={saint.href}
-                className="group relative mx-auto w-3/4 rounded-xl overflow-hidden aspect-[6/5] block border border-burgundy/20 bg-parchment-deep hover:border-burgundy/60 transition-all duration-300 hover:shadow-xl hover:shadow-burgundy/30 hover:-translate-y-1 transform">
-                <Image
-                  src={saint.image}
-                  alt={saint.alt}
-                  fill
-                  quality={95}
-                  sizes="(max-width: 640px) 75vw, (max-width: 768px) 37.5vw, 25vw"
-                  className={`object-contain object-top transition-transform duration-500 ${saint.imageClassName ?? "group-hover:scale-105"}`}
-                />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-warmBrown-dark/90 via-warmBrown-dark/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <p className="saint-card-title font-semibold text-sm leading-tight">{saint.name}</p>
-                  <span className="text-warmGold text-xs mt-1 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-                    Learn more <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                  </span>
-                </div>
-              </Link>
-              )}
-            </div>
-          </div>
+          <MoscRedesignSaintsCarousel saints={saints} />
         </div>
       </section>
 

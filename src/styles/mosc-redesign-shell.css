@@ -580,6 +580,54 @@
   }
 }
 
+/*
+ * Homepage About Us + Saints: syro-malabar.css sets display:flex on
+ * #mainContent section:first-of-type (breadcrumb banner). About Us is also
+ * section:first-of-type among #mainContent direct children, which forced
+ * the editorial article and saints carousel into one horizontal flex row.
+ */
+.mosc-redesign-home-shell #mainContent.syro-main section.mosc-home-about-us {
+  display: block !important;
+  align-items: stretch !important;
+}
+
+.mosc-redesign-home-shell #mainContent.syro-main section.mosc-home-about-us > .mosc-home-about-us__inner {
+  display: block !important;
+  align-items: stretch !important;
+  min-height: 0 !important;
+  width: 100%;
+}
+
+/* Beat syro-malabar section:first-of-type > div > div (0,4,3) — flex row was collapsing cards */
+.mosc-redesign-home-shell #mainContent.syro-main section.mosc-home-about-us > .mosc-home-about-us__inner > .about-us-saints-section {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  align-self: stretch !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  clear: both;
+}
+
+.mosc-redesign-home-shell #mainContent.syro-main section.mosc-home-about-us > .mosc-home-about-us__inner > .about-us-saints-section > .about-us-saints-header {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  min-height: 0 !important;
+}
+
+.mosc-redesign-home-shell #mainContent.syro-main section.mosc-home-about-us > .mosc-home-about-us__inner > .about-us-saints-section > .about-us-saints-viewport {
+  display: block !important;
+  width: 100% !important;
+  min-height: 0 !important;
+}
+
+.about-us-saints-track {
+  will-change: transform;
+}
+
 /* ── Homepage About Us: editorial weave (images around text) ── */
 .about-us-editorial {
   position: relative;
