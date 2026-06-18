@@ -343,7 +343,7 @@ export default async function DirectoryPage() {
               </p>
             </Link>
             <Link
-              href="/mosc-redesign/spiritual-organizations"
+              href="/mosc-redesign/spiritual-organizations-cms"
               className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 text-center group border-l-[7px] border-syro-red"
             >
               <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red transition-colors">

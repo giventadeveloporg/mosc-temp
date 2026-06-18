@@ -72,7 +72,7 @@ const links = [
   { href: '/mosc-redesign/institutions', label: 'Institutions', icon: <BuildingIcon /> },
   { href: '/mosc-redesign/training', label: 'Training', icon: <AcademicIcon /> },
   { href: '/mosc-redesign/publications', label: 'Publications', icon: <BookIcon /> },
-  { href: '/mosc-redesign/spiritual-organizations', label: 'Spiritual Organisations', icon: <HeartIcon /> },
+  { href: '/mosc-redesign/spiritual-organizations-cms', label: 'Spiritual Organisations', icon: <HeartIcon /> },
   { href: '/mosc-redesign/theological-seminaries', label: 'Theological Seminaries', icon: <ChurchIcon /> },
   { href: '/mosc-redesign/lectionary', label: 'Lectionary', icon: <BookOpenIcon /> },
   { href: '/mosc-redesign/gallery', label: 'Gallery', icon: <PhotoIcon /> },

@@ -18,7 +18,7 @@ const AboutOurChurchSection = () => {
   ];
 
   const quickLinks = [
-    { label: 'Spiritual Organisations', href: '/mosc-redesign/spiritual-organizations', icon: 'Cross', isInternal: true },
+    { label: 'Spiritual Organisations', href: '/mosc-redesign/spiritual-organizations-cms', icon: 'Cross', isInternal: true },
     { label: 'Theological Seminaries', href: '/mosc-redesign/theological-seminaries', icon: 'GraduationCap', isInternal: true },
     { label: 'Publications', href: '/mosc-redesign/publications', icon: 'BookOpen', isInternal: true },
     { label: 'Lectionary', href: '/mosc-redesign/lectionary', icon: 'BookOpen', isInternal: true },

@@ -18,7 +18,7 @@ const navigationItems = [
 ];
 
 const quickLinks = [
-  { name: 'Spiritual Organisations', href: '/mosc-redesign/spiritual-organizations' },
+  { name: 'Spiritual Organisations', href: '/mosc-redesign/spiritual-organizations-cms' },
   { name: 'Publications', href: '/mosc-redesign/publications' },
   { name: 'Institutions', href: '/mosc-redesign/institutions' },
   { name: 'Training', href: '/mosc-redesign/training' },

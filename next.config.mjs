@@ -50,6 +50,11 @@ const nextConfig = {
         port: '1337',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: '**.strapiapp.com',
+        pathname: '/uploads/**',
+      },
     ],
     formats: ['image/avif', 'image/webp'],
     unoptimized: true,
@@ -72,6 +77,21 @@ const nextConfig = {
   turbopack: {},
 
   // No redirects from /mosc; /mosc-old exists on its own (rewrite only)
+
+  async redirects() {
+    return [
+      {
+        source: '/mosc-redesign/spiritual-organizations',
+        destination: '/mosc-redesign/spiritual-organizations-cms',
+        permanent: true,
+      },
+      {
+        source: '/mosc-redesign/spiritual-organizations/:slug',
+        destination: '/mosc-redesign/spiritual-organizations-cms/:slug',
+        permanent: true,
+      },
+    ];
+  },
 
   // Clerk FAPI proxy is now handled by clerkMiddleware's frontendApiProxy option (v7+).
   // The old manual rewrite for /__clerk/* has been removed because it didn't forward
