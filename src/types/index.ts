@@ -295,6 +295,20 @@ export interface OfficialDocumentYearBundleDTO {
 }
 
 /**
+ * DTO for gallery category (tenant-scoped lookup table).
+ */
+export interface GalleryCategoryDTO {
+  id: number;
+  tenantId?: string;
+  slug: string;
+  displayName: string;
+  sortOrder?: number;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
  * DTO for gallery album, matches backend schema.
  */
 export interface GalleryAlbumDTO {
@@ -305,6 +319,9 @@ export interface GalleryAlbumDTO {
   coverImageUrl?: string;
   isPublic?: boolean;
   displayOrder?: number;
+  albumYear?: number | null;
+  galleryCategoryId?: number | null;
+  galleryCategory?: GalleryCategoryDTO | null;
   createdAt: string;
   updatedAt: string;
   createdById?: number;

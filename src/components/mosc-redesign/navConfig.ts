@@ -10,7 +10,6 @@ export const MOSC_REDESIGN_QUICK_LINKS = [
   { label: "Theological Seminaries", href: "/mosc-redesign/theological-seminaries-cms" },
   { label: "Lectionary", href: "/mosc-redesign/lectionary" },
   { label: "Downloads", href: "/mosc-redesign/downloads" },
-  { label: "Gallery", href: "/mosc-redesign/gallery" },
 ] as const;
 
 /** Right-aligned main nav item with search icon (rendered separately in header). */

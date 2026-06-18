@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { GalleryAlbumDTO } from '@/types';
-import { fetchAlbumsServer, deleteAlbumServer, createAlbumServer } from './ApiServerActions';
+import type { GalleryAlbumDTO, GalleryCategoryDTO } from '@/types';
+import { fetchAlbumsServer, deleteAlbumServer, createAlbumServer, resolveGalleryCategoryIdForSaveServer } from './ApiServerActions';
+import { GalleryCategoryTypeahead } from '@/components/admin/gallery/GalleryCategoryTypeahead';
 import Image from 'next/image';
 import { Modal } from '@/components/Modal';
 
@@ -13,6 +14,7 @@ interface AdminAlbumListClientProps {
   initialTotalCount: number;
   initialPage: number;
   initialSearchTerm: string;
+  categories: GalleryCategoryDTO[];
 }
 
 export default function AdminAlbumListClient({
@@ -20,8 +22,11 @@ export default function AdminAlbumListClient({
   initialTotalCount,
   initialPage,
   initialSearchTerm,
+  categories,
 }: AdminAlbumListClientProps) {
   const router = useRouter();
+  const [categoryList, setCategoryList] = useState<GalleryCategoryDTO[]>(categories);
+  const [pendingCategoryName, setPendingCategoryName] = useState<string | null>(null);
   const [albums, setAlbums] = useState<GalleryAlbumDTO[]>(initialAlbums);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +42,8 @@ export default function AdminAlbumListClient({
     coverImageUrl: '',
     isPublic: true,
     displayOrder: 0,
+    albumYear: null as number | null,
+    galleryCategoryId: null as number | null,
   });
   const pageSize = 12;
 
@@ -91,12 +98,19 @@ export default function AdminAlbumListClient({
     setCreateError(null);
 
     try {
+      const galleryCategoryId = await resolveGalleryCategoryIdForSaveServer(
+        formData.galleryCategoryId,
+        pendingCategoryName
+      );
+
       const newAlbum = await createAlbumServer({
         title: formData.title,
         description: formData.description || undefined,
         coverImageUrl: formData.coverImageUrl || undefined,
         isPublic: formData.isPublic,
         displayOrder: formData.displayOrder,
+        albumYear: formData.albumYear,
+        galleryCategoryId,
       });
 
       // Reset form and close modal
@@ -106,7 +120,10 @@ export default function AdminAlbumListClient({
         coverImageUrl: '',
         isPublic: true,
         displayOrder: 0,
+        albumYear: null,
+        galleryCategoryId: null,
       });
+      setPendingCategoryName(null);
       setIsCreateModalOpen(false);
 
       // Refresh the list
@@ -127,7 +144,10 @@ export default function AdminAlbumListClient({
       coverImageUrl: '',
       isPublic: true,
       displayOrder: 0,
+      albumYear: null,
+      galleryCategoryId: null,
     });
+    setPendingCategoryName(null);
     setCreateError(null);
   };
 
@@ -455,6 +475,46 @@ export default function AdminAlbumListClient({
               rows={4}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter album description (optional)"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="create-galleryCategoryId">
+              Category
+            </label>
+            <GalleryCategoryTypeahead
+              id="create-galleryCategoryId"
+              categories={categoryList}
+              value={formData.galleryCategoryId}
+              onChange={(galleryCategoryId) => setFormData((prev) => ({ ...prev, galleryCategoryId }))}
+              onCategoryCreated={(category) =>
+                setCategoryList((prev) =>
+                  prev.some((c) => c.id === category.id) ? prev : [...prev, category]
+                )
+              }
+              onPendingDisplayNameChange={setPendingCategoryName}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="create-albumYear">
+              Album Year
+            </label>
+            <input
+              id="create-albumYear"
+              type="number"
+              value={formData.albumYear ?? ''}
+              onChange={(e) => {
+                const raw = e.target.value;
+                setFormData((prev) => ({
+                  ...prev,
+                  albumYear: raw === '' ? null : parseInt(raw, 10),
+                }));
+              }}
+              min={1900}
+              max={2100}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="e.g. 2023 (optional)"
             />
           </div>
 

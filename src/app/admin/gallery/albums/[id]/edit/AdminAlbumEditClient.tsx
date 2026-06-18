@@ -3,16 +3,20 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import type { GalleryAlbumDTO } from '@/types';
-import { updateAlbumServer, deleteAlbumServer } from '../../ApiServerActions';
+import type { GalleryAlbumDTO, GalleryCategoryDTO } from '@/types';
+import { updateAlbumServer, deleteAlbumServer, resolveGalleryCategoryIdForSaveServer } from '../../ApiServerActions';
+import { GalleryCategoryTypeahead } from '@/components/admin/gallery/GalleryCategoryTypeahead';
 import { Modal } from '@/components/Modal';
 
 interface AdminAlbumEditClientProps {
   initialAlbum: GalleryAlbumDTO;
+  categories: GalleryCategoryDTO[];
 }
 
-export default function AdminAlbumEditClient({ initialAlbum }: AdminAlbumEditClientProps) {
+export default function AdminAlbumEditClient({ initialAlbum, categories }: AdminAlbumEditClientProps) {
   const router = useRouter();
+  const [categoryList, setCategoryList] = useState<GalleryCategoryDTO[]>(categories);
+  const [pendingCategoryName, setPendingCategoryName] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -22,6 +26,8 @@ export default function AdminAlbumEditClient({ initialAlbum }: AdminAlbumEditCli
     coverImageUrl: initialAlbum.coverImageUrl || '',
     isPublic: initialAlbum.isPublic ?? true,
     displayOrder: initialAlbum.displayOrder || 0,
+    albumYear: initialAlbum.albumYear ?? null as number | null,
+    galleryCategoryId: initialAlbum.galleryCategoryId ?? null as number | null,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,12 +36,19 @@ export default function AdminAlbumEditClient({ initialAlbum }: AdminAlbumEditCli
     setError(null);
 
     try {
+      const galleryCategoryId = await resolveGalleryCategoryIdForSaveServer(
+        formData.galleryCategoryId,
+        pendingCategoryName
+      );
+
       await updateAlbumServer(initialAlbum.id!, {
         title: formData.title,
         description: formData.description || undefined,
         coverImageUrl: formData.coverImageUrl || undefined,
         isPublic: formData.isPublic,
         displayOrder: formData.displayOrder,
+        albumYear: formData.albumYear,
+        galleryCategoryId,
       });
 
       // Redirect to album list
@@ -172,6 +185,49 @@ export default function AdminAlbumEditClient({ initialAlbum }: AdminAlbumEditCli
             />
             <p className="mt-1 text-xs text-gray-500">
               URL to the cover image for this album. You can also select a cover image from the media management page.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="galleryCategoryId">
+              Category
+            </label>
+            <GalleryCategoryTypeahead
+              id="galleryCategoryId"
+              categories={categoryList}
+              value={formData.galleryCategoryId}
+              onChange={(galleryCategoryId) => setFormData((prev) => ({ ...prev, galleryCategoryId }))}
+              onCategoryCreated={(category) =>
+                setCategoryList((prev) =>
+                  prev.some((c) => c.id === category.id) ? prev : [...prev, category]
+                )
+              }
+              onPendingDisplayNameChange={setPendingCategoryName}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="albumYear">
+              Album Year
+            </label>
+            <input
+              id="albumYear"
+              type="number"
+              value={formData.albumYear ?? ''}
+              onChange={(e) => {
+                const raw = e.target.value;
+                setFormData((prev) => ({
+                  ...prev,
+                  albumYear: raw === '' ? null : parseInt(raw, 10),
+                }));
+              }}
+              min={1900}
+              max={2100}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="e.g. 2023"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Year shown on public gallery cards (1900–2100).
             </p>
           </div>
 

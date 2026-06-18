@@ -10,7 +10,8 @@ REM
 REM Flags:
 REM   /FORCE         Skip confirmation before schema rebuild
 REM   /PROD          Import corrected_event_media_inserts.ordered_PROD.sql
-REM   /SKIP-EXPORT   Skip pg_dump; reuse existing export.sql
+REM   /SKIP-EXPORT   Skip pg_dump and steps 2-4; reuse export.sql and
+REM                  corrected_event_media_inserts.ordered.sql unchanged
 REM   /REMOTE        Steps 5-7 target remote Postgres (mosc-temp\.env.local first)
 REM ============================================================
 
@@ -179,18 +180,19 @@ call :log_info "File: %EXPORT_FILE%"
 goto :step2
 
 :step1_skip
-if not exist "%EXPORT_FILE%" (
-  set "S1=FAIL"
-  call :log_err "export file not found: %EXPORT_FILE%"
-  goto :fail
-)
 set "S1=SKIP"
-call :log_ok "Step 1 skipped (/SKIP-EXPORT) - using existing export file"
-call :log_info "File: %EXPORT_FILE%"
+call :log_ok "Step 1 skipped (/SKIP-EXPORT) - export.sql left unchanged"
+if exist "%EXPORT_FILE%" (
+  call :log_info "File: %EXPORT_FILE% (not read; import uses ordered SQL below)"
+) else (
+  call :log_info "export.sql not present (OK for /SKIP-EXPORT)"
+)
+goto :step2
 
 REM --- STEP 2: Reorder ---
 :step2
 call :log_step "2" "Reorder INSERT statements"
+if "%SKIP_EXPORT%"=="1" goto :step2_skip
 pushd "%SQLS_DIR%"
 node reorder_sql_inserts_final.cjs
 set "REORDER_ERR=!errorlevel!"
@@ -208,9 +210,30 @@ if not exist "%ORDERED_FILE%" (
 set "S2=OK"
 call :log_ok "Step 2 complete - ordered INSERT file created"
 call :log_info "File: %ORDERED_FILE%"
+goto :step3
+
+:step2_skip
+if not exist "%ORDERED_FILE%" (
+  set "S2=FAIL"
+  call :log_err "ordered import file not found: %ORDERED_FILE%"
+  call :log_info "Restore from git or run without /SKIP-EXPORT to regenerate from export.sql"
+  goto :fail
+)
+for %%F in ("%ORDERED_FILE%") do set "ORDERED_SIZE=%%~zF"
+if !ORDERED_SIZE! LSS 100 (
+  set "S2=FAIL"
+  call :log_err "ordered import file is empty or too small (!ORDERED_SIZE! bytes): %ORDERED_FILE%"
+  call :log_info "Restore from git: git checkout HEAD -- code_html_template/SQLS/corrected_event_media_inserts.ordered.sql"
+  goto :fail
+)
+set "S2=SKIP"
+call :log_ok "Step 2 skipped (/SKIP-EXPORT) - ordered file left unchanged"
+call :log_info "File: %ORDERED_FILE% (!ORDERED_SIZE! bytes)"
 
 REM --- STEP 3: PROD user ID copy ---
+:step3
 call :log_step "3" "Create PROD SQL copy with user ID replacements"
+if "%SKIP_EXPORT%"=="1" goto :step3_skip
 pushd "%MOSC_TEMP%"
 node scripts\replace-user-profile-ids-in-sql.mjs
 set "PROD_ERR=!errorlevel!"
@@ -228,15 +251,41 @@ if not exist "%PROD_FILE%" (
 set "S3=OK"
 call :log_ok "Step 3 complete - PROD copy created"
 call :log_info "File: %PROD_FILE%"
+goto :step4_setup
+
+:step3_skip
+if "%USE_PROD%"=="1" (
+  if not exist "%PROD_FILE%" (
+    set "S3=FAIL"
+    call :log_err "PROD import file not found: %PROD_FILE%"
+    call :log_info "Run without /SKIP-EXPORT once to generate it, or copy from a backup"
+    goto :fail
+  )
+  for %%F in ("%PROD_FILE%") do set "PROD_SIZE=%%~zF"
+  if !PROD_SIZE! LSS 100 (
+    set "S3=FAIL"
+    call :log_err "PROD import file is empty or too small (!PROD_SIZE! bytes): %PROD_FILE%"
+    goto :fail
+  )
+  set "S3=SKIP"
+  call :log_ok "Step 3 skipped (/SKIP-EXPORT) - PROD file left unchanged"
+  call :log_info "File: %PROD_FILE% (!PROD_SIZE! bytes)"
+) else (
+  set "S3=SKIP"
+  call :log_ok "Step 3 skipped (/SKIP-EXPORT) - PROD copy not regenerated"
+)
 
 REM --- STEP 4: Comment pg_dump lines ---
+:step4_setup
 if "%USE_PROD%"=="1" (
   set "IMPORT_FILE=%PROD_FILE%"
 ) else (
   set "IMPORT_FILE=%ORDERED_FILE%"
 )
 
+:step4
 call :log_step "4" "Comment pg_dump header lines in import file"
+if "%SKIP_EXPORT%"=="1" goto :step4_skip
 powershell -NoProfile -Command "$path = '%IMPORT_FILE%'; $lines = Get-Content -LiteralPath $path; $out = $lines | ForEach-Object { if ($_ -match '^\s*pg_dump') { $_ -replace 'pg_dump','-- pg_dump' } else { $_ } }; Set-Content -LiteralPath $path -Value $out -Encoding UTF8"
 if errorlevel 1 (
   set "S4=FAIL"
@@ -246,6 +295,19 @@ if errorlevel 1 (
 set "S4=OK"
 call :log_ok "Step 4 complete - import file patched"
 call :log_info "File: !IMPORT_FILE!"
+goto :step4_done
+
+:step4_skip
+if not exist "!IMPORT_FILE!" (
+  set "S4=FAIL"
+  call :log_err "import file not found: !IMPORT_FILE!"
+  goto :fail
+)
+set "S4=SKIP"
+call :log_ok "Step 4 skipped (/SKIP-EXPORT) - import file left unchanged"
+call :log_info "File: !IMPORT_FILE!"
+
+:step4_done
 
 REM --- Confirm destructive steps ---
 call :log_banner "WARNING: Steps 5-7 rebuild schema and replace data"
@@ -439,7 +501,7 @@ echo(   WORKSPACE_ROOT  Parent folder containing mosc-temp (e.g. F:\project_work
 echo(   CONTAINER_ID    Docker Postgres container ID (auto-detected if omitted)
 echo(   /FORCE          Skip confirmation before schema rebuild
 echo(   /PROD           Import corrected_event_media_inserts.ordered_PROD.sql
-echo(   /SKIP-EXPORT    Skip pg_dump; reuse existing export.sql
+echo(   /SKIP-EXPORT    Skip export/reorder/PROD/patch; import existing ordered SQL as-is
 echo(   /REMOTE         Apply steps 5-7 to remote Postgres (reads mosc-temp\.env.local)
 echo(
 echo( Remote config (first match wins):
