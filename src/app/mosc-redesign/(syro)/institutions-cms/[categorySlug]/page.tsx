@@ -43,9 +43,6 @@ export default async function InstitutionCategoryCmsPage({ params }: PageProps) 
   const { entries } = await getInstitutionsData();
   const categoryEntries = filterInstitutionsByCategory(entries, categorySlug);
   const imageSrc = pickCategoryCardImage(categoryEntries, category);
-  const introText =
-    categoryEntries.find((entry) => entry.description?.trim())?.description ??
-    category.fallbackDescription;
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
@@ -55,28 +52,31 @@ export default async function InstitutionCategoryCmsPage({ params }: PageProps) 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
-                <div className="mb-8 flex justify-center">
-                  <div className="relative w-full h-auto rounded-lg overflow-hidden flex items-center justify-center bg-syro-bg-gray/20">
+              <div className="overflow-hidden rounded-lg bg-white p-4 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] sm:p-6">
+                <div className="flex justify-center">
+                  <div className="relative flex h-auto w-full items-center justify-center overflow-hidden rounded-lg bg-syro-bg-gray/20">
                     <Image
                       src={imageSrc}
                       alt={category.title}
                       width={800}
                       height={600}
-                      className="w-full h-auto object-contain"
+                      className="h-auto w-full object-contain"
                       style={{ backgroundColor: 'transparent', borderRadius: '0.5rem' }}
                       priority
                       unoptimized={Boolean(imageSrc.startsWith('http'))}
                     />
                   </div>
                 </div>
-                <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
-                  {introText}
-                </p>
               </div>
 
               <div className="mt-8">
-                <InstitutionCategoryList entries={categoryEntries} categoryTitle={category.title} />
+                <InstitutionCategoryList
+                  entries={categoryEntries}
+                  categoryTitle={category.title}
+                  singleColumn={
+                    categorySlug === 'medical-college' || categorySlug === 'engineering-colleges'
+                  }
+                />
               </div>
 
               <div className="mt-8 hidden lg:block">

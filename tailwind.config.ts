@@ -149,6 +149,7 @@ const config = {
         script: "var(--font-script)",
         /** MOSC rocket redesign homepage ( /mosc-redesign ) */
         "dm-sans": ["var(--font-dm-sans)", "DM Sans", "ui-sans-serif", "system-ui", "sans-serif"],
+        "anek-malayalam": ["var(--font-anek-malayalam)", "Anek Malayalam", "ui-sans-serif", "system-ui", "sans-serif"],
         "syro-primary": ["Poppins", "Arial", "Helvetica", "sans-serif"],
         "syro-display": ["Playfair Display", "serif"],
       },

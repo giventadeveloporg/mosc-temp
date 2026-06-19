@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Anek_Malayalam } from 'next/font/google';
 import { useCalendarNav } from '@/app/calendar/hooks/useCalendarNav';
 import { fetchLiturgyDaysForMonthServer } from './ApiServerActions';
 import type { LiturgyCalendarItem, LiturgyCalendarView, LiturgyLanguage } from './types';
@@ -12,12 +11,6 @@ import { LiturgyWeekView } from './components/LiturgyWeekView';
 import { LiturgyDayView } from './components/LiturgyDayView';
 
 const BASE_PATH = '/mosc-redesign/liturgical-calendar';
-
-const anekMalayalam = Anek_Malayalam({
-  subsets: ['latin', 'malayalam'],
-  weight: ['400', '500', '600', '700'],
-  display: 'swap',
-});
 
 export default function LiturgyCalendarClient({
   initialItems,
@@ -290,7 +283,7 @@ export default function LiturgyCalendarClient({
 
       {!loading && (
         <div
-          className={lng === 'ml' ? anekMalayalam.className : undefined}
+          className={lng === 'ml' ? 'font-anek-malayalam' : undefined}
           lang={lng === 'ml' ? 'ml' : 'en'}
         >
           {displayView === 'month' && (

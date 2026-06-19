@@ -83,29 +83,29 @@ export function MoscGalleryAlbumCard({
 }: MoscGalleryAlbumCardProps) {
   const isMosc = variant === 'mosc-redesign';
   const badgeClass = isMosc
-    ? 'absolute top-3 right-3 bg-syro-red px-3 py-1 rounded-full text-xs font-syro-primary font-medium shadow-md text-white'
+    ? 'absolute top-3 right-3 bg-[#be1929] px-3 py-1 rounded-full text-xs font-syro-primary font-medium shadow-md text-white'
     : 'absolute top-3 right-3 bg-violet-600 px-3 py-1 rounded-full text-xs font-medium shadow-md text-white';
 
   const cardOuterClass = isMosc
-    ? 'group bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full'
+    ? 'group bg-white rounded-xl shadow-md hover:shadow-lg border border-gray-100 transition-all duration-300 overflow-hidden flex flex-col h-full'
     : 'group homepage-glass-card services-glass-card-face rounded-2xl overflow-hidden flex flex-col h-full hover:-translate-y-1 transition-all duration-300';
 
-  const bodyPadding = isMosc ? 'p-8' : 'p-6 sm:p-8';
+  const bodyPadding = isMosc ? 'p-5 sm:p-6' : 'p-6 sm:p-8';
   const titleClass = isMosc
-    ? 'font-syro-display font-semibold text-lg text-syro-blue mb-2 line-clamp-2 group-hover:text-syro-red transition-all duration-300'
+    ? 'font-syro-display font-bold text-sm sm:text-base text-[#be1929] uppercase tracking-wide mb-2 line-clamp-2 group-hover:text-syro-red transition-colors duration-300'
     : 'font-semibold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-violet-700 transition-all duration-300';
 
   const gradient = MOSC_GRADIENTS[gradientIndex % MOSC_GRADIENTS.length];
 
   const cardContent = (
     <>
-      <div className="relative w-full h-48 overflow-hidden bg-white">
+      <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-50">
         {coverImageUrl ? (
           <Image
             src={coverImageUrl}
             alt={title}
             fill
-            className="object-contain group-hover:scale-105 transition-all duration-300"
+            className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
@@ -129,8 +129,8 @@ export function MoscGalleryAlbumCard({
 
       <div className={`${bodyPadding} flex flex-col flex-1`}>
         {categoryDisplayName && (
-          <div className="mb-3">
-            <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${isMosc ? 'bg-syro-red/10 text-syro-red font-syro-primary' : 'bg-violet-100 text-violet-700'}`}>
+          <div className="mb-2.5">
+            <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${isMosc ? 'bg-[#fce4ec] text-[#be1929] font-syro-primary' : 'bg-violet-100 text-violet-700'}`}>
               {categoryDisplayName}
             </span>
           </div>
@@ -139,7 +139,7 @@ export function MoscGalleryAlbumCard({
         <h3 className={titleClass}>{title}</h3>
 
         {albumYear != null && (
-          <p className={`text-sm mb-4 ${isMosc ? 'font-syro-primary text-syro-dark-gray' : 'text-gray-600'}`}>
+          <p className={`text-sm mb-4 ${isMosc ? 'font-syro-primary text-gray-500' : 'text-gray-600'}`}>
             {String(albumYear)}
           </p>
         )}

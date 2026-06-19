@@ -35,9 +35,11 @@ function formatWebsiteHref(website: string): string {
 function InstitutionEntryCard({
   entry,
   index,
+  compact,
 }: {
   entry: InstitutionEntry;
   index: number;
+  compact?: boolean;
 }) {
   const location =
     entry.address?.split('\n').map((line) => line.trim()).filter(Boolean)[0] ?? null;
@@ -49,7 +51,9 @@ function InstitutionEntryCard({
   const displayIndex = String(index + 1).padStart(2, '0');
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-burgundy/15 bg-white shadow-[rgba(50,50,93,0.18)_0px_8px_20px_-4px,rgba(0,0,0,0.2)_0px_4px_10px_-4px] transition-all duration-300 hover:border-burgundy/30 hover:shadow-[rgba(50,50,93,0.22)_0px_12px_28px_-4px,rgba(0,0,0,0.22)_0px_6px_14px_-4px]">
+    <article
+      className={`group flex flex-col overflow-hidden rounded-xl border border-burgundy/15 bg-white shadow-[rgba(50,50,93,0.18)_0px_8px_20px_-4px,rgba(0,0,0,0.2)_0px_4px_10px_-4px] transition-all duration-300 hover:border-burgundy/30 hover:shadow-[rgba(50,50,93,0.22)_0px_12px_28px_-4px,rgba(0,0,0,0.22)_0px_6px_14px_-4px]${compact ? '' : ' h-full'}`}
+    >
       <header className="institution-entry-card__header flex items-start gap-4 border-b border-burgundy/10 bg-gradient-to-r from-burgundy-dark to-burgundy px-5 py-4">
           <span
             className="institution-entry-card__index flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-parchment-light/20 font-syro-display text-sm font-bold"
@@ -127,11 +131,14 @@ function InstitutionEntryCard({
 interface InstitutionCategoryListProps {
   entries: InstitutionEntry[];
   categoryTitle?: string;
+  /** One card per row (no 2-column grid). Use for categories with few entries. */
+  singleColumn?: boolean;
 }
 
 export default function InstitutionCategoryList({
   entries,
   categoryTitle = 'institutions',
+  singleColumn = false,
 }: InstitutionCategoryListProps) {
   const listRef = useRef<HTMLDivElement>(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -244,10 +251,20 @@ export default function InstitutionCategoryList({
           </p>
         </div>
       ) : (
-        <ul className="m-0 grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2 md:gap-8">
+        <ul
+          className={
+            singleColumn
+              ? 'm-0 grid list-none grid-cols-1 gap-5 p-0'
+              : 'm-0 grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2 md:gap-8'
+          }
+        >
           {pageEntries.map((entry, index) => (
-            <li key={entry.documentId || entry.slug} className="h-full">
-              <InstitutionEntryCard entry={entry} index={safePage * PAGE_SIZE + index} />
+            <li key={entry.documentId || entry.slug} className={singleColumn ? undefined : 'h-full'}>
+              <InstitutionEntryCard
+                entry={entry}
+                index={safePage * PAGE_SIZE + index}
+                compact={singleColumn}
+              />
             </li>
           ))}
         </ul>
