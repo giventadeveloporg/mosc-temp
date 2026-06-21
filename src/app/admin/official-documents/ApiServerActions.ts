@@ -198,12 +198,47 @@ export type OfficialDocumentsPageResult = {
   size: number;
 };
 
+/** Criteria fields supported for admin document search (Spring Data REST). */
+export type OfficialDocumentSearchField = 'title' | 'description' | 'id' | 'eventMediaType';
+
+function appendOfficialDocumentSearchCriteria(
+  params: URLSearchParams,
+  searchField: OfficialDocumentSearchField | undefined,
+  searchTerm: string | undefined
+) {
+  const term = searchTerm?.trim();
+  if (!term) return;
+
+  const field = searchField ?? 'title';
+  switch (field) {
+    case 'title':
+      params.append('title.contains', term);
+      break;
+    case 'description':
+      params.append('description.contains', term);
+      break;
+    case 'eventMediaType':
+      params.append('eventMediaType.contains', term);
+      break;
+    case 'id': {
+      const id = parseInt(term, 10);
+      if (!Number.isNaN(id)) params.append('id.equals', String(id));
+      break;
+    }
+    default:
+      break;
+  }
+}
+
 /** Paginated list for admin table (Spring `page` / `size`). */
 export async function fetchTenantOfficialDocumentsPagedServer(filters: {
   year?: number;
   officialDocumentCategoryId?: number;
   page?: number;
   size?: number;
+  searchField?: OfficialDocumentSearchField;
+  searchTerm?: string;
+  isPublic?: boolean;
 }): Promise<OfficialDocumentsPageResult> {
   const page = filters.page ?? 0;
   const size = filters.size ?? 20;
@@ -218,6 +253,9 @@ export async function fetchTenantOfficialDocumentsPagedServer(filters: {
     if (filters.officialDocumentCategoryId != null) {
       params.append('officialDocumentCategoryId.equals', String(filters.officialDocumentCategoryId));
     }
+    if (filters.isPublic === true) params.append('isPublic.equals', 'true');
+    if (filters.isPublic === false) params.append('isPublic.equals', 'false');
+    appendOfficialDocumentSearchCriteria(params, filters.searchField, filters.searchTerm);
     const url = `${getApiBaseUrl()}/api/event-medias?${params.toString()}`;
     const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
     if (!res.ok) {

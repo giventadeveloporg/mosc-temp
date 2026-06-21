@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-06-19T23:10:43.558Z",
+  "startedAt": "2026-06-21T05:39:53.184Z",
   "dryRun": false,
   "dedupe": {
     "albumsReassigned": [],
@@ -10,161 +10,161 @@
   "albumsPatched": [],
   "albumsSkipped": [
     {
-      "id": 8332,
+      "id": 608332,
       "title": "Chicago Malayalee Association",
       "reason": "no static_slug in description"
     },
     {
-      "id": 10688,
+      "id": 610688,
       "title": "Malayalees US",
       "reason": "no static_slug in description"
     },
     {
-      "id": 11044,
+      "id": 611044,
       "staticSlug": "russia-visit",
       "reason": "already up to date"
     },
     {
-      "id": 11045,
+      "id": 611045,
       "staticSlug": "vatican-visit",
       "reason": "already up to date"
     },
     {
-      "id": 11046,
+      "id": 611046,
       "staticSlug": "enthronement-mathews-iii",
       "reason": "already up to date"
     },
     {
-      "id": 11047,
+      "id": 611047,
       "staticSlug": "reception-mathews-iii",
       "reason": "already up to date"
     },
     {
-      "id": 11048,
+      "id": 611048,
       "staticSlug": "paulose-ii-with-kiril",
       "reason": "already up to date"
     },
     {
-      "id": 11049,
+      "id": 611049,
       "staticSlug": "st-matrona-relics",
       "reason": "already up to date"
     },
     {
-      "id": 11050,
+      "id": 611050,
       "staticSlug": "st-cyril-methodius",
       "reason": "already up to date"
     },
     {
-      "id": 11051,
+      "id": 611051,
       "staticSlug": "metropolitan-hilarion",
       "reason": "already up to date"
     },
     {
-      "id": 11052,
+      "id": 611052,
       "staticSlug": "pokrovsky-monastery",
       "reason": "already up to date"
     },
     {
-      "id": 11053,
+      "id": 611053,
       "staticSlug": "mother-feofania",
       "reason": "already up to date"
     },
     {
-      "id": 11054,
+      "id": 611054,
       "staticSlug": "ceremonial-reception-russian-orthodox",
       "reason": "already up to date"
     },
     {
-      "id": 11055,
+      "id": 611055,
       "staticSlug": "offering-incense-st-thomas",
       "reason": "already up to date"
     },
     {
-      "id": 11056,
+      "id": 611056,
       "staticSlug": "order-st-thomas-abune-mathias",
       "reason": "already up to date"
     },
     {
-      "id": 11057,
+      "id": 611057,
       "staticSlug": "visit-abune-mathias",
       "reason": "already up to date"
     },
     {
-      "id": 11058,
+      "id": 611058,
       "staticSlug": "reception-tikon-puthupally",
       "reason": "already up to date"
     },
     {
-      "id": 11059,
+      "id": 611059,
       "staticSlug": "website-inauguration",
       "reason": "already up to date"
     },
     {
-      "id": 11060,
+      "id": 611060,
       "staticSlug": "private-audience-tikon-devalokam",
       "reason": "already up to date"
     },
     {
-      "id": 11061,
+      "id": 611061,
       "staticSlug": "canberra-visit",
       "reason": "already up to date"
     },
     {
-      "id": 11062,
+      "id": 611062,
       "staticSlug": "dharma-dhamma-conference",
       "reason": "already up to date"
     },
     {
-      "id": 11063,
+      "id": 611063,
       "staticSlug": "vienna-fraternity",
       "reason": "already up to date"
     },
     {
-      "id": 11064,
+      "id": 611064,
       "staticSlug": "armenian-genocide-canonization",
       "reason": "already up to date"
     },
     {
-      "id": 11065,
+      "id": 611065,
       "staticSlug": "armenian-president",
       "reason": "already up to date"
     },
     {
-      "id": 11066,
+      "id": 611066,
       "staticSlug": "private-audience-karekin",
       "reason": "already up to date"
     },
     {
-      "id": 11067,
+      "id": 611067,
       "staticSlug": "enthronement-coptic-pope",
       "reason": "already up to date"
     },
     {
-      "id": 11068,
+      "id": 611068,
       "staticSlug": "blessing-holy-myron",
       "reason": "already up to date"
     },
     {
-      "id": 11069,
+      "id": 611069,
       "staticSlug": "private-audience-aram",
       "reason": "already up to date"
     },
     {
-      "id": 11070,
+      "id": 611070,
       "staticSlug": "armenian-genocide-100th",
       "reason": "already up to date"
     },
     {
-      "id": 11071,
+      "id": 611071,
       "staticSlug": "ethiopian-visit",
       "reason": "already up to date"
     },
     {
-      "id": 11072,
+      "id": 611072,
       "staticSlug": "rome-visit",
       "reason": "already up to date"
     }
   ],
   "albumsMissingMeta": [],
-  "finishedAt": "2026-06-19T23:10:43.560Z"
+  "finishedAt": "2026-06-21T05:39:53.185Z"
 }

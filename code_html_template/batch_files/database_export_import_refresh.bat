@@ -907,6 +907,20 @@ if !REGEN_ERR! neq 0 (
   call :log_err "patch_mosc_malankara_import_block.cjs failed with exit code !REGEN_ERR!"
   exit /b 1
 )
+python scripts\patch_mosc_shared_s3_urls.py "%MOSC_FULL_FILE%"
+set "REGEN_ERR=!errorlevel!"
+if !REGEN_ERR! neq 0 (
+  popd
+  call :log_err "patch_mosc_shared_s3_urls.py failed with exit code !REGEN_ERR!"
+  exit /b 1
+)
+python scripts\patch_mosc_fk_remap.py "%MOSC_FULL_FILE%"
+set "REGEN_ERR=!errorlevel!"
+if !REGEN_ERR! neq 0 (
+  popd
+  call :log_err "patch_mosc_fk_remap.py failed with exit code !REGEN_ERR!"
+  exit /b 1
+)
 python scripts\extract_dup_tenant_sql.py "%MOSC_FULL_FILE%" "%MOSC_DUP_FILE%"
 set "REGEN_ERR=!errorlevel!"
 popd
