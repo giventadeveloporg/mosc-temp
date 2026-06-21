@@ -12,6 +12,9 @@ from pathlib import Path
 SOURCE_TENANT = "tenant_demo_002"
 TARGET_TENANT = "mosc_malankara_orthodox_2"
 ID_OFFSET = 600_000
+# Duplicated rows reuse the same S3 objects as tenant_demo_002 (bucket is not copied per tenant).
+S3_TENANT_PATH_SOURCE = f"tenantId/{SOURCE_TENANT}"
+S3_TENANT_PATH_TARGET = f"tenantId/{TARGET_TENANT}"
 
 SKIP_DUPLICATE_TABLES = {
     "satellite_domain",  # global unique hostname/satellite_key — configure per tenant manually
@@ -54,6 +57,7 @@ UNIQUE_SUFFIX = "_M2"
 
 FK_COLUMN_TARGETS: dict[str, str] = {
     "created_by_id": "user_profile",
+    "uploaded_by_id": "user_profile",
     "reviewed_by_admin_id": "user_profile",
     "user_profile_id": "user_profile",
     "event_type_id": "event_type_details",
@@ -63,24 +67,31 @@ FK_COLUMN_TARGETS: dict[str, str] = {
     "recurrence_series_id": "event_recurrence_series",
     "tenant_organization_id": "tenant_organization",
     "gallery_album_id": "gallery_album",
+    "album_id": "gallery_album",
     "discount_codes_id": "discount_code",
     "ticket_type_id": "event_ticket_type",
     "transaction_id": "event_ticket_transaction",
+    "ticket_transaction_id": "event_ticket_transaction",
     "live_update_id": "event_live_update",
     "score_card_id": "event_score_card",
     "membership_plan_id": "membership_plan",
     "focus_group_id": "focus_group",
+    "event_focus_group_id": "focus_group",
+    "event_sponsors_join_id": "event_sponsors_join",
     "sponsor_id": "event_sponsors",
     "job_execution_id": "batch_job_execution",
     "job_instance_id": "batch_job_instance",
     "step_execution_id": "batch_step_execution",
     "payment_request_id": "manual_payment_request",
     "category_id": "official_document_category",
+    "official_document_category_id": "official_document_category",
     "year_bundle_id": "official_document_year_bundle",
     "poll_id": "event_poll",
     "poll_option_id": "event_poll_option",
     "attendee_id": "event_attendee",
     "primary_attendee_id": "event_attendee",
+    "template_id": "promotion_email_template",
+    "sent_by_id": "user_profile",
 }
 
 
@@ -232,8 +243,11 @@ def replace_tenant_strings(val: str) -> str:
         return val
     if val.startswith("'") and val.endswith("'"):
         inner = val[1:-1].replace("''", "'")
+        # Shared S3 objects remain under tenant_demo_002; duplication does not copy the bucket.
+        if "eventapp-media-bucket" in inner and S3_TENANT_PATH_SOURCE in inner:
+            return val
         inner = inner.replace(SOURCE_TENANT, TARGET_TENANT)
-        inner = inner.replace(f"tenantId/{SOURCE_TENANT}", f"tenantId/{TARGET_TENANT}")
+        inner = inner.replace(S3_TENANT_PATH_SOURCE, S3_TENANT_PATH_TARGET)
         return "'" + inner.replace("'", "''") + "'"
     s = unquote_sql_string(val)
     if s == SOURCE_TENANT:
@@ -254,6 +268,9 @@ def remap_value(col: str, val: str, table: str, id_maps: dict[str, dict[int, int
         table_map = id_maps.get(target_table, {})
         if n in table_map:
             return str(table_map[n])
+        # Already duplicated offset id (e.g. 605152) — keep, do not null
+        if target_table == "user_profile" and n >= ID_OFFSET and n in table_map.values():
+            return str(n)
         # Shared demo event types (tenant_demo_001) referenced by tenant_demo_002 events
         if col == "event_type_id" and 1 <= n <= 20:
             return str(n + ID_OFFSET)
