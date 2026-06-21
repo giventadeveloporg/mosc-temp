@@ -5,27 +5,29 @@
 
 import 'server-only';
 import { getStrapiUrl, getStrapiApiBase, getStrapiHeaders, getStrapiTenantId } from '@/lib/strapi';
+import { unwrapStrapiRecord, unwrapStrapiRelation } from '@/lib/strapi/unwrapRecord';
 import { getMediaUrl, getMediaAlt } from '../lib/strapiMedia';
 import type { Parish, ParishesListResult, StrapiPagination } from './types';
 
 function parseParish(raw: Record<string, unknown>, baseUrl: string): Parish {
-  const documentId = typeof raw.documentId === 'string' ? raw.documentId : '';
-  const name = typeof raw.name === 'string' ? raw.name : '';
-  const slug = typeof raw.slug === 'string' ? raw.slug : '';
-  const address = typeof raw.address === 'string' ? raw.address : null;
-  const addressLine1 = typeof raw.addressLine1 === 'string' ? raw.addressLine1 : null;
-  const addressLine2 = typeof raw.addressLine2 === 'string' ? raw.addressLine2 : null;
-  const email = typeof raw.email === 'string' ? raw.email : null;
-  const phones = typeof raw.phones === 'string' ? raw.phones : null;
-  const phoneSecondary = typeof raw.phoneSecondary === 'string' ? raw.phoneSecondary : null;
-  const city = typeof raw.city === 'string' ? raw.city : null;
-  const state = typeof raw.state === 'string' ? raw.state : null;
-  const postalCode = typeof raw.postalCode === 'string' ? raw.postalCode : null;
-  const country = typeof raw.country === 'string' ? raw.country : null;
+  const item = unwrapStrapiRecord(raw);
+  const documentId = typeof item.documentId === 'string' ? item.documentId : '';
+  const name = typeof item.name === 'string' ? item.name : '';
+  const slug = typeof item.slug === 'string' ? item.slug : '';
+  const address = typeof item.address === 'string' ? item.address : null;
+  const addressLine1 = typeof item.addressLine1 === 'string' ? item.addressLine1 : null;
+  const addressLine2 = typeof item.addressLine2 === 'string' ? item.addressLine2 : null;
+  const email = typeof item.email === 'string' ? item.email : null;
+  const phones = typeof item.phones === 'string' ? item.phones : null;
+  const phoneSecondary = typeof item.phoneSecondary === 'string' ? item.phoneSecondary : null;
+  const city = typeof item.city === 'string' ? item.city : null;
+  const state = typeof item.state === 'string' ? item.state : null;
+  const postalCode = typeof item.postalCode === 'string' ? item.postalCode : null;
+  const country = typeof item.country === 'string' ? item.country : null;
   let dioceseName: string | null = null;
-  const diocese = raw.diocese as Record<string, unknown> | undefined;
+  const diocese = unwrapStrapiRelation(item.diocese);
   if (diocese && typeof diocese.name === 'string') dioceseName = diocese.name;
-  const image = raw.image;
+  const image = item.image;
   const imageUrl = image && baseUrl ? getMediaUrl(image, baseUrl) : null;
   const imageAlt = image ? (getMediaAlt(image) ?? null) : null;
   return {

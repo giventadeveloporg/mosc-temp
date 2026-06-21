@@ -62,6 +62,9 @@ export function getStrapiHeaders(): Record<string, string> {
   return headers;
 }
 
+export { unwrapStrapiRecord, unwrapStrapiRelation, normalizeStrapiSlug, findByStrapiSlug } from '@/lib/strapi/unwrapRecord';
+export { fetchStrapiEntryBySlug } from '@/lib/strapi/fetchBySlug';
+
 const LOG_PREFIX = '[STRAPI-NEWS]';
 
 /**

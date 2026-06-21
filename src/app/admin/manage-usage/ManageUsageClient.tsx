@@ -20,6 +20,99 @@ const SEARCH_FIELDS = [
   { label: 'Phone', value: 'phone' },
 ];
 
+function AdminPromotionGuidance() {
+  const tenantId = getTenantId();
+
+  return (
+    <details
+      open
+      className="mb-6 rounded-xl border-2 border-blue-200 bg-blue-50 shadow-sm group"
+    >
+      <summary className="cursor-pointer list-none px-4 py-3 sm:px-5 sm:py-4 flex items-start gap-3 hover:bg-blue-100/60 rounded-xl transition-colors [&::-webkit-details-marker]:hidden">
+        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center mt-0.5">
+          <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold text-blue-900 text-sm sm:text-base">How to add or promote an admin user</p>
+          <p className="text-xs sm:text-sm text-blue-800/90 mt-0.5">
+            Users must register on this site first, then appear in the list below where you can change their role.
+          </p>
+        </div>
+        <svg
+          className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1 transition-transform group-open:rotate-180"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </summary>
+
+      <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0 border-t border-blue-200/80" role="note" aria-label="How to promote a user to admin">
+        <ol className="mt-4 space-y-3 text-sm text-gray-700 list-none m-0 p-0">
+          <li className="flex gap-3 items-start">
+            <span className="flex-shrink-0 w-8 h-8 rounded-lg border-2 border-blue-300 bg-blue-100 font-bold text-sm flex items-center justify-center text-blue-700">
+              1
+            </span>
+            <p className="pt-1 leading-relaxed">
+              Ask the person to{' '}
+              <Link href="/sign-up" className="font-semibold text-blue-700 underline hover:text-blue-900">
+                register on this site
+              </Link>{' '}
+              (or sign in if they already have an account). Registration creates a profile linked to tenant{' '}
+              <code className="text-xs bg-white/80 px-1.5 py-0.5 rounded border border-blue-200">{tenantId}</code>{' '}
+              in the database.
+            </p>
+          </li>
+          <li className="flex gap-3 items-start">
+            <span className="flex-shrink-0 w-8 h-8 rounded-lg border-2 border-emerald-300 bg-emerald-100 font-bold text-sm flex items-center justify-center text-emerald-700">
+              2
+            </span>
+            <p className="pt-1 leading-relaxed">
+              After they complete sign-up, their profile appears in the user table below. Use search or filters to find
+              them by name or email.
+            </p>
+          </li>
+          <li className="flex gap-3 items-start">
+            <span className="flex-shrink-0 w-8 h-8 rounded-lg border-2 border-purple-300 bg-purple-100 font-bold text-sm flex items-center justify-center text-purple-700">
+              3
+            </span>
+            <p className="pt-1 leading-relaxed">
+              Click <strong>Edit</strong> on their row, set <strong>Role</strong> to{' '}
+              <strong>ADMIN</strong> (or <strong>SUPER ADMIN</strong> if needed), adjust status or other fields, then
+              save.
+            </p>
+          </li>
+          <li className="flex gap-3 items-start">
+            <span className="flex-shrink-0 w-8 h-8 rounded-lg border-2 border-orange-300 bg-orange-100 font-bold text-sm flex items-center justify-center text-orange-700">
+              4
+            </span>
+            <p className="pt-1 leading-relaxed">
+              The promoted user must <strong>sign out and sign back in</strong> before the Admin menu appears in the
+              site header.
+            </p>
+          </li>
+        </ol>
+
+        <div className="mt-4 rounded-lg border border-blue-200 bg-white/70 px-3 py-2.5 text-xs text-gray-600 space-y-1.5">
+          <p>
+            <strong className="text-gray-800">Cannot find the user?</strong> They may not have registered yet, or they
+            signed up on a different tenant site. Bulk upload can create profiles, but the person still needs to sign in
+            with the same email for full access.
+          </p>
+          <p>
+            <strong className="text-gray-800">Guest / mobile payment profiles</strong> may exist with incomplete names;
+            those users are updated automatically when they sign in with Clerk using the same email.
+          </p>
+        </div>
+      </div>
+    </details>
+  );
+}
+
 function UserDetailsTooltip({ user, anchorRect, onClose }: { user: UserProfileDTO, anchorRect: DOMRect | null, onClose: () => void }) {
   if (!anchorRect) return null;
 
@@ -307,6 +400,10 @@ function EditUserModal({ user, open, onClose, onSave, loading }: {
                 <option value="VOLUNTEER">VOLUNTEER</option>
                 <option value="MEMBER">MEMBER</option>
               </select>
+              <p className="mt-1.5 text-xs text-gray-500 leading-relaxed">
+                Set to <strong>ADMIN</strong> to grant access to the Admin panel. The user must already be registered on
+                this site; after saving, ask them to sign out and sign back in.
+              </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
@@ -703,6 +800,9 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
           Manage user profiles, roles, and statuses for your organization
         </p>
       </div>
+
+      <AdminPromotionGuidance />
+
         <div className="flex items-center gap-2">
           <button
             onClick={() => fileInputRef.current?.click()}

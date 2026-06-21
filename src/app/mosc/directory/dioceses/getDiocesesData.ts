@@ -6,18 +6,20 @@
 import 'server-only';
 import { getStrapiUrl, getStrapiApiBase, getStrapiHeaders, getStrapiTenantId } from '@/lib/strapi';
 import { getMediaUrl, getMediaAlt } from '../lib/strapiMedia';
+import { unwrapStrapiRecord } from '@/lib/strapi/unwrapRecord';
 import type { Diocese, DiocesesListResult, StrapiPagination } from './types';
 
 function parseDiocese(raw: Record<string, unknown>, baseUrl: string): Diocese {
-  const documentId = typeof raw.documentId === 'string' ? raw.documentId : '';
-  const name = typeof raw.name === 'string' ? raw.name : '';
-  const slug = typeof raw.slug === 'string' ? raw.slug : '';
-  const description = typeof raw.description === 'string' ? raw.description : null;
-  const address = typeof raw.address === 'string' ? raw.address : null;
-  const email = typeof raw.email === 'string' ? raw.email : null;
-  const phones = typeof raw.phones === 'string' ? raw.phones : null;
-  const website = typeof raw.website === 'string' ? raw.website : null;
-  const image = raw.image;
+  const item = unwrapStrapiRecord(raw);
+  const documentId = typeof item.documentId === 'string' ? item.documentId : '';
+  const name = typeof item.name === 'string' ? item.name : '';
+  const slug = typeof item.slug === 'string' ? item.slug : '';
+  const description = typeof item.description === 'string' ? item.description : null;
+  const address = typeof item.address === 'string' ? item.address : null;
+  const email = typeof item.email === 'string' ? item.email : null;
+  const phones = typeof item.phones === 'string' ? item.phones : null;
+  const website = typeof item.website === 'string' ? item.website : null;
+  const image = item.image;
   const imageUrl = image ? getMediaUrl(image, baseUrl) : null;
   const imageAlt = image ? getMediaAlt(image) ?? null : null;
   return {

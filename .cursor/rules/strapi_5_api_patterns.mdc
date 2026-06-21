@@ -15,6 +15,7 @@ This rule defines correct patterns for Strapi 5 Content API calls, particularly 
 - **status=published** – Can cause validation errors in Strapi 5 setups; use `filters[publishedAt][$notNull]=true` instead
 - **Comma-separated populate** – `populate=cover,category,author` triggers 400s; Strapi 5 expects array-style populate
 - **Category slug values** – Use canonical kebab slugs from [`src/lib/strapi/newsCategorySlugs.ts`](mdc:src/lib/strapi/newsCategorySlugs.ts); see [strapi_frontend_slug_contract.mdc](mdc:.cursor/rules/strapi_frontend_slug_contract.mdc)
+- **URL slug vs stored slug** – Parent/child CMS pages (e.g. Kalpana editions → documents) may store tenant-suffixed slugs in Strapi while URLs use unsuffixed slugs; use multi-tier slug → year/semantic fallbacks — see **URL slug vs Strapi stored slug** in [strapi_frontend_slug_contract.mdc](mdc:.cursor/rules/strapi_frontend_slug_contract.mdc)
 
 ## **Tenant Filtering (Required — No Fallback)**
 
