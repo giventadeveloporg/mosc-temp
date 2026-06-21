@@ -8,6 +8,7 @@ import {
   getKalpanaDocumentsByEditionSlug,
   getKalpanaEditionBySlug,
 } from '../getKalpanaDocumentsData';
+import { synthesizeKalpanaEditionFromSlug } from '../getKalpanaData';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,13 +35,18 @@ export default async function KalpanaEditionDetailPage({ params }: PageProps) {
     getKalpanaDocumentsByEditionSlug(slug),
   ]);
 
-  if (!edition) {
+  if (!edition && documents.length === 0) {
+    notFound();
+  }
+
+  const displayEdition = edition ?? synthesizeKalpanaEditionFromSlug(slug);
+  if (!displayEdition) {
     notFound();
   }
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      <SyroPageBanner title={edition.title} breadcrumbFrom="kalpana-cms" />
+      <SyroPageBanner title={displayEdition.title} breadcrumbFrom="kalpana-cms" />
 
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -58,7 +64,7 @@ export default async function KalpanaEditionDetailPage({ params }: PageProps) {
 
           <div className="bg-white rounded-lg shadow-syro-card p-8">
             <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
-              {edition.title}
+              {displayEdition.title}
             </h2>
 
             {documents.length > 0 ? (

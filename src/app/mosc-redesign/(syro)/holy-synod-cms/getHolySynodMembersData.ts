@@ -8,22 +8,25 @@ import {
   getStrapiApiBase,
   getStrapiHeaders,
   getStrapiTenantId,
+  fetchStrapiEntryBySlug,
 } from '@/lib/strapi';
+import { unwrapStrapiRecord } from '@/lib/strapi/unwrapRecord';
 import { getMediaUrl, getMediaAlt } from '@/app/mosc-redesign/(syro)/directory/lib/strapiMedia';
 import type { HolySynodMember, HolySynodMemberType, HolySynodMembersListResult } from './types';
 
 function parseMember(raw: Record<string, unknown>, baseUrl: string): HolySynodMember {
-  const documentId = typeof raw.documentId === 'string' ? raw.documentId : '';
-  const name = typeof raw.name === 'string' ? raw.name : '';
-  const slug = typeof raw.slug === 'string' ? raw.slug : '';
-  const memberType = (raw.memberType as HolySynodMemberType) ?? 'metropolitan';
-  const excerpt = typeof raw.excerpt === 'string' ? raw.excerpt : null;
-  const body = typeof raw.body === 'string' ? raw.body : null;
-  const address = typeof raw.address === 'string' ? raw.address : null;
-  const email = typeof raw.email === 'string' ? raw.email : null;
-  const phones = typeof raw.phones === 'string' ? raw.phones : null;
-  const order = typeof raw.order === 'number' ? raw.order : 0;
-  const image = raw.image;
+  const item = unwrapStrapiRecord(raw);
+  const documentId = typeof item.documentId === 'string' ? item.documentId : '';
+  const name = typeof item.name === 'string' ? item.name : '';
+  const slug = typeof item.slug === 'string' ? item.slug : '';
+  const memberType = (item.memberType as HolySynodMemberType) ?? 'metropolitan';
+  const excerpt = typeof item.excerpt === 'string' ? item.excerpt : null;
+  const body = typeof item.body === 'string' ? item.body : null;
+  const address = typeof item.address === 'string' ? item.address : null;
+  const email = typeof item.email === 'string' ? item.email : null;
+  const phones = typeof item.phones === 'string' ? item.phones : null;
+  const order = typeof item.order === 'number' ? item.order : 0;
+  const image = item.image;
   const imageUrl = image ? getMediaUrl(image, baseUrl) : null;
   const imageAlt = image ? getMediaAlt(image) ?? null : null;
 
@@ -45,9 +48,6 @@ function parseMember(raw: Record<string, unknown>, baseUrl: string): HolySynodMe
 
 const EMPTY_LIST: HolySynodMembersListResult = { members: [] };
 
-/**
- * Fetches all Holy Synod members for the current tenant, sorted by display order.
- */
 export async function getHolySynodMembersData(): Promise<HolySynodMembersListResult> {
   const baseUrl = getStrapiUrl();
   const base = getStrapiApiBase();
@@ -83,9 +83,6 @@ export async function getHolySynodMembersData(): Promise<HolySynodMembersListRes
   }
 }
 
-/**
- * Fetches a single Holy Synod member by slug. Returns null if not found or on error.
- */
 export async function getHolySynodMemberBySlug(slug: string): Promise<HolySynodMember | null> {
   const baseUrl = getStrapiUrl();
   const base = getStrapiApiBase();
@@ -94,30 +91,15 @@ export async function getHolySynodMemberBySlug(slug: string): Promise<HolySynodM
     return null;
   }
 
-  const params = new URLSearchParams();
-  params.set('filters[tenant][tenantId][$eq]', tenantId);
-  params.set('filters[slug][$eq]', slug);
-  params.set('populate[0]', 'image');
-  params.set('pagination[pageSize]', '1');
-
-  const url = `${base}/holy-synod-members?${params.toString()}`;
-
-  try {
-    const res = await fetch(url, {
-      headers: getStrapiHeaders(),
-      cache: 'no-store',
-    });
-    if (!res.ok) {
-      return null;
-    }
-    const json = (await res.json()) as { data?: unknown[] };
-    const list = Array.isArray(json?.data) ? json.data : [];
-    const raw = list[0];
-    if (!raw || typeof raw !== 'object') {
-      return null;
-    }
-    return parseMember(raw as Record<string, unknown>, baseUrl);
-  } catch {
-    return null;
-  }
+  return fetchStrapiEntryBySlug({
+    collectionPath: 'holy-synod-members',
+    slug,
+    baseUrl,
+    apiBase: base,
+    tenantId,
+    populate: ['image'],
+    parse: parseMember,
+    fetchList: async () => (await getHolySynodMembersData()).members,
+    isValid: (entry) => Boolean(entry.slug || entry.name),
+  });
 }

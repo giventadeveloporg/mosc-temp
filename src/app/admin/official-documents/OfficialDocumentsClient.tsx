@@ -47,6 +47,41 @@ const DOCUMENT_SEARCH_FIELDS: { label: string; value: OfficialDocumentSearchFiel
   { label: 'File type', value: 'eventMediaType' },
 ];
 
+/** Solid admin action buttons (visible fill, not pale/transparent). */
+const SOLID_BTN =
+  'text-sm font-semibold border-2 shadow-sm transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100';
+const solidBtnMd = (color: string) =>
+  `px-4 py-2.5 rounded-xl min-h-[44px] ${SOLID_BTN} ${color}`;
+const solidBtnBlue = solidBtnMd(
+  'bg-blue-600 hover:bg-blue-700 text-white border-blue-700 hover:border-blue-800'
+);
+const solidBtnOrange = solidBtnMd(
+  'bg-orange-500 hover:bg-orange-600 text-white border-orange-600 hover:border-orange-700'
+);
+const solidBtnViolet = solidBtnMd(
+  'bg-violet-600 hover:bg-violet-700 text-white border-violet-700 hover:border-violet-800'
+);
+const solidBtnEmerald = solidBtnMd(
+  'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-700 hover:border-emerald-800'
+);
+const solidBtnTeal = solidBtnMd(
+  'bg-teal-600 hover:bg-teal-700 text-white border-teal-700 hover:border-teal-800'
+);
+const solidBtnIndigo = solidBtnMd(
+  'bg-indigo-600 hover:bg-indigo-700 text-white border-indigo-700 hover:border-indigo-800'
+);
+const solidBtnSlate = solidBtnMd(
+  'bg-slate-600 hover:bg-slate-700 text-white border-slate-700 hover:border-slate-800'
+);
+const solidBtnGreen = solidBtnMd(
+  'bg-green-600 hover:bg-green-700 text-white border-green-700 hover:border-green-800'
+);
+const solidBtnRed = solidBtnMd(
+  'bg-red-600 hover:bg-red-700 text-white border-red-700 hover:border-red-800'
+);
+const solidBtnBlueLg = `w-full flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 ${SOLID_BTN} bg-blue-600 hover:bg-blue-700 text-white border-blue-700 hover:border-blue-800`;
+const solidFileLabel = (btnClass: string) => `inline-flex cursor-pointer items-center ${btnClass}`;
+
 function isImageMedia(d: EventMediaDTO): boolean {
   const t = (d.eventMediaType || '').toLowerCase();
   const c = (d.contentType || d.fileDataContentType || '').toLowerCase();
@@ -835,7 +870,7 @@ export default function OfficialDocumentsClient({
                 Applied to every file in this batch (PDF/Office previews on the public downloads page).
               </p>
               <OfficialDocumentThumbnailUploadGuidance className="mb-3" />
-              <label className="inline-flex cursor-pointer items-center rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-sm font-medium text-violet-800 hover:bg-violet-100">
+              <label className={solidFileLabel(solidBtnViolet)}>
                 <input
                   ref={bulkThumbnailInputRef}
                   type="file"
@@ -857,7 +892,7 @@ export default function OfficialDocumentsClient({
                 list).
               </p>
               <div className="flex flex-wrap gap-2 mb-2">
-                <label className="inline-flex cursor-pointer items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-800 hover:bg-blue-100">
+                <label className={solidFileLabel(solidBtnBlue)}>
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -867,7 +902,7 @@ export default function OfficialDocumentsClient({
                   />
                   Choose files
                 </label>
-                <label className="inline-flex cursor-pointer items-center rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm font-medium text-green-800 hover:bg-green-100">
+                <label className={solidFileLabel(solidBtnGreen)}>
                   <input
                     ref={folderInputRef}
                     type="file"
@@ -895,9 +930,9 @@ export default function OfficialDocumentsClient({
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              className={solidBtnBlueLg}
             >
-              <span className="font-semibold text-blue-700">{loading ? 'Uploading…' : 'Upload batch'}</span>
+              <span className="font-semibold">{loading ? 'Uploading…' : 'Upload batch'}</span>
             </button>
           </form>
         </div>
@@ -939,14 +974,18 @@ export default function OfficialDocumentsClient({
             <button
               type="button"
               onClick={() => void reloadDocuments(0)}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium"
+              className={solidBtnBlue}
+              title="Apply year and category filters"
+              aria-label="Apply year and category filters"
             >
               Apply
             </button>
             <button
               type="button"
               onClick={() => void reloadCategories()}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium"
+              className={solidBtnIndigo}
+              title="Refresh category list"
+              aria-label="Refresh category list"
             >
               Refresh categories
             </button>
@@ -955,7 +994,9 @@ export default function OfficialDocumentsClient({
             <button
               type="button"
               onClick={() => setQuickAddOpen(true)}
-              className="px-4 py-2 rounded-xl bg-teal-100 hover:bg-teal-200 text-teal-900 text-sm font-semibold transition-all"
+              className={solidBtnTeal}
+              title="Add a single official document file"
+              aria-label="Add a single official document file"
             >
               Add one file…
             </button>
@@ -1000,7 +1041,9 @@ export default function OfficialDocumentsClient({
                 currentBundle != null
               }
               onClick={() => void handleCreateYearBundle()}
-              className="px-4 py-2 rounded-xl bg-violet-100 hover:bg-violet-200 text-violet-900 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className={solidBtnViolet}
+              title="Create year bundle for selected category and year"
+              aria-label="Create year bundle"
             >
               {bundleBusy ? 'Working…' : 'Create year bundle'}
             </button>
@@ -1027,7 +1070,9 @@ export default function OfficialDocumentsClient({
               type="button"
               disabled={bundleBusy || !currentBundle?.id}
               onClick={() => void handleSaveCover()}
-              className="px-4 py-2 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-medium text-sm disabled:opacity-50"
+              className={solidBtnEmerald}
+              title="Save cover image for year bundle"
+              aria-label="Save cover"
             >
               Save cover
             </button>
@@ -1116,7 +1161,9 @@ export default function OfficialDocumentsClient({
               <button
                 type="button"
                 onClick={() => void reloadDocuments(0)}
-                className="px-4 py-2.5 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-800 text-sm font-semibold transition-all min-h-[44px]"
+                className={solidBtnBlue}
+                title="Search documents"
+                aria-label="Search documents"
               >
                 Search
               </button>
@@ -1124,7 +1171,9 @@ export default function OfficialDocumentsClient({
                 type="button"
                 onClick={handleClearSearch}
                 disabled={!searchTerm && filterIsPublic === '' && searchField === 'title'}
-                className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-medium transition-all min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
+                className={solidBtnOrange}
+                title="Clear search filters"
+                aria-label="Clear search filters"
               >
                 Clear
               </button>
@@ -1362,7 +1411,7 @@ export default function OfficialDocumentsClient({
                 );
               })()}
               <div className="flex flex-wrap gap-2 items-center">
-                <label className="inline-flex cursor-pointer items-center rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-sm font-medium text-violet-800 hover:bg-violet-100">
+                <label className={solidFileLabel(solidBtnViolet)}>
                   <input
                     type="file"
                     accept="image/*"
@@ -1376,7 +1425,7 @@ export default function OfficialDocumentsClient({
                     type="button"
                     disabled={editThumbnailBusy}
                     onClick={() => void handleUploadEditThumbnail()}
-                    className="px-3 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium disabled:opacity-50"
+                    className={`px-3 py-2 rounded-xl ${SOLID_BTN} bg-violet-600 hover:bg-violet-700 text-white border-violet-700 hover:border-violet-800`}
                   >
                     {editThumbnailBusy ? 'Uploading…' : 'Upload thumbnail'}
                   </button>
@@ -1391,7 +1440,7 @@ export default function OfficialDocumentsClient({
             <button
               type="button"
               onClick={() => setEditing(null)}
-              className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium"
+              className={solidBtnSlate}
             >
               Cancel
             </button>
@@ -1399,7 +1448,7 @@ export default function OfficialDocumentsClient({
               type="button"
               disabled={editSaving}
               onClick={() => void handleSaveEdit()}
-              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium disabled:opacity-50"
+              className={solidBtnBlue}
             >
               {editSaving ? 'Saving…' : 'Save'}
             </button>
@@ -1488,7 +1537,7 @@ export default function OfficialDocumentsClient({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Card thumbnail (optional)</label>
             <OfficialDocumentThumbnailUploadGuidance className="mb-3" />
-            <label className="inline-flex cursor-pointer items-center rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-sm font-medium text-violet-800 hover:bg-violet-100">
+            <label className={solidFileLabel(solidBtnViolet)}>
               <input
                 type="file"
                 accept="image/*"
@@ -1516,14 +1565,14 @@ export default function OfficialDocumentsClient({
             <button
               type="button"
               onClick={() => setQuickAddOpen(false)}
-              className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium"
+              className={solidBtnSlate}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={qaBusy}
-              className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:opacity-50"
+              className={solidBtnTeal}
             >
               {qaBusy ? 'Uploading…' : 'Upload'}
             </button>
@@ -1541,10 +1590,10 @@ export default function OfficialDocumentsClient({
           </AlertDialogHeader>
           <AlertDialogFooter className="flex flex-row gap-3 sm:gap-4">
             <AlertDialogCancel
-              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+              className={`flex-1 flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 ${SOLID_BTN} bg-slate-600 hover:bg-slate-700 text-white border-slate-700 hover:border-slate-800`}
               disabled={deleteBusy}
             >
-              <span className="font-semibold text-blue-700">Cancel</span>
+              <span className="font-semibold">Cancel</span>
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
@@ -1552,9 +1601,9 @@ export default function OfficialDocumentsClient({
                 void handleConfirmDelete();
               }}
               disabled={deleteBusy}
-              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50"
+              className={`flex-1 flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 ${SOLID_BTN} bg-red-600 hover:bg-red-700 text-white border-red-700 hover:border-red-800`}
             >
-              <span className="font-semibold text-red-700">{deleteBusy ? 'Deleting…' : 'Delete'}</span>
+              <span className="font-semibold">{deleteBusy ? 'Deleting…' : 'Delete'}</span>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

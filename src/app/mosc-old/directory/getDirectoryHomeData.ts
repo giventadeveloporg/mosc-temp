@@ -7,6 +7,7 @@
 
 import 'server-only';
 import { fetchStrapi, getStrapiUrl, getStrapiTenantId } from '@/lib/strapi';
+import { unwrapStrapiRecord } from '@/lib/strapi/unwrapRecord';
 import type { DirectoryHomeData, DirectorySectionCard } from './types';
 
 /** Strapi 5: array-style populate only (no comma-separated). */
@@ -92,13 +93,16 @@ export async function getDirectoryHomeData(): Promise<DirectoryHomeData> {
   }
 
   const raw = result.data;
+  const data = unwrapStrapiRecord(
+    typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>) : {}
+  );
   const introText =
-    typeof raw.introText === 'string' && raw.introText.trim()
-      ? raw.introText.trim()
+    typeof data.introText === 'string' && data.introText.trim()
+      ? data.introText.trim()
       : null;
 
   const sectionCards: DirectorySectionCard[] = [];
-  const cards = raw.sectionCards;
+  const cards = data.sectionCards;
   if (Array.isArray(cards)) {
     for (const card of cards) {
       const title = typeof card?.title === 'string' ? card.title : '';

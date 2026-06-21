@@ -9,6 +9,11 @@ import {
   getStrapiHeaders,
   getStrapiTenantId,
 } from '@/lib/strapi';
+import {
+  findByStrapiSlug,
+  normalizeStrapiSlug,
+  unwrapStrapiRecord,
+} from '@/lib/strapi/unwrapRecord';
 import { getMediaUrl, getMediaAlt } from '@/app/mosc-redesign/(syro)/directory/lib/strapiMedia';
 import type { KalpanaCmsData, KalpanaEdition, KalpanaPageContent } from './types';
 
@@ -74,18 +79,62 @@ function parseAboutFeatures(value: unknown): string[] {
   return DEFAULT_ABOUT_FEATURES;
 }
 
+function resolveEditionSlug(raw: Record<string, unknown>): string {
+  const slug = typeof raw.slug === 'string' ? raw.slug.trim() : '';
+  if (slug) return slug;
+  const yearRaw = raw.year;
+  const year =
+    typeof yearRaw === 'string' ? yearRaw.trim() : typeof yearRaw === 'number' ? String(yearRaw) : '';
+  if (year) return `kalpana-${year}`;
+  return '';
+}
+
+function findEditionBySlug(editions: KalpanaEdition[], editionSlug: string): KalpanaEdition | undefined {
+  const bySlug = findByStrapiSlug(editions, editionSlug);
+  if (bySlug) return bySlug;
+  const target = normalizeStrapiSlug(editionSlug);
+  return editions.find((e) => e.year && target === normalizeStrapiSlug(`kalpana-${e.year}`));
+}
+
+export function synthesizeKalpanaEditionFromSlug(editionSlug: string): KalpanaEdition | null {
+  const trimmed = editionSlug.trim();
+  const match = /^kalpana-(\d{4})$/i.exec(trimmed);
+  if (!match) return null;
+  const year = match[1];
+  const slug = `kalpana-${year}`;
+  return {
+    documentId: year,
+    title: `Kalpana ${year}`,
+    slug,
+    year,
+    externalLink: editionDetailPath(year),
+    available: true,
+    cardImageUrl: null,
+    cardImageAlt: null,
+    order: 0,
+  };
+}
+
 function parseEdition(raw: Record<string, unknown>, baseUrl: string): KalpanaEdition {
-  const documentId = typeof raw.documentId === 'string' ? raw.documentId : '';
-  const title = typeof raw.title === 'string' ? raw.title : '';
-  const slug = typeof raw.slug === 'string' ? raw.slug : '';
-  const year = typeof raw.year === 'string' ? raw.year : '';
+  const item = unwrapStrapiRecord(raw);
+  const documentId =
+    typeof item.documentId === 'string'
+      ? item.documentId
+      : typeof item.id === 'number'
+        ? String(item.id)
+        : '';
+  const title = typeof item.title === 'string' ? item.title : '';
+  const slug = resolveEditionSlug(item);
+  const yearRaw = item.year;
+  const year =
+    typeof yearRaw === 'string' ? yearRaw : typeof yearRaw === 'number' ? String(yearRaw) : '';
   const externalLinkRaw =
-    typeof raw.externalLink === 'string' && raw.externalLink.trim() ? raw.externalLink.trim() : null;
+    typeof item.externalLink === 'string' && item.externalLink.trim() ? item.externalLink.trim() : null;
   const externalLink =
     externalLinkRaw ?? (slug ? `/mosc-redesign/kalpana-cms/${slug}` : year ? editionDetailPath(year) : null);
-  const available = typeof raw.available === 'boolean' ? raw.available : true;
-  const order = typeof raw.order === 'number' ? raw.order : 0;
-  const cardImage = raw.cardImage;
+  const available = typeof item.available === 'boolean' ? item.available : true;
+  const order = typeof item.order === 'number' ? item.order : 0;
+  const cardImage = item.cardImage;
   const cardImageUrl = cardImage ? getMediaUrl(cardImage, baseUrl) : null;
   const cardImageAlt = cardImage ? getMediaAlt(cardImage) ?? null : null;
 
@@ -103,30 +152,73 @@ function parseEdition(raw: Record<string, unknown>, baseUrl: string): KalpanaEdi
 }
 
 function parsePage(raw: Record<string, unknown>, baseUrl: string): KalpanaPageContent {
-  const heroImage = raw.heroImage;
+  const item = unwrapStrapiRecord(raw);
+  const heroImage = item.heroImage;
   const heroImageUrl = heroImage ? getMediaUrl(heroImage, baseUrl) : null;
 
   return {
     heroImageUrl: heroImageUrl ?? DEFAULT_HERO_IMAGE,
     heroImageAlt: heroImage ? getMediaAlt(heroImage) ?? 'Kalpana' : 'Kalpana',
     introParagraph1:
-      typeof raw.introParagraph1 === 'string' && raw.introParagraph1.trim()
-        ? raw.introParagraph1.trim()
+      typeof item.introParagraph1 === 'string' && item.introParagraph1.trim()
+        ? item.introParagraph1.trim()
         : DEFAULT_INTRO_1,
     introParagraph2:
-      typeof raw.introParagraph2 === 'string' && raw.introParagraph2.trim()
-        ? raw.introParagraph2.trim()
+      typeof item.introParagraph2 === 'string' && item.introParagraph2.trim()
+        ? item.introParagraph2.trim()
         : DEFAULT_INTRO_2,
     aboutTitle:
-      typeof raw.aboutTitle === 'string' && raw.aboutTitle.trim()
-        ? raw.aboutTitle.trim()
+      typeof item.aboutTitle === 'string' && item.aboutTitle.trim()
+        ? item.aboutTitle.trim()
         : DEFAULT_ABOUT_TITLE,
     aboutDescription:
-      typeof raw.aboutDescription === 'string' && raw.aboutDescription.trim()
-        ? raw.aboutDescription.trim()
+      typeof item.aboutDescription === 'string' && item.aboutDescription.trim()
+        ? item.aboutDescription.trim()
         : DEFAULT_ABOUT_DESCRIPTION,
-    aboutFeatures: parseAboutFeatures(raw.aboutFeatures),
+    aboutFeatures: parseAboutFeatures(item.aboutFeatures),
   };
+}
+
+async function fetchKalpanaEditionBySlugDirect(
+  editionSlug: string,
+  baseUrl: string,
+  base: string,
+  tenantId: string
+): Promise<KalpanaEdition | null> {
+  const tryFetch = async (params: URLSearchParams): Promise<KalpanaEdition | null> => {
+    const url = `${base}/kalpana-editions?${params.toString()}`;
+    const res = await fetch(url, {
+      headers: getStrapiHeaders(),
+      cache: 'no-store',
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { data?: unknown[] };
+    const list = Array.isArray(json?.data) ? json.data : [];
+    const raw = list[0];
+    if (!raw || typeof raw !== 'object') return null;
+    const edition = parseEdition(raw as Record<string, unknown>, baseUrl);
+    return edition.slug || edition.year ? edition : null;
+  };
+
+  const slugParams = new URLSearchParams();
+  slugParams.set('filters[tenant][tenantId][$eq]', tenantId);
+  slugParams.set('filters[slug][$eqi]', editionSlug);
+  slugParams.set('populate[0]', 'cardImage');
+  slugParams.set('pagination[pageSize]', '1');
+
+  const bySlug = await tryFetch(slugParams);
+  if (bySlug) return bySlug;
+
+  const yearMatch = /^kalpana-(\d{4})$/i.exec(editionSlug.trim());
+  if (!yearMatch) return null;
+
+  const yearParams = new URLSearchParams();
+  yearParams.set('filters[tenant][tenantId][$eq]', tenantId);
+  yearParams.set('filters[year][$eq]', yearMatch[1]);
+  yearParams.set('populate[0]', 'cardImage');
+  yearParams.set('pagination[pageSize]', '1');
+
+  return tryFetch(yearParams);
 }
 
 async function fetchKalpanaPage(baseUrl: string, base: string, tenantId: string): Promise<KalpanaPageContent> {
@@ -200,4 +292,4 @@ export async function getKalpanaCmsData(): Promise<KalpanaCmsData> {
   return { page, editions };
 }
 
-export { DEFAULT_CARD_IMAGE };
+export { DEFAULT_CARD_IMAGE, DEFAULT_EDITIONS, findEditionBySlug, fetchKalpanaEditionBySlugDirect };

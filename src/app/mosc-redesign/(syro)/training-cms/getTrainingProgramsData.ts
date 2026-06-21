@@ -8,7 +8,9 @@ import {
   getStrapiApiBase,
   getStrapiHeaders,
   getStrapiTenantId,
+  fetchStrapiEntryBySlug,
 } from '@/lib/strapi';
+import { findByStrapiSlug, unwrapStrapiRecord } from '@/lib/strapi/unwrapRecord';
 import { getMediaUrl, getMediaAlt } from '@/app/mosc-redesign/(syro)/directory/lib/strapiMedia';
 import type { TrainingProgramEntry, TrainingProgramsListResult } from './types';
 
@@ -67,17 +69,18 @@ const DEFAULT_PROGRAMS: TrainingProgramEntry[] = [
 ];
 
 function parseEntry(raw: Record<string, unknown>, baseUrl: string): TrainingProgramEntry {
-  const documentId = typeof raw.documentId === 'string' ? raw.documentId : '';
-  const name = typeof raw.name === 'string' ? raw.name : '';
-  const slug = typeof raw.slug === 'string' ? raw.slug : '';
-  const excerpt = typeof raw.excerpt === 'string' ? raw.excerpt : null;
-  const body = typeof raw.body === 'string' ? raw.body : null;
-  const address = typeof raw.address === 'string' ? raw.address : null;
-  const email = typeof raw.email === 'string' ? raw.email : null;
-  const phones = typeof raw.phones === 'string' ? raw.phones : null;
-  const website = typeof raw.website === 'string' ? raw.website : null;
-  const order = typeof raw.order === 'number' ? raw.order : 0;
-  const image = raw.image;
+  const item = unwrapStrapiRecord(raw);
+  const documentId = typeof item.documentId === 'string' ? item.documentId : '';
+  const name = typeof item.name === 'string' ? item.name : '';
+  const slug = typeof item.slug === 'string' ? item.slug : '';
+  const excerpt = typeof item.excerpt === 'string' ? item.excerpt : null;
+  const body = typeof item.body === 'string' ? item.body : null;
+  const address = typeof item.address === 'string' ? item.address : null;
+  const email = typeof item.email === 'string' ? item.email : null;
+  const phones = typeof item.phones === 'string' ? item.phones : null;
+  const website = typeof item.website === 'string' ? item.website : null;
+  const order = typeof item.order === 'number' ? item.order : 0;
+  const image = item.image;
   const imageUrl = image ? getMediaUrl(image, baseUrl) : DEFAULT_IMAGE_BY_SLUG[slug] ?? null;
   const imageAlt = image ? getMediaAlt(image) ?? null : name || null;
 
@@ -138,35 +141,22 @@ export async function getTrainingProgramBySlug(slug: string): Promise<TrainingPr
   const base = getStrapiApiBase();
   const tenantId = getStrapiTenantId();
   if (!baseUrl || !base || !tenantId || !slug) {
-    return DEFAULT_PROGRAMS.find((p) => p.slug === slug) ?? null;
+    return findByStrapiSlug(DEFAULT_PROGRAMS, slug) ?? null;
   }
 
-  const params = new URLSearchParams();
-  params.set('filters[tenant][tenantId][$eq]', tenantId);
-  params.set('filters[slug][$eq]', slug);
-  params.set('populate[0]', 'image');
-  params.set('pagination[pageSize]', '1');
+  const fromApi = await fetchStrapiEntryBySlug({
+    collectionPath: 'training-programs',
+    slug,
+    baseUrl,
+    apiBase: base,
+    tenantId,
+    populate: ['image'],
+    parse: parseEntry,
+    fetchList: async () => (await getTrainingProgramsData()).entries,
+    isValid: (entry) => Boolean(entry.slug || entry.name),
+  });
 
-  const url = `${base}/training-programs?${params.toString()}`;
-
-  try {
-    const res = await fetch(url, {
-      headers: getStrapiHeaders(),
-      cache: 'no-store',
-    });
-    if (!res.ok) {
-      return DEFAULT_PROGRAMS.find((p) => p.slug === slug) ?? null;
-    }
-    const json = (await res.json()) as { data?: unknown[] };
-    const list = Array.isArray(json?.data) ? json.data : [];
-    const raw = list[0];
-    if (!raw || typeof raw !== 'object') {
-      return DEFAULT_PROGRAMS.find((p) => p.slug === slug) ?? null;
-    }
-    return parseEntry(raw as Record<string, unknown>, baseUrl);
-  } catch {
-    return DEFAULT_PROGRAMS.find((p) => p.slug === slug) ?? null;
-  }
+  return fromApi ?? findByStrapiSlug(DEFAULT_PROGRAMS, slug) ?? null;
 }
 
 export { DEFAULT_IMAGE_BY_SLUG };

@@ -9,6 +9,7 @@ import {
   getStrapiHeaders,
   getStrapiTenantId,
 } from '@/lib/strapi';
+import { unwrapStrapiRecord } from '@/lib/strapi/unwrapRecord';
 import { getMediaUrl, getMediaAlt } from '@/app/mosc-redesign/(syro)/directory/lib/strapiMedia';
 import {
   institutionBelongsToCategory,
@@ -17,16 +18,17 @@ import {
 import type { InstitutionEntry, InstitutionsListResult } from './types';
 
 function parseEntry(raw: Record<string, unknown>, baseUrl: string): InstitutionEntry {
-  const documentId = typeof raw.documentId === 'string' ? raw.documentId : '';
-  const name = typeof raw.name === 'string' ? raw.name : '';
-  const slug = typeof raw.slug === 'string' ? raw.slug : '';
-  const description = typeof raw.description === 'string' ? raw.description : null;
-  const address = typeof raw.address === 'string' ? raw.address : null;
-  const email = typeof raw.email === 'string' ? raw.email : null;
-  const phones = typeof raw.phones === 'string' ? raw.phones : null;
-  const website = typeof raw.website === 'string' ? raw.website : null;
-  const order = typeof raw.order === 'number' ? raw.order : 0;
-  const image = raw.image;
+  const item = unwrapStrapiRecord(raw);
+  const documentId = typeof item.documentId === 'string' ? item.documentId : '';
+  const name = typeof item.name === 'string' ? item.name : '';
+  const slug = typeof item.slug === 'string' ? item.slug : '';
+  const description = typeof item.description === 'string' ? item.description : null;
+  const address = typeof item.address === 'string' ? item.address : null;
+  const email = typeof item.email === 'string' ? item.email : null;
+  const phones = typeof item.phones === 'string' ? item.phones : null;
+  const website = typeof item.website === 'string' ? item.website : null;
+  const order = typeof item.order === 'number' ? item.order : 0;
+  const image = item.image;
   const imageUrl = image ? getMediaUrl(image, baseUrl) : null;
   const imageAlt = image ? getMediaAlt(image) ?? null : null;
 

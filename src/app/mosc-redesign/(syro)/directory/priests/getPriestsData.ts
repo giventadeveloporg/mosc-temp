@@ -6,24 +6,26 @@
 import 'server-only';
 import { getStrapiUrl, getStrapiApiBase, getStrapiHeaders, getStrapiTenantId } from '@/lib/strapi';
 import { getMediaUrl, getMediaAlt } from '../lib/strapiMedia';
+import { unwrapStrapiRecord, unwrapStrapiRelation } from '@/lib/strapi/unwrapRecord';
 import type { Priest, PriestsListResult, StrapiPagination } from './types';
 
 function parsePriest(raw: Record<string, unknown>, baseUrl: string): Priest {
-  const documentId = typeof raw.documentId === 'string' ? raw.documentId : '';
-  const name = typeof raw.name === 'string' ? raw.name : '';
-  const slug = typeof raw.slug === 'string' ? raw.slug : '';
-  const title = typeof raw.title === 'string' ? raw.title : null;
-  const address = typeof raw.address === 'string' ? raw.address : null;
-  const email = typeof raw.email === 'string' ? raw.email : null;
-  const phones = typeof raw.phones === 'string' ? raw.phones : null;
-  const image = raw.image;
+  const item = unwrapStrapiRecord(raw);
+  const documentId = typeof item.documentId === 'string' ? item.documentId : '';
+  const name = typeof item.name === 'string' ? item.name : '';
+  const slug = typeof item.slug === 'string' ? item.slug : '';
+  const title = typeof item.title === 'string' ? item.title : null;
+  const address = typeof item.address === 'string' ? item.address : null;
+  const email = typeof item.email === 'string' ? item.email : null;
+  const phones = typeof item.phones === 'string' ? item.phones : null;
+  const image = item.image;
   const imageUrl = image ? getMediaUrl(image, baseUrl) : null;
   const imageAlt = image ? getMediaAlt(image) ?? null : null;
   let dioceseName: string | null = null;
   let parishName: string | null = null;
-  const diocese = raw.diocese as Record<string, unknown> | undefined;
+  const diocese = unwrapStrapiRelation(item.diocese);
   if (diocese && typeof diocese.name === 'string') dioceseName = diocese.name;
-  const parish = raw.parish as Record<string, unknown> | undefined;
+  const parish = unwrapStrapiRelation(item.parish);
   if (parish && typeof parish.name === 'string') parishName = parish.name;
   return {
     documentId,
