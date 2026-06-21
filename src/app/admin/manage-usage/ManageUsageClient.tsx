@@ -8,6 +8,7 @@ import * as XLSX from 'xlsx';
 import { getTenantId } from '@/lib/env';
 import { fetchUsersServer, patchUserProfileServer, bulkUploadUsersServer } from './ApiServerActions';
 import AdminNavigation from '@/components/AdminNavigation';
+import SuccessDialog from '@/components/SuccessDialog';
 
 // Import UserDetailsTooltip and EditUserModal from the same file or extract if needed
 // ... (copy UserDetailsTooltip and EditUserModal here or import them)
@@ -432,6 +433,8 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
   const tooltipTimer = useRef<NodeJS.Timeout | null>(null);
   const [editUser, setEditUser] = useState<UserProfileDTO | null>(null);
   const [editLoading, setEditLoading] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const [bulkLoading, setBulkLoading] = useState(false);
   const [bulkMessage, setBulkMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -592,9 +595,20 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
     try {
       const res = await patchUserProfileServer(editUser.id, { ...editUser, ...updated });
       if (res && !res.error) {
-        setUsers(users => users.map(u => u.id === editUser.id ? { ...u, ...updated } : u));
+        const savedUser = { ...editUser, ...updated };
+        setUsers(users => users.map(u => u.id === editUser.id ? savedUser : u));
         setEditUser(null);
+        const displayName = [savedUser.firstName, savedUser.lastName].filter(Boolean).join(' ') || savedUser.email || 'User';
+        setSuccessMessage(`${displayName} was saved successfully.`);
+        setShowSuccessDialog(true);
+      } else {
+        setBulkMessage('Save failed: ' + (res?.error || 'Unknown error'));
+        setTimeout(() => setBulkMessage(null), 4000);
       }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setBulkMessage('Save error: ' + message);
+      setTimeout(() => setBulkMessage(null), 4000);
     } finally {
       setEditLoading(false);
     }
@@ -1073,6 +1087,14 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
           loading={editLoading}
         />
       )}
+
+      <SuccessDialog
+        isOpen={showSuccessDialog}
+        onClose={() => setShowSuccessDialog(false)}
+        title="Saved Successfully!"
+        message={successMessage}
+        buttonText="OK"
+      />
     </div>
   );
 }

@@ -20,6 +20,7 @@ const TABLE_ORDER = [
   'event_live_update_attachment',
   'event_sponsors',      // parent of event_media.sponsor_id (fk_event_media_sponsor_id)
   'event_sponsors_join',
+  'gallery_category', // parent of gallery_album.gallery_category_id (fk_gallery_album_category)
   'gallery_album',   // parent of event_media.album_id (fk_event_media_album_id)
   'official_document_category', // parent of event_media.official_document_category_id (fk_event_media_official_document_category_id); see Latest_Schema_Post__Blob_Claude_12.sql
   'official_document_year_bundle', // parent rows for year bundles; must precede event_media rows that reference bundles

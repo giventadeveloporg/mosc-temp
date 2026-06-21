@@ -3,7 +3,160 @@
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
-import type { GalleryAlbumDTO, EventMediaDTO } from '@/types';
+import type { GalleryAlbumDTO, GalleryCategoryDTO, EventMediaDTO } from '@/types';
+
+/** URL-safe slug for gallery_category (matches DB check: ^[a-z0-9]+(-[a-z0-9]+)*$). */
+function slugFromDisplayName(displayName: string): string {
+  let slug = displayName
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  if (!slug || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) {
+    slug = 'category';
+  }
+  return slug.slice(0, 80);
+}
+
+/**
+ * Find an active category by display name (case-insensitive exact match).
+ */
+export async function findGalleryCategoryByDisplayNameServer(
+  displayName: string
+): Promise<GalleryCategoryDTO | null> {
+  const trimmed = displayName.trim();
+  if (!trimmed) return null;
+
+  const categories = await fetchGalleryCategoriesForAdminServer();
+  return (
+    categories.find((c) => c.displayName.trim().toLowerCase() === trimmed.toLowerCase()) ?? null
+  );
+}
+
+/**
+ * Create a new gallery category.
+ */
+export async function createGalleryCategoryServer(displayName: string): Promise<GalleryCategoryDTO> {
+  const trimmed = displayName.trim();
+  if (!trimmed) {
+    throw new Error('Category name is required');
+  }
+
+  const existing = await findGalleryCategoryByDisplayNameServer(trimmed);
+  if (existing) {
+    return existing;
+  }
+
+  const categories = await fetchGalleryCategoriesForAdminServer();
+  const maxSort = categories.reduce((max, c) => Math.max(max, c.sortOrder ?? 0), 0);
+  const baseSlug = slugFromDisplayName(trimmed);
+  const now = new Date().toISOString();
+
+  let lastError = 'Failed to create gallery category';
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const slug = attempt === 0 ? baseSlug : `${baseSlug}-${attempt + 1}`;
+    const payload = withTenantId({
+      slug,
+      displayName: trimmed,
+      sortOrder: maxSort + 10,
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    const url = `${getApiBase()}/api/gallery-categories`;
+    const res = await fetchWithJwtRetry(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      cache: 'no-store',
+    });
+
+    if (res.ok) {
+      return (await res.json()) as GalleryCategoryDTO;
+    }
+
+    const errorText = await res.text();
+    lastError = errorText || lastError;
+    const isDuplicate =
+      res.status === 409 ||
+      /duplicate|unique|already exists|constraint/i.test(errorText);
+
+    if (!isDuplicate) {
+      console.error('Failed to create gallery category:', res.status, errorText);
+      throw new Error(`Failed to create gallery category: ${errorText}`);
+    }
+  }
+
+  throw new Error(`Failed to create gallery category: ${lastError}`);
+}
+
+/**
+ * Return existing category id or create one from the typed display name.
+ */
+export async function findOrCreateGalleryCategoryServer(
+  displayName: string
+): Promise<GalleryCategoryDTO> {
+  const trimmed = displayName.trim();
+  if (!trimmed) {
+    throw new Error('Category name is required');
+  }
+
+  const existing = await findGalleryCategoryByDisplayNameServer(trimmed);
+  if (existing) {
+    return existing;
+  }
+
+  return createGalleryCategoryServer(trimmed);
+}
+
+/**
+ * Resolve galleryCategoryId on album save when user typed a new name without clicking create.
+ */
+export async function resolveGalleryCategoryIdForSaveServer(
+  categoryId: number | null,
+  pendingDisplayName: string | null
+): Promise<number | null> {
+  if (categoryId != null) {
+    return categoryId;
+  }
+
+  const name = pendingDisplayName?.trim();
+  if (!name) {
+    return null;
+  }
+
+  const category = await findOrCreateGalleryCategoryServer(name);
+  return category.id;
+}
+
+/**
+ * Fetch active gallery categories for admin album forms.
+ */
+export async function fetchGalleryCategoriesForAdminServer(): Promise<GalleryCategoryDTO[]> {
+  try {
+    const tenantId = getTenantId();
+    const params = new URLSearchParams();
+    params.append('tenantId.equals', tenantId);
+    params.append('isActive.equals', 'true');
+    params.append('sort', 'sortOrder,asc');
+
+    const url = `${getApiBase()}/api/gallery-categories?${params.toString()}`;
+    const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
+
+    if (!res.ok) {
+      console.error('Failed to fetch gallery categories:', res.status, res.statusText);
+      return [];
+    }
+
+    const data: GalleryCategoryDTO[] = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('Error fetching gallery categories:', error);
+    return [];
+  }
+}
 
 // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
 function getApiBase() {

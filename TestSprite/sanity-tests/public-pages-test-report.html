@@ -204,7 +204,7 @@
         <div class="header">
             <h1>🧪 Public Pages Test Report</h1>
             <p>Malayalees US Site Event Registration Platform</p>
-            <p style="margin-top: 10px; font-size: 0.9em;">Test Engine: Playwright (Local) | 14 Tests | 78.6% Success Rate</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Test Engine: Playwright (Local) | 14 Tests | 85.7% Success Rate</p>
         </div>
 
         <div class="summary">
@@ -216,11 +216,11 @@
                 </div>
                 <div class="summary-card">
                     <h3>Passed</h3>
-                    <div class="number passed">11</div>
+                    <div class="number passed">12</div>
                 </div>
                 <div class="summary-card">
                     <h3>Failed</h3>
-                    <div class="number failed">3</div>
+                    <div class="number failed">2</div>
                 </div>
                 <div class="summary-card">
                     <h3>Skipped</h3>
@@ -228,7 +228,7 @@
                 </div>
                 <div class="summary-card">
                     <h3>Success Rate</h3>
-                    <div class="number success-rate">78.6%</div>
+                    <div class="number success-rate">85.7%</div>
                 </div>
             </div>
         </div>
@@ -236,32 +236,17 @@
         <div class="tests-section">
             <h2 style="margin-bottom: 20px; color: #333;">Test Results</h2>
             
-                <div class="test-item failed">
-                    <div class="test-status">❌</div>
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
                     <div class="test-info">
                         <h4>
                             <span class="test-id">public-001</span>
                             Homepage Load Test
                             <span class="test-priority priority-critical">critical</span>
                         </h4>
-                        <p>Error: Page errors: Switched to client rendering because the server rendering errored:
-
-__webpack_modules__[moduleId] is not a function</p>
-                        
-                        <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading
-                        </div>
+                        <p>Test completed successfully</p>
                         
                         
-                        
-                        <div class="error-details">
-                            <strong>Errors:</strong>
-                            <ul>
-                                <li>Page errors: Switched to client rendering because the server rendering errored:
-
-__webpack_modules__[moduleId] is not a function</li>
-                            </ul>
-                        </div>
                         
                         
                         <div class="error-details">
@@ -274,8 +259,8 @@ __webpack_modules__[moduleId] is not a function</li>
                     </div>
                     <div class="test-details">
                         <div class="url">/</div>
-                        <div class="duration">32068ms</div>
-                        <a href="screenshots/public-001-1780584020055.png" target="_blank" class="screenshot-link">📷 Screenshot</a>
+                        <div class="duration">19628ms</div>
+                        
                     </div>
                 </div>
             
@@ -287,22 +272,18 @@ __webpack_modules__[moduleId] is not a function</li>
                             Events Listing Page Test
                             <span class="test-priority priority-critical">critical</span>
                         </h4>
-                        <p>Error: See Event Details buttons: Found 0, expected at least 2; Add to Calendar buttons: Found 0, expected at least 2</p>
+                        <p>Error: Buy Tickets buttons: 4 invalid link(s) found: /events/4202/givebutter-checkout, /events/4202/givebutter-checkout, /events/2/eventcube-checkout...</p>
                         
                         <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Some expected elements not found: a[href*="/events/"][title*="Event Details"], a[href*="/events/"][aria-label*="Event Details"], a[href*="calendar.google.com"], a[title*="Calendar"], a[aria-label*="Calendar"], a[href*="/checkout"], a[href*="/manual-checkout"], img[alt*="Buy Tickets"], img[alt*="buy tickets"]
+                            <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading
                         </div>
                         
-                        
-                        <div class="error-details">
-                            <strong class="missing-elements">Missing Elements:</strong> <code>a[href*="/events/"][title*="Event Details"], a[href*="/events/"][aria-label*="Event Details"]</code>, <code>a[href*="calendar.google.com"], a[title*="Calendar"], a[aria-label*="Calendar"]</code>, <code>a[href*="/checkout"], a[href*="/manual-checkout"], img[alt*="Buy Tickets"], img[alt*="buy tickets"]</code>
-                        </div>
                         
                         
                         <div class="error-details">
                             <strong>Errors:</strong>
                             <ul>
-                                <li>See Event Details buttons: Found 0, expected at least 2</li><li>Add to Calendar buttons: Found 0, expected at least 2</li>
+                                <li>Buy Tickets buttons: 4 invalid link(s) found: /events/4202/givebutter-checkout, /events/4202/givebutter-checkout, /events/2/eventcube-checkout...</li>
                             </ul>
                         </div>
                         
@@ -317,8 +298,8 @@ __webpack_modules__[moduleId] is not a function</li>
                     </div>
                     <div class="test-details">
                         <div class="url">/events</div>
-                        <div class="duration">14980ms</div>
-                        <a href="screenshots/public-002-1780584038429.png" target="_blank" class="screenshot-link">📷 Screenshot</a>
+                        <div class="duration">20345ms</div>
+                        <a href="screenshots/public-002-1781796534493.png" target="_blank" class="screenshot-link">📷 Screenshot</a>
                     </div>
                 </div>
             
@@ -333,7 +314,7 @@ __webpack_modules__[moduleId] is not a function</li>
                         <p>Test completed successfully</p>
                         
                         <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Some expected elements not found: h1, [class*="event"], [class*="date"], [class*="time"], [class*="location"]; Interaction failed: page.waitForSelector: Timeout 5000ms exceeded.
+                            <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading; Some expected elements not found: h1, [class*="event"], [class*="date"], [class*="time"], [class*="location"]; Interaction failed: page.waitForSelector: Timeout 5000ms exceeded.
 Call log:
 [2m  - waiting for locator('h1') to be visible[22m
 
@@ -356,7 +337,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/events/1</div>
-                        <div class="duration">12703ms</div>
+                        <div class="duration">25104ms</div>
                         
                     </div>
                 </div>
@@ -384,7 +365,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/sponsors</div>
-                        <div class="duration">9137ms</div>
+                        <div class="duration">5525ms</div>
                         
                     </div>
                 </div>
@@ -420,22 +401,35 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/sponsors/1</div>
-                        <div class="duration">5862ms</div>
+                        <div class="duration">5082ms</div>
                         
                     </div>
                 </div>
             
-                <div class="test-item passed">
-                    <div class="test-status">✅</div>
+                <div class="test-item failed">
+                    <div class="test-status">❌</div>
                     <div class="test-info">
                         <h4>
                             <span class="test-id">public-006</span>
                             Gallery Page Test
                             <span class="test-priority priority-high">high</span>
                         </h4>
-                        <p>Test completed successfully</p>
+                        <p>Error: page.goto: Timeout 30000ms exceeded.
+Call log:
+[2m  - navigating to "http://localhost:3000/gallery", waiting until "domcontentloaded"[22m
+</p>
                         
                         
+                        
+                        <div class="error-details">
+                            <strong>Errors:</strong>
+                            <ul>
+                                <li>page.goto: Timeout 30000ms exceeded.
+Call log:
+[2m  - navigating to "http://localhost:3000/gallery", waiting until "domcontentloaded"[22m
+</li>
+                            </ul>
+                        </div>
                         
                         
                         <div class="error-details">
@@ -448,7 +442,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/gallery</div>
-                        <div class="duration">1768ms</div>
+                        <div class="duration">30086ms</div>
                         
                     </div>
                 </div>
@@ -484,7 +478,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/polls</div>
-                        <div class="duration">10747ms</div>
+                        <div class="duration">7837ms</div>
                         
                     </div>
                 </div>
@@ -520,7 +514,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/calendar</div>
-                        <div class="duration">7037ms</div>
+                        <div class="duration">6745ms</div>
                         
                     </div>
                 </div>
@@ -535,10 +529,6 @@ Call log:
                         </h4>
                         <p>Test completed successfully</p>
                         
-                        <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading
-                        </div>
-                        
                         
                         
                         
@@ -552,7 +542,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc</div>
-                        <div class="duration">22524ms</div>
+                        <div class="duration">6993ms</div>
                         
                     </div>
                 </div>
@@ -588,7 +578,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/holy-synod</div>
-                        <div class="duration">7210ms</div>
+                        <div class="duration">5653ms</div>
                         
                     </div>
                 </div>
@@ -624,7 +614,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/gallery</div>
-                        <div class="duration">7041ms</div>
+                        <div class="duration">4112ms</div>
                         
                     </div>
                 </div>
@@ -660,7 +650,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/directory</div>
-                        <div class="duration">6486ms</div>
+                        <div class="duration">5837ms</div>
                         
                     </div>
                 </div>
@@ -676,7 +666,7 @@ Call log:
                         <p>Test completed successfully</p>
                         
                         <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading; Some expected elements not found: h1
+                            <strong>⚠️ Warnings:</strong> Some expected elements not found: h1
                         </div>
                         
                         
@@ -696,35 +686,30 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/charity-theme</div>
-                        <div class="duration">26946ms</div>
+                        <div class="duration">14473ms</div>
                         
                     </div>
                 </div>
             
-                <div class="test-item failed">
-                    <div class="test-status">❌</div>
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
                     <div class="test-info">
                         <h4>
                             <span class="test-id">public-014</span>
                             Pricing Page Test
                             <span class="test-priority priority-medium">medium</span>
                         </h4>
-                        <p>Error: page.goto: Timeout 30000ms exceeded.
-Call log:
-[2m  - navigating to "http://localhost:3000/pricing", waiting until "domcontentloaded"[22m
-</p>
+                        <p>Test completed successfully</p>
                         
+                        <div class="warning-details">
+                            <strong>⚠️ Warnings:</strong> Some expected elements not found: [class*="pricing"], [class*="plan"]
+                        </div>
                         
                         
                         <div class="error-details">
-                            <strong>Errors:</strong>
-                            <ul>
-                                <li>page.goto: Timeout 30000ms exceeded.
-Call log:
-[2m  - navigating to "http://localhost:3000/pricing", waiting until "domcontentloaded"[22m
-</li>
-                            </ul>
+                            <strong class="missing-elements">Missing Elements:</strong> <code>[class*="pricing"], [class*="plan"]</code>
                         </div>
+                        
                         
                         
                         <div class="error-details">
@@ -737,7 +722,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/pricing</div>
-                        <div class="duration">30097ms</div>
+                        <div class="duration">11897ms</div>
                         
                     </div>
                 </div>
@@ -746,7 +731,7 @@ Call log:
 
         <div class="footer">
             <p>Generated by Public Pages Test Suite</p>
-            <p class="timestamp">Report generated on: 6/4/2026, 2:43:12 PM</p>
+            <p class="timestamp">Report generated on: 6/18/2026, 3:31:11 PM</p>
             <p class="timestamp">Base URL: http://localhost:3000</p>
             <p class="timestamp">Test Engine: Playwright (Local Browser Execution)</p>
         </div>

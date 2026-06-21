@@ -1,6 +1,7 @@
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { withTenantId } from '@/lib/withTenantId';
 import { getAppUrl, getApiBaseUrl } from '@/lib/env';
+import { stripDeprecatedSettingsIdentityFields } from '@/lib/resolveTenantOrganizationIdentity';
 import type {
   TenantSettingsDTO,
   TenantSettingsFormDTO,
@@ -117,13 +118,42 @@ export async function fetchTenantSettingsByTenantId(tenantId: string): Promise<T
   }
 }
 
+function parseTenantSettingsApiError(errorText: string, action: 'create' | 'update'): string {
+  const lower = errorText.toLowerCase();
+  if (lower.includes('duplicate key') || lower.includes('already exists')) {
+    return 'Settings for this tenant already exist. Edit the existing settings instead of creating new ones.';
+  }
+  if (lower.includes('column') && lower.includes('does not exist')) {
+    return 'The backend database is missing required columns. Apply the tenant profile migration and restart the API server.';
+  }
+  try {
+    const parsed = JSON.parse(errorText) as {
+      detail?: string;
+      title?: string;
+      message?: string;
+      error?: string;
+    };
+    if (parsed.detail) return parsed.detail;
+    if (parsed.message) return parsed.message;
+    if (parsed.title) return parsed.title;
+    if (parsed.error) return parsed.error;
+  } catch {
+    // not JSON
+  }
+  const trimmed = errorText.trim();
+  if (trimmed.length > 0 && trimmed.length <= 500) {
+    return trimmed;
+  }
+  return action === 'create' ? 'Failed to create tenant settings.' : 'Failed to update tenant settings.';
+}
+
 /**
  * Create a new tenant setting
  */
 export async function createTenantSetting(data: TenantSettingsFormDTO): Promise<TenantSettingsDTO> {
   try {
     const payload = withTenantId({
-      ...data,
+      ...stripDeprecatedSettingsIdentityFields(data),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
@@ -138,13 +168,21 @@ export async function createTenantSetting(data: TenantSettingsFormDTO): Promise<
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Failed to create tenant setting: ${errorText}`);
+      console.error('[createTenantSetting] Backend error:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText.slice(0, 2000),
+      });
+      throw new Error(parseTenantSettingsApiError(errorText, 'create'));
     }
 
     return await response.json();
   } catch (error) {
     console.error('Error creating tenant setting:', error);
-    throw new Error('Failed to create tenant setting');
+    if (error instanceof Error && error.message !== 'Failed to create tenant settings.') {
+      throw error;
+    }
+    throw new Error('Failed to create tenant settings. Please try again.');
   }
 }
 
@@ -194,7 +232,7 @@ export async function updateTenantSetting(
     }
 
     const payload = withTenantId({
-      ...data,
+      ...stripDeprecatedSettingsIdentityFields(data),
       id,
       createdAt: existingSetting.createdAt, // Preserve original createdAt
       updatedAt: new Date().toISOString(),
@@ -275,7 +313,7 @@ export async function patchTenantSetting(
     }
 
     const payload = withTenantId({
-      ...data,
+      ...stripDeprecatedSettingsIdentityFields(data),
       id,
       updatedAt: new Date().toISOString(),
       // Include the tenantOrganization relationship (either existing or newly fetched)

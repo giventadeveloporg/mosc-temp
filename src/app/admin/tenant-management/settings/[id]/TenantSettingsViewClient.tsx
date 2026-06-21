@@ -121,6 +121,21 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
                 </dd>
               </div>
             )}
+            {organization && (
+              <div className="sm:col-span-2">
+                <dt className="text-sm font-medium text-gray-500">Organization identity</dt>
+                <dd className="mt-1 text-sm text-gray-600">
+                  Description, address, and website are on the{' '}
+                  <Link
+                    href={`/admin/tenant-management/organizations/${organization.id}`}
+                    className="text-blue-600 hover:text-blue-500 font-medium"
+                  >
+                    organization record
+                  </Link>
+                  .
+                </dd>
+              </div>
+            )}
             <div>
               <dt className="text-sm font-medium text-gray-500">User Registration</dt>
               <dd className="mt-1">
@@ -223,16 +238,6 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
               <div>
                 <dt className="text-sm font-medium text-gray-500">Phone Number</dt>
                 <dd className="mt-1 text-sm text-gray-900">{settings.phoneNumber}</dd>
-              </div>
-            )}
-            {settings?.addressLine1 && (
-              <div className="sm:col-span-2">
-                <dt className="text-sm font-medium text-gray-500">Address</dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  {[settings.addressLine1, settings.addressLine2, settings.stateProvince, settings.zipCode, settings.country]
-                    .filter(Boolean)
-                    .join(', ')}
-                </dd>
               </div>
             )}
             {/* Social media URLs - always show so admins see available fields; empty = "Not set" */}

@@ -10,8 +10,15 @@ REM
 REM Flags:
 REM   /FORCE         Skip confirmation before schema rebuild
 REM   /PROD          Import corrected_event_media_inserts.ordered_PROD.sql
-REM   /SKIP-EXPORT   Skip pg_dump; reuse existing export.sql
+REM   /SKIP-EXPORT   Skip pg_dump and steps 2-4; reuse export.sql and
+REM                  corrected_event_media_inserts.ordered.sql unchanged
 REM   /REMOTE        Steps 5-7 target remote Postgres (mosc-temp\.env.local first)
+REM   /SCHEMA-ONLY   Apply schema (step 5) only; skip export 1-4 and import/sync 6-7
+REM   /IMPORT-FILE   Override default import SQL (next arg or /IMPORT-FILE=path)
+REM   /REGEN-MOSC    Regenerate mosc_malankara_orthodox_2 SQL from ordered source
+REM   /PRE-CLEAN-MOSC  Run delete_mosc_tenant.sql before import (auto for MOSC files)
+REM   /IMPORT-DUP-ONLY Import mosc_dup_only.sql (implies /PRE-CLEAN-MOSC, use with /DATA-ONLY)
+REM   /DATA-ONLY     Skip schema rebuild (step 5); import + sequence sync only
 REM ============================================================
 
 set "CONTAINER_ID="
@@ -19,6 +26,12 @@ set "FORCE=0"
 set "USE_PROD=0"
 set "SKIP_EXPORT=0"
 set "USE_REMOTE=0"
+set "SCHEMA_ONLY=0"
+set "CUSTOM_IMPORT_FILE="
+set "REGEN_MOSC=0"
+set "PRE_CLEAN_MOSC=0"
+set "DATA_ONLY=0"
+set "IMPORT_DUP_ONLY=0"
 set "FINAL_EXIT=0"
 set "RUN_MODE=FULL"
 set "PSQL_MODE="
@@ -42,28 +55,95 @@ if /i "%~1"=="--help" goto :usage
 set "WORKSPACE_ROOT=%~1"
 set "BATCH_DIR=%~dp0"
 set "TARGET_ENV=%BATCH_DIR%database_target.local.env"
+shift
 
-if not "%~2"=="" call :parse_one_arg "%~2"
-if not "%~3"=="" call :parse_one_arg "%~3"
-if not "%~4"=="" call :parse_one_arg "%~4"
-if not "%~5"=="" call :parse_one_arg "%~5"
-if not "%~6"=="" call :parse_one_arg "%~6"
-if not "%~7"=="" call :parse_one_arg "%~7"
-goto :args_done
-
-:parse_one_arg
-if /i "%~1"=="/FORCE" set "FORCE=1" & goto :eof
-if /i "%~1"=="/PROD" set "USE_PROD=1" & goto :eof
-if /i "%~1"=="/SKIP-EXPORT" set "SKIP_EXPORT=1" & goto :eof
-if /i "%~1"=="/REMOTE" set "USE_REMOTE=1" & goto :eof
-if not defined CONTAINER_ID (
-  set "CONTAINER_ID=%~1"
-  goto :eof
+:parse_loop
+if "%~1"=="" goto :args_done
+set "ARG=%~1"
+if /i "!ARG!"=="/FORCE" (
+  set "FORCE=1"
+  shift
+  goto :parse_loop
 )
-call :log_warn "Ignoring extra argument: %~1"
-goto :eof
+if /i "!ARG!"=="/PROD" (
+  set "USE_PROD=1"
+  shift
+  goto :parse_loop
+)
+if /i "!ARG!"=="/SKIP-EXPORT" (
+  set "SKIP_EXPORT=1"
+  shift
+  goto :parse_loop
+)
+if /i "!ARG!"=="/REMOTE" (
+  set "USE_REMOTE=1"
+  shift
+  goto :parse_loop
+)
+if /i "!ARG!"=="/SCHEMA-ONLY" (
+  set "SCHEMA_ONLY=1"
+  shift
+  goto :parse_loop
+)
+if /i "!ARG!"=="/IMPORT-FILE" goto :parse_import_file_path
+if /i "!ARG!"=="/REGEN-MOSC" (
+  set "REGEN_MOSC=1"
+  shift
+  goto :parse_loop
+)
+if /i "!ARG!"=="/PRE-CLEAN-MOSC" (
+  set "PRE_CLEAN_MOSC=1"
+  shift
+  goto :parse_loop
+)
+if /i "!ARG!"=="/IMPORT-DUP-ONLY" (
+  set "IMPORT_DUP_ONLY=1"
+  set "PRE_CLEAN_MOSC=1"
+  shift
+  goto :parse_loop
+)
+if /i "!ARG!"=="/DATA-ONLY" (
+  set "DATA_ONLY=1"
+  set "SKIP_EXPORT=1"
+  shift
+  goto :parse_loop
+)
+if /i "!ARG:~0,13!"=="/IMPORT-FILE=" (
+  set "CUSTOM_IMPORT_FILE=!ARG:~13!"
+  shift
+  goto :parse_loop
+)
+if /i "!ARG:~0,14!"=="/import-file=" (
+  set "CUSTOM_IMPORT_FILE=!ARG:~14!"
+  shift
+  goto :parse_loop
+)
+if not "!ARG:~0,1!"=="/" (
+  if not defined CONTAINER_ID (
+    set "CONTAINER_ID=!ARG!"
+    shift
+    goto :parse_loop
+  )
+)
+call :log_warn "Ignoring extra argument: !ARG!"
+shift
+goto :parse_loop
+
+:parse_import_file_path
+shift
+if "%~1"=="" (
+  call :log_err "/IMPORT-FILE requires a file path argument."
+  exit /b 1
+)
+set "CUSTOM_IMPORT_FILE=%~1"
+shift
+goto :parse_loop
 
 :args_done
+
+if "%SCHEMA_ONLY%"=="1" (
+  set "SKIP_EXPORT=1"
+)
 
 if "%USE_REMOTE%"=="1" (
   set "TARGET_MODE=REMOTE POSTGRES"
@@ -81,6 +161,13 @@ set "ORDERED_FILE=%SQLS_DIR%\corrected_event_media_inserts.ordered.sql"
 set "PROD_FILE=%SQLS_DIR%\corrected_event_media_inserts.ordered_PROD.sql"
 set "SYNC_BOOT=%WORKSPACE_ROOT%\malayalees-us-site-boot\src\main\resources\sqls\sync_sequence_after_inserts.sql"
 set "SYNC_MOSC=%SQLS_DIR%\Current_Sqls\sync_sequence_after_inserts.sql"
+set "DELETE_MOSC_FILE=%SQLS_DIR%\delete_mosc_tenant.sql"
+set "MOSC_DUP_FILE=%SQLS_DIR%\mosc_dup_only.sql"
+set "MOSC_FULL_FILE=%SQLS_DIR%\corrected_event_media_inserts.ordered.mosc_malankara_orthodox_2.sql"
+
+if "%IMPORT_DUP_ONLY%"=="1" (
+  set "CUSTOM_IMPORT_FILE=%MOSC_DUP_FILE%"
+)
 
 set "DB_USER=event_site_admin"
 set "DB_NAME=event_site_manager_db"
@@ -100,6 +187,36 @@ if not exist "%SQLS_DIR%" (
   goto :fail
 )
 
+if defined CUSTOM_IMPORT_FILE (
+  if not exist "!CUSTOM_IMPORT_FILE!" (
+    call :log_err "Custom import file not found: !CUSTOM_IMPORT_FILE!"
+    goto :fail
+  )
+)
+
+if "%SCHEMA_ONLY%"=="1" (
+  call :log_info "/SCHEMA-ONLY enabled - steps 1-4 and 6-7 will be skipped (schema apply only)."
+)
+if defined CUSTOM_IMPORT_FILE (
+  call :log_info "Using custom import file: !CUSTOM_IMPORT_FILE!"
+  if "%SCHEMA_ONLY%"=="1" (
+    call :log_warn "/IMPORT-FILE ignored with /SCHEMA-ONLY (no data import will run)."
+  )
+  if "%PRE_CLEAN_MOSC%"=="0" (
+    echo !CUSTOM_IMPORT_FILE! | findstr /i "mosc_malankara_orthodox_2 mosc_dup_only" >nul 2>&1
+    if not errorlevel 1 (
+      set "PRE_CLEAN_MOSC=1"
+      call :log_info "Auto-enabling /PRE-CLEAN-MOSC for MOSC tenant import file."
+    )
+  )
+)
+if "%REGEN_MOSC%"=="1" (
+  call :log_info "/REGEN-MOSC enabled - will regenerate MOSC SQL before import."
+)
+if "%DATA_ONLY%"=="1" (
+  call :log_info "/DATA-ONLY enabled - step 5 schema rebuild will be skipped."
+)
+
 where node >nul 2>&1
 if errorlevel 1 (
   call :log_err "node is not on PATH. Install Node.js and retry."
@@ -116,6 +233,13 @@ if "%USE_REMOTE%"=="1" (
 if "%SKIP_EXPORT%"=="1" if "%USE_REMOTE%"=="1" (
   set "S0=SKIP"
   call :log_info "Step 0 skipped - /SKIP-EXPORT with /REMOTE (no local Docker export needed)."
+  if "%SCHEMA_ONLY%"=="1" (
+    set "S1=SKIP"
+    set "S2=SKIP"
+    set "S3=SKIP"
+    set "S4=SKIP"
+    goto :before_confirm
+  )
   goto :step1
 )
 
@@ -155,6 +279,14 @@ if errorlevel 1 call :log_warn "Could not verify container details; continuing a
 set "S0=OK"
 call :log_ok "Step 0 complete - local container resolved"
 
+if "%SCHEMA_ONLY%"=="1" (
+  set "S1=SKIP"
+  set "S2=SKIP"
+  set "S3=SKIP"
+  set "S4=SKIP"
+  goto :before_confirm
+)
+
 REM --- STEP 1: pg_dump export ---
 :step1
 call :log_step "1" "Export data-only INSERTs from local Docker"
@@ -179,18 +311,19 @@ call :log_info "File: %EXPORT_FILE%"
 goto :step2
 
 :step1_skip
-if not exist "%EXPORT_FILE%" (
-  set "S1=FAIL"
-  call :log_err "export file not found: %EXPORT_FILE%"
-  goto :fail
-)
 set "S1=SKIP"
-call :log_ok "Step 1 skipped (/SKIP-EXPORT) - using existing export file"
-call :log_info "File: %EXPORT_FILE%"
+call :log_ok "Step 1 skipped (/SKIP-EXPORT) - export.sql left unchanged"
+if exist "%EXPORT_FILE%" (
+  call :log_info "File: %EXPORT_FILE% (not read; import uses ordered SQL below)"
+) else (
+  call :log_info "export.sql not present (OK for /SKIP-EXPORT)"
+)
+goto :step2
 
 REM --- STEP 2: Reorder ---
 :step2
 call :log_step "2" "Reorder INSERT statements"
+if "%SKIP_EXPORT%"=="1" goto :step2_skip
 pushd "%SQLS_DIR%"
 node reorder_sql_inserts_final.cjs
 set "REORDER_ERR=!errorlevel!"
@@ -208,9 +341,40 @@ if not exist "%ORDERED_FILE%" (
 set "S2=OK"
 call :log_ok "Step 2 complete - ordered INSERT file created"
 call :log_info "File: %ORDERED_FILE%"
+pushd "%SQLS_DIR%"
+node patch_ordered_mosc_user_profiles.cjs
+set "MOSC_PATCH_ERR=!errorlevel!"
+popd
+if !MOSC_PATCH_ERR! neq 0 (
+  set "S2=FAIL"
+  call :log_err "patch_ordered_mosc_user_profiles.cjs failed with exit code !MOSC_PATCH_ERR!"
+  goto :fail
+)
+call :log_ok "Step 2b complete - MOSC user_profile rows normalized (600k IDs)"
+goto :step3
+
+:step2_skip
+if not exist "%ORDERED_FILE%" (
+  set "S2=FAIL"
+  call :log_err "ordered import file not found: %ORDERED_FILE%"
+  call :log_info "Restore from git or run without /SKIP-EXPORT to regenerate from export.sql"
+  goto :fail
+)
+for %%F in ("%ORDERED_FILE%") do set "ORDERED_SIZE=%%~zF"
+if !ORDERED_SIZE! LSS 100 (
+  set "S2=FAIL"
+  call :log_err "ordered import file is empty or too small (!ORDERED_SIZE! bytes): %ORDERED_FILE%"
+  call :log_info "Restore from git: git checkout HEAD -- code_html_template/SQLS/corrected_event_media_inserts.ordered.sql"
+  goto :fail
+)
+set "S2=SKIP"
+call :log_ok "Step 2 skipped (/SKIP-EXPORT) - ordered file left unchanged"
+call :log_info "File: %ORDERED_FILE% (!ORDERED_SIZE! bytes)"
 
 REM --- STEP 3: PROD user ID copy ---
+:step3
 call :log_step "3" "Create PROD SQL copy with user ID replacements"
+if "%SKIP_EXPORT%"=="1" goto :step3_skip
 pushd "%MOSC_TEMP%"
 node scripts\replace-user-profile-ids-in-sql.mjs
 set "PROD_ERR=!errorlevel!"
@@ -228,15 +392,43 @@ if not exist "%PROD_FILE%" (
 set "S3=OK"
 call :log_ok "Step 3 complete - PROD copy created"
 call :log_info "File: %PROD_FILE%"
+goto :step4_setup
+
+:step3_skip
+if "%USE_PROD%"=="1" (
+  if not exist "%PROD_FILE%" (
+    set "S3=FAIL"
+    call :log_err "PROD import file not found: %PROD_FILE%"
+    call :log_info "Run without /SKIP-EXPORT once to generate it, or copy from a backup"
+    goto :fail
+  )
+  for %%F in ("%PROD_FILE%") do set "PROD_SIZE=%%~zF"
+  if !PROD_SIZE! LSS 100 (
+    set "S3=FAIL"
+    call :log_err "PROD import file is empty or too small (!PROD_SIZE! bytes): %PROD_FILE%"
+    goto :fail
+  )
+  set "S3=SKIP"
+  call :log_ok "Step 3 skipped (/SKIP-EXPORT) - PROD file left unchanged"
+  call :log_info "File: %PROD_FILE% (!PROD_SIZE! bytes)"
+) else (
+  set "S3=SKIP"
+  call :log_ok "Step 3 skipped (/SKIP-EXPORT) - PROD copy not regenerated"
+)
 
 REM --- STEP 4: Comment pg_dump lines ---
-if "%USE_PROD%"=="1" (
+:step4_setup
+if defined CUSTOM_IMPORT_FILE (
+  set "IMPORT_FILE=!CUSTOM_IMPORT_FILE!"
+) else if "%USE_PROD%"=="1" (
   set "IMPORT_FILE=%PROD_FILE%"
 ) else (
   set "IMPORT_FILE=%ORDERED_FILE%"
 )
 
+:step4
 call :log_step "4" "Comment pg_dump header lines in import file"
+if "%SKIP_EXPORT%"=="1" goto :step4_skip
 powershell -NoProfile -Command "$path = '%IMPORT_FILE%'; $lines = Get-Content -LiteralPath $path; $out = $lines | ForEach-Object { if ($_ -match '^\s*pg_dump') { $_ -replace 'pg_dump','-- pg_dump' } else { $_ } }; Set-Content -LiteralPath $path -Value $out -Encoding UTF8"
 if errorlevel 1 (
   set "S4=FAIL"
@@ -246,9 +438,35 @@ if errorlevel 1 (
 set "S4=OK"
 call :log_ok "Step 4 complete - import file patched"
 call :log_info "File: !IMPORT_FILE!"
+goto :step4_done
 
+:step4_skip
+if not exist "!IMPORT_FILE!" (
+  set "S4=FAIL"
+  call :log_err "import file not found: !IMPORT_FILE!"
+  goto :fail
+)
+set "S4=SKIP"
+call :log_ok "Step 4 skipped (/SKIP-EXPORT) - import file left unchanged"
+call :log_info "File: !IMPORT_FILE!"
+
+:step4_done
+
+if "%REGEN_MOSC%"=="1" (
+  call :log_step "4b" "Regenerate MOSC tenant SQL (duplicate + patch + dup extract)"
+  call :regen_mosc_sql
+  if errorlevel 1 goto :fail
+)
+
+:before_confirm
 REM --- Confirm destructive steps ---
-call :log_banner "WARNING: Steps 5-7 rebuild schema and replace data"
+if "%DATA_ONLY%"=="1" (
+  call :log_banner "WARNING: /DATA-ONLY - import and sequence sync only (schema unchanged)"
+) else if "%SCHEMA_ONLY%"=="1" (
+  call :log_banner "WARNING: Step 5 will rebuild schema only (no data import)"
+) else (
+  call :log_banner "WARNING: Steps 5-7 rebuild schema and replace data"
+)
 if "%USE_REMOTE%"=="1" (
   echo( Target     : REMOTE - !REMOTE_HOST!:!REMOTE_PORT! / !REMOTE_DB!
   echo( User       : !REMOTE_USER!
@@ -266,7 +484,13 @@ if "%USE_REMOTE%"=="1" (
 )
 
 if "%FORCE%"=="0" (
-  set /p "CONFIRM=Type Y or YES to continue with schema rebuild and import: "
+  if "%DATA_ONLY%"=="1" (
+    set /p "CONFIRM=Type Y or YES to continue with MOSC data-only import (no schema rebuild): "
+  ) else if "%SCHEMA_ONLY%"=="1" (
+    set /p "CONFIRM=Type Y or YES to continue with schema-only rebuild (no import): "
+  ) else (
+    set /p "CONFIRM=Type Y or YES to continue with schema rebuild and import: "
+  )
   if /i "!CONFIRM!"=="YES" goto :confirm_ok
   if /i "!CONFIRM!"=="Y" goto :confirm_ok
   goto :confirm_abort
@@ -274,9 +498,17 @@ if "%FORCE%"=="0" (
 :confirm_ok
 
 if not exist "%SCHEMA_FILE%" (
-  set "S5=FAIL"
-  call :log_err "Schema file not found: %SCHEMA_FILE%"
-  goto :fail
+  if not "%DATA_ONLY%"=="1" (
+    set "S5=FAIL"
+    call :log_err "Schema file not found: %SCHEMA_FILE%"
+    goto :fail
+  )
+)
+
+if "%DATA_ONLY%"=="1" (
+  set "S5=SKIP"
+  call :log_ok "Step 5 skipped (/DATA-ONLY) - schema left unchanged"
+  goto :step6_pre_clean
 )
 
 REM --- STEP 5: Schema ---
@@ -297,19 +529,71 @@ set "S5=OK"
 call :log_ok "Step 5 complete - schema applied"
 call :log_info "File: %SCHEMA_FILE%"
 
+if "%SCHEMA_ONLY%"=="1" (
+  set "S6=SKIP"
+  set "S7=SKIP"
+  if "%USE_REMOTE%"=="1" (
+    set "RUN_MODE=SCHEMA-ONLY-REMOTE"
+  ) else (
+    set "RUN_MODE=SCHEMA-ONLY"
+  )
+  goto :print_summary
+)
+
+:step6_pre_clean
+if "%PRE_CLEAN_MOSC%"=="1" if not "%SCHEMA_ONLY%"=="1" (
+  call :log_step "5b" "Pre-clean MOSC tenant rows (delete_mosc_tenant.sql)"
+  if not exist "%DELETE_MOSC_FILE%" (
+    set "S6=FAIL"
+    call :log_err "delete_mosc_tenant.sql not found: %DELETE_MOSC_FILE%"
+    goto :fail
+  )
+  if "%USE_REMOTE%"=="1" (
+    call :run_psql_file "%DELETE_MOSC_FILE%" 1
+    set "PSQL_ERR=!errorlevel!"
+  ) else (
+    docker exec -i !CONTAINER_ID! psql -U %DB_USER% -d %DB_NAME% -v ON_ERROR_STOP=1 < "%DELETE_MOSC_FILE%"
+    set "PSQL_ERR=!errorlevel!"
+  )
+  if !PSQL_ERR! neq 0 (
+    set "S6=FAIL"
+    call :log_err "MOSC pre-clean failed"
+    goto :fail
+  )
+  call :log_ok "Step 5b complete - MOSC tenant rows removed"
+)
+
 REM --- STEP 6: Import ---
 call :log_step "6" "Import data"
+if not exist "!IMPORT_FILE!" (
+  set "S6=FAIL"
+  call :log_err "Import file not found: !IMPORT_FILE!"
+  goto :fail
+)
+if defined CUSTOM_IMPORT_FILE (
+  set "IMPORT_STOP_ON_ERR=1"
+  call :log_info "Custom /IMPORT-FILE: strict mode ON_ERROR_STOP=1 (import fails on first SQL error)"
+) else (
+  set "IMPORT_STOP_ON_ERR=0"
+)
 if "%USE_REMOTE%"=="1" (
-  call :run_psql_file "!IMPORT_FILE!" 0
+  call :run_psql_file "!IMPORT_FILE!" !IMPORT_STOP_ON_ERR!
   set "PSQL_ERR=!errorlevel!"
 ) else (
-  docker exec -i !CONTAINER_ID! psql -U %DB_USER% -d %DB_NAME% -v ON_ERROR_STOP=0 < "!IMPORT_FILE!"
+  docker exec -i !CONTAINER_ID! psql -U %DB_USER% -d %DB_NAME% -v ON_ERROR_STOP=!IMPORT_STOP_ON_ERR! < "!IMPORT_FILE!"
   set "PSQL_ERR=!errorlevel!"
 )
 if !PSQL_ERR! neq 0 (
-  set "S6=WARN"
-  call :log_warn "Import reported errors - review psql output above"
-  call :log_info "Partial imports may need manual cleanup (see DATABASE_EXPORT_IMPORT_GUIDE.html)"
+  if defined CUSTOM_IMPORT_FILE (
+    set "S6=FAIL"
+    call :log_err "Import failed - custom /IMPORT-FILE uses strict ON_ERROR_STOP=1"
+    call :log_info "Fix SQL errors above, then re-run with /SKIP-EXPORT /IMPORT-FILE ... /FORCE"
+    goto :fail
+  ) else (
+    set "S6=WARN"
+    call :log_warn "Import reported errors - review psql output above"
+    call :log_info "Partial imports may need manual cleanup (see DATABASE_EXPORT_IMPORT_GUIDE.html)"
+  )
 ) else (
   set "S6=OK"
   call :log_ok "Step 6 complete - data import finished"
@@ -348,6 +632,8 @@ call :log_info "File: !SYNC_FILE!"
 
 if "%USE_REMOTE%"=="1" (
   set "RUN_MODE=FULL-REMOTE"
+) else if "%DATA_ONLY%"=="1" (
+  set "RUN_MODE=DATA-ONLY"
 ) else (
   set "RUN_MODE=FULL"
 )
@@ -406,6 +692,12 @@ if /i "!RUN_MODE!"=="FULL" (
   set "FINAL_EXIT=0"
   call :log_ok "OVERALL: PARTIAL SUCCESS - export/reorder/PROD files ready"
   call :log_info "Re-run with /FORCE when ready for schema rebuild and import"
+) else if /i "!RUN_MODE!"=="SCHEMA-ONLY" (
+  set "FINAL_EXIT=0"
+  call :log_ok "OVERALL: SUCCESS - schema applied (no data import)"
+) else if /i "!RUN_MODE!"=="SCHEMA-ONLY-REMOTE" (
+  set "FINAL_EXIT=0"
+  call :log_ok "OVERALL: REMOTE SUCCESS - schema applied (no data import)"
 ) else (
   set "FINAL_EXIT=1"
   call :log_err "OVERALL: FAILED"
@@ -439,8 +731,18 @@ echo(   WORKSPACE_ROOT  Parent folder containing mosc-temp (e.g. F:\project_work
 echo(   CONTAINER_ID    Docker Postgres container ID (auto-detected if omitted)
 echo(   /FORCE          Skip confirmation before schema rebuild
 echo(   /PROD           Import corrected_event_media_inserts.ordered_PROD.sql
-echo(   /SKIP-EXPORT    Skip pg_dump; reuse existing export.sql
+echo(   /SKIP-EXPORT    Skip export/reorder/PROD/patch; import existing ordered SQL as-is
 echo(   /REMOTE         Apply steps 5-7 to remote Postgres (reads mosc-temp\.env.local)
+echo(   /SCHEMA-ONLY    Apply schema only (step 5); skip export 1-4 and import/sync 6-7
+echo(   /IMPORT-FILE    Override import SQL file (next arg or /IMPORT-FILE=path)
+echo(   /REGEN-MOSC     Regenerate mosc_malankara_orthodox_2 SQL before import
+echo(   /PRE-CLEAN-MOSC Run delete_mosc_tenant.sql before import (auto for MOSC files)
+echo(   /IMPORT-DUP-ONLY Import mosc_dup_only.sql only (fast MOSC tenant refresh)
+echo(   /DATA-ONLY      Skip schema rebuild; import + sequence sync only
+echo(
+echo( MOSC examples:
+echo(   %~nx0 F:\project_workspace /REGEN-MOSC /SKIP-EXPORT /IMPORT-FILE "...\mosc_malankara_orthodox_2.sql" /FORCE
+echo(   %~nx0 F:\project_workspace /REGEN-MOSC /SKIP-EXPORT /DATA-ONLY /IMPORT-DUP-ONLY /FORCE
 echo(
 echo( Remote config (first match wins):
 echo(   1. WORKSPACE_ROOT\mosc-temp\.env.local  - RDS_ENDPOINT, DB_NAME, DB_USERNAME, DB_PASSWORD
@@ -449,6 +751,8 @@ echo(
 echo( Example:
 echo(   %~nx0 F:\project_workspace
 echo(   %~nx0 F:\project_workspace /SKIP-EXPORT /REMOTE /FORCE
+echo(   %~nx0 F:\project_workspace /SCHEMA-ONLY /FORCE
+echo(   %~nx0 F:\project_workspace /IMPORT-FILE "F:\path\to\custom_import.sql" /FORCE
 exit /b 1
 
 REM --- Load remote DB config: mosc-temp\.env.local first, then database_target.local.env ---
@@ -582,3 +886,38 @@ goto :eof
 :log_info
 echo(          %~1
 goto :eof
+
+:regen_mosc_sql
+if not exist "%ORDERED_FILE%" (
+  call :log_err "Source ordered file not found: %ORDERED_FILE%"
+  exit /b 1
+)
+pushd "%MOSC_TEMP%"
+python scripts\duplicate_tenant_sql.py "%ORDERED_FILE%" "%MOSC_FULL_FILE%"
+set "REGEN_ERR=!errorlevel!"
+if !REGEN_ERR! neq 0 (
+  popd
+  call :log_err "duplicate_tenant_sql.py failed with exit code !REGEN_ERR!"
+  exit /b 1
+)
+node "%SQLS_DIR%\patch_mosc_malankara_import_block.cjs"
+set "REGEN_ERR=!errorlevel!"
+if !REGEN_ERR! neq 0 (
+  popd
+  call :log_err "patch_mosc_malankara_import_block.cjs failed with exit code !REGEN_ERR!"
+  exit /b 1
+)
+python scripts\extract_dup_tenant_sql.py "%MOSC_FULL_FILE%" "%MOSC_DUP_FILE%"
+set "REGEN_ERR=!errorlevel!"
+popd
+if !REGEN_ERR! neq 0 (
+  call :log_err "extract_dup_tenant_sql.py failed with exit code !REGEN_ERR!"
+  exit /b 1
+)
+if "%IMPORT_DUP_ONLY%"=="1" (
+  set "IMPORT_FILE=%MOSC_DUP_FILE%"
+) else if defined CUSTOM_IMPORT_FILE (
+  set "IMPORT_FILE=!CUSTOM_IMPORT_FILE!"
+)
+call :log_ok "MOSC SQL regenerated: !MOSC_FULL_FILE! and !MOSC_DUP_FILE!"
+exit /b 0

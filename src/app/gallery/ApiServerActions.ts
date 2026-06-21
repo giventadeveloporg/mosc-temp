@@ -2,7 +2,37 @@
 
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getTenantId, getApiBaseUrl } from '@/lib/env';
-import type { EventDetailsDTO, EventMediaDTO, GalleryAlbumDTO, GalleryAlbumWithMedia } from '@/types';
+import type {
+  EventDetailsDTO,
+  EventMediaDTO,
+  GalleryAlbumDTO,
+  GalleryAlbumWithMedia,
+  GalleryCategoryDTO,
+} from '@/types';
+
+export interface GalleryAlbumExtraFilters {
+  categoryId?: number;
+  albumYear?: number;
+  eventLocation?: string;
+}
+
+export interface GalleryEventExtraFilters {
+  year?: number;
+  location?: string;
+  eventTypeId?: number;
+}
+
+export interface GalleryAlbumFilterOptions {
+  categories: GalleryCategoryDTO[];
+  years: number[];
+  locations: string[];
+}
+
+export interface GalleryEventFilterOptions {
+  years: number[];
+  locations: string[];
+  eventTypes: { id: number; name: string }[];
+}
 
 // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
 function getApiBase() {
@@ -39,7 +69,8 @@ export async function fetchEventsForGallery(
   size: number = 12,
   searchTerm: string = '',
   startDate?: string,
-  endDate?: string
+  endDate?: string,
+  extraFilters?: GalleryEventExtraFilters
 ): Promise<GalleryPageData> {
   try {
     const tenantId = getTenantId();
@@ -56,12 +87,24 @@ export async function fetchEventsForGallery(
           eventParams.append('title.contains', searchTerm);
         }
 
-        // Add date range filtering
-        if (startDate) {
-          eventParams.append('startDate.greaterThanOrEqual', startDate);
+        if (extraFilters?.year && !startDate && !endDate) {
+          eventParams.append('startDate.greaterThanOrEqual', `${extraFilters.year}-01-01`);
+          eventParams.append('startDate.lessThanOrEqual', `${extraFilters.year}-12-31`);
+        } else {
+          if (startDate) {
+            eventParams.append('startDate.greaterThanOrEqual', startDate);
+          }
+          if (endDate) {
+            eventParams.append('startDate.lessThanOrEqual', endDate);
+          }
         }
-        if (endDate) {
-          eventParams.append('startDate.lessThanOrEqual', endDate);
+
+        if (extraFilters?.location) {
+          eventParams.append('location.contains', extraFilters.location);
+        }
+
+        if (extraFilters?.eventTypeId) {
+          eventParams.append('eventTypeId.equals', extraFilters.eventTypeId.toString());
         }
 
     // Fetch events
@@ -236,7 +279,8 @@ export async function fetchAlbumsForGallery(
   size: number = 12,
   searchTerm: string = '',
   startDate?: string,
-  endDate?: string
+  endDate?: string,
+  extraFilters?: GalleryAlbumExtraFilters
 ): Promise<{
   albumsWithMedia: GalleryAlbumWithMedia[];
   totalAlbums: number;
@@ -252,19 +296,29 @@ export async function fetchAlbumsForGallery(
     albumParams.append('isPublic.equals', 'true'); // Public albums only for gallery
     albumParams.append('page', page.toString());
     albumParams.append('size', size.toString());
-    albumParams.append('sort', 'displayOrder,asc');
+    albumParams.append('sort', 'eventDateStart,desc');
+    albumParams.append('sort', 'albumYear,desc');
     albumParams.append('sort', 'createdAt,desc');
 
     if (searchTerm) {
       albumParams.append('title.contains', searchTerm);
     }
 
-    // Add date range filtering (for albums, filter by createdAt)
+    if (extraFilters?.categoryId) {
+      albumParams.append('galleryCategoryId.equals', extraFilters.categoryId.toString());
+    }
+    if (extraFilters?.albumYear) {
+      albumParams.append('albumYear.equals', extraFilters.albumYear.toString());
+    }
+    if (extraFilters?.eventLocation) {
+      albumParams.append('eventLocation.contains', extraFilters.eventLocation);
+    }
+
     if (startDate) {
-      albumParams.append('createdAt.greaterThanOrEqual', startDate);
+      albumParams.append('eventDateStart.greaterThanOrEqual', startDate);
     }
     if (endDate) {
-      albumParams.append('createdAt.lessThanOrEqual', endDate);
+      albumParams.append('eventDateStart.lessThanOrEqual', endDate);
     }
 
     // Fetch albums
@@ -400,5 +454,109 @@ export async function fetchAlbumWithMedia(
   } catch (error) {
     console.error(`Error fetching album ${albumId} with media:`, error);
     return null;
+  }
+}
+
+function uniqueSortedNumbers(values: (number | null | undefined)[]): number[] {
+  const set = new Set<number>();
+  for (const v of values) {
+    if (typeof v === 'number' && Number.isFinite(v)) set.add(v);
+  }
+  return [...set].sort((a, b) => b - a);
+}
+
+function uniqueSortedStrings(values: (string | null | undefined)[]): string[] {
+  const set = new Set<string>();
+  for (const v of values) {
+    const trimmed = v?.trim();
+    if (trimmed) set.add(trimmed);
+  }
+  return [...set].sort((a, b) => a.localeCompare(b));
+}
+
+/**
+ * Active gallery categories for public filter dropdowns.
+ */
+export async function fetchGalleryCategoriesForGallery(): Promise<GalleryCategoryDTO[]> {
+  try {
+    const tenantId = getTenantId();
+    const params = new URLSearchParams();
+    params.append('tenantId.equals', tenantId);
+    params.append('isActive.equals', 'true');
+    params.append('sort', 'sortOrder,asc');
+
+    const url = `${getApiBase()}/api/gallery-categories?${params.toString()}`;
+    const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
+
+    if (!res.ok) {
+      console.error('Failed to fetch gallery categories for gallery:', res.status, res.statusText);
+      return [];
+    }
+
+    const data: GalleryCategoryDTO[] = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('Error fetching gallery categories for gallery:', error);
+    return [];
+  }
+}
+
+/**
+ * Distinct filter dropdown values from public gallery albums.
+ */
+export async function fetchGalleryAlbumFilterOptions(): Promise<GalleryAlbumFilterOptions> {
+  try {
+    const [categories, albumsResult] = await Promise.all([
+      fetchGalleryCategoriesForGallery(),
+      fetchAlbumsForGallery(0, 500),
+    ]);
+
+    const albums = albumsResult.albumsWithMedia.map((item) => item.album);
+
+    return {
+      categories,
+      years: uniqueSortedNumbers(albums.map((a) => a.albumYear)),
+      locations: uniqueSortedStrings(albums.map((a) => a.eventLocation)),
+    };
+  } catch (error) {
+    console.error('Error fetching gallery album filter options:', error);
+    return { categories: [], years: [], locations: [] };
+  }
+}
+
+/**
+ * Distinct filter dropdown values from active events with gallery media.
+ */
+export async function fetchGalleryEventFilterOptions(): Promise<GalleryEventFilterOptions> {
+  try {
+    const eventsResult = await fetchEventsForGallery(0, 500);
+    const events = eventsResult.eventsWithMedia.map((item) => item.event);
+
+    const eventTypeMap = new Map<number, string>();
+    for (const event of events) {
+      const typeId = event.eventType?.id;
+      const typeName = event.eventType?.name?.trim();
+      if (typeId && typeName) {
+        eventTypeMap.set(typeId, typeName);
+      }
+    }
+
+    const eventTypes = [...eventTypeMap.entries()]
+      .map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    return {
+      years: uniqueSortedNumbers(
+        events.map((e) => {
+          const start = e.startDate?.slice(0, 4);
+          return start ? parseInt(start, 10) : null;
+        }),
+      ),
+      locations: uniqueSortedStrings(events.map((e) => e.location)),
+      eventTypes,
+    };
+  } catch (error) {
+    console.error('Error fetching gallery event filter options:', error);
+    return { years: [], locations: [], eventTypes: [] };
   }
 }

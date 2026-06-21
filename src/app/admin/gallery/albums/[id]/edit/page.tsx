@@ -1,4 +1,4 @@
-import { fetchAlbumServer } from '../../ApiServerActions';
+import { fetchAlbumServer, fetchGalleryCategoriesForAdminServer } from '../../ApiServerActions';
 import AdminAlbumEditClient from './AdminAlbumEditClient';
 import AdminNavigation from '@/components/AdminNavigation';
 import { notFound } from 'next/navigation';
@@ -21,11 +21,13 @@ export default async function AdminAlbumEditPage({
     notFound();
   }
 
+  const categories = await fetchGalleryCategoriesForAdminServer();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 xl:px-16" style={{ paddingTop: '180px', paddingBottom: '48px' }}>
         <AdminNavigation currentPage="gallery-albums" />
-        <AdminAlbumEditClient initialAlbum={album} />
+        <AdminAlbumEditClient initialAlbum={album} categories={categories} />
       </div>
     </div>
   );

@@ -114,6 +114,7 @@ CREATE TYPE public.manual_payment_method_type AS ENUM ('ZELLE_MANUAL', 'VENMO_MA
 -- ===================================================
 DROP FUNCTION IF EXISTS public.generate_attendee_qr_code() CASCADE;
 DROP FUNCTION IF EXISTS public.generate_enhanced_qr_code() CASCADE;
+DROP FUNCTION IF EXISTS public.reconcile_ticket_type_sold_quantity(BIGINT) CASCADE;
 DROP FUNCTION IF EXISTS public.manage_ticket_inventory() CASCADE;
 DROP FUNCTION IF EXISTS public.update_ticket_sold_quantity() CASCADE;
 DROP FUNCTION IF EXISTS public.update_updated_at_column() CASCADE;
@@ -152,6 +153,7 @@ DROP TABLE IF EXISTS public.event_attendee CASCADE;
 DROP TABLE IF EXISTS public.event_admin_audit_log CASCADE;
 DROP TABLE IF EXISTS public.event_calendar_entry CASCADE;
 DROP TABLE IF EXISTS public.gallery_album CASCADE;
+DROP TABLE IF EXISTS public.gallery_category CASCADE;
 DROP TABLE IF EXISTS public.official_document_year_bundle CASCADE;
 DROP TABLE IF EXISTS public.event_media CASCADE;
 DROP TABLE IF EXISTS public.official_document_category CASCADE;
@@ -319,6 +321,56 @@ $$;
 
 --
 -- TOC entry 273 (class 1255 OID 71150)
+-- Name: reconcile_ticket_type_sold_quantity(bigint); Type: FUNCTION; Schema: public; Owner: giventa_event_management
+--
+-- Recompute sold_quantity from completed transaction line items (source of truth).
+-- Safe for bulk seed imports: ignores pre-set sold_quantity on event_ticket_type rows
+-- and avoids double-counting when replaying production snapshots.
+--
+
+CREATE OR REPLACE FUNCTION public.reconcile_ticket_type_sold_quantity(p_ticket_type_id BIGINT) RETURNS void
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    computed_sold INTEGER;
+    type_cap INTEGER;
+BEGIN
+    IF p_ticket_type_id IS NULL THEN
+        RETURN;
+    END IF;
+
+    SELECT COALESCE(SUM(etti.quantity), 0)
+    INTO computed_sold
+    FROM public.event_ticket_transaction_item etti
+    INNER JOIN public.event_ticket_transaction ett ON ett.id = etti.transaction_id
+    WHERE etti.ticket_type_id = p_ticket_type_id
+      AND ett.status = 'COMPLETED';
+
+    SELECT available_quantity
+    INTO type_cap
+    FROM public.event_ticket_type
+    WHERE id = p_ticket_type_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Ticket type not found for ID: %', p_ticket_type_id;
+    END IF;
+
+    IF type_cap IS NOT NULL AND computed_sold > type_cap THEN
+        RAISE EXCEPTION 'Insufficient tickets available. Requested: %, Available: %',
+            computed_sold, type_cap;
+    END IF;
+
+    UPDATE public.event_ticket_type
+    SET sold_quantity = computed_sold,
+        remaining_quantity = GREATEST(COALESCE(available_quantity, 0) - computed_sold, 0),
+        updated_at = NOW()
+    WHERE id = p_ticket_type_id;
+END;
+$$;
+
+
+--
+-- TOC entry 273 (class 1255 OID 71150)
 -- Name: manage_ticket_inventory(); Type: FUNCTION; Schema: public; Owner: giventa_event_management
 --
 
@@ -326,84 +378,43 @@ CREATE OR REPLACE FUNCTION public.manage_ticket_inventory() RETURNS trigger
 LANGUAGE plpgsql
 AS $$
 DECLARE
-ticket_type_record RECORD;
-    available_quantity INTEGER;
     parent_status TEXT;
-    txn_id BIGINT;
+    old_parent_status TEXT;
 BEGIN
-    IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-        txn_id := NEW.transaction_id;
-ELSE
-        txn_id := OLD.transaction_id;
-END IF;
-
-    -- Get parent transaction status
-SELECT status INTO parent_status FROM public.event_ticket_transaction WHERE id = txn_id;
-
-IF parent_status != 'COMPLETED' THEN
-        IF TG_OP = 'DELETE' THEN
-            RETURN OLD;
-ELSE
-            RETURN NEW;
-END IF;
-END IF;
-
-    -- Get ticket type details
-    IF TG_OP = 'INSERT' THEN
-SELECT * INTO ticket_type_record
-FROM public.event_ticket_type
-WHERE id = NEW.ticket_type_id;
-
-IF NOT FOUND THEN
-            RAISE EXCEPTION 'Ticket type not found for ID: %', NEW.ticket_type_id;
-END IF;
-
-        available_quantity := ticket_type_record.available_quantity - ticket_type_record.sold_quantity;
-        IF available_quantity < NEW.quantity THEN
-            RAISE EXCEPTION 'Insufficient tickets available. Requested: %, Available: %',
-                NEW.quantity, available_quantity;
-END IF;
-
-UPDATE public.event_ticket_type
-SET sold_quantity = sold_quantity + NEW.quantity,
-    updated_at = NOW()
-WHERE id = NEW.ticket_type_id;
-
-RAISE NOTICE 'Added % tickets to sold quantity for ticket type %', NEW.quantity, NEW.ticket_type_id;
-
-    ELSIF TG_OP = 'UPDATE' THEN
-        IF OLD.ticket_type_id = NEW.ticket_type_id THEN
-UPDATE public.event_ticket_type
-SET sold_quantity = sold_quantity - OLD.quantity + NEW.quantity,
-    updated_at = NOW()
-WHERE id = NEW.ticket_type_id;
-ELSE
-            -- Remove from old ticket type
-UPDATE public.event_ticket_type
-SET sold_quantity = sold_quantity - OLD.quantity,
-    updated_at = NOW()
-WHERE id = OLD.ticket_type_id;
--- Add to new ticket type
-UPDATE public.event_ticket_type
-SET sold_quantity = sold_quantity + NEW.quantity,
-    updated_at = NOW()
-WHERE id = NEW.ticket_type_id;
-END IF;
-
-    ELSIF TG_OP = 'DELETE' THEN
-UPDATE public.event_ticket_type
-SET sold_quantity = sold_quantity - OLD.quantity,
-    updated_at = NOW()
-WHERE id = OLD.ticket_type_id;
-
-RAISE NOTICE 'Removed % tickets from sold quantity for ticket type %', OLD.quantity, OLD.ticket_type_id;
-END IF;
-
     IF TG_OP = 'DELETE' THEN
+        SELECT status INTO parent_status
+        FROM public.event_ticket_transaction
+        WHERE id = OLD.transaction_id;
+
+        IF parent_status = 'COMPLETED' THEN
+            PERFORM public.reconcile_ticket_type_sold_quantity(OLD.ticket_type_id);
+        END IF;
+
         RETURN OLD;
-ELSE
-        RETURN NEW;
-END IF;
+    END IF;
+
+    SELECT status INTO parent_status
+    FROM public.event_ticket_transaction
+    WHERE id = NEW.transaction_id;
+
+    IF parent_status = 'COMPLETED' THEN
+        PERFORM public.reconcile_ticket_type_sold_quantity(NEW.ticket_type_id);
+    END IF;
+
+    IF TG_OP = 'UPDATE' THEN
+        IF OLD.ticket_type_id IS DISTINCT FROM NEW.ticket_type_id
+           OR OLD.transaction_id IS DISTINCT FROM NEW.transaction_id THEN
+            SELECT status INTO old_parent_status
+            FROM public.event_ticket_transaction
+            WHERE id = OLD.transaction_id;
+
+            IF old_parent_status = 'COMPLETED' THEN
+                PERFORM public.reconcile_ticket_type_sold_quantity(OLD.ticket_type_id);
+            END IF;
+        END IF;
+    END IF;
+
+    RETURN NEW;
 END;
 $$;
 
@@ -1613,6 +1624,39 @@ CREATE TABLE public.event_sponsors_join (
     );
 
 --
+-- Gallery categories (tenant-scoped lookup for album card category pills).
+--
+
+CREATE TABLE public.gallery_category (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    slug character varying(64) NOT NULL,
+    display_name character varying(128) NOT NULL,
+    description character varying(512) NULL,
+    sort_order integer DEFAULT 0 NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp DEFAULT now() NOT NULL,
+    updated_at timestamp DEFAULT now() NOT NULL,
+    CONSTRAINT gallery_category_pkey PRIMARY KEY (id),
+    CONSTRAINT ux_gallery_category_tenant_slug UNIQUE (tenant_id, slug),
+    CONSTRAINT check_gallery_category_slug_format CHECK (
+        slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'
+    ),
+    CONSTRAINT check_gallery_category_sort_non_negative CHECK (sort_order >= 0)
+);
+
+COMMENT ON TABLE public.gallery_category IS
+    'Tenant-scoped categories for gallery albums (e.g. Ecumenical Visits, Major Events).';
+COMMENT ON COLUMN public.gallery_category.slug IS
+    'URL-safe identifier; unique per tenant. Used for filters and admin keys.';
+COMMENT ON COLUMN public.gallery_category.display_name IS
+    'Human-readable label shown on album card category pill.';
+
+CREATE INDEX idx_gallery_category_tenant_active
+    ON public.gallery_category (tenant_id, is_active, sort_order);
+
+
+--
 -- TOC entry 247 (class 1259 OID 83071)
 -- Name: gallery_album; Type: TABLE; Schema: public; Owner: giventa_event_management
 --
@@ -1625,12 +1669,26 @@ CREATE TABLE public.gallery_album (
                                     cover_image_url varchar(2048) NULL,
                                     is_public bool DEFAULT true NOT NULL,
                                     display_order int4 DEFAULT 0 NOT NULL,
+                                    gallery_category_id int8 NULL,
+                                    album_year int4 NULL,
+                                    event_date_start date NULL,
+                                    event_date_end date NULL,
+                                    event_location varchar(256) NULL,
                                     created_at timestamp DEFAULT now() NOT NULL,
                                     updated_at timestamp DEFAULT now() NOT NULL,
                                     created_by_id int8 NULL,
                                     CONSTRAINT pk_gallery_album PRIMARY KEY (id),
                                     CONSTRAINT fk_gallery_album_created_by FOREIGN KEY (created_by_id) REFERENCES public.user_profile(id) ON DELETE SET NULL,
-                                    CONSTRAINT check_display_order_non_negative CHECK (display_order >= 0)
+                                    CONSTRAINT fk_gallery_album_category FOREIGN KEY (gallery_category_id) REFERENCES public.gallery_category(id) ON DELETE SET NULL,
+                                    CONSTRAINT check_display_order_non_negative CHECK (display_order >= 0),
+                                    CONSTRAINT chk_gallery_album_year_range CHECK (
+                                        album_year IS NULL OR (album_year >= 1900 AND album_year <= 2100)
+                                    ),
+                                    CONSTRAINT chk_gallery_album_event_date_order CHECK (
+                                        event_date_start IS NULL
+                                        OR event_date_end IS NULL
+                                        OR event_date_end >= event_date_start
+                                    )
 );
 
 
@@ -1647,6 +1705,21 @@ COMMENT ON COLUMN public.gallery_album.cover_image_url IS 'URL to cover image (r
 COMMENT ON COLUMN public.gallery_album.display_order IS 'Order for displaying albums in gallery (lower values appear first). Default: 0.';
 
 COMMENT ON COLUMN public.gallery_album.is_public IS 'Whether album is visible to public gallery. Default: true.';
+
+COMMENT ON COLUMN public.gallery_album.gallery_category_id IS
+    'Optional FK to gallery_category; drives category pill on public album cards.';
+
+COMMENT ON COLUMN public.gallery_album.album_year IS
+    'Calendar year of the visit/event shown on cards (e.g. 2019). Not the same as created_at.';
+
+COMMENT ON COLUMN public.gallery_album.event_date_start IS
+    'Calendar start date of the visit/event shown on album cards (date only, no time).';
+
+COMMENT ON COLUMN public.gallery_album.event_date_end IS
+    'Optional end date for multi-day events; must be >= event_date_start when both set.';
+
+COMMENT ON COLUMN public.gallery_album.event_location IS
+    'Human-readable place (city/venue) shown after formatted date on cards, e.g. Indore, Beirut.';
 
 
 --
@@ -2297,6 +2370,14 @@ CREATE TABLE public.tenant_organization (
                                             subscription_end_date date,
                                             monthly_fee_usd numeric(21,2),
                                             stripe_customer_id character varying(255),
+                                            description character varying(1000),
+                                            address_line_1 character varying(255),
+                                            address_line_2 character varying(255),
+                                            city character varying(255),
+                                            state_province character varying(255),
+                                            zip_code character varying(20),
+                                            country character varying(100),
+                                            website_url character varying(1024),
                                             is_active boolean DEFAULT true,
                                             created_at timestamp without time zone DEFAULT now() NOT NULL,
                                             updated_at timestamp without time zone DEFAULT now() NOT NULL,
@@ -2316,6 +2397,15 @@ CREATE TABLE public.tenant_organization (
 --
 
 COMMENT ON TABLE public.tenant_organization IS 'Multi-tenant organization configuration and subscription management';
+
+COMMENT ON COLUMN public.tenant_organization.description IS 'Canonical long-form organization description (max 1000 chars). Source of truth — do not duplicate on tenant_settings.';
+COMMENT ON COLUMN public.tenant_organization.address_line_1 IS 'Canonical primary street address line.';
+COMMENT ON COLUMN public.tenant_organization.address_line_2 IS 'Canonical secondary address line (suite, unit, etc.).';
+COMMENT ON COLUMN public.tenant_organization.city IS 'Canonical city or locality.';
+COMMENT ON COLUMN public.tenant_organization.state_province IS 'Canonical state, province, or region.';
+COMMENT ON COLUMN public.tenant_organization.zip_code IS 'Canonical ZIP or postal code.';
+COMMENT ON COLUMN public.tenant_organization.country IS 'Canonical country name (free text).';
+COMMENT ON COLUMN public.tenant_organization.website_url IS 'Canonical public website URL for the organization.';
 
 
 --
@@ -2341,7 +2431,9 @@ CREATE TABLE public.tenant_settings (
                                         zip_code character varying(20),
                                         country character varying(100),
                                         state_province character varying(100),
+                                        city character varying(255),
                                         email character varying(255),
+                                        description character varying(1000),
                                         whatsapp_api_key character varying(500),
                                         twilio_account_sid character varying(500),
                                         twilio_auth_token character varying(1048),
@@ -2398,6 +2490,12 @@ CREATE INDEX idx_tenant_settings_organization_id ON public.tenant_settings(tenan
 COMMENT ON TABLE public.tenant_settings IS 'Tenant-specific configuration settings with enhanced options';
 
 COMMENT ON COLUMN public.tenant_settings.tenant_organization_id IS 'Foreign key reference to tenant_organization.id for standard Long->Long relationship';
+
+COMMENT ON COLUMN public.tenant_settings.address_line_1 IS 'DEPRECATED v2.0 — use tenant_organization.address_line_1. Read fallback only; do not PATCH.';
+COMMENT ON COLUMN public.tenant_settings.address_line_2 IS 'DEPRECATED v2.0 — use tenant_organization.address_line_2. Read fallback only; do not PATCH.';
+COMMENT ON COLUMN public.tenant_settings.state_province IS 'DEPRECATED v2.0 — use tenant_organization.state_province. Read fallback only; do not PATCH.';
+COMMENT ON COLUMN public.tenant_settings.zip_code IS 'DEPRECATED v2.0 — use tenant_organization.zip_code. Read fallback only; do not PATCH.';
+COMMENT ON COLUMN public.tenant_settings.country IS 'DEPRECATED v2.0 — use tenant_organization.country. Read fallback only; do not PATCH.';
 
 COMMENT ON COLUMN public.tenant_settings.facebook_url IS 'Organization Facebook profile or page URL for Follow our journey section';
 COMMENT ON COLUMN public.tenant_settings.instagram_url IS 'Organization Instagram profile URL for Follow our journey section';
@@ -3089,6 +3187,27 @@ CREATE INDEX idx_gallery_album_display_order ON public.gallery_album USING btree
 --
 
 CREATE INDEX idx_gallery_album_created_at ON public.gallery_album USING btree (created_at DESC);
+
+
+--
+-- Name: idx_gallery_album_category_id; Type: INDEX; Schema: public; Owner: giventa_event_management
+--
+
+CREATE INDEX idx_gallery_album_category_id ON public.gallery_album USING btree (gallery_category_id) WHERE (gallery_category_id IS NOT NULL);
+
+
+--
+-- Name: idx_gallery_album_album_year; Type: INDEX; Schema: public; Owner: giventa_event_management
+--
+
+CREATE INDEX idx_gallery_album_album_year ON public.gallery_album USING btree (tenant_id, album_year) WHERE (album_year IS NOT NULL);
+
+
+--
+-- Name: idx_gallery_album_event_date_start; Type: INDEX; Schema: public; Owner: giventa_event_management
+--
+
+CREATE INDEX idx_gallery_album_event_date_start ON public.gallery_album USING btree (tenant_id, event_date_start) WHERE (event_date_start IS NOT NULL);
 
 
 --
@@ -5756,6 +5875,7 @@ SELECT pg_catalog.setval(
                    COALESCE((SELECT MAX(id) FROM public.event_sponsors), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_sponsors_join), 0),
                    COALESCE((SELECT MAX(id) FROM public.gallery_album), 0),
+                   COALESCE((SELECT MAX(id) FROM public.gallery_category), 0),
                    COALESCE((SELECT MAX(id) FROM public.official_document_category), 0),
                    COALESCE((SELECT MAX(id) FROM public.official_document_year_bundle), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_media), 0),

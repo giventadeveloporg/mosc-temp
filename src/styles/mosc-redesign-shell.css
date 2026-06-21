@@ -113,6 +113,16 @@
   color: #c0284a !important;
 }
 
+/* Institution CMS cards: light text on burgundy header — beat shell .font-syro-display / #mainContent p */
+.mosc-redesign-subpage-shell.syro-layout #mainContent.syro-main .institution-entry-card__header .institution-entry-card__title,
+.mosc-redesign-subpage-shell.syro-layout #mainContent.syro-main .institution-entry-card__header .institution-entry-card__index {
+  color: #faf7f0 !important;
+}
+
+.mosc-redesign-subpage-shell.syro-layout #mainContent.syro-main .institution-entry-card__header .institution-entry-card__location {
+  color: rgba(250, 247, 240, 0.92) !important;
+}
+
 /* Subpage ribbon: description on burgundy — parchment tint, beats body p rule */
 .mosc-redesign-subpage-shell.syro-layout #mainContent.syro-main section.mosc-subpage-ribbon .syro-banner-content p.syro-banner-description,
 .mosc-redesign-subpage-shell.syro-layout #mainContent.syro-main section.mosc-subpage-ribbon .mosc-subpage-ribbon__description {

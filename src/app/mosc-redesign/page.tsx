@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Anek_Malayalam } from "next/font/google";
 import InteractiveWorldMap from "@/components/ui/InteractiveWorldMap";
 import MoscRedesignHeader from "@/components/mosc-redesign/MoscRedesignHeader";
 import MoscRedesignFooter from "@/components/mosc-redesign/MoscRedesignFooter";
@@ -60,12 +59,6 @@ const regions: Region[] = [
 { id: "africa", label: "Africa" },
 { id: "india", label: "India" }];
 
-
-const anekMalayalam = Anek_Malayalam({
-  subsets: ["latin", "malayalam"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
 
 function formatLiturgyDisplayDate(liturgyDate: string | null): string {
   const d = liturgyDate ? new Date(`${liturgyDate}T12:00:00`) : new Date();
@@ -524,7 +517,7 @@ export default function HomePage() {
 
               <div
                 className={`bg-gradient-to-b from-parchment-deep to-parchment rounded-xl p-5 border border-burgundy/25 shadow-inner ${
-                  readingLang === "malayalam" ? anekMalayalam.className : "font-dm-sans"
+                  readingLang === "malayalam" ? "font-anek-malayalam" : "font-dm-sans"
                 }`}
                 lang={readingLang === "malayalam" ? "ml" : "en"}
               >

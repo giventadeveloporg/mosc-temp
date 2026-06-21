@@ -17,7 +17,6 @@ import {
   CALENDAR_QUICK_LINK_LABEL,
   isCalendarNavActive,
 } from './calendarNav';
-
 const ADMINISTRATION_NAV_LABEL = 'Administration';
 const ADMINISTRATION_BASE_HREF = '/mosc-redesign/administration';
 const ADMIN_MENU_CLOSE_MS = 200;

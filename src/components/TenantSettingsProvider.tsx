@@ -1,16 +1,22 @@
 'use client';
 
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { TenantSettingsDTO } from '@/types';
+import { TenantOrganizationDTO, TenantSettingsDTO } from '@/types';
 import { usePageReady } from '@/hooks/usePageReady';
 import {
   getHomepageCacheKey,
   clearHomepageCaches,
   HOMEPAGE_CACHE_INVALIDATE_CHANNEL,
 } from '@/lib/homepageCacheKeys';
+import {
+  resolveTenantOrganizationIdentity,
+  type TenantOrganizationIdentity,
+} from '@/lib/resolveTenantOrganizationIdentity';
 
 interface TenantSettingsContextType {
   settings: TenantSettingsDTO | null;
+  organization: TenantOrganizationDTO | null;
+  organizationIdentity: TenantOrganizationIdentity;
   loading: boolean;
   showEventsSection: boolean;
   /** Squad / band roster carousel on homepage */
@@ -24,6 +30,17 @@ interface TenantSettingsContextType {
 
 const TenantSettingsContext = React.createContext<TenantSettingsContextType>({
   settings: null,
+  organization: null,
+  organizationIdentity: {
+    description: null,
+    addressLine1: null,
+    addressLine2: null,
+    city: null,
+    stateProvince: null,
+    zipCode: null,
+    country: null,
+    websiteUrl: null,
+  },
   loading: true,
   showEventsSection: true, // Default to true for backward compatibility
   showSquadSection: false,
@@ -40,6 +57,7 @@ interface TenantSettingsProviderProps {
 
 export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ children }) => {
   const [settings, setSettings] = useState<TenantSettingsDTO | null>(null);
+  const [organization, setOrganization] = useState<TenantOrganizationDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [retryCount, setRetryCount] = useState(0);
   const [invalidateTrigger, setInvalidateTrigger] = useState(0);
@@ -59,6 +77,7 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
     channel.onmessage = () => {
       clearHomepageCaches();
       setSettings(null);
+      setOrganization(null);
       setLoading(true);
       setInvalidateTrigger((t) => t + 1);
     };
@@ -82,6 +101,7 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
         const { data, timestamp } = JSON.parse(cachedData);
         if (Date.now() - timestamp < CACHE_DURATION) {
           setSettings(data);
+          setOrganization(data.tenantOrganization ?? null);
           setLoading(false);
         }
       }
@@ -108,6 +128,7 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
           if (Date.now() - timestamp < CACHE_DURATION) {
             console.log('✅ Using cached tenant settings data');
             setSettings(data);
+            setOrganization(data.tenantOrganization ?? null);
             setLoading(false);
             return;
           }
@@ -143,6 +164,34 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
 
             setSettings(tenantSettings);
 
+            let orgRecord: TenantOrganizationDTO | null =
+              tenantSettings.tenantOrganization ?? null;
+
+            if (!orgRecord?.id && tenantSettings.tenantId) {
+              try {
+                const orgParams = new URLSearchParams({
+                  'tenantId.equals': tenantSettings.tenantId,
+                  size: '1',
+                });
+                const orgResponse = await fetch(
+                  `/api/proxy/tenant-organizations?${orgParams.toString()}`,
+                  {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    cache: 'no-store',
+                  }
+                );
+                if (orgResponse.ok) {
+                  const orgData = await orgResponse.json();
+                  orgRecord = Array.isArray(orgData) ? orgData[0] ?? null : orgData;
+                }
+              } catch (orgError) {
+                console.warn('Failed to fetch tenant organization for identity:', orgError);
+              }
+            }
+
+            setOrganization(orgRecord);
+
             const version = typeof tenantSettings.homepageCacheVersion === 'number' ? tenantSettings.homepageCacheVersion : undefined;
             const cacheKey = version != null ? getHomepageCacheKey('homepage_tenant_settings_cache', version) : CACHE_KEY_BASE;
             try {
@@ -159,6 +208,7 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
           } else {
             console.warn('⚠️ No tenant settings found, using defaults');
             setSettings(null);
+            setOrganization(null);
           }
         } else {
           // Handle different error status codes gracefully
@@ -180,6 +230,7 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
           }
 
           setSettings(null);
+          setOrganization(null);
         }
       } catch (error) {
         // Handle network errors and other exceptions gracefully
@@ -199,6 +250,7 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
         }
 
         setSettings(null);
+        setOrganization(null);
         setLoading(false); // Always stop loading after max retries
       }
 
@@ -220,8 +272,12 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
   const showTeamSection = showExecutiveCommitteeSection;
   const showSponsorsSection = settings?.showSponsorsSectionInHomePage ?? true;
 
+  const organizationIdentity = resolveTenantOrganizationIdentity(organization, settings);
+
   const contextValue: TenantSettingsContextType = {
     settings,
+    organization,
+    organizationIdentity,
     loading,
     showEventsSection,
     showSquadSection,

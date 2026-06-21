@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { GalleryAlbumDTO } from '@/types';
-import { fetchAlbumsServer, deleteAlbumServer, createAlbumServer } from './ApiServerActions';
+import type { GalleryAlbumDTO, GalleryCategoryDTO } from '@/types';
+import { fetchAlbumsServer, deleteAlbumServer, createAlbumServer, resolveGalleryCategoryIdForSaveServer } from './ApiServerActions';
+import { GalleryCategoryTypeahead } from '@/components/admin/gallery/GalleryCategoryTypeahead';
+import { uploadGalleryAlbumCoverFile } from '@/lib/gallery/uploadGalleryAlbumCoverClient';
 import Image from 'next/image';
 import { Modal } from '@/components/Modal';
 
@@ -13,6 +15,7 @@ interface AdminAlbumListClientProps {
   initialTotalCount: number;
   initialPage: number;
   initialSearchTerm: string;
+  categories: GalleryCategoryDTO[];
 }
 
 export default function AdminAlbumListClient({
@@ -20,8 +23,11 @@ export default function AdminAlbumListClient({
   initialTotalCount,
   initialPage,
   initialSearchTerm,
+  categories,
 }: AdminAlbumListClientProps) {
   const router = useRouter();
+  const [categoryList, setCategoryList] = useState<GalleryCategoryDTO[]>(categories);
+  const [pendingCategoryName, setPendingCategoryName] = useState<string | null>(null);
   const [albums, setAlbums] = useState<GalleryAlbumDTO[]>(initialAlbums);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,14 +37,37 @@ export default function AdminAlbumListClient({
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [pendingCoverFile, setPendingCoverFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    coverImageUrl: '',
     isPublic: true,
     displayOrder: 0,
+    albumYear: null as number | null,
+    galleryCategoryId: null as number | null,
+    eventDateStart: '',
+    eventDateEnd: '',
+    eventLocation: '',
   });
   const pageSize = 12;
+
+  const validateEventDates = (): string | null => {
+    const start = formData.eventDateStart.trim();
+    const end = formData.eventDateEnd.trim();
+    if (end && !start) {
+      return 'Event start date is required when an end date is set.';
+    }
+    if (start && end && end < start) {
+      return 'Event end date must be on or after the start date.';
+    }
+    return null;
+  };
+
+  const buildEventDatePayload = () => ({
+    eventDateStart: formData.eventDateStart.trim() || null,
+    eventDateEnd: formData.eventDateEnd.trim() || null,
+    eventLocation: formData.eventLocation.trim() || null,
+  });
 
   // Load albums
   const loadAlbums = async (page: number, search: string) => {
@@ -90,23 +119,57 @@ export default function AdminAlbumListClient({
     setCreateLoading(true);
     setCreateError(null);
 
+    const dateError = validateEventDates();
+    if (dateError) {
+      setCreateError(dateError);
+      setCreateLoading(false);
+      return;
+    }
+
     try {
+      const galleryCategoryId = await resolveGalleryCategoryIdForSaveServer(
+        formData.galleryCategoryId,
+        pendingCategoryName
+      );
+
       const newAlbum = await createAlbumServer({
         title: formData.title,
         description: formData.description || undefined,
-        coverImageUrl: formData.coverImageUrl || undefined,
         isPublic: formData.isPublic,
         displayOrder: formData.displayOrder,
+        albumYear: formData.albumYear,
+        galleryCategoryId,
+        ...buildEventDatePayload(),
       });
+
+      if (pendingCoverFile && newAlbum.id != null) {
+        try {
+          await uploadGalleryAlbumCoverFile(newAlbum.id, pendingCoverFile);
+        } catch (uploadErr) {
+          setCreateError(
+            uploadErr instanceof Error
+              ? `Album created, but cover upload failed: ${uploadErr.message}`
+              : 'Album created, but cover upload failed.'
+          );
+          await loadAlbums(currentPage, searchTerm);
+          return;
+        }
+      }
 
       // Reset form and close modal
       setFormData({
         title: '',
         description: '',
-        coverImageUrl: '',
         isPublic: true,
         displayOrder: 0,
+        albumYear: null,
+        galleryCategoryId: null,
+        eventDateStart: '',
+        eventDateEnd: '',
+        eventLocation: '',
       });
+      setPendingCoverFile(null);
+      setPendingCategoryName(null);
       setIsCreateModalOpen(false);
 
       // Refresh the list
@@ -124,10 +187,16 @@ export default function AdminAlbumListClient({
     setFormData({
       title: '',
       description: '',
-      coverImageUrl: '',
       isPublic: true,
       displayOrder: 0,
+      albumYear: null,
+      galleryCategoryId: null,
+      eventDateStart: '',
+      eventDateEnd: '',
+      eventLocation: '',
     });
+    setPendingCoverFile(null);
+    setPendingCategoryName(null);
     setCreateError(null);
   };
 
@@ -459,19 +528,115 @@ export default function AdminAlbumListClient({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="coverImageUrl">
-              Cover Image URL
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="create-galleryCategoryId">
+              Category
+            </label>
+            <GalleryCategoryTypeahead
+              id="create-galleryCategoryId"
+              categories={categoryList}
+              value={formData.galleryCategoryId}
+              onChange={(galleryCategoryId) => setFormData((prev) => ({ ...prev, galleryCategoryId }))}
+              onCategoryCreated={(category) =>
+                setCategoryList((prev) =>
+                  prev.some((c) => c.id === category.id) ? prev : [...prev, category]
+                )
+              }
+              onPendingDisplayNameChange={setPendingCategoryName}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="create-albumYear">
+              Album Year
             </label>
             <input
-              id="coverImageUrl"
-              type="url"
-              value={formData.coverImageUrl}
-              onChange={(e) => setFormData(prev => ({ ...prev, coverImageUrl: e.target.value }))}
+              id="create-albumYear"
+              type="number"
+              value={formData.albumYear ?? ''}
+              onChange={(e) => {
+                const raw = e.target.value;
+                setFormData((prev) => ({
+                  ...prev,
+                  albumYear: raw === '' ? null : parseInt(raw, 10),
+                }));
+              }}
+              min={1900}
+              max={2100}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="https://example.com/image.jpg (optional)"
+              placeholder="e.g. 2023 (optional)"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="create-eventDateStart">
+                Event Start Date
+              </label>
+              <input
+                id="create-eventDateStart"
+                type="date"
+                value={formData.eventDateStart}
+                onChange={(e) => setFormData((prev) => ({ ...prev, eventDateStart: e.target.value }))}
+                onBlur={() => {
+                  const start = formData.eventDateStart.trim();
+                  if (start && formData.albumYear == null) {
+                    const year = parseInt(start.slice(0, 4), 10);
+                    if (!Number.isNaN(year)) {
+                      setFormData((prev) => ({ ...prev, albumYear: year }));
+                    }
+                  }
+                }}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="create-eventDateEnd">
+                Event End Date
+              </label>
+              <input
+                id="create-eventDateEnd"
+                type="date"
+                value={formData.eventDateEnd}
+                onChange={(e) => setFormData((prev) => ({ ...prev, eventDateEnd: e.target.value }))}
+                min={formData.eventDateStart || undefined}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="create-eventLocation">
+              Event Location
+            </label>
+            <input
+              id="create-eventLocation"
+              type="text"
+              maxLength={256}
+              value={formData.eventLocation}
+              onChange={(e) => setFormData((prev) => ({ ...prev, eventLocation: e.target.value }))}
+              onBlur={(e) =>
+                setFormData((prev) => ({ ...prev, eventLocation: e.target.value.trim() }))
+              }
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="e.g. Indore, Beirut (optional)"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="create-coverImage">
+              Cover Image (optional)
+            </label>
+            <input
+              id="create-coverImage"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setPendingCoverFile(e.target.files?.[0] ?? null)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             <p className="mt-1 text-xs text-gray-500">
-              URL to the cover image for this album. Can be set later when adding media.
+              {pendingCoverFile
+                ? `Selected: ${pendingCoverFile.name} — uploads to S3 after the album is created.`
+                : 'JPEG, PNG, or GIF up to 10MB. Uploads after create, or add later on the edit page.'}
             </p>
           </div>
 

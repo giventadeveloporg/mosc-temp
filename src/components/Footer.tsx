@@ -6,6 +6,7 @@ import { Facebook, Linkedin, Youtube, ArrowUp, Mail, Phone, MapPin } from "lucid
 import React, { useEffect, useState } from "react";
 import { useTenantSettings } from "@/components/TenantSettingsProvider";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
+import { formatAddressBlock } from "@/lib/formatAddress";
 
 // Back-to-top button component with comprehensive styling
 const BackToTopButton = () => {
@@ -66,8 +67,14 @@ const linkBaseClass =
   'flex items-center justify-center w-10 h-10 text-gray-400 hover:text-white rounded-lg transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900';
 
 const Footer = () => {
-  const { settings } = useTenantSettings();
+  const { settings, organizationIdentity } = useTenantSettings();
   const hasAnySocial = settings?.facebookUrl?.trim() || settings?.instagramUrl?.trim() || settings?.twitterUrl?.trim() || settings?.linkedinUrl?.trim() || settings?.youtubeUrl?.trim() || settings?.tiktokUrl?.trim();
+  const formattedAddress = formatAddressBlock(organizationIdentity);
+  const contactEmail = settings?.email?.trim() || '';
+  const contactPhone = settings?.phoneNumber?.trim() || '';
+  const footerDescription =
+    organizationIdentity.description?.trim() ||
+    'Making a difference in communities worldwide through compassionate action and sustainable impact.';
 
   return (
     <footer className="bg-gray-900 text-gray-300 footer-edge-to-edge mt-20" data-testid="main-footer" role="contentinfo">
@@ -90,7 +97,7 @@ const Footer = () => {
               </Link>
 
               <p className="text-gray-400 mb-6 font-inter text-sm leading-relaxed">
-                Making a difference in communities worldwide through compassionate action and sustainable impact.
+                {footerDescription}
               </p>
 
               {hasAnySocial && (
@@ -149,48 +156,42 @@ const Footer = () => {
               <h6 className="text-white font-inter font-semibold text-lg mb-6 tracking-wide">Get in Touch</h6>
 
               <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <MapPin size={18} className="text-blue-400 mt-1 flex-shrink-0" strokeWidth={2} />
-                  <p className="text-gray-400 font-inter text-sm leading-relaxed">
-                    123 Charity Lane<br />
-                    Hope City, HC 12345<br />
-                    United States
-                  </p>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <Phone size={18} className="text-blue-400 flex-shrink-0" strokeWidth={2} />
-                  <div className="space-y-1">
-                    <p>
-                      <a
-                        href="tel:+15551234567"
-                        className="text-gray-300 hover:text-white font-inter text-sm transition-colors duration-300 focus:outline-none focus:text-white"
-                      >
-                        +1 (555) 123-4567
-                      </a>
+                {formattedAddress && (
+                  <div className="flex items-start space-x-3">
+                    <MapPin size={18} className="text-blue-400 mt-1 flex-shrink-0" strokeWidth={2} />
+                    <p className="text-gray-400 font-inter text-sm leading-relaxed whitespace-pre-wrap">
+                      {formattedAddress}
                     </p>
+                  </div>
+                )}
+
+                {contactPhone && (
+                  <div className="flex items-center space-x-3">
+                    <Phone size={18} className="text-blue-400 flex-shrink-0" strokeWidth={2} />
                     <p>
                       <a
-                        href="tel:+18005551234"
+                        href={`tel:${contactPhone.replace(/\s/g, '')}`}
                         className="text-gray-300 hover:text-white font-inter text-sm transition-colors duration-300 focus:outline-none focus:text-white"
                       >
-                        1-800-555-1234 (Toll Free)
+                        {contactPhone}
                       </a>
                     </p>
                   </div>
-                </div>
+                )}
 
-                <div className="flex items-center space-x-3">
-                  <Mail size={18} className="text-blue-400 flex-shrink-0" strokeWidth={2} />
-                  <p>
-                    <a
-                      href="mailto:contact@charityorg.com"
-                      className="text-blue-400 hover:text-blue-300 font-inter text-sm transition-colors duration-300 focus:outline-none focus:text-blue-300"
-                    >
-                      contact@charityorg.com
-                    </a>
-                  </p>
-                </div>
+                {contactEmail && (
+                  <div className="flex items-center space-x-3">
+                    <Mail size={18} className="text-blue-400 flex-shrink-0" strokeWidth={2} />
+                    <p>
+                      <a
+                        href={`mailto:${contactEmail}`}
+                        className="text-blue-400 hover:text-blue-300 font-inter text-sm transition-colors duration-300 focus:outline-none focus:text-blue-300"
+                      >
+                        {contactEmail}
+                      </a>
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 

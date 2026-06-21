@@ -28,6 +28,8 @@ const REPLACEMENTS = [
 ];
 
 const USER_PROFILE_INSERT = 'INSERT INTO public.user_profile ';
+const TENANT_TYPO = 'mosc_malankara_orthodox_02';
+const TENANT_CORRECT = 'mosc_malankara_orthodox_2';
 
 const SOURCE_FILE = path.join(
   process.cwd(),
@@ -44,7 +46,7 @@ const PROD_FILE = path.join(
 
 function replaceInLine(line) {
   if (!line.includes(USER_PROFILE_INSERT)) return line;
-  let out = line;
+  let out = line.split(`'${TENANT_TYPO}'`).join(`'${TENANT_CORRECT}'`);
   for (const [from, to] of REPLACEMENTS) {
     out = out.split(from).join(to);
   }

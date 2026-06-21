@@ -1,4 +1,4 @@
-import { fetchAlbumsServer } from './ApiServerActions';
+import { fetchAlbumsServer, fetchGalleryCategoriesForAdminServer } from './ApiServerActions';
 import AdminAlbumListClient from './AdminAlbumListClient';
 import AdminNavigation from '@/components/AdminNavigation';
 
@@ -11,6 +11,7 @@ export default async function AdminAlbumsPage({
   const searchTerm = typeof searchParams?.search === 'string' ? searchParams.search : '';
 
   const { albums, totalCount } = await fetchAlbumsServer(page, 12, searchTerm);
+  const categories = await fetchGalleryCategoriesForAdminServer();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -21,6 +22,7 @@ export default async function AdminAlbumsPage({
           initialTotalCount={totalCount}
           initialPage={page}
           initialSearchTerm={searchTerm}
+          categories={categories}
         />
       </div>
     </div>

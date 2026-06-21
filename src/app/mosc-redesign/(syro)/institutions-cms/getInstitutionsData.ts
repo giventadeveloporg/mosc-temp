@@ -47,6 +47,9 @@ function parseEntry(raw: Record<string, unknown>, baseUrl: string): InstitutionE
 
 const EMPTY_LIST: InstitutionsListResult = { entries: [] };
 
+/** Strapi 5 caps pageSize at 100; paginate to load all tenant institutions. */
+const INSTITUTIONS_PAGE_SIZE = 100;
+
 /**
  * Fetches all institution entries for the current tenant, sorted by display order.
  */
@@ -62,24 +65,38 @@ export async function getInstitutionsData(): Promise<InstitutionsListResult> {
   params.set('filters[tenant][tenantId][$eq]', tenantId);
   params.set('sort', 'order:asc,name:asc');
   params.set('populate[0]', 'image');
-  params.set('pagination[pageSize]', '500');
-
-  const url = `${base}/institutions?${params.toString()}`;
+  params.set('pagination[pageSize]', String(INSTITUTIONS_PAGE_SIZE));
 
   try {
-    const res = await fetch(url, {
-      headers: getStrapiHeaders(),
-      cache: 'no-store',
-    });
-    if (!res.ok) {
-      return EMPTY_LIST;
+    const allRows: Record<string, unknown>[] = [];
+    let page = 1;
+    let pageCount = 1;
+
+    while (page <= pageCount) {
+      params.set('pagination[page]', String(page));
+      const url = `${base}/institutions?${params.toString()}`;
+      const res = await fetch(url, {
+        headers: getStrapiHeaders(),
+        cache: 'no-store',
+      });
+      if (!res.ok) {
+        return page === 1 ? EMPTY_LIST : { entries: allRows.map((item) => parseEntry(item, baseUrl)) };
+      }
+      const json = (await res.json()) as {
+        data?: unknown[];
+        meta?: { pagination?: { pageCount?: number } };
+      };
+      const list = Array.isArray(json?.data) ? json.data : [];
+      for (const item of list) {
+        if (item != null && typeof item === 'object') {
+          allRows.push(item as Record<string, unknown>);
+        }
+      }
+      pageCount = json?.meta?.pagination?.pageCount ?? 1;
+      page += 1;
     }
-    const json = (await res.json()) as { data?: unknown[] };
-    const list = Array.isArray(json?.data) ? json.data : [];
-    const entries = list
-      .filter((item): item is Record<string, unknown> => item != null && typeof item === 'object')
-      .map((item) => parseEntry(item, baseUrl));
-    return { entries };
+
+    return { entries: allRows.map((item) => parseEntry(item, baseUrl)) };
   } catch {
     return EMPTY_LIST;
   }

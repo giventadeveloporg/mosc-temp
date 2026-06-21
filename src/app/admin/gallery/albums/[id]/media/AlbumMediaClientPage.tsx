@@ -4,7 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { GalleryAlbumDTO, EventMediaDTO } from '@/types';
-// Server actions are called via fetch directly in this client component
+import { setAlbumCoverImageServer } from '../../ApiServerActions';
 import { Modal } from '@/components/Modal';
 
 interface AlbumMediaClientPageProps {
@@ -26,6 +26,8 @@ export default function AlbumMediaClientPage({
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [mediaList, setMediaList] = useState<EventMediaDTO[]>(initialMediaList);
+  const [coverImageUrl, setCoverImageUrl] = useState(album.coverImageUrl || '');
+  const [settingCoverMediaId, setSettingCoverMediaId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [pageSize] = useState(12);
@@ -415,32 +417,24 @@ export default function AlbumMediaClientPage({
       alert('Media does not have a file URL');
       return;
     }
+    if (media.id == null) {
+      alert('Media does not have a valid ID');
+      return;
+    }
+    setSettingCoverMediaId(media.id);
     try {
-      const tenantId = process.env.NEXT_PUBLIC_TENANT_ID;
-      const payload = {
-        id: albumId,
-        coverImageUrl: media.fileUrl,
-        tenantId,
-        updatedAt: new Date().toISOString(),
-      };
-
-      const res = await fetch(`/api/proxy/gallery-albums/${albumId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/merge-patch+json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText);
-      }
-
-      alert('Cover image updated successfully');
-      await loadMedia();
-    } catch (error: any) {
-      alert(`Error: ${error.message}`);
+      await setAlbumCoverImageServer(albumId, media.fileUrl);
+      setCoverImageUrl(media.fileUrl);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to set cover image';
+      alert(`Error: ${message}`);
+    } finally {
+      setSettingCoverMediaId(null);
     }
   };
+
+  const isCoverMedia = (media: EventMediaDTO) =>
+    Boolean(media.fileUrl && coverImageUrl && media.fileUrl === coverImageUrl);
 
   return (
     <div className="space-y-6">
@@ -733,6 +727,11 @@ export default function AlbumMediaClientPage({
                 <div key={media.id} className="bg-white rounded-lg shadow-md overflow-hidden group flex flex-col">
                   {/* Media Preview */}
                   <div className="relative h-48 bg-gray-200">
+                    {isCoverMedia(media) && (
+                      <span className="absolute top-2 left-2 z-10 inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-purple-600 text-white shadow-md">
+                        Album Cover
+                      </span>
+                    )}
                     {media.fileUrl ? (
                       media.fileUrl.match(/\.(mp4|mov|avi|webm|mkv)$/i) ? (
                         <video
@@ -770,9 +769,10 @@ export default function AlbumMediaClientPage({
                   <div className="p-4 pt-0 flex justify-end gap-2">
                     <button
                       onClick={() => handleSetCoverImage(media)}
-                      className="flex-shrink-0 w-12 h-12 rounded-lg bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
-                      title="Set as Cover Image"
-                      aria-label="Set as Cover Image"
+                      disabled={settingCoverMediaId === media.id || isCoverMedia(media)}
+                      className="flex-shrink-0 w-12 h-12 rounded-lg bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      title={isCoverMedia(media) ? 'Current album cover' : 'Set as Cover Image'}
+                      aria-label={isCoverMedia(media) ? 'Current album cover' : 'Set as Cover Image'}
                       type="button"
                     >
                       <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
