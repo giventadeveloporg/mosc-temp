@@ -10,6 +10,7 @@ import {
   placeholderGradient,
 } from '@/lib/officialDocumentThumbnail';
 import type { PublicOfficialDocumentTreePage } from './ApiServerActions';
+import DownloadsPagination from './DownloadsPagination';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -40,15 +41,6 @@ type DownloadErrorState = {
   fileName: string;
   message: string;
 };
-
-function buildSortedDownloads(content: PublicOfficialDocumentTreePage['content']): TreeItem[] {
-  return [...content].sort((a, b) => {
-    const aPriority = Number.isFinite(a.priorityRanking) ? a.priorityRanking : 999999;
-    const bPriority = Number.isFinite(b.priorityRanking) ? b.priorityRanking : 999999;
-    if (aPriority !== bPriority) return aPriority - bPriority;
-    return a.fileName.localeCompare(b.fileName);
-  });
-}
 
 function getFolderPath(item: TreeItem) {
   if (item.pathSegments.length <= 1) return 'Library Root';
@@ -484,12 +476,16 @@ function YearFilterBar({
   buildFilterHref,
   searchQuery,
   onSearchChange,
+  onClearFilters,
+  hasActiveFiltersOrSearch,
 }: {
   yearOptions: number[];
   currentFilters: { categoryId: number | null; year: number | null };
   buildFilterHref: (categoryId: number | null, year: number | null) => string;
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  onClearFilters: () => void;
+  hasActiveFiltersOrSearch: boolean;
 }) {
   const router = useRouter();
   const currentCalendarYear = new Date().getFullYear();
@@ -557,8 +553,8 @@ function YearFilterBar({
         ) : null}
 
         {/* Search documents — pushed to the right-most end of the filter row */}
-        <div className="ml-auto w-full sm:w-auto">
-          <label className="relative block">
+        <div className="ml-auto flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
+          <label className="relative block min-w-0 flex-1 sm:flex-initial">
             <span className="sr-only">Search downloads</span>
             <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-syro-blue/50">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -570,10 +566,20 @@ function YearFilterBar({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Search documents…"
-              className="w-full sm:w-64 rounded-md border-2 border-syro-gold/40 bg-white py-1.5 pl-9 pr-3 text-xs font-semibold text-syro-blue placeholder:font-normal placeholder:text-gray-400 focus:border-syro-blue focus:outline-none focus:ring-2 focus:ring-syro-blue/30"
+              className="w-full sm:w-56 rounded-md border-2 border-syro-gold/40 bg-white py-1.5 pl-9 pr-3 text-xs font-semibold text-syro-blue placeholder:font-normal placeholder:text-gray-400 focus:border-syro-blue focus:outline-none focus:ring-2 focus:ring-syro-blue/30"
               aria-label="Search documents on this page"
             />
           </label>
+          <button
+            type="button"
+            onClick={onClearFilters}
+            disabled={!hasActiveFiltersOrSearch}
+            className="shrink-0 rounded-md border-2 border-syro-gold/40 bg-white px-3 py-1.5 text-xs font-semibold text-syro-blue transition-colors hover:border-syro-red hover:bg-red-50 hover:text-syro-red disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-syro-gold/40 disabled:hover:bg-white disabled:hover:text-syro-blue"
+            title="Clear search and reset to all years and categories"
+            aria-label="Clear search and reset filters"
+          >
+            Clear filters
+          </button>
         </div>
       </div>
     </div>
@@ -660,35 +666,20 @@ export default function DownloadsPageClient({
   officialTreePage,
   currentFilters,
 }: Props) {
-  const sortedDownloads = React.useMemo(() => buildSortedDownloads(officialTreePage.content), [officialTreePage.content]);
+  const router = useRouter();
+  const pageSize = officialTreePage.size || 24;
   const totalPages = Math.max(officialTreePage.totalPages || 1, 1);
-  const currentPage = Math.min(Math.max(currentFilters.page, 1), totalPages);
+  const currentPageZeroBased = Math.min(Math.max(officialTreePage.page, 0), totalPages - 1);
 
   const [downloadingId, setDownloadingId] = React.useState<number | null>(null);
   const [downloadSuccess, setDownloadSuccess] = React.useState<DownloadSuccessState | null>(null);
   const [downloadError, setDownloadError] = React.useState<DownloadErrorState | null>(null);
   const [searchQuery, setSearchQuery] = React.useState('');
 
-  React.useEffect(() => {
-    setSearchQuery('');
-  }, [currentFilters.categoryId, currentFilters.year]);
-
-  const filterMatchedDownloads = React.useMemo(() => {
-    return sortedDownloads.filter((file) => {
-      if (currentFilters.categoryId != null && file.officialDocumentCategoryId !== currentFilters.categoryId) {
-        return false;
-      }
-      if (currentFilters.year != null && file.officialDocumentYear !== currentFilters.year) {
-        return false;
-      }
-      return true;
-    });
-  }, [sortedDownloads, currentFilters.categoryId, currentFilters.year]);
-
   const filteredDownloads = React.useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return filterMatchedDownloads;
-    return filterMatchedDownloads.filter((file) => {
+    if (!q) return officialTreePage.content;
+    return officialTreePage.content.filter((file) => {
       const haystack = [
         file.fileName,
         file.description ?? '',
@@ -700,10 +691,16 @@ export default function DownloadsPageClient({
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [filterMatchedDownloads, searchQuery]);
+  }, [officialTreePage.content, searchQuery]);
 
   const isSearching = searchQuery.trim().length > 0;
   const hasActiveFilters = currentFilters.categoryId != null || currentFilters.year != null;
+  const hasActiveFiltersOrSearch = hasActiveFilters || isSearching;
+
+  const handleClearFilters = React.useCallback(() => {
+    setSearchQuery('');
+    router.push('/mosc-redesign/downloads');
+  }, [router]);
 
   const handleDownload = React.useCallback(async (file: TreeItem) => {
     if (!file.downloadUrl) {
@@ -791,26 +788,39 @@ export default function DownloadsPageClient({
           <div className="bg-white rounded-xl border border-syro-gold/25 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-6 md:p-8 mb-12">
             <div className="mb-6 space-y-4">
               <div className="text-sm text-gray-600">
-                Showing page <span className="font-semibold">{currentPage}</span> of{' '}
-                <span className="font-semibold">{totalPages}</span> (
-                <span className="font-semibold">{officialTreePage.totalElements}</span> files
-                {currentFilters.categoryId ? (
+                {hasActiveFilters || isSearching ? (
                   <>
-                    {' '}
-                    in{' '}
-                    <span className="font-semibold">
-                      {officialTreePage.categoryOptions.find((c) => c.id === currentFilters.categoryId)?.displayName ??
-                        'selected category'}
-                    </span>
+                    Filtered library
+                    {currentFilters.categoryId ? (
+                      <>
+                        {' '}
+                        in{' '}
+                        <span className="font-semibold">
+                          {officialTreePage.categoryOptions.find((c) => c.id === currentFilters.categoryId)
+                            ?.displayName ?? 'selected category'}
+                        </span>
+                      </>
+                    ) : null}
+                    {currentFilters.year ? (
+                      <>
+                        {' '}
+                        for year <span className="font-semibold">{currentFilters.year}</span>
+                      </>
+                    ) : null}
+                    {isSearching ? (
+                      <>
+                        {' '}
+                        — search on this page:{' '}
+                        <span className="font-semibold">&ldquo;{searchQuery.trim()}&rdquo;</span>
+                      </>
+                    ) : null}
+                    . Lower priority values are shown first.
                   </>
-                ) : null}
-                {currentFilters.year ? (
+                ) : (
                   <>
-                    {' '}
-                    for year <span className="font-semibold">{currentFilters.year}</span>
+                    Browse official documents by year and category. Lower priority values are shown first.
                   </>
-                ) : null}
-                ). Lower priority values are shown first.
+                )}
               </div>
 
               <YearFilterBar
@@ -819,6 +829,8 @@ export default function DownloadsPageClient({
                 buildFilterHref={queryWithFilter}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
+                onClearFilters={handleClearFilters}
+                hasActiveFiltersOrSearch={hasActiveFiltersOrSearch}
               />
 
               <CategoryFilterBar
@@ -831,7 +843,7 @@ export default function DownloadsPageClient({
             {isSearching ? (
               <div className="mb-4 text-sm text-gray-600">
                 Showing <span className="font-semibold">{filteredDownloads.length}</span> of{' '}
-                <span className="font-semibold">{filterMatchedDownloads.length}</span> files on this page matching{' '}
+                <span className="font-semibold">{officialTreePage.content.length}</span> files on this page matching{' '}
                 <span className="font-semibold">&ldquo;{searchQuery.trim()}&rdquo;</span>.
               </div>
             ) : null}
@@ -843,10 +855,10 @@ export default function DownloadsPageClient({
                     No files on this page match &ldquo;{searchQuery.trim()}&rdquo;. Try a different search term or{' '}
                     <button
                       type="button"
-                      onClick={() => setSearchQuery('')}
+                      onClick={handleClearFilters}
                       className="font-semibold text-syro-blue underline hover:text-syro-red"
                     >
-                      clear the search
+                      clear filters
                     </button>
                     .
                   </p>
@@ -876,22 +888,14 @@ export default function DownloadsPageClient({
               />
             )}
 
-            <div className="mt-6 flex items-center justify-between">
-              {currentPage > 1 ? (
-                <Link href={queryWithPage(currentPage - 1)} className="syro-primary-button inline-flex items-center gap-2">
-                  Previous
-                </Link>
-              ) : (
-                <span className="text-sm text-gray-400">Previous</span>
-              )}
-              {currentPage < totalPages ? (
-                <Link href={queryWithPage(currentPage + 1)} className="syro-primary-button inline-flex items-center gap-2">
-                  Next
-                </Link>
-              ) : (
-                <span className="text-sm text-gray-400">Next</span>
-              )}
-            </div>
+            <DownloadsPagination
+              currentPage={currentPageZeroBased}
+              totalPages={totalPages}
+              totalCount={officialTreePage.totalElements}
+              pageSize={pageSize}
+              buildPageHref={queryWithPage}
+              itemLabel="files"
+            />
           </div>
         </div>
       </section>

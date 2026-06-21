@@ -19,6 +19,7 @@ import {
   fetchTenantOfficialDocumentsServer,
   patchOfficialDocumentMediaServer,
   patchOfficialDocumentYearBundleServer,
+  type OfficialDocumentSearchField,
 } from './ApiServerActions';
 import Modal from '@/components/ui/Modal';
 import {
@@ -38,6 +39,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+
+const DOCUMENT_SEARCH_FIELDS: { label: string; value: OfficialDocumentSearchField }[] = [
+  { label: 'Title', value: 'title' },
+  { label: 'Description', value: 'description' },
+  { label: 'Media ID', value: 'id' },
+  { label: 'File type', value: 'eventMediaType' },
+];
 
 function isImageMedia(d: EventMediaDTO): boolean {
   const t = (d.eventMediaType || '').toLowerCase();
@@ -162,6 +170,9 @@ export default function OfficialDocumentsClient({
 
   const [filterYear, setFilterYear] = useState<number | ''>('');
   const [filterCategoryId, setFilterCategoryId] = useState<number | ''>('');
+  const [searchField, setSearchField] = useState<OfficialDocumentSearchField>('title');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterIsPublic, setFilterIsPublic] = useState<'' | 'true' | 'false'>('');
   const [bundleError, setBundleError] = useState<string | null>(null);
   const [bundleBusy, setBundleBusy] = useState(false);
   const [coverSelectId, setCoverSelectId] = useState<number | '' | 'none'>('none');
@@ -291,14 +302,22 @@ export default function OfficialDocumentsClient({
     }
   };
 
+  const buildListFilters = useCallback(() => {
+    const trimmed = searchTerm.trim();
+    return {
+      ...(filterYear !== '' ? { year: filterYear } : {}),
+      ...(filterCategoryId !== '' ? { officialDocumentCategoryId: filterCategoryId } : {}),
+      ...(trimmed ? { searchField, searchTerm: trimmed } : {}),
+      ...(filterIsPublic === 'true' ? { isPublic: true as const } : {}),
+      ...(filterIsPublic === 'false' ? { isPublic: false as const } : {}),
+    };
+  }, [filterYear, filterCategoryId, searchField, searchTerm, filterIsPublic]);
+
   const reloadDocuments = useCallback(
     async (page: number) => {
       setListLoading(true);
       try {
-        const filters = {
-          ...(filterYear !== '' ? { year: filterYear } : {}),
-          ...(filterCategoryId !== '' ? { officialDocumentCategoryId: filterCategoryId } : {}),
-        };
+        const filters = buildListFilters();
         let result = await fetchTenantOfficialDocumentsPagedServer({
           page,
           size: pageSize,
@@ -319,8 +338,29 @@ export default function OfficialDocumentsClient({
         setListLoading(false);
       }
     },
-    [filterYear, filterCategoryId, pageSize]
+    [buildListFilters, pageSize]
   );
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void reloadDocuments(0);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchTerm, searchField, filterIsPublic, reloadDocuments]);
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setSearchField('title');
+    setFilterIsPublic('');
+  };
+
+  const categoryNameById = useMemo(() => {
+    const map = new Map<number, string>();
+    categories.forEach((c) => {
+      if (c.id != null) map.set(c.id, c.displayName || c.slug);
+    });
+    return map;
+  }, [categories]);
 
   const openEdit = (row: EventMediaDTO) => {
     setEditError(null);
@@ -920,7 +960,8 @@ export default function OfficialDocumentsClient({
               Add one file…
             </button>
             <p className="text-sm text-gray-500">
-              Page {currentPage + 1} — {totalElements} total. Filters apply when you click Apply.
+              Page {currentPage + 1} — {totalElements} total. Year/category filters apply when you click Apply;
+              text search above the table updates automatically.
             </p>
           </div>
         </div>
@@ -1027,13 +1068,77 @@ export default function OfficialDocumentsClient({
             <span className="text-sm text-gray-500">Loading…</span>
           )}
         </div>
+
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold text-gray-600 mb-1">Search documents</label>
+              <div className="flex items-stretch">
+                <select
+                  value={searchField}
+                  onChange={(e) => setSearchField(e.target.value as OfficialDocumentSearchField)}
+                  className="border border-gray-400 rounded-l-xl focus:ring-blue-500 focus:border-blue-500 px-3 py-2.5 text-sm min-h-[44px] bg-white shrink-0"
+                  aria-label="Search field"
+                >
+                  {DOCUMENT_SEARCH_FIELDS.map((f) => (
+                    <option key={f.value} value={f.value}>
+                      {f.label}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type={searchField === 'id' ? 'number' : 'text'}
+                  placeholder={`Search by ${DOCUMENT_SEARCH_FIELDS.find((f) => f.value === searchField)?.label ?? 'field'}…`}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') void reloadDocuments(0);
+                  }}
+                  className="block w-full border border-gray-400 border-l-0 rounded-r-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-2.5 text-sm min-h-[44px]"
+                  aria-label="Search term"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">Public visibility</label>
+              <select
+                value={filterIsPublic}
+                onChange={(e) => setFilterIsPublic(e.target.value as '' | 'true' | 'false')}
+                className="block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-2.5 text-sm min-h-[44px] bg-white"
+                aria-label="Filter by public visibility"
+              >
+                <option value="">All</option>
+                <option value="true">Public only</option>
+                <option value="false">Private only</option>
+              </select>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => void reloadDocuments(0)}
+                className="px-4 py-2.5 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-800 text-sm font-semibold transition-all min-h-[44px]"
+              >
+                Search
+              </button>
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                disabled={!searchTerm && filterIsPublic === '' && searchField === 'title'}
+                className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-medium transition-all min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category id</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Public</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Link</th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
@@ -1053,7 +1158,11 @@ export default function OfficialDocumentsClient({
                       {d.title}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">{d.officialDocumentYear ?? '—'}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{d.officialDocumentCategoryId ?? '—'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {d.officialDocumentCategoryId != null
+                        ? categoryNameById.get(d.officialDocumentCategoryId) ?? `#${d.officialDocumentCategoryId}`
+                        : '—'}
+                    </td>
                     <td className="px-4 py-3 text-sm">{d.isPublic ? 'Yes' : 'No'}</td>
                     <td className="px-4 py-3 text-sm">
                       {(d.preSignedUrl || d.fileUrl) ? (

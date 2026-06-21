@@ -100,19 +100,6 @@ function mapEventMediaToTreeItem(doc: EventMediaDTO): PublicOfficialDocumentTree
   };
 }
 
-function matchesOfficialDocumentFilters(
-  item: PublicOfficialDocumentTreeItem,
-  filters: { categoryId?: number; year?: number }
-): boolean {
-  if (filters.categoryId && item.officialDocumentCategoryId !== filters.categoryId) {
-    return false;
-  }
-  if (filters.year && item.officialDocumentYear !== filters.year) {
-    return false;
-  }
-  return true;
-}
-
 async function fetchAllPublicOfficialDocumentsRaw(): Promise<EventMediaDTO[]> {
   const all: EventMediaDTO[] = [];
   const batchSize = 100;
@@ -182,75 +169,55 @@ export async function fetchPublicOfficialDocumentsTreeServer(input?: {
 }): Promise<PublicOfficialDocumentTreePage> {
   const page = Math.max(0, input?.page ?? 0);
   const size = Math.min(Math.max(1, input?.size ?? 24), 100);
-  const hasFilters = Boolean(input?.categoryId || input?.year);
 
   try {
-    const [yearOptions, docsRaw, pagedMeta] = await (async () => {
-      if (hasFilters) {
-        const allRaw = await fetchAllPublicOfficialDocumentsRaw();
-        const yearOpts = extractYearOptionsFromDocs(allRaw, input?.categoryId);
-        return [yearOpts, allRaw, null] as const;
-      }
-
-      const yearOptsPromise = fetchPublicOfficialDocumentYearOptionsServer({
-        categoryId: input?.categoryId,
-      });
-
-      const baseParams = new globalThis.URLSearchParams();
-      baseParams.append('tenantId.equals', getTenantId());
-      baseParams.append('isEventManagementOfficialDocument.equals', 'true');
-      baseParams.append('isPublic.equals', 'true');
-      baseParams.append('sort', 'priorityRanking,asc');
-      baseParams.append('sort', 'createdAt,desc');
-      baseParams.append('page', String(page));
-      baseParams.append('size', String(size));
-
-      const docsUrl = `${getApiBaseUrl()}/api/event-medias?${baseParams.toString()}`;
-      const [docsRes, yearOpts] = await Promise.all([
-        fetchWithJwtRetry(docsUrl, { cache: 'no-store' }),
-        yearOptsPromise,
-      ]);
-      if (!docsRes.ok) {
-        return [yearOpts, [], { totalElements: 0, totalPages: 0, currentPage: page }] as const;
-      }
-      const docsJson = await docsRes.json();
-      const raw = Array.isArray(docsJson) ? docsJson : Array.isArray(docsJson?.content) ? docsJson.content : [];
-      const meta = Array.isArray(docsJson)
-        ? { totalElements: raw.length, totalPages: 1, currentPage: 0 }
-        : {
-            totalElements: Number(docsJson?.totalElements ?? raw.length),
-            totalPages: Number(docsJson?.totalPages ?? 1),
-            currentPage: Number(docsJson?.number ?? page),
-          };
-      return [yearOpts, raw as EventMediaDTO[], meta] as const;
-    })();
-
-    let content = (docsRaw as EventMediaDTO[]).map(mapEventMediaToTreeItem);
-
-    let totalElements: number;
-    let totalPages: number;
-    let currentPage: number;
-
-    if (hasFilters) {
-      const filtered = content.filter((item) =>
-        matchesOfficialDocumentFilters(item, {
-          categoryId: input?.categoryId,
-          year: input?.year,
-        })
-      );
-      totalElements = filtered.length;
-      totalPages = Math.max(1, Math.ceil(totalElements / size));
-      currentPage = Math.min(page, totalPages - 1);
-      content = filtered.slice(currentPage * size, currentPage * size + size);
-    } else if (pagedMeta) {
-      totalElements = pagedMeta.totalElements;
-      totalPages = pagedMeta.totalPages;
-      currentPage = pagedMeta.currentPage;
-    } else {
-      totalElements = 0;
-      totalPages = 0;
-      currentPage = page;
+    const baseParams = new globalThis.URLSearchParams();
+    baseParams.append('tenantId.equals', getTenantId());
+    baseParams.append('isEventManagementOfficialDocument.equals', 'true');
+    baseParams.append('isPublic.equals', 'true');
+    if (input?.categoryId) {
+      baseParams.append('officialDocumentCategoryId.equals', String(input.categoryId));
     }
+    if (input?.year) {
+      baseParams.append('officialDocumentYear.equals', String(input.year));
+    }
+    baseParams.append('sort', 'priorityRanking,asc');
+    baseParams.append('sort', 'createdAt,desc');
+    baseParams.append('page', String(page));
+    baseParams.append('size', String(size));
+
+    const docsUrl = `${getApiBaseUrl()}/api/event-medias?${baseParams.toString()}`;
+
+    const [docsRes, yearOptions] = await Promise.all([
+      fetchWithJwtRetry(docsUrl, { cache: 'no-store' }),
+      fetchPublicOfficialDocumentYearOptionsServer({ categoryId: input?.categoryId }),
+    ]);
+
+    if (!docsRes.ok) {
+      return {
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        page,
+        size,
+        categoryOptions: [],
+        yearOptions,
+      };
+    }
+
+    const docsJson = await docsRes.json();
+    const docsRaw = Array.isArray(docsJson)
+      ? docsJson
+      : Array.isArray(docsJson?.content)
+        ? docsJson.content
+        : [];
+    const totalElements = Array.isArray(docsJson)
+      ? docsRaw.length
+      : Number(docsJson?.totalElements ?? docsRaw.length);
+    const totalPages = Array.isArray(docsJson) ? 1 : Number(docsJson?.totalPages ?? 1);
+    const currentPage = Array.isArray(docsJson) ? 0 : Number(docsJson?.number ?? page);
+
+    const content = (docsRaw as EventMediaDTO[]).map(mapEventMediaToTreeItem);
 
     const catParams = new globalThis.URLSearchParams();
     catParams.append('tenantId.equals', getTenantId());
