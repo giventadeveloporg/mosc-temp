@@ -6,6 +6,7 @@ import Link from 'next/link';
 import type { GalleryAlbumDTO, GalleryCategoryDTO } from '@/types';
 import { updateAlbumServer, deleteAlbumServer, resolveGalleryCategoryIdForSaveServer } from '../../ApiServerActions';
 import { GalleryCategoryTypeahead } from '@/components/admin/gallery/GalleryCategoryTypeahead';
+import GalleryAlbumCoverImageUpload from '@/components/admin/gallery/GalleryAlbumCoverImageUpload';
 import { Modal } from '@/components/Modal';
 
 interface AdminAlbumEditClientProps {
@@ -18,6 +19,8 @@ export default function AdminAlbumEditClient({ initialAlbum, categories }: Admin
   const [categoryList, setCategoryList] = useState<GalleryCategoryDTO[]>(categories);
   const [pendingCategoryName, setPendingCategoryName] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [showAdvancedCoverUrl, setShowAdvancedCoverUrl] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -28,12 +31,40 @@ export default function AdminAlbumEditClient({ initialAlbum, categories }: Admin
     displayOrder: initialAlbum.displayOrder || 0,
     albumYear: initialAlbum.albumYear ?? null as number | null,
     galleryCategoryId: initialAlbum.galleryCategoryId ?? null as number | null,
+    eventDateStart: initialAlbum.eventDateStart?.slice(0, 10) ?? '',
+    eventDateEnd: initialAlbum.eventDateEnd?.slice(0, 10) ?? '',
+    eventLocation: initialAlbum.eventLocation ?? '',
+  });
+
+  const validateEventDates = (): string | null => {
+    const start = formData.eventDateStart.trim();
+    const end = formData.eventDateEnd.trim();
+    if (end && !start) {
+      return 'Event start date is required when an end date is set.';
+    }
+    if (start && end && end < start) {
+      return 'Event end date must be on or after the start date.';
+    }
+    return null;
+  };
+
+  const buildEventDatePayload = () => ({
+    eventDateStart: formData.eventDateStart.trim() || null,
+    eventDateEnd: formData.eventDateEnd.trim() || null,
+    eventLocation: formData.eventLocation.trim() || null,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    const dateError = validateEventDates();
+    if (dateError) {
+      setError(dateError);
+      setLoading(false);
+      return;
+    }
 
     try {
       const galleryCategoryId = await resolveGalleryCategoryIdForSaveServer(
@@ -49,6 +80,7 @@ export default function AdminAlbumEditClient({ initialAlbum, categories }: Admin
         displayOrder: formData.displayOrder,
         albumYear: formData.albumYear,
         galleryCategoryId,
+        ...buildEventDatePayload(),
       });
 
       // Redirect to album list
@@ -172,20 +204,48 @@ export default function AdminAlbumEditClient({ initialAlbum, categories }: Admin
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="coverImageUrl">
-              Cover Image URL
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Cover Image
             </label>
-            <input
-              id="coverImageUrl"
-              type="url"
-              value={formData.coverImageUrl}
-              onChange={(e) => setFormData(prev => ({ ...prev, coverImageUrl: e.target.value }))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="https://example.com/image.jpg (optional)"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              URL to the cover image for this album. You can also select a cover image from the media management page.
+            {initialAlbum.id != null && (
+              <GalleryAlbumCoverImageUpload
+                albumId={initialAlbum.id}
+                currentImageUrl={formData.coverImageUrl || undefined}
+                onImageUploaded={(url) => setFormData((prev) => ({ ...prev, coverImageUrl: url }))}
+                onError={() => {}}
+                onUploadingChange={setCoverUploading}
+                disabled={loading}
+              />
+            )}
+            <p className="mt-2 text-xs text-gray-500">
+              Upload saves the cover immediately (S3). You can also set a cover from the{' '}
+              <Link href={`/admin/gallery/albums/${initialAlbum.id}/media`} className="text-blue-600 hover:underline">
+                media management page
+              </Link>
+              .
             </p>
+            <button
+              type="button"
+              onClick={() => setShowAdvancedCoverUrl((v) => !v)}
+              className="mt-2 text-xs text-blue-600 hover:underline"
+            >
+              {showAdvancedCoverUrl ? 'Hide' : 'Show'} advanced: paste cover URL
+            </button>
+            {showAdvancedCoverUrl && (
+              <div className="mt-2">
+                <input
+                  id="coverImageUrl"
+                  type="url"
+                  value={formData.coverImageUrl}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, coverImageUrl: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="https://example.com/image.jpg (optional)"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Manual URL is saved when you click Update Album below.
+                </p>
+              </div>
+            )}
           </div>
 
           <div>
@@ -229,6 +289,62 @@ export default function AdminAlbumEditClient({ initialAlbum, categories }: Admin
             <p className="mt-1 text-xs text-gray-500">
               Year shown on public gallery cards (1900–2100).
             </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="eventDateStart">
+                Event Start Date
+              </label>
+              <input
+                id="eventDateStart"
+                type="date"
+                value={formData.eventDateStart}
+                onChange={(e) => setFormData((prev) => ({ ...prev, eventDateStart: e.target.value }))}
+                onBlur={() => {
+                  const start = formData.eventDateStart.trim();
+                  if (start && formData.albumYear == null) {
+                    const year = parseInt(start.slice(0, 4), 10);
+                    if (!Number.isNaN(year)) {
+                      setFormData((prev) => ({ ...prev, albumYear: year }));
+                    }
+                  }
+                }}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="eventDateEnd">
+                Event End Date
+              </label>
+              <input
+                id="eventDateEnd"
+                type="date"
+                value={formData.eventDateEnd}
+                onChange={(e) => setFormData((prev) => ({ ...prev, eventDateEnd: e.target.value }))}
+                min={formData.eventDateStart || undefined}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <p className="mt-1 text-xs text-gray-500">Optional — for multi-day events.</p>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="eventLocation">
+              Event Location
+            </label>
+            <input
+              id="eventLocation"
+              type="text"
+              maxLength={256}
+              value={formData.eventLocation}
+              onChange={(e) => setFormData((prev) => ({ ...prev, eventLocation: e.target.value }))}
+              onBlur={(e) =>
+                setFormData((prev) => ({ ...prev, eventLocation: e.target.value.trim() }))
+              }
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="e.g. Indore, Beirut"
+            />
           </div>
 
           <div>
@@ -280,9 +396,9 @@ export default function AdminAlbumEditClient({ initialAlbum, categories }: Admin
               <button
                 type="submit"
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={loading}
+                disabled={loading || coverUploading}
               >
-                {loading ? 'Saving...' : 'Save Changes'}
+                {loading ? 'Saving...' : coverUploading ? 'Uploading cover...' : 'Save Changes'}
               </button>
             </div>
           </div>

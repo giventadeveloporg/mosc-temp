@@ -235,6 +235,37 @@
       width: 100%;
       box-sizing: border-box;
     }
+    .parameter-input .path-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .parameter-input .path-input-row input[type="text"] {
+      flex: 1;
+      min-width: 0;
+    }
+    .browse-button {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border: 2px solid var(--blue-accent);
+      border-radius: 4px;
+      background: #fff;
+      color: var(--blue-accent);
+      font-size: 0.85em;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .browse-button:hover {
+      background: var(--blue-accent);
+      color: #fff;
+    }
+    .parameter-hint {
+      font-size: 0.78em;
+      color: #666;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
     .flag-checkbox-group {
       display: flex;
       flex-wrap: wrap;
@@ -319,6 +350,7 @@
         <li><a href="#quick-start">1. Quick-start workflow</a></li>
         <li><a href="#batch-automation">1a. Automated batch script (all steps)</a></li>
         <li><a href="#batch-remote-prod">1b. Import into production PostgreSQL (/REMOTE)</a></li>
+        <li><a href="#mosc-tenant-import">1c. MOSC tenant duplicate import (mosc_malankara_orthodox_2)</a></li>
         <li><a href="#export">2. Export data with pg_dump (Docker)</a></li>
         <li><a href="#reorder">3. Reorder INSERT statements</a></li>
         <li><a href="#prod">4. Production user ID replacement</a></li>
@@ -433,7 +465,22 @@
                   <input type="checkbox" id="batch-full-flag-remote" onchange="updateBatchRefresh('batch-full')">
                   <span><code>/REMOTE</code> — steps 5–7 on RDS (.env.local); auto /PROD</span>
                 </label>
+                <label class="flag-checkbox">
+                  <input type="checkbox" id="batch-full-flag-schema-only" onchange="updateBatchRefresh('batch-full')">
+                  <span><code>/SCHEMA-ONLY</code> — apply schema only; skip export and import</span>
+                </label>
               </div>
+            </div>
+          </div>
+          <div class="parameter-group single">
+            <div class="parameter-input">
+              <label for="batch-full-import-file">Custom import file (optional, overrides default ordered/PROD SQL):</label>
+              <div class="path-input-row">
+                <input type="text" id="batch-full-import-file" value="" placeholder="Leave empty for default ordered or _PROD file" oninput="updateBatchRefresh('batch-full')">
+                <button type="button" class="browse-button" onclick="document.getElementById('batch-full-import-file-picker').click()" title="Browse for SQL file" aria-label="Browse for SQL import file">Browse…</button>
+                <input type="file" id="batch-full-import-file-picker" accept=".sql,.SQL" style="display:none" onchange="onImportFileBrowse('batch-full', this)">
+              </div>
+              <p class="parameter-hint">Browsers may not expose the full path — verify or paste the absolute path (e.g. <code>F:\project_workspace\mosc-temp\code_html_template\SQLS\my_import.sql</code>). Adds <code>/IMPORT-FILE "path"</code> to the command. Ignored with <code>/SCHEMA-ONLY</code>.</p>
             </div>
           </div>
         </div>
@@ -481,6 +528,12 @@
             <tr><td><code>/PROD</code></td><td>No</td><td>Import the SQL file with production Clerk user IDs</td></tr>
             <tr><td><code>/SKIP-EXPORT</code></td><td>No</td><td>Do not run <code>pg_dump</code>; reuse an existing <code>export.sql</code></td></tr>
             <tr><td><code>/REMOTE</code></td><td>No</td><td>Apply schema, import, and sync on remote Postgres (e.g. AWS RDS)</td></tr>
+            <tr><td><code>/SCHEMA-ONLY</code></td><td>No</td><td>Apply schema (step 5) only; skip export steps 1–4 and import/sync 6–7</td></tr>
+            <tr><td><code>/IMPORT-FILE</code></td><td>No</td><td>Override the default import SQL with a custom file path</td></tr>
+            <tr><td><code>/REGEN-MOSC</code></td><td>No</td><td>Regenerate <code>mosc_malankara_orthodox_2</code> SQL from the ordered source before import</td></tr>
+            <tr><td><code>/PRE-CLEAN-MOSC</code></td><td>No</td><td>Run <code>delete_mosc_tenant.sql</code> before import (auto when import path contains MOSC files)</td></tr>
+            <tr><td><code>/IMPORT-DUP-ONLY</code></td><td>No</td><td>Import <code>mosc_dup_only.sql</code> only (fast MOSC tenant refresh; implies pre-clean)</td></tr>
+            <tr><td><code>/DATA-ONLY</code></td><td>No</td><td>Skip schema rebuild (step 5); import + sequence sync only</td></tr>
           </tbody>
         </table>
 
@@ -605,13 +658,49 @@
           <code class="code-highlight">psql</code> inside a <code class="code-highlight">postgres:16</code> container.
         </p>
 
+        <h3><code>/SCHEMA-ONLY</code> — rebuild schema without importing data</h3>
+        <p>
+          Applies <code class="code-highlight">Latest_Schema_Post__Blob_Claude_12.sql</code> (step 5) and skips export
+          (steps 1–4), data import (step 6), and sequence sync (step 7). Use when you only need DDL changes applied to
+          an empty or disposable database, or when data is already loaded and you want a schema refresh without touching
+          INSERT files.
+        </p>
+        <p>
+          Automatically implies <code class="code-highlight">/SKIP-EXPORT</code> behavior for the export pipeline.
+          <code class="code-highlight">/IMPORT-FILE</code> is ignored if both flags are passed.
+        </p>
+
+        <h3><code>/IMPORT-FILE</code> — override the default import SQL</h3>
+        <p>
+          By default, step 6 imports either
+          <code class="code-highlight">corrected_event_media_inserts.ordered.sql</code> or
+          <code class="code-highlight">corrected_event_media_inserts.ordered_PROD.sql</code> (when <code class="code-highlight">/PROD</code>
+          or <code class="code-highlight">/REMOTE</code> is set). Pass a custom path to import a different prepared SQL file:
+        </p>
+        <ul>
+          <li><code class="code-highlight">/IMPORT-FILE "F:\path\to\custom.sql"</code> — path as the next argument (quote if spaces)</li>
+          <li><code class="code-highlight">/IMPORT-FILE=F:\path\to\custom.sql</code> — path in the same token</li>
+        </ul>
+        <p>
+          The file must exist before the batch runs. Step 4 still patches <code class="code-highlight">pg_dump</code> header
+          lines in that file unless <code class="code-highlight">/SKIP-EXPORT</code> is also set.
+          <strong>Strict import:</strong> when <code class="code-highlight">/IMPORT-FILE</code> is set, step 6 uses
+          <code class="code-highlight">ON_ERROR_STOP=1</code> and the batch <strong>fails</strong> on the first SQL error (instead of
+          logging a warning and continuing). Use <code class="code-highlight">/SKIP-EXPORT</code> with custom files to skip export/reorder.
+        </p>
+
         <div class="info" style="margin-top:1.25rem;">
           <strong>Common flag combinations</strong>
           <ul style="margin:0.5rem 0 0 1rem;">
             <li><strong>Full local refresh:</strong> <code class="code-highlight">WORKSPACE_ROOT</code> — export, reorder, import into local Docker (confirm with Y/YES).</li>
             <li><strong>Full local refresh, no prompt:</strong> add <code class="code-highlight">/FORCE</code>.</li>
             <li><strong>Local DB with prod Clerk IDs:</strong> add <code class="code-highlight">/PROD</code>.</li>
+            <li><strong>Schema only (local):</strong> <code class="code-highlight">WORKSPACE_ROOT /SCHEMA-ONLY /FORCE</code>.</li>
+            <li><strong>Custom import file:</strong> <code class="code-highlight">WORKSPACE_ROOT /SKIP-EXPORT /IMPORT-FILE "path\to\file.sql" /FORCE</code> (recommended).</li>
+            <li><strong>MOSC full custom import:</strong> <code class="code-highlight">/REGEN-MOSC /SKIP-EXPORT /IMPORT-FILE "...\mosc_malankara_orthodox_2.sql" /FORCE</code> — see <a href="#mosc-tenant-import">§1c</a>.</li>
+            <li><strong>MOSC fast refresh (no schema rebuild):</strong> <code class="code-highlight">/SKIP-EXPORT /DATA-ONLY /IMPORT-DUP-ONLY /FORCE</code> — see <a href="#mosc-tenant-import">§1c</a>.</li>
             <li><strong>Production RDS push (reuse export):</strong> <code class="code-highlight">/SKIP-EXPORT /REMOTE</code> — type <code class="code-highlight">PRODUCTION</code> when asked.</li>
+            <li><strong>Remote schema only:</strong> <code class="code-highlight">/SCHEMA-ONLY /REMOTE</code> — type <code class="code-highlight">PRODUCTION</code> when asked.</li>
             <li><strong>Azure VM, known container:</strong> <code class="code-highlight">WORKSPACE_ROOT CONTAINER_ID /FORCE</code>.</li>
           </ul>
         </div>
@@ -730,6 +819,111 @@ DB_PASSWORD=your_password_here
         </table>
       </div>
 
+    </section>
+
+    <!-- Section 1c: MOSC tenant duplicate import -->
+    <section id="mosc-tenant-import" aria-labelledby="h-mosc-import">
+      <h2 id="h-mosc-import">1c. MOSC tenant duplicate import (<code>mosc_malankara_orthodox_2</code>)</h2>
+
+      <div class="section-intro">
+        <p>
+          The default ordered import file seeds <code class="code-highlight">tenant_demo_002</code>. For the MOSC satellite site,
+          a <strong>duplicate tenant block</strong> copies demo data into
+          <code class="code-highlight">mosc_malankara_orthodox_2</code> with a <strong>+600000 ID offset</strong> so primary keys and
+          foreign keys stay unique. Six <code class="code-highlight">user_profile</code> rows (604101–610838) are included in the dup block.
+        </p>
+        <p>
+          <strong>Tenant ID:</strong> use <code class="code-highlight">mosc_malankara_orthodox_2</code> (ends in <code>_2</code>),
+          not <code class="code-highlight">mosc_malankara_orthodox_02</code>. Set
+          <code class="code-highlight">NEXT_PUBLIC_TENANT_ID=mosc_malankara_orthodox_2</code> in <code class="code-highlight">.env.local</code>
+          after import.
+        </p>
+      </div>
+
+      <div class="section-container usage">
+        <div class="section-header usage">📋 Key SQL files</div>
+        <table>
+          <thead>
+            <tr><th>File</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>corrected_event_media_inserts.ordered.sql</code></td><td>Default import (tenant_demo_002 + base tenants)</td></tr>
+            <tr><td><code>corrected_event_media_inserts.ordered.mosc_malankara_orthodox_2.sql</code></td><td>Full custom import: base file + duplicated MOSC block</td></tr>
+            <tr><td><code>mosc_dup_only.sql</code></td><td>MOSC dup block only — fast refresh without schema rebuild</td></tr>
+            <tr><td><code>delete_mosc_tenant.sql</code></td><td>Removes MOSC tenant rows before re-import (FK-safe order)</td></tr>
+            <tr><td><code>verify_mosc_user_profiles.sql</code></td><td>Idempotent upsert for the six MOSC user profiles</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-container parameters">
+        <div class="section-header parameters">⚙️ Regenerate MOSC SQL (after source ordered file changes)</div>
+        <p>Run from repo root or use the helper batch file:</p>
+        <div class="command-block" data-command-base="F:\project_workspace\mosc-temp\code_html_template\batch_files\regenerate_mosc_tenant_sql.bat" data-template-command="F:\project_workspace\mosc-temp\code_html_template\batch_files\regenerate_mosc_tenant_sql.bat F:\project_workspace">
+          <div class="command-content">python scripts\duplicate_tenant_sql.py code_html_template\SQLS\corrected_event_media_inserts.ordered.sql code_html_template\SQLS\corrected_event_media_inserts.ordered.mosc_malankara_orthodox_2.sql
+node code_html_template\SQLS\patch_mosc_malankara_import_block.cjs
+python scripts\extract_dup_tenant_sql.py code_html_template\SQLS\corrected_event_media_inserts.ordered.mosc_malankara_orthodox_2.sql code_html_template\SQLS\mosc_dup_only.sql</div>
+        </div>
+        <p>
+          <code class="script-name">patch_mosc_malankara_import_block.cjs</code> removes stale base-section MOSC
+          <code class="code-highlight">user_profile</code> rows (old +500000 IDs), injects tenant org/settings/event types at the
+          start of the dup block, and sets unique domain <code class="code-highlight">mosc.in2</code>.
+        </p>
+      </div>
+
+      <div class="section-container output">
+        <div class="section-header output">✅ Workflow A — default ordered import (tenant_demo_002)</div>
+        <p>Standard local refresh; no MOSC-specific flags:</p>
+        <div class="command-block">
+          <div class="command-content">F:\project_workspace\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat F:\project_workspace /FORCE</div>
+        </div>
+        <p>Imports <code class="code-highlight">corrected_event_media_inserts.ordered.sql</code> after schema rebuild. Uses dev Clerk user IDs.</p>
+      </div>
+
+      <div class="section-container output">
+        <div class="section-header output">✅ Workflow B — full MOSC custom import (schema + all data)</div>
+        <p>Rebuilds schema, then imports the full MOSC file (base tenants + MOSC dup block):</p>
+        <div class="command-block">
+          <div class="command-content">F:\project_workspace\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat F:\project_workspace /REGEN-MOSC /SKIP-EXPORT /IMPORT-FILE "F:\project_workspace\mosc-temp\code_html_template\SQLS\corrected_event_media_inserts.ordered.mosc_malankara_orthodox_2.sql" /FORCE</div>
+        </div>
+        <p>
+          <code class="code-highlight">/REGEN-MOSC</code> runs duplicate + patch + extract before import.
+          Custom imports use strict <code class="code-highlight">ON_ERROR_STOP=1</code> (batch fails on first SQL error).
+        </p>
+      </div>
+
+      <div class="section-container output">
+        <div class="section-header output">✅ Workflow C — fast MOSC refresh (recommended for iteration)</div>
+        <p>Keeps schema and other tenants; replaces only MOSC tenant data:</p>
+        <div class="command-block">
+          <div class="command-content">F:\project_workspace\mosc-temp\code_html_template\batch_files\database_export_import_refresh.bat F:\project_workspace /REGEN-MOSC /SKIP-EXPORT /DATA-ONLY /IMPORT-DUP-ONLY /FORCE</div>
+        </div>
+        <p>
+          Steps: pre-clean (<code class="code-highlight">delete_mosc_tenant.sql</code>) → import
+          <code class="code-highlight">mosc_dup_only.sql</code> → sequence sync.
+          Equivalent to the PowerShell one-liners documented previously.
+        </p>
+      </div>
+
+      <div class="section-container parameters">
+        <div class="section-header parameters">🔍 Verify after import</div>
+        <div class="command-block">
+          <div class="command-content">python scripts\analyze_tenant_sql_coverage.py code_html_template\SQLS\corrected_event_media_inserts.ordered.mosc_malankara_orthodox_2.sql --db</div>
+        </div>
+        <p>
+          Expect matching row counts for <code class="code-highlight">event_details</code> (13),
+          <code class="code-highlight">gallery_album</code> (31),
+          <code class="code-highlight">executive_committee_team_members</code> (15),
+          <code class="code-highlight">event_media</code> (394), and
+          <code class="code-highlight">user_profile</code> (6).
+          <code class="code-highlight">batch_*</code> and <code class="code-highlight">satellite_domain</code> are intentionally skipped in the dup block.
+        </p>
+      </div>
+
+      <div class="warning" style="margin-top:1rem;">
+        <strong>Partial import recovery:</strong> If a previous import stopped mid-file (<code class="code-highlight">ON_ERROR_STOP=1</code>),
+        run <code class="code-highlight">delete_mosc_tenant.sql</code> before retrying. Do not re-import the dup block on top of orphan rows.
+      </div>
     </section>
 
     <!-- Section 2 -->
@@ -1246,23 +1440,46 @@ DB_PASSWORD=your_password_here
       if (single) single.textContent = cmd;
     }
 
+    function onImportFileBrowse(commandId, picker) {
+      const file = picker.files && picker.files[0];
+      if (!file) return;
+      const wsInput = document.getElementById(commandId + '-workspace');
+      const ws = (wsInput && wsInput.value.trim()) || 'F:\\project_workspace';
+      const defaultDir = ws + '\\mosc-temp\\code_html_template\\SQLS\\';
+      let path = picker.value || file.name;
+      if (path.indexOf('fakepath') !== -1 || !/^[A-Za-z]:\\/.test(path)) {
+        path = defaultDir + file.name;
+      }
+      const pathInput = document.getElementById(commandId + '-import-file');
+      if (pathInput) pathInput.value = path;
+      updateBatchRefresh(commandId);
+      picker.value = '';
+    }
+
     function updateBatchRefresh(commandId) {
       const wsInput = document.getElementById(commandId + '-workspace');
       const containerInput = document.getElementById(commandId + '-container');
+      const importFileInput = document.getElementById(commandId + '-import-file');
       const ws = (wsInput && wsInput.value.trim()) || 'F:\\project_workspace';
       const container = containerInput ? containerInput.value.trim() : '';
+      const importFile = importFileInput ? importFileInput.value.trim() : '';
       const flags = [];
       const forceEl = document.getElementById(commandId + '-flag-force');
       const prodEl = document.getElementById(commandId + '-flag-prod');
       const skipEl = document.getElementById(commandId + '-flag-skip-export');
       const remoteEl = document.getElementById(commandId + '-flag-remote');
+      const schemaOnlyEl = document.getElementById(commandId + '-flag-schema-only');
       if (forceEl && forceEl.checked) flags.push('/FORCE');
       if (prodEl && prodEl.checked) flags.push('/PROD');
       if (skipEl && skipEl.checked) flags.push('/SKIP-EXPORT');
       if (remoteEl && remoteEl.checked) flags.push('/REMOTE');
+      if (schemaOnlyEl && schemaOnlyEl.checked) flags.push('/SCHEMA-ONLY');
       const bat = ws + '\\mosc-temp\\code_html_template\\batch_files\\database_export_import_refresh.bat';
       let cmd = bat + ' ' + ws;
       if (container) cmd += ' ' + container;
+      if (importFile && !(schemaOnlyEl && schemaOnlyEl.checked)) {
+        cmd += ' /IMPORT-FILE "' + importFile.replace(/"/g, '') + '"';
+      }
       if (flags.length) cmd += ' ' + flags.join(' ');
       const el = document.getElementById(commandId);
       const single = document.getElementById(commandId + '-single-code');

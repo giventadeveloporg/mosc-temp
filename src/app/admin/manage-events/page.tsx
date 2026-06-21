@@ -770,7 +770,6 @@ export default function ManageEventsPage() {
         page={page}
         totalCount={totalCount}
         pageSize={pageSize}
-        showPastEvents={showPastEvents}
       />
 
       {/* Delete Confirmation Dialog */}

@@ -5,6 +5,7 @@ import { fetchTenantSettingsByTenantId } from '@/app/admin/tenant-management/set
 import Link from 'next/link';
 import { FaArrowLeft, FaEdit, FaTrash, FaCog, FaToggleOn, FaToggleOff } from 'react-icons/fa';
 import { TenantOrganizationDTO, TenantSettingsDTO } from '@/app/admin/tenant-management/types';
+import { formatAddressBlock } from '@/lib/formatAddress';
 
 interface PageProps {
   params: { id: string };
@@ -160,8 +161,8 @@ export default async function TenantOrganizationViewPage({ params }: PageProps) 
                 {organization?.isActive ? 'Active' : 'Inactive'}
               </span>
             </div>
-            <p className="text-sm text-gray-600">
-              {organization?.description || 'No description provided'}
+            <p className="text-sm text-gray-600 whitespace-pre-wrap">
+              {organization?.description?.trim() || 'No description provided'}
             </p>
           </div>
           <div className="flex gap-3">
@@ -241,26 +242,33 @@ export default async function TenantOrganizationViewPage({ params }: PageProps) 
                     Website
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900">
-                    {organization?.website ? (
+                    {organization?.websiteUrl ? (
                       <a
-                        href={organization.website}
+                        href={organization.websiteUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-500"
                       >
-                        {organization.website}
+                        {organization.websiteUrl}
                       </a>
                     ) : (
                       'Not provided'
                     )}
                   </dd>
                 </div>
-                <div>
+                <div className="sm:col-span-2">
                   <dt className="text-sm font-medium text-gray-500">
                     Address
                   </dt>
-                  <dd className="mt-1 text-sm text-gray-900">
-                    {organization?.address || 'Not provided'}
+                  <dd className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">
+                    {formatAddressBlock({
+                      addressLine1: organization?.addressLine1,
+                      addressLine2: organization?.addressLine2,
+                      city: organization?.city,
+                      stateProvince: organization?.stateProvince,
+                      zipCode: organization?.zipCode,
+                      country: organization?.country,
+                    }) || 'Not provided'}
                   </dd>
                 </div>
                 <div>

@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { formatGalleryAlbumEventDate } from '@/lib/gallery/formatGalleryAlbumEventDate';
 
 export interface MoscGalleryAlbumCardProps {
   title: string;
@@ -9,6 +10,11 @@ export interface MoscGalleryAlbumCardProps {
   totalMediaCount: number;
   categoryDisplayName?: string | null;
   albumYear?: number | null;
+  eventDateStart?: string | null;
+  eventDateEnd?: string | null;
+  eventLocation?: string | null;
+  /** Static-only fallback when API event fields are not yet backfilled */
+  eventDateDisplay?: string | null;
   description?: string | null;
   href?: string;
   onViewAlbum?: () => void;
@@ -35,6 +41,23 @@ function ViewAlbumCta({
   disabled?: boolean;
 }) {
   if (variant === 'mosc-redesign') {
+    if (onViewAlbum) {
+      return (
+        <button
+          type="button"
+          onClick={onViewAlbum}
+          disabled={disabled}
+          className="syro-primary-button inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          title="View Album"
+          aria-label="View Album"
+        >
+          View Album
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      );
+    }
     return (
       <span className="syro-primary-button inline-flex items-center gap-2">
         View Album
@@ -74,6 +97,10 @@ export function MoscGalleryAlbumCard({
   totalMediaCount,
   categoryDisplayName,
   albumYear,
+  eventDateStart,
+  eventDateEnd,
+  eventLocation,
+  eventDateDisplay,
   description,
   href,
   onViewAlbum,
@@ -82,6 +109,13 @@ export function MoscGalleryAlbumCard({
   gradientIndex = 0,
 }: MoscGalleryAlbumCardProps) {
   const isMosc = variant === 'mosc-redesign';
+  const eventDateLine = formatGalleryAlbumEventDate({
+    eventDateStart,
+    eventDateEnd,
+    eventLocation,
+    albumYear,
+    eventDateDisplay,
+  });
   const badgeClass = isMosc
     ? 'absolute top-3 right-3 bg-[#be1929] px-3 py-1 rounded-full text-xs font-syro-primary font-medium shadow-md text-white'
     : 'absolute top-3 right-3 bg-violet-600 px-3 py-1 rounded-full text-xs font-medium shadow-md text-white';
@@ -138,9 +172,9 @@ export function MoscGalleryAlbumCard({
 
         <h3 className={titleClass}>{title}</h3>
 
-        {albumYear != null && (
+        {eventDateLine && (
           <p className={`text-sm mb-4 ${isMosc ? 'font-syro-primary text-gray-500' : 'text-gray-600'}`}>
-            {String(albumYear)}
+            {eventDateLine}
           </p>
         )}
 

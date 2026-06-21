@@ -34,6 +34,9 @@ export function GalleryAlbumCard({ albumWithMedia }: GalleryAlbumCardProps) {
         totalMediaCount={totalMediaCount}
         categoryDisplayName={categoryDisplayName}
         albumYear={album.albumYear ?? null}
+        eventDateStart={album.eventDateStart ?? null}
+        eventDateEnd={album.eventDateEnd ?? null}
+        eventLocation={album.eventLocation ?? null}
         description={description}
         variant="main-gallery"
         onViewAlbum={() => setShowSlideshow(true)}

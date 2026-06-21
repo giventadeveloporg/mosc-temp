@@ -35,6 +35,18 @@ export const CATEGORY_DISPLAY_TO_SLUG = {
   Conferences: 'conferences',
 };
 
+/** Matches documentation/gallery_album_category_year_enhancements/migrations/002_seed_gallery_category.sql */
+export const GALLERY_CATEGORY_SEEDS = [
+  { slug: 'ecumenical-visits', displayName: 'Ecumenical Visits', description: 'Ecumenical and inter-church visits', sortOrder: 10 },
+  { slug: 'major-events', displayName: 'Major Events', description: 'Enthronements, ordinations, and major church events', sortOrder: 20 },
+  { slug: 'receptions', displayName: 'Receptions', description: 'Official receptions and welcome ceremonies', sortOrder: 30 },
+  { slug: 'liturgical-events', displayName: 'Liturgical Events', description: 'Liturgical services and sacred ceremonies', sortOrder: 40 },
+  { slug: 'special-events', displayName: 'Special Events', description: 'Commemorations, inaugurations, and special occasions', sortOrder: 50 },
+  { slug: 'private-audiences', displayName: 'Private Audiences', description: 'Private audiences with church leaders', sortOrder: 60 },
+  { slug: 'church-visits', displayName: 'Church Visits', description: 'Parish and regional church visits', sortOrder: 70 },
+  { slug: 'conferences', displayName: 'Conferences', description: 'Conferences and formal gatherings', sortOrder: 80 },
+];
+
 export const ROOT = process.cwd();
 export const STATIC_ALBUMS_TS = join(ROOT, 'src/lib/gallery/moscStaticAlbums.ts');
 export const GALLERY_PAGES_DIR = join(ROOT, 'src/app/mosc-redesign/(syro)/gallery');

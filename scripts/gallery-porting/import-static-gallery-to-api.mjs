@@ -23,6 +23,7 @@ import { resolve, join, basename } from 'path';
 import {
   APP_BASE_URL,
   TENANT_ID,
+  GALLERY_CATEGORY_SEEDS,
   apiFetch,
   assertEnv,
   buildAlbumManifest,
@@ -31,6 +32,10 @@ import {
   parseStaticSlugFromDescription,
   sleep,
 } from './gallery-porting-lib.mjs';
+import {
+  eventFieldsFromManifestAlbum,
+  albumNeedsManifestPatch,
+} from './parse-manifest-album-date.mjs';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const ALBUMS_ONLY = process.argv.includes('--albums-only');
@@ -76,6 +81,73 @@ async function fetchGalleryCategories(token) {
   return bySlug;
 }
 
+async function ensureGalleryCategories(token, categoriesBySlug) {
+  let created = 0;
+  for (const seed of GALLERY_CATEGORY_SEEDS) {
+    if (categoriesBySlug.has(seed.slug)) continue;
+
+    const now = new Date().toISOString();
+    const payload = {
+      tenantId: TENANT_ID,
+      slug: seed.slug,
+      displayName: seed.displayName,
+      description: seed.description,
+      sortOrder: seed.sortOrder,
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    if (DRY_RUN) {
+      console.log(`  [dry-run] POST gallery-category ${seed.slug}`);
+      categoriesBySlug.set(seed.slug, { id: -1, ...payload });
+      created++;
+      continue;
+    }
+
+    const { res, text, json } = await apiFetch(token, '/api/gallery-categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      throw new Error(`create category "${seed.slug}": ${res.status} ${text}`);
+    }
+    categoriesBySlug.set(seed.slug, json);
+    created++;
+    console.log(`  ✓ Seeded category ${seed.slug} → id=${json.id}`);
+  }
+  if (created > 0) {
+    console.log(`Seeded ${created} gallery categor${created === 1 ? 'y' : 'ies'}`);
+  }
+}
+
+async function patchAlbumFromManifest(token, albumId, albumMeta, categoryId) {
+  const fields = eventFieldsFromManifestAlbum(albumMeta);
+  const now = new Date().toISOString();
+  const payload = {
+    id: albumId,
+    galleryCategoryId: categoryId,
+    updatedAt: now,
+  };
+  if (fields.albumYear != null) payload.albumYear = fields.albumYear;
+  if (fields.eventDateStart != null) payload.eventDateStart = fields.eventDateStart;
+  if (fields.eventDateEnd != null) payload.eventDateEnd = fields.eventDateEnd;
+  if (fields.eventLocation != null) payload.eventLocation = fields.eventLocation;
+
+  if (DRY_RUN) {
+    console.log(`  [dry-run] PATCH album ${albumId}`, payload);
+    return;
+  }
+
+  const { res, text } = await apiFetch(token, `/api/gallery-albums/${albumId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/merge-patch+json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(`patch album ${albumId}: ${res.status} ${text}`);
+}
+
 async function fetchGalleryAlbums(token) {
   const qs = new URLSearchParams({
     'tenantId.equals': TENANT_ID,
@@ -97,6 +169,7 @@ function indexAlbumsByStaticSlug(albums) {
 }
 
 async function createAlbum(token, albumMeta, categoryId, displayOrder) {
+  const fields = eventFieldsFromManifestAlbum(albumMeta);
   const now = new Date().toISOString();
   const payload = {
     tenantId: TENANT_ID,
@@ -105,11 +178,14 @@ async function createAlbum(token, albumMeta, categoryId, displayOrder) {
     coverImageUrl: albumMeta.coverImageUrl,
     isPublic: true,
     displayOrder,
-    albumYear: albumMeta.albumYear,
+    albumYear: fields.albumYear ?? albumMeta.albumYear,
     galleryCategoryId: categoryId,
     createdAt: now,
     updatedAt: now,
   };
+  if (fields.eventDateStart != null) payload.eventDateStart = fields.eventDateStart;
+  if (fields.eventDateEnd != null) payload.eventDateEnd = fields.eventDateEnd;
+  if (fields.eventLocation != null) payload.eventLocation = fields.eventLocation;
 
   if (DRY_RUN) {
     console.log('[dry-run] POST gallery-album', payload.title);
@@ -285,6 +361,9 @@ async function main() {
 
   const token = DRY_RUN ? null : await getServiceJwt();
   const categoriesBySlug = DRY_RUN ? new Map() : await fetchGalleryCategories(token);
+  if (!DRY_RUN) {
+    await ensureGalleryCategories(token, categoriesBySlug);
+  }
   const existingAlbums = DRY_RUN ? [] : await fetchGalleryAlbums(token);
   const albumsBySlug = indexAlbumsByStaticSlug(existingAlbums);
 
@@ -321,6 +400,16 @@ async function main() {
     if (!MEDIA_ONLY) {
       if (album && SKIP_EXISTING) {
         console.log(`• ${albumMeta.slug}: album exists (id=${album.id}), skipping create`);
+        const fields = eventFieldsFromManifestAlbum(albumMeta);
+        if (
+          categoryId &&
+          albumNeedsManifestPatch(album, categoryId, fields)
+        ) {
+          await patchAlbumFromManifest(token, album.id, albumMeta, categoryId);
+          console.log(
+            `  ✓ Updated album ${albumMeta.slug} (category + event dates/location)`,
+          );
+        }
       } else if (!album) {
         album = await createAlbum(token, albumMeta, categoryId, displayOrderBase);
         albumsBySlug.set(albumMeta.slug, album);

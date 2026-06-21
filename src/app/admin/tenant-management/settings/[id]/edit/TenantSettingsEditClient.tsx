@@ -85,8 +85,10 @@ export default function TenantSettingsEditClient({
           defaultHeroIncludeWithEvents: settings?.defaultHeroIncludeWithEvents ?? true,
           defaultHeroMaxDisplayCount: settings?.defaultHeroMaxDisplayCount ?? 6,
           // Contact and Address Fields
+          description: settings?.description || '',
           addressLine1: settings?.addressLine1 || '',
           addressLine2: settings?.addressLine2 || '',
+          city: settings?.city || '',
           phoneNumber: settings?.phoneNumber || '',
           zipCode: settings?.zipCode || '',
           country: settings?.country || '',

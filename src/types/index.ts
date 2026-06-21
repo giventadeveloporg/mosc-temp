@@ -322,6 +322,12 @@ export interface GalleryAlbumDTO {
   albumYear?: number | null;
   galleryCategoryId?: number | null;
   galleryCategory?: GalleryCategoryDTO | null;
+  /** ISO date YYYY-MM-DD — event/visit start */
+  eventDateStart?: string | null;
+  /** ISO date YYYY-MM-DD — optional end for multi-day events */
+  eventDateEnd?: string | null;
+  /** City/venue shown after formatted date on cards, e.g. "Indore" */
+  eventLocation?: string | null;
   createdAt: string;
   updatedAt: string;
   createdById?: number;
@@ -675,6 +681,14 @@ export interface TenantOrganizationDTO {
   subscriptionEndDate?: string;   // date (YYYY-MM-DD)
   monthlyFeeUsd?: number;
   stripeCustomerId?: string;
+  description?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  stateProvince?: string;
+  zipCode?: string;
+  country?: string;
+  websiteUrl?: string;
   isActive?: boolean;
   createdAt: string; // date-time
   updatedAt: string; // date-time
@@ -708,16 +722,25 @@ export interface TenantSettingsDTO {
   showSponsorsSectionInHomePage?: boolean;
   isMembershipSubscriptionEnabled?: boolean;
   homepageCacheVersion?: number;
+  /** @deprecated v2.0 — canonical source is tenant_organization.description */
+  description?: string;
   defaultHeroImageUrlsJson?: string;
   defaultHeroDisplayMode?: 'slideshow' | 'random' | 'single';
   defaultHeroIncludeWithEvents?: boolean;
   defaultHeroMaxDisplayCount?: number;
-  // Contact and Address Fields
+  // Deprecated identity fields (read fallback only — use tenant_organization)
+  /** @deprecated v2.0 — use tenant_organization.addressLine1 */
   addressLine1?: string;
+  /** @deprecated v2.0 — use tenant_organization.addressLine2 */
   addressLine2?: string;
+  /** @deprecated v2.0 — use tenant_organization.city */
+  city?: string;
   phoneNumber?: string;
+  /** @deprecated v2.0 — use tenant_organization.zipCode */
   zipCode?: string;
+  /** @deprecated v2.0 — use tenant_organization.country */
   country?: string;
+  /** @deprecated v2.0 — use tenant_organization.stateProvince */
   stateProvince?: string;
   email?: string;
   // Social media URLs (Follow our journey / organization links)

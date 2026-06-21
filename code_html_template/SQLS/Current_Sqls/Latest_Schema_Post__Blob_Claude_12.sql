@@ -1671,6 +1671,9 @@ CREATE TABLE public.gallery_album (
                                     display_order int4 DEFAULT 0 NOT NULL,
                                     gallery_category_id int8 NULL,
                                     album_year int4 NULL,
+                                    event_date_start date NULL,
+                                    event_date_end date NULL,
+                                    event_location varchar(256) NULL,
                                     created_at timestamp DEFAULT now() NOT NULL,
                                     updated_at timestamp DEFAULT now() NOT NULL,
                                     created_by_id int8 NULL,
@@ -1680,6 +1683,11 @@ CREATE TABLE public.gallery_album (
                                     CONSTRAINT check_display_order_non_negative CHECK (display_order >= 0),
                                     CONSTRAINT chk_gallery_album_year_range CHECK (
                                         album_year IS NULL OR (album_year >= 1900 AND album_year <= 2100)
+                                    ),
+                                    CONSTRAINT chk_gallery_album_event_date_order CHECK (
+                                        event_date_start IS NULL
+                                        OR event_date_end IS NULL
+                                        OR event_date_end >= event_date_start
                                     )
 );
 
@@ -1703,6 +1711,15 @@ COMMENT ON COLUMN public.gallery_album.gallery_category_id IS
 
 COMMENT ON COLUMN public.gallery_album.album_year IS
     'Calendar year of the visit/event shown on cards (e.g. 2019). Not the same as created_at.';
+
+COMMENT ON COLUMN public.gallery_album.event_date_start IS
+    'Calendar start date of the visit/event shown on album cards (date only, no time).';
+
+COMMENT ON COLUMN public.gallery_album.event_date_end IS
+    'Optional end date for multi-day events; must be >= event_date_start when both set.';
+
+COMMENT ON COLUMN public.gallery_album.event_location IS
+    'Human-readable place (city/venue) shown after formatted date on cards, e.g. Indore, Beirut.';
 
 
 --
@@ -2353,6 +2370,14 @@ CREATE TABLE public.tenant_organization (
                                             subscription_end_date date,
                                             monthly_fee_usd numeric(21,2),
                                             stripe_customer_id character varying(255),
+                                            description character varying(1000),
+                                            address_line_1 character varying(255),
+                                            address_line_2 character varying(255),
+                                            city character varying(255),
+                                            state_province character varying(255),
+                                            zip_code character varying(20),
+                                            country character varying(100),
+                                            website_url character varying(1024),
                                             is_active boolean DEFAULT true,
                                             created_at timestamp without time zone DEFAULT now() NOT NULL,
                                             updated_at timestamp without time zone DEFAULT now() NOT NULL,
@@ -2372,6 +2397,15 @@ CREATE TABLE public.tenant_organization (
 --
 
 COMMENT ON TABLE public.tenant_organization IS 'Multi-tenant organization configuration and subscription management';
+
+COMMENT ON COLUMN public.tenant_organization.description IS 'Canonical long-form organization description (max 1000 chars). Source of truth — do not duplicate on tenant_settings.';
+COMMENT ON COLUMN public.tenant_organization.address_line_1 IS 'Canonical primary street address line.';
+COMMENT ON COLUMN public.tenant_organization.address_line_2 IS 'Canonical secondary address line (suite, unit, etc.).';
+COMMENT ON COLUMN public.tenant_organization.city IS 'Canonical city or locality.';
+COMMENT ON COLUMN public.tenant_organization.state_province IS 'Canonical state, province, or region.';
+COMMENT ON COLUMN public.tenant_organization.zip_code IS 'Canonical ZIP or postal code.';
+COMMENT ON COLUMN public.tenant_organization.country IS 'Canonical country name (free text).';
+COMMENT ON COLUMN public.tenant_organization.website_url IS 'Canonical public website URL for the organization.';
 
 
 --
@@ -2397,7 +2431,9 @@ CREATE TABLE public.tenant_settings (
                                         zip_code character varying(20),
                                         country character varying(100),
                                         state_province character varying(100),
+                                        city character varying(255),
                                         email character varying(255),
+                                        description character varying(1000),
                                         whatsapp_api_key character varying(500),
                                         twilio_account_sid character varying(500),
                                         twilio_auth_token character varying(1048),
@@ -2454,6 +2490,12 @@ CREATE INDEX idx_tenant_settings_organization_id ON public.tenant_settings(tenan
 COMMENT ON TABLE public.tenant_settings IS 'Tenant-specific configuration settings with enhanced options';
 
 COMMENT ON COLUMN public.tenant_settings.tenant_organization_id IS 'Foreign key reference to tenant_organization.id for standard Long->Long relationship';
+
+COMMENT ON COLUMN public.tenant_settings.address_line_1 IS 'DEPRECATED v2.0 — use tenant_organization.address_line_1. Read fallback only; do not PATCH.';
+COMMENT ON COLUMN public.tenant_settings.address_line_2 IS 'DEPRECATED v2.0 — use tenant_organization.address_line_2. Read fallback only; do not PATCH.';
+COMMENT ON COLUMN public.tenant_settings.state_province IS 'DEPRECATED v2.0 — use tenant_organization.state_province. Read fallback only; do not PATCH.';
+COMMENT ON COLUMN public.tenant_settings.zip_code IS 'DEPRECATED v2.0 — use tenant_organization.zip_code. Read fallback only; do not PATCH.';
+COMMENT ON COLUMN public.tenant_settings.country IS 'DEPRECATED v2.0 — use tenant_organization.country. Read fallback only; do not PATCH.';
 
 COMMENT ON COLUMN public.tenant_settings.facebook_url IS 'Organization Facebook profile or page URL for Follow our journey section';
 COMMENT ON COLUMN public.tenant_settings.instagram_url IS 'Organization Instagram profile URL for Follow our journey section';
@@ -3159,6 +3201,13 @@ CREATE INDEX idx_gallery_album_category_id ON public.gallery_album USING btree (
 --
 
 CREATE INDEX idx_gallery_album_album_year ON public.gallery_album USING btree (tenant_id, album_year) WHERE (album_year IS NOT NULL);
+
+
+--
+-- Name: idx_gallery_album_event_date_start; Type: INDEX; Schema: public; Owner: giventa_event_management
+--
+
+CREATE INDEX idx_gallery_album_event_date_start ON public.gallery_album USING btree (tenant_id, event_date_start) WHERE (event_date_start IS NOT NULL);
 
 
 --

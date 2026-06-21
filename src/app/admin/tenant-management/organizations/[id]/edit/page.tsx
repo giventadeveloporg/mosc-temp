@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { fetchTenantOrganization, updateTenantOrganization } from '@/app/admin/tenant-management/organizations/ApiServerActions';
-import TenantOrganizationForm from '@/app/admin/tenant-management/components/TenantOrganizationForm';
+import TenantOrganizationFormClient from '@/app/admin/tenant-management/components/TenantOrganizationFormClient';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';
 import { TenantOrganizationFormDTO } from '@/app/admin/tenant-management/types';
@@ -182,24 +182,11 @@ export default async function EditTenantOrganizationPage({ params }: PageProps) 
           <h2 className="text-lg font-medium text-gray-900">Organization Information</h2>
         </div>
         <div className="px-6 py-6">
-          <TenantOrganizationForm
+          <TenantOrganizationFormClient
             mode="edit"
             onSubmit={handleSubmit}
-            initialData={{
-              organizationName: organization?.organizationName || '',
-              tenantId: organization?.tenantId || '',
-              description: organization?.description || '',
-              contactEmail: organization?.contactEmail || '',
-              contactPhone: organization?.contactPhone || '',
-              website: organization?.website || '',
-              address: organization?.address || '',
-              primaryColor: organization?.primaryColor || '#3B82F6',
-              secondaryColor: organization?.secondaryColor || '#1E40AF',
-              logoUrl: organization?.logoUrl || '',
-              subscriptionStatus: organization?.subscriptionStatus || 'TRIAL',
-              subscriptionPlan: organization?.subscriptionPlan || 'BASIC',
-              isActive: organization?.isActive ?? true
-            }}
+            cancelHref={`/admin/tenant-management/organizations/${id}`}
+            initialData={organization ?? undefined}
           />
         </div>
       </div>
