@@ -1,313 +1,13 @@
 {
-  "startedAt": "2026-06-21T04:49:14.898Z",
+  "startedAt": "2026-06-21T05:39:53.184Z",
   "dryRun": false,
   "dedupe": {
     "albumsReassigned": [],
     "categoriesDeleted": [],
     "categoriesSkipped": []
   },
-  "categoriesCreated": [
-    "ecumenical-visits",
-    "major-events",
-    "receptions",
-    "liturgical-events",
-    "special-events",
-    "private-audiences",
-    "church-visits",
-    "conferences"
-  ],
-  "albumsPatched": [
-    {
-      "id": 611044,
-      "staticSlug": "russia-visit",
-      "galleryCategoryId": 611401,
-      "categorySlug": "ecumenical-visits",
-      "albumYear": 2019,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611045,
-      "staticSlug": "vatican-visit",
-      "galleryCategoryId": 611401,
-      "categorySlug": "ecumenical-visits",
-      "albumYear": 2023,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611046,
-      "staticSlug": "enthronement-mathews-iii",
-      "galleryCategoryId": 611402,
-      "categorySlug": "major-events",
-      "albumYear": 2021,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611047,
-      "staticSlug": "reception-mathews-iii",
-      "galleryCategoryId": 611403,
-      "categorySlug": "receptions",
-      "albumYear": 2021,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611048,
-      "staticSlug": "paulose-ii-with-kiril",
-      "galleryCategoryId": 611401,
-      "categorySlug": "ecumenical-visits",
-      "albumYear": 2019,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611049,
-      "staticSlug": "st-matrona-relics",
-      "galleryCategoryId": 611404,
-      "categorySlug": "liturgical-events",
-      "albumYear": 2019,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611050,
-      "staticSlug": "st-cyril-methodius",
-      "galleryCategoryId": 611403,
-      "categorySlug": "receptions",
-      "albumYear": 2019,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611051,
-      "staticSlug": "metropolitan-hilarion",
-      "galleryCategoryId": 611401,
-      "categorySlug": "ecumenical-visits",
-      "albumYear": 2019,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611052,
-      "staticSlug": "pokrovsky-monastery",
-      "galleryCategoryId": 611404,
-      "categorySlug": "liturgical-events",
-      "albumYear": 2019,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611053,
-      "staticSlug": "mother-feofania",
-      "galleryCategoryId": 611405,
-      "categorySlug": "special-events",
-      "albumYear": 2019,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611054,
-      "staticSlug": "ceremonial-reception-russian-orthodox",
-      "galleryCategoryId": 611401,
-      "categorySlug": "ecumenical-visits",
-      "albumYear": 2019,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611055,
-      "staticSlug": "offering-incense-st-thomas",
-      "galleryCategoryId": 611404,
-      "categorySlug": "liturgical-events",
-      "albumYear": 2016,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611056,
-      "staticSlug": "order-st-thomas-abune-mathias",
-      "galleryCategoryId": 611402,
-      "categorySlug": "major-events",
-      "albumYear": 2016,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611057,
-      "staticSlug": "visit-abune-mathias",
-      "galleryCategoryId": 611401,
-      "categorySlug": "ecumenical-visits",
-      "albumYear": 2016,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611058,
-      "staticSlug": "reception-tikon-puthupally",
-      "galleryCategoryId": 611403,
-      "categorySlug": "receptions",
-      "albumYear": 2015,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611059,
-      "staticSlug": "website-inauguration",
-      "galleryCategoryId": 611405,
-      "categorySlug": "special-events",
-      "albumYear": 2015,
-      "eventDateStart": "2015-11-25",
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611060,
-      "staticSlug": "private-audience-tikon-devalokam",
-      "galleryCategoryId": 611406,
-      "categorySlug": "private-audiences",
-      "albumYear": 2015,
-      "eventDateStart": "2015-11-25",
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611061,
-      "staticSlug": "canberra-visit",
-      "galleryCategoryId": 611407,
-      "categorySlug": "church-visits",
-      "albumYear": 2015,
-      "eventDateStart": "2015-11-17",
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611062,
-      "staticSlug": "dharma-dhamma-conference",
-      "galleryCategoryId": 611408,
-      "categorySlug": "conferences",
-      "albumYear": 2015,
-      "eventDateStart": "2015-10-24",
-      "eventDateEnd": "2015-10-26",
-      "eventLocation": "Indore"
-    },
-    {
-      "id": 611063,
-      "staticSlug": "vienna-fraternity",
-      "galleryCategoryId": 611405,
-      "categorySlug": "special-events",
-      "albumYear": 2013,
-      "eventDateStart": "2013-09-03",
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611064,
-      "staticSlug": "armenian-genocide-canonization",
-      "galleryCategoryId": 611405,
-      "categorySlug": "special-events",
-      "albumYear": 2015,
-      "eventDateStart": "2015-04-23",
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611065,
-      "staticSlug": "armenian-president",
-      "galleryCategoryId": 611405,
-      "categorySlug": "special-events",
-      "albumYear": 2015,
-      "eventDateStart": "2015-04-23",
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611066,
-      "staticSlug": "private-audience-karekin",
-      "galleryCategoryId": 611406,
-      "categorySlug": "private-audiences",
-      "albumYear": 2015,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611067,
-      "staticSlug": "enthronement-coptic-pope",
-      "galleryCategoryId": 611401,
-      "categorySlug": "ecumenical-visits",
-      "albumYear": 2012,
-      "eventDateStart": null,
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611068,
-      "staticSlug": "blessing-holy-myron",
-      "galleryCategoryId": 611404,
-      "categorySlug": "liturgical-events",
-      "albumYear": 2015,
-      "eventDateStart": "2015-07-19",
-      "eventDateEnd": null,
-      "eventLocation": "Beirut"
-    },
-    {
-      "id": 611069,
-      "staticSlug": "private-audience-aram",
-      "galleryCategoryId": 611406,
-      "categorySlug": "private-audiences",
-      "albumYear": 2015,
-      "eventDateStart": "2015-07-17",
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611070,
-      "staticSlug": "armenian-genocide-100th",
-      "galleryCategoryId": 611405,
-      "categorySlug": "special-events",
-      "albumYear": 2015,
-      "eventDateStart": "2015-07-18",
-      "eventDateEnd": null,
-      "eventLocation": "Beirut"
-    },
-    {
-      "id": 611071,
-      "staticSlug": "ethiopian-visit",
-      "galleryCategoryId": 611401,
-      "categorySlug": "ecumenical-visits",
-      "albumYear": 2013,
-      "eventDateStart": "2013-02-28",
-      "eventDateEnd": null,
-      "eventLocation": null
-    },
-    {
-      "id": 611072,
-      "staticSlug": "rome-visit",
-      "galleryCategoryId": 611401,
-      "categorySlug": "ecumenical-visits",
-      "albumYear": 2013,
-      "eventDateStart": "2013-09-05",
-      "eventDateEnd": null,
-      "eventLocation": null
-    }
-  ],
+  "categoriesCreated": [],
+  "albumsPatched": [],
   "albumsSkipped": [
     {
       "id": 608332,
@@ -318,8 +18,153 @@
       "id": 610688,
       "title": "Malayalees US",
       "reason": "no static_slug in description"
+    },
+    {
+      "id": 611044,
+      "staticSlug": "russia-visit",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611045,
+      "staticSlug": "vatican-visit",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611046,
+      "staticSlug": "enthronement-mathews-iii",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611047,
+      "staticSlug": "reception-mathews-iii",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611048,
+      "staticSlug": "paulose-ii-with-kiril",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611049,
+      "staticSlug": "st-matrona-relics",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611050,
+      "staticSlug": "st-cyril-methodius",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611051,
+      "staticSlug": "metropolitan-hilarion",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611052,
+      "staticSlug": "pokrovsky-monastery",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611053,
+      "staticSlug": "mother-feofania",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611054,
+      "staticSlug": "ceremonial-reception-russian-orthodox",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611055,
+      "staticSlug": "offering-incense-st-thomas",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611056,
+      "staticSlug": "order-st-thomas-abune-mathias",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611057,
+      "staticSlug": "visit-abune-mathias",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611058,
+      "staticSlug": "reception-tikon-puthupally",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611059,
+      "staticSlug": "website-inauguration",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611060,
+      "staticSlug": "private-audience-tikon-devalokam",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611061,
+      "staticSlug": "canberra-visit",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611062,
+      "staticSlug": "dharma-dhamma-conference",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611063,
+      "staticSlug": "vienna-fraternity",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611064,
+      "staticSlug": "armenian-genocide-canonization",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611065,
+      "staticSlug": "armenian-president",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611066,
+      "staticSlug": "private-audience-karekin",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611067,
+      "staticSlug": "enthronement-coptic-pope",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611068,
+      "staticSlug": "blessing-holy-myron",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611069,
+      "staticSlug": "private-audience-aram",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611070,
+      "staticSlug": "armenian-genocide-100th",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611071,
+      "staticSlug": "ethiopian-visit",
+      "reason": "already up to date"
+    },
+    {
+      "id": 611072,
+      "staticSlug": "rome-visit",
+      "reason": "already up to date"
     }
   ],
   "albumsMissingMeta": [],
-  "finishedAt": "2026-06-21T04:49:15.518Z"
+  "finishedAt": "2026-06-21T05:39:53.185Z"
 }
