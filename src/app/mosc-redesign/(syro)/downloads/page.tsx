@@ -27,6 +27,7 @@ export default async function DownloadsPage(props: {
     size: 24,
     categoryOptions: [] as any[],
     yearOptions: [] as number[],
+    allYearOptions: [] as number[],
   };
 
   try {

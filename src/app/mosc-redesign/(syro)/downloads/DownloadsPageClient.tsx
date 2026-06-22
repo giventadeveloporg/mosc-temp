@@ -470,8 +470,171 @@ const filterDropdownClass = (active: boolean, tone: 'year' | 'category') =>
       : 'border-syro-gold/40'
   }`;
 
+const MAX_DROPDOWN_YEARS = 20;
+
+function buildOlderYearDropdownOptions(
+  allYearOptions: number[],
+  currentCalendarYear: number,
+  priorCalendarYear: number
+): number[] {
+  const pinned = new Set([currentCalendarYear, priorCalendarYear]);
+  const fromData = [...new Set(allYearOptions)]
+    .filter((y) => !pinned.has(y))
+    .sort((a, b) => b - a);
+
+  if (fromData.length > 0) {
+    return fromData.slice(0, MAX_DROPDOWN_YEARS);
+  }
+
+  return Array.from({ length: MAX_DROPDOWN_YEARS }, (_, index) => currentCalendarYear - 2 - index);
+}
+
+function YearCombobox({
+  years,
+  selectedYear,
+  categoryId,
+  buildFilterHref,
+}: {
+  years: number[];
+  selectedYear: number | null;
+  categoryId: number | null;
+  buildFilterHref: (categoryId: number | null, year: number | null) => string;
+}) {
+  const router = useRouter();
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const listId = React.useId();
+  const currentCalendarYear = new Date().getFullYear();
+  const priorCalendarYear = currentCalendarYear - 1;
+
+  const dropdownYears = React.useMemo(
+    () => buildOlderYearDropdownOptions(years, currentCalendarYear, priorCalendarYear),
+    [years, currentCalendarYear, priorCalendarYear]
+  );
+
+  const isOlderYearSelected =
+    selectedYear != null &&
+    selectedYear !== currentCalendarYear &&
+    selectedYear !== priorCalendarYear;
+
+  const [open, setOpen] = React.useState(false);
+  const [inputValue, setInputValue] = React.useState(
+    isOlderYearSelected && selectedYear != null ? String(selectedYear) : ''
+  );
+
+  React.useEffect(() => {
+    if (isOlderYearSelected && selectedYear != null) {
+      setInputValue(String(selectedYear));
+    } else if (!open) {
+      setInputValue('');
+    }
+  }, [isOlderYearSelected, selectedYear, open]);
+
+  React.useEffect(() => {
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handlePointerDown);
+    return () => document.removeEventListener('mousedown', handlePointerDown);
+  }, []);
+
+  const filteredYears = React.useMemo(() => {
+    const query = inputValue.trim();
+    if (!query) return dropdownYears;
+    return dropdownYears.filter((year) => String(year).includes(query));
+  }, [dropdownYears, inputValue]);
+
+  const applyYear = (year: number | null) => {
+    setOpen(false);
+    if (year != null && selectedYear === year) {
+      router.push(buildFilterHref(categoryId, null));
+      setInputValue('');
+      return;
+    }
+    router.push(buildFilterHref(categoryId, year));
+    if (year != null) {
+      setInputValue(String(year));
+    }
+  };
+
+  const handleInputChange = (value: string) => {
+    setInputValue(value.replace(/[^\d]/g, '').slice(0, 4));
+    setOpen(true);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const parsed = parseInt(inputValue.trim(), 10);
+      if (Number.isFinite(parsed) && parsed >= 1900 && parsed <= 2100) {
+        applyYear(parsed);
+      } else if (filteredYears.length === 1) {
+        applyYear(filteredYears[0]);
+      }
+    } else if (event.key === 'Escape') {
+      setOpen(false);
+    }
+  };
+
+  const comboboxActive = isOlderYearSelected || inputValue.trim().length > 0;
+
+  return (
+    <div ref={containerRef} className="relative inline-flex min-w-[11rem] max-w-[14rem]">
+      <label className="sr-only" htmlFor={listId}>
+        Filter by other years (type to search)
+      </label>
+      <input
+        id={listId}
+        type="text"
+        inputMode="numeric"
+        role="combobox"
+        aria-expanded={open}
+        aria-controls={`${listId}-listbox`}
+        aria-autocomplete="list"
+        aria-label="Filter by other years (type to search)"
+        placeholder="More years…"
+        value={inputValue}
+        onChange={(e) => handleInputChange(e.target.value)}
+        onFocus={() => setOpen(true)}
+        onKeyDown={handleKeyDown}
+        className={`w-full rounded-md border-2 px-3 py-1.5 text-xs font-semibold text-syro-blue bg-white focus:outline-none focus:ring-2 focus:ring-syro-blue/30 ${
+          comboboxActive ? 'border-syro-red bg-red-50' : 'border-syro-gold/40'
+        }`}
+      />
+      {open ? (
+        <ul
+          id={`${listId}-listbox`}
+          role="listbox"
+          className="absolute left-0 right-0 top-full z-30 mt-1 max-h-52 overflow-y-auto rounded-md border-2 border-syro-gold/40 bg-white py-1 shadow-lg"
+        >
+          {filteredYears.length > 0 ? (
+            filteredYears.map((year) => (
+              <li key={year} role="option" aria-selected={selectedYear === year}>
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => applyYear(year)}
+                  className={`block w-full px-3 py-1.5 text-left text-xs font-semibold hover:bg-red-50 ${
+                    selectedYear === year ? 'bg-red-50 text-syro-red' : 'text-syro-blue'
+                  }`}
+                >
+                  {year}
+                  {selectedYear === year ? ' (click to clear)' : ''}
+                </button>
+              </li>
+            ))
+          ) : (
+            <li className="px-3 py-2 text-xs text-gray-500">No matching years</li>
+          )}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
 function YearFilterBar({
-  yearOptions,
+  allYearOptions,
   currentFilters,
   buildFilterHref,
   searchQuery,
@@ -479,7 +642,7 @@ function YearFilterBar({
   onClearFilters,
   hasActiveFiltersOrSearch,
 }: {
-  yearOptions: number[];
+  allYearOptions: number[];
   currentFilters: { categoryId: number | null; year: number | null };
   buildFilterHref: (categoryId: number | null, year: number | null) => string;
   searchQuery: string;
@@ -487,21 +650,11 @@ function YearFilterBar({
   onClearFilters: () => void;
   hasActiveFiltersOrSearch: boolean;
 }) {
-  const router = useRouter();
   const currentCalendarYear = new Date().getFullYear();
   const priorCalendarYear = currentCalendarYear - 1;
 
-  const olderYearOptions = React.useMemo(() => {
-    const pinned = new Set([currentCalendarYear, priorCalendarYear]);
-    return yearOptions.filter((y) => !pinned.has(y));
-  }, [yearOptions, currentCalendarYear, priorCalendarYear]);
-
-  const dropdownValue =
-    currentFilters.year != null && olderYearOptions.includes(currentFilters.year)
-      ? String(currentFilters.year)
-      : '';
-
-  const dropdownActive = dropdownValue !== '';
+  const toggleYearHref = (year: number) =>
+    buildFilterHref(currentFilters.categoryId, currentFilters.year === year ? null : year);
 
   return (
     <div>
@@ -514,43 +667,25 @@ function YearFilterBar({
           All years
         </Link>
         <Link
-          href={buildFilterHref(currentFilters.categoryId, currentCalendarYear)}
+          href={toggleYearHref(currentCalendarYear)}
           className={yearFilterChipClass(currentFilters.year === currentCalendarYear)}
+          title={currentFilters.year === currentCalendarYear ? 'Click again to clear year filter' : undefined}
         >
           {currentCalendarYear}
         </Link>
         <Link
-          href={buildFilterHref(currentFilters.categoryId, priorCalendarYear)}
+          href={toggleYearHref(priorCalendarYear)}
           className={yearFilterChipClass(currentFilters.year === priorCalendarYear)}
+          title={currentFilters.year === priorCalendarYear ? 'Click again to clear year filter' : undefined}
         >
           {priorCalendarYear}
         </Link>
-        {olderYearOptions.length > 0 ? (
-          <label className="inline-flex items-center gap-2">
-            <span className="sr-only">Select another year</span>
-            <select
-              value={dropdownValue}
-              onChange={(e) => {
-                const next = e.target.value;
-                router.push(
-                  buildFilterHref(
-                    currentFilters.categoryId,
-                    next ? Number(next) : null
-                  )
-                );
-              }}
-              className={filterDropdownClass(dropdownActive, 'year')}
-              aria-label="Filter by other years"
-            >
-              <option value="">More years…</option>
-              {olderYearOptions.map((yr) => (
-                <option key={yr} value={String(yr)}>
-                  {yr}
-                </option>
-              ))}
-            </select>
-          </label>
-        ) : null}
+        <YearCombobox
+          years={allYearOptions}
+          selectedYear={currentFilters.year}
+          categoryId={currentFilters.categoryId}
+          buildFilterHref={buildFilterHref}
+        />
 
         {/* Search documents — pushed to the right-most end of the filter row */}
         <div className="ml-auto flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
@@ -624,16 +759,19 @@ function CategoryFilterBar({
         >
           All categories
         </Link>
-        {featured.map((cat) => (
-          <Link
-            key={cat.id}
-            href={buildFilterHref(cat.id, currentFilters.year)}
-            className={categoryFilterChipClass(currentFilters.categoryId === cat.id)}
-            title={cat.displayName}
-          >
-            {cat.displayName}
-          </Link>
-        ))}
+        {featured.map((cat) => {
+          const isActive = currentFilters.categoryId === cat.id;
+          return (
+            <Link
+              key={cat.id}
+              href={buildFilterHref(isActive ? null : cat.id, currentFilters.year)}
+              className={categoryFilterChipClass(isActive)}
+              title={isActive ? `${cat.displayName} — click again to clear` : cat.displayName}
+            >
+              {cat.displayName}
+            </Link>
+          );
+        })}
         {dropdownOptions.length > 0 ? (
           <label className="inline-flex shrink-0 items-center gap-2">
             <span className="sr-only">Select another document category</span>
@@ -641,8 +779,12 @@ function CategoryFilterBar({
               value={dropdownValue}
               onChange={(e) => {
                 const next = e.target.value;
+                const nextId = next ? Number(next) : null;
                 router.push(
-                  buildFilterHref(next ? Number(next) : null, currentFilters.year)
+                  buildFilterHref(
+                    nextId != null && nextId === currentFilters.categoryId ? null : nextId,
+                    currentFilters.year
+                  )
                 );
               }}
               className={filterDropdownClass(dropdownActive, 'category')}
@@ -699,7 +841,8 @@ export default function DownloadsPageClient({
 
   const handleClearFilters = React.useCallback(() => {
     setSearchQuery('');
-    router.push('/mosc-redesign/downloads');
+    router.replace('/mosc-redesign/downloads');
+    router.refresh();
   }, [router]);
 
   const handleDownload = React.useCallback(async (file: TreeItem) => {
@@ -824,7 +967,7 @@ export default function DownloadsPageClient({
               </div>
 
               <YearFilterBar
-                yearOptions={officialTreePage.yearOptions}
+                allYearOptions={officialTreePage.allYearOptions}
                 currentFilters={currentFilters}
                 buildFilterHref={queryWithFilter}
                 searchQuery={searchQuery}
@@ -852,15 +995,16 @@ export default function DownloadsPageClient({
               <div className="rounded-lg border border-syro-gold/25 bg-syro-bg-gray/50 px-5 py-6 text-sm text-gray-600 space-y-3">
                 {isSearching ? (
                   <p>
-                    No files on this page match &ldquo;{searchQuery.trim()}&rdquo;. Try a different search term or{' '}
+                    No files on this page match &ldquo;{searchQuery.trim()}&rdquo;. Try a different search term, or
+                    click the{' '}
                     <button
                       type="button"
                       onClick={handleClearFilters}
                       className="font-semibold text-syro-blue underline hover:text-syro-red"
                     >
-                      clear filters
-                    </button>
-                    .
+                      Clear filters
+                    </button>{' '}
+                    button to return to all downloads.
                   </p>
                 ) : hasActiveFilters ? (
                   <p>
@@ -870,11 +1014,15 @@ export default function DownloadsPageClient({
                       : currentFilters.categoryId
                         ? 'category'
                         : 'year'}
-                    . Try another filter, or{' '}
-                    <Link href={queryWithFilter(null, null)} className="font-semibold text-syro-blue underline hover:text-syro-red">
-                      view all downloads
-                    </Link>
-                    .
+                    . Try another filter, click an active category or year chip again to undo it, or click the{' '}
+                    <button
+                      type="button"
+                      onClick={handleClearFilters}
+                      className="font-semibold text-syro-blue underline hover:text-syro-red"
+                    >
+                      Clear filters
+                    </button>{' '}
+                    button to return to all downloads.
                   </p>
                 ) : (
                   <p>No files are available right now. Please check back later.</p>
@@ -893,6 +1041,7 @@ export default function DownloadsPageClient({
               totalPages={totalPages}
               totalCount={officialTreePage.totalElements}
               pageSize={pageSize}
+              itemsOnPage={isSearching ? filteredDownloads.length : officialTreePage.content.length}
               buildPageHref={queryWithPage}
               itemLabel="files"
             />

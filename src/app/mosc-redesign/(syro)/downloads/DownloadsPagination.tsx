@@ -6,6 +6,8 @@ type DownloadsPaginationProps = {
   totalPages: number;
   totalCount: number;
   pageSize: number;
+  /** Items rendered on the current page (for accurate "Showing X to Y" on partial last pages) */
+  itemsOnPage?: number;
   buildPageHref: (pageOneBased: number) => string;
   itemLabel?: string;
 };
@@ -15,6 +17,7 @@ export default function DownloadsPagination({
   totalPages,
   totalCount,
   pageSize,
+  itemsOnPage,
   buildPageHref,
   itemLabel = 'files',
 }: DownloadsPaginationProps) {
@@ -23,7 +26,13 @@ export default function DownloadsPagination({
   const hasResults = totalCount > 0;
   const startItem = hasResults ? currentPage * pageSize + 1 : 0;
   const endItem = hasResults
-    ? currentPage * pageSize + Math.min(pageSize, totalCount - currentPage * pageSize)
+    ? currentPage * pageSize +
+      Math.min(
+        typeof itemsOnPage === 'number' && itemsOnPage >= 0
+          ? itemsOnPage
+          : pageSize,
+        totalCount - currentPage * pageSize
+      )
     : 0;
 
   const isPrevDisabled = currentPage <= 0;
