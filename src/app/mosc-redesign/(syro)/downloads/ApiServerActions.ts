@@ -7,20 +7,24 @@ import { parseHierarchyDescription } from '@/lib/officialDocumentHierarchy';
 import { resolveOfficialDocumentDownloadUrl } from '@/lib/officialDocumentDownload';
 import { getEventMediaDisplayThumbnailUrl } from '@/lib/officialDocumentThumbnail';
 
+/** Parse Spring Data REST pagination from response headers (body is a plain array). */
+function parseSpringTotalCountHeader(res: Response, fallback: number): number {
+  const raw = res.headers.get('X-Total-Count') ?? res.headers.get('x-total-count');
+  if (raw == null || raw.trim() === '') {
+    return fallback;
+  }
+  const parsed = parseInt(raw, 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+function buildPublicOfficialDocumentsUrl(params: globalThis.URLSearchParams): string {
+  return `${getApiBaseUrl()}/api/event-medias/public-official-documents?${params.toString()}`;
+}
+
 /** Public tenant official documents for the downloads page (server-side JWT). */
 export async function fetchPublicOfficialDocumentsForDownloadsServer(): Promise<EventMediaDTO[]> {
   try {
-    const params = new globalThis.URLSearchParams();
-    params.append('tenantId.equals', getTenantId());
-    params.append('isEventManagementOfficialDocument.equals', 'true');
-    params.append('isPublic.equals', 'true');
-    params.append('sort', 'createdAt,desc');
-    params.append('size', '200');
-    const url = `${getApiBaseUrl()}/api/event-medias?${params.toString()}`;
-    const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data : [];
+    return await fetchAllPublicOfficialDocumentsRaw();
   } catch (e) {
     globalThis.console.error('[downloads] fetchPublicOfficialDocumentsForDownloadsServer:', e);
     return [];
@@ -52,8 +56,10 @@ export type PublicOfficialDocumentTreePage = {
   page: number;
   size: number;
   categoryOptions: Array<{ id: number; slug: string; displayName: string }>;
-  /** Distinct years from public official documents (newest first) */
+  /** Distinct years for the active category filter (newest first) */
   yearOptions: number[];
+  /** All distinct years across public official documents — used for the year typeahead (always populated) */
+  allYearOptions: number[];
 };
 
 function mapEventMediaToTreeItem(doc: EventMediaDTO): PublicOfficialDocumentTreeItem {
@@ -100,34 +106,33 @@ function mapEventMediaToTreeItem(doc: EventMediaDTO): PublicOfficialDocumentTree
   };
 }
 
-async function fetchAllPublicOfficialDocumentsRaw(): Promise<EventMediaDTO[]> {
+async function fetchAllPublicOfficialDocumentsRaw(input?: {
+  categoryId?: number;
+}): Promise<EventMediaDTO[]> {
+  const tenantId = getTenantId();
   const all: EventMediaDTO[] = [];
   const batchSize = 100;
   let page = 0;
-  let totalPages = 1;
+  let totalElements = Number.POSITIVE_INFINITY;
 
-  while (page < totalPages && page < 50) {
+  while (all.length < totalElements && page < 50) {
     const params = new globalThis.URLSearchParams();
-    params.append('tenantId.equals', getTenantId());
-    params.append('isEventManagementOfficialDocument.equals', 'true');
-    params.append('isPublic.equals', 'true');
-    params.append('sort', 'priorityRanking,asc');
-    params.append('sort', 'createdAt,desc');
-    params.append('page', String(page));
-    params.append('size', String(batchSize));
+    params.set('tenantId', tenantId);
+    if (input?.categoryId) {
+      params.set('officialDocumentCategoryId', String(input.categoryId));
+    }
+    params.set('page', String(page));
+    params.set('size', String(batchSize));
 
-    const url = `${getApiBaseUrl()}/api/event-medias?${params.toString()}`;
+    const url = buildPublicOfficialDocumentsUrl(params);
     const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
     if (!res.ok) break;
 
-    const json = await res.json();
-    const batch = Array.isArray(json) ? json : Array.isArray(json?.content) ? json.content : [];
-    all.push(...(batch as EventMediaDTO[]));
+    const batch = (await res.json()) as EventMediaDTO[];
+    if (!Array.isArray(batch)) break;
 
-    if (Array.isArray(json)) {
-      break;
-    }
-    totalPages = Math.max(1, Number(json?.totalPages ?? 1));
+    totalElements = parseSpringTotalCountHeader(res, all.length + batch.length);
+    all.push(...batch);
     page += 1;
     if (batch.length === 0) break;
   }
@@ -154,7 +159,7 @@ async function fetchPublicOfficialDocumentYearOptionsServer(input?: {
   docs?: EventMediaDTO[];
 }): Promise<number[]> {
   try {
-    const docs = input?.docs ?? (await fetchAllPublicOfficialDocumentsRaw());
+    const docs = input?.docs ?? (await fetchAllPublicOfficialDocumentsRaw({ categoryId: input?.categoryId }));
     return extractYearOptionsFromDocs(docs, input?.categoryId);
   } catch {
     return [];
@@ -171,26 +176,24 @@ export async function fetchPublicOfficialDocumentsTreeServer(input?: {
   const size = Math.min(Math.max(1, input?.size ?? 24), 100);
 
   try {
+    const tenantId = getTenantId();
     const baseParams = new globalThis.URLSearchParams();
-    baseParams.append('tenantId.equals', getTenantId());
-    baseParams.append('isEventManagementOfficialDocument.equals', 'true');
-    baseParams.append('isPublic.equals', 'true');
+    baseParams.set('tenantId', tenantId);
     if (input?.categoryId) {
-      baseParams.append('officialDocumentCategoryId.equals', String(input.categoryId));
+      baseParams.set('officialDocumentCategoryId', String(input.categoryId));
     }
     if (input?.year) {
-      baseParams.append('officialDocumentYear.equals', String(input.year));
+      baseParams.set('officialDocumentYear', String(input.year));
     }
-    baseParams.append('sort', 'priorityRanking,asc');
-    baseParams.append('sort', 'createdAt,desc');
-    baseParams.append('page', String(page));
-    baseParams.append('size', String(size));
+    baseParams.set('page', String(page));
+    baseParams.set('size', String(size));
 
-    const docsUrl = `${getApiBaseUrl()}/api/event-medias?${baseParams.toString()}`;
+    const docsUrl = buildPublicOfficialDocumentsUrl(baseParams);
 
-    const [docsRes, yearOptions] = await Promise.all([
+    const [docsRes, yearOptions, allYearOptions] = await Promise.all([
       fetchWithJwtRetry(docsUrl, { cache: 'no-store' }),
       fetchPublicOfficialDocumentYearOptionsServer({ categoryId: input?.categoryId }),
+      fetchPublicOfficialDocumentYearOptionsServer(),
     ]);
 
     if (!docsRes.ok) {
@@ -202,22 +205,17 @@ export async function fetchPublicOfficialDocumentsTreeServer(input?: {
         size,
         categoryOptions: [],
         yearOptions,
+        allYearOptions,
       };
     }
 
-    const docsJson = await docsRes.json();
-    const docsRaw = Array.isArray(docsJson)
-      ? docsJson
-      : Array.isArray(docsJson?.content)
-        ? docsJson.content
-        : [];
-    const totalElements = Array.isArray(docsJson)
-      ? docsRaw.length
-      : Number(docsJson?.totalElements ?? docsRaw.length);
-    const totalPages = Array.isArray(docsJson) ? 1 : Number(docsJson?.totalPages ?? 1);
-    const currentPage = Array.isArray(docsJson) ? 0 : Number(docsJson?.number ?? page);
+    const docsRaw = (await docsRes.json()) as EventMediaDTO[];
+    const docsList = Array.isArray(docsRaw) ? docsRaw : [];
+    const totalElements = parseSpringTotalCountHeader(docsRes, docsList.length);
+    const totalPages = Math.max(1, Math.ceil(totalElements / size));
+    const currentPage = page;
 
-    const content = (docsRaw as EventMediaDTO[]).map(mapEventMediaToTreeItem);
+    const content = docsList.map(mapEventMediaToTreeItem);
 
     const catParams = new globalThis.URLSearchParams();
     catParams.append('tenantId.equals', getTenantId());
@@ -244,9 +242,19 @@ export async function fetchPublicOfficialDocumentsTreeServer(input?: {
       size,
       categoryOptions,
       yearOptions,
+      allYearOptions,
     };
   } catch (e) {
     globalThis.console.error('[downloads] fetchPublicOfficialDocumentsTreeServer:', e);
-    return { content: [], totalElements: 0, totalPages: 0, page, size, categoryOptions: [], yearOptions: [] };
+    return {
+      content: [],
+      totalElements: 0,
+      totalPages: 0,
+      page,
+      size,
+      categoryOptions: [],
+      yearOptions: [],
+      allYearOptions: [],
+    };
   }
 }
