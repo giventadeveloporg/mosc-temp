@@ -7,7 +7,7 @@
       "Edit(*)",
       "Glob(*)",
       "Grep(*)",
-      "*"
+      "PowerShell(npx tsc --noEmit -p tsconfig.json 2>&1)"
     ],
     "deny": [],
     "defaultMode": "bypassPermissions"

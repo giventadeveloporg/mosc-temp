@@ -1,26 +1,16 @@
 'use server';
 
-import { headers } from 'next/headers';
-import { getAppUrl, getTenantId } from '@/lib/env';
-
-/** Server-side fetch to this Next app (upload proxy). Prefer request host over env default port. */
-async function getInternalAppOrigin(): Promise<string> {
-  try {
-    const h = await headers();
-    const host = h.get('x-forwarded-host') ?? h.get('host');
-    if (host) {
-      const proto = h.get('x-forwarded-proto') ?? 'http';
-      return `${proto}://${host}`;
-    }
-  } catch {
-    /* outside request context */
-  }
-  return getAppUrl();
-}
+import { getApiBaseUrl, getTenantId } from '@/lib/env';
+import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 
 /**
- * Uploads a profile image for a team member via Next proxy (multipart).
- * Uses request Host so server actions work on any port (not only getAppUrl() default).
+ * Uploads a profile image for a team member via a direct backend POST (multipart).
+ *
+ * Posts straight to the Spring API instead of routing through the Next upload proxy. The
+ * proxy streams the raw request body through node-fetch (`body: req`, duplex 'half'), which
+ * can stall / "premature close" on multipart and — because the caller has no timeout — leaves
+ * the edit form stuck on "Saving…" indefinitely. fetchWithJwtRetry injects the JWT + tenant
+ * header and applies a 30s timeout, so a slow upload fails fast instead of hanging.
  */
 export async function uploadTeamMemberProfileImage(
   memberId: number,
@@ -45,10 +35,8 @@ export async function uploadTeamMemberProfileImage(
     params.append('description', 'Profile image uploaded for executive committee team member');
     params.append('tenantId', getTenantId());
 
-    const origin = await getInternalAppOrigin();
-    const url = `${origin}/api/proxy/event-medias/upload?${params.toString()}`;
-
-    const response = await fetch(url, {
+    const url = `${getApiBaseUrl()}/api/event-medias/upload?${params.toString()}`;
+    const response = await fetchWithJwtRetry(url, {
       method: 'POST',
       body: formData,
     });

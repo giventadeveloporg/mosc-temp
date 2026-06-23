@@ -19,13 +19,21 @@ import {
   fetchTenantOfficialDocumentsServer,
   patchOfficialDocumentMediaServer,
   patchOfficialDocumentYearBundleServer,
+  uploadOfficialDocumentThumbnailServer,
+  fetchOfficialDocumentMediaByIdServer,
   type OfficialDocumentSearchField,
 } from './ApiServerActions';
 import Modal from '@/components/ui/Modal';
 import {
-  getEventMediaDisplayThumbnailUrl,
+  composeOfficialDocumentThumbnailCacheKey,
+  getOfficialDocumentCardThumbnailSrc,
+  mergeEventMediaListPreservingThumbnails,
+  mergeEventMediaPreservingNewerThumbnail,
+  resolveEventMediaThumbnailFields,
   getOfficialDocumentPlaceholderKind,
   OFFICIAL_DOCUMENT_CARD_THUMBNAIL_RECOMMENDED,
+  OFFICIAL_DOCUMENT_THUMBNAIL_COPY_SPEC,
+  hasStoredOfficialDocumentThumbnail,
   placeholderGradient,
   placeholderLabel,
 } from '@/lib/officialDocumentThumbnail';
@@ -39,6 +47,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  FaCalendarAlt,
+  FaFileAlt,
+  FaFolderOpen,
+  FaHome,
+  FaListUl,
+  FaTags,
+  FaUpload,
+  FaUsers,
+} from 'react-icons/fa';
 
 const DOCUMENT_SEARCH_FIELDS: { label: string; value: OfficialDocumentSearchField }[] = [
   { label: 'Title', value: 'title' },
@@ -47,40 +65,223 @@ const DOCUMENT_SEARCH_FIELDS: { label: string; value: OfficialDocumentSearchFiel
   { label: 'File type', value: 'eventMediaType' },
 ];
 
-/** Solid admin action buttons (visible fill, not pale/transparent). */
-const SOLID_BTN =
-  'text-sm font-semibold border-2 shadow-sm transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100';
-const solidBtnMd = (color: string) =>
-  `px-4 py-2.5 rounded-xl min-h-[44px] ${SOLID_BTN} ${color}`;
-const solidBtnBlue = solidBtnMd(
-  'bg-blue-600 hover:bg-blue-700 text-white border-blue-700 hover:border-blue-800'
-);
-const solidBtnOrange = solidBtnMd(
-  'bg-orange-500 hover:bg-orange-600 text-white border-orange-600 hover:border-orange-700'
-);
-const solidBtnViolet = solidBtnMd(
-  'bg-violet-600 hover:bg-violet-700 text-white border-violet-700 hover:border-violet-800'
-);
-const solidBtnEmerald = solidBtnMd(
-  'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-700 hover:border-emerald-800'
-);
-const solidBtnTeal = solidBtnMd(
-  'bg-teal-600 hover:bg-teal-700 text-white border-teal-700 hover:border-teal-800'
-);
-const solidBtnIndigo = solidBtnMd(
-  'bg-indigo-600 hover:bg-indigo-700 text-white border-indigo-700 hover:border-indigo-800'
-);
-const solidBtnSlate = solidBtnMd(
-  'bg-slate-600 hover:bg-slate-700 text-white border-slate-700 hover:border-slate-800'
-);
-const solidBtnGreen = solidBtnMd(
-  'bg-green-600 hover:bg-green-700 text-white border-green-700 hover:border-green-800'
-);
-const solidBtnRed = solidBtnMd(
-  'bg-red-600 hover:bg-red-700 text-white border-red-700 hover:border-red-800'
-);
-const solidBtnBlueLg = `w-full flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 ${SOLID_BTN} bg-blue-600 hover:bg-blue-700 text-white border-blue-700 hover:border-blue-800`;
-const solidFileLabel = (btnClass: string) => `inline-flex cursor-pointer items-center ${btnClass}`;
+type AdminBtnColor =
+  | 'blue'
+  | 'green'
+  | 'orange'
+  | 'red'
+  | 'violet'
+  | 'emerald'
+  | 'teal'
+  | 'indigo'
+  | 'yellow'
+  | 'pink'
+  | 'amber'
+  | 'cyan';
+
+const ADMIN_COLORS: Record<
+  AdminBtnColor,
+  { shell: string; iconBox: string; icon: string; label: string }
+> = {
+  blue: {
+    shell: 'bg-blue-100 hover:bg-blue-200',
+    iconBox: 'bg-blue-200',
+    icon: 'text-blue-600',
+    label: 'text-blue-700',
+  },
+  green: {
+    shell: 'bg-green-100 hover:bg-green-200',
+    iconBox: 'bg-green-200',
+    icon: 'text-green-600',
+    label: 'text-green-700',
+  },
+  orange: {
+    shell: 'bg-orange-100 hover:bg-orange-200',
+    iconBox: 'bg-orange-200',
+    icon: 'text-orange-600',
+    label: 'text-orange-700',
+  },
+  red: {
+    shell: 'bg-red-100 hover:bg-red-200',
+    iconBox: 'bg-red-200',
+    icon: 'text-red-600',
+    label: 'text-red-700',
+  },
+  violet: {
+    shell: 'bg-violet-100 hover:bg-violet-200',
+    iconBox: 'bg-violet-200',
+    icon: 'text-violet-600',
+    label: 'text-violet-700',
+  },
+  emerald: {
+    shell: 'bg-emerald-100 hover:bg-emerald-200',
+    iconBox: 'bg-emerald-200',
+    icon: 'text-emerald-600',
+    label: 'text-emerald-700',
+  },
+  teal: {
+    shell: 'bg-teal-100 hover:bg-teal-200',
+    iconBox: 'bg-teal-200',
+    icon: 'text-teal-600',
+    label: 'text-teal-700',
+  },
+  indigo: {
+    shell: 'bg-indigo-100 hover:bg-indigo-200',
+    iconBox: 'bg-indigo-200',
+    icon: 'text-indigo-600',
+    label: 'text-indigo-700',
+  },
+  yellow: {
+    shell: 'bg-yellow-100 hover:bg-yellow-200',
+    iconBox: 'bg-yellow-200',
+    icon: 'text-yellow-600',
+    label: 'text-yellow-700',
+  },
+  pink: {
+    shell: 'bg-pink-100 hover:bg-pink-200',
+    iconBox: 'bg-pink-200',
+    icon: 'text-pink-600',
+    label: 'text-pink-700',
+  },
+  amber: {
+    shell: 'bg-amber-100 hover:bg-amber-200',
+    iconBox: 'bg-amber-200',
+    icon: 'text-amber-600',
+    label: 'text-amber-700',
+  },
+  cyan: {
+    shell: 'bg-cyan-100 hover:bg-cyan-200',
+    iconBox: 'bg-cyan-200',
+    icon: 'text-cyan-600',
+    label: 'text-cyan-700',
+  },
+};
+
+const ADMIN_BTN_BASE =
+  'flex-shrink-0 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100';
+
+function AdminActionButton({
+  color,
+  fullWidth = false,
+  hideLabelOnMobile = false,
+  icon,
+  children,
+  className = '',
+  type = 'button',
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  color: AdminBtnColor;
+  fullWidth?: boolean;
+  hideLabelOnMobile?: boolean;
+  icon: React.ReactNode;
+}) {
+  const c = ADMIN_COLORS[color];
+  return (
+    <button
+      type={type}
+      className={`${ADMIN_BTN_BASE} h-14 ${fullWidth ? 'w-full' : 'px-5'} ${c.shell} ${className}`}
+      {...props}
+    >
+      <div className={`flex-shrink-0 w-10 h-10 rounded-lg ${c.iconBox} flex items-center justify-center`}>
+        {icon}
+      </div>
+      <span className={`font-semibold ${c.label} ${hideLabelOnMobile ? 'hidden sm:inline' : ''}`}>
+        {children}
+      </span>
+    </button>
+  );
+}
+
+function AdminFileButton({
+  color,
+  label,
+  className = '',
+  children,
+  ...props
+}: React.LabelHTMLAttributes<HTMLLabelElement> & { color: AdminBtnColor; label: string }) {
+  const c = ADMIN_COLORS[color];
+  return (
+    <label
+      className={`${ADMIN_BTN_BASE} h-14 px-5 cursor-pointer ${c.shell} ${className}`}
+      {...props}
+    >
+      {children}
+      <div className={`flex-shrink-0 w-10 h-10 rounded-lg ${c.iconBox} flex items-center justify-center`}>
+        <svg className={`w-6 h-6 ${c.icon}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+      </div>
+      <span className={`font-semibold ${c.label}`}>{label}</span>
+    </label>
+  );
+}
+
+function AdminModalFooter({
+  onCancel,
+  onSave,
+  saveLabel,
+  saving,
+  saveColor = 'green',
+}: {
+  onCancel: () => void;
+  onSave: () => void;
+  saveLabel: string;
+  saving?: boolean;
+  saveColor?: AdminBtnColor;
+}) {
+  return (
+    <div className="flex flex-row gap-2 sm:gap-3 pt-2">
+      <button
+        type="button"
+        onClick={onCancel}
+        className="flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-0 sm:gap-3 transition-all duration-300 hover:scale-105"
+        title="Cancel"
+        aria-label="Cancel"
+      >
+        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+          <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </div>
+        <span className="font-semibold text-red-700 hidden sm:inline">Cancel</span>
+      </button>
+      <button
+        type="button"
+        disabled={saving}
+        onClick={onSave}
+        className={`flex-1 flex-shrink-0 h-14 rounded-xl ${ADMIN_COLORS[saveColor].shell} flex items-center justify-center gap-0 sm:gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
+        title={saveLabel}
+        aria-label={saveLabel}
+      >
+        <div
+          className={`flex-shrink-0 w-10 h-10 rounded-lg ${ADMIN_COLORS[saveColor].iconBox} flex items-center justify-center`}
+        >
+          <svg
+            className={`w-6 h-6 ${ADMIN_COLORS[saveColor].icon}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <span className={`font-semibold ${ADMIN_COLORS[saveColor].label} hidden sm:inline`}>
+          {saving ? 'Saving…' : saveLabel}
+        </span>
+      </button>
+    </div>
+  );
+}
+
+const NAV_GRID_LINK =
+  'flex flex-col items-center justify-center rounded-lg shadow-md p-3 text-xs transition-all group';
+const NAV_GRID_ICON =
+  'flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300';
 
 function isImageMedia(d: EventMediaDTO): boolean {
   const t = (d.eventMediaType || '').toLowerCase();
@@ -100,13 +301,52 @@ function resolveCoverPreviewUrl(
 }
 
 function OfficialDocumentThumbnailUploadGuidance({ className = '' }: { className?: string }) {
+  const [specCopied, setSpecCopied] = React.useState(false);
+
+  const handleCopySpec = async () => {
+    try {
+      await navigator.clipboard.writeText(OFFICIAL_DOCUMENT_THUMBNAIL_COPY_SPEC);
+      setSpecCopied(true);
+      window.setTimeout(() => setSpecCopied(false), 2000);
+    } catch (error) {
+      console.error('[OfficialDocumentThumbnailUploadGuidance] Copy failed:', error);
+    }
+  };
+
   return (
     <div
       className={`rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5 text-xs text-gray-700 space-y-2 ${className}`}
       role="note"
       aria-label="Recommended thumbnail size"
     >
-      <p className="font-semibold text-blue-800">Recommended thumbnail size</p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="font-semibold text-blue-800">Recommended thumbnail size</p>
+        <button
+          type="button"
+          onClick={() => void handleCopySpec()}
+          className="flex-shrink-0 h-10 px-3 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105"
+          title="Copy aspect ratio and image spec"
+          aria-label="Copy aspect ratio and image spec"
+        >
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-200 flex items-center justify-center">
+            {specCopied ? (
+              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
+              </svg>
+            )}
+          </div>
+          <span className="font-semibold text-blue-700 text-xs">{specCopied ? 'Copied' : 'Copy spec'}</span>
+        </button>
+      </div>
       <p className="text-gray-600">
         Download cards use a <span className="font-medium text-gray-800">16:10</span> preview frame (
         <code className="text-[11px]">aspect-[16/10]</code>).
@@ -149,6 +389,59 @@ function OfficialDocumentThumbnailUploadGuidance({ className = '' }: { className
         <span className="font-medium text-gray-800">{OFFICIAL_DOCUMENT_CARD_THUMBNAIL_RECOMMENDED.label}</span> so it
         stays sharp on high-DPI screens.
       </p>
+    </div>
+  );
+}
+
+function EditThumbnailPreview({
+  editing,
+  thumbnailRevision,
+  localPreviewUrl,
+}: {
+  editing: EventMediaDTO;
+  thumbnailRevision: number;
+  /** Blob URL from the selected/uploaded file — kept until modal closes so preview never reverts to stale S3 bytes. */
+  localPreviewUrl: string | null;
+}) {
+  const thumbInput = resolveEventMediaThumbnailFields({
+    fileUrl: editing.fileUrl,
+    thumbnailUrl: editing.thumbnailUrl,
+    thumbnailPreSignedUrl: editing.thumbnailPreSignedUrl,
+    fileDataContentType: editing.fileDataContentType || editing.contentType,
+    contentType: editing.contentType,
+    title: editing.title,
+    fileName: editing.fileUrl?.split('/').pop(),
+  });
+  const proxyUrl = getOfficialDocumentCardThumbnailSrc(editing.id, thumbInput, {
+    cacheKey: composeOfficialDocumentThumbnailCacheKey(editing, { revision: thumbnailRevision }),
+    hasStoredThumbnail: hasStoredOfficialDocumentThumbnail(editing),
+    thumbnailExpiresAtIso: editing.thumbnailPreSignedUrlExpiresAt,
+    fileExpiresAtIso: editing.preSignedUrlExpiresAt,
+    // Stream the thumbnail this row already resolved, so the preview never falls back to a
+    // stale by-id read after a replace.
+    srcHint: thumbInput.thumbnailUrl || null,
+  });
+  const kind = getOfficialDocumentPlaceholderKind(thumbInput);
+  const displayUrl = localPreviewUrl ?? proxyUrl;
+
+  if (!displayUrl) {
+    return (
+      <div
+        className={`h-28 max-w-xs rounded-lg border border-gray-200 flex items-center justify-center bg-gradient-to-br ${placeholderGradient(kind)}`}
+      >
+        <span className="text-lg font-bold text-gray-600">{placeholderLabel(kind)}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative h-28 w-full max-w-xs overflow-hidden rounded-lg border border-gray-200">
+      <img
+        key={localPreviewUrl ?? `${proxyUrl}|${thumbnailRevision}`}
+        src={displayUrl}
+        alt=""
+        className="h-full w-full object-cover"
+      />
     </div>
   );
 }
@@ -222,6 +515,8 @@ export default function OfficialDocumentsClient({
   const [editError, setEditError] = useState<string | null>(null);
   const [editThumbnailFile, setEditThumbnailFile] = useState<File | null>(null);
   const [editThumbnailBusy, setEditThumbnailBusy] = useState(false);
+  const [editThumbnailRevision, setEditThumbnailRevision] = useState(0);
+  const [editThumbnailPendingUrl, setEditThumbnailPendingUrl] = useState<string | null>(null);
 
   const [deleting, setDeleting] = useState<EventMediaDTO | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
@@ -242,7 +537,7 @@ export default function OfficialDocumentsClient({
   }, [initialBundles]);
 
   useEffect(() => {
-    setDocuments(initialDocuments);
+    setDocuments((prev) => mergeEventMediaListPreservingThumbnails(initialDocuments, prev));
     setTotalElements(initialTotalElements);
     setTotalPages(initialTotalPages);
     setCurrentPage(initialPage);
@@ -365,7 +660,9 @@ export default function OfficialDocumentsClient({
             ...filters,
           });
         }
-        setDocuments(result.content);
+        setDocuments((prev) =>
+          mergeEventMediaListPreservingThumbnails(result.content, prev)
+        );
         setTotalElements(result.totalElements);
         setTotalPages(result.totalPages);
         setCurrentPage(result.page);
@@ -397,9 +694,49 @@ export default function OfficialDocumentsClient({
     return map;
   }, [categories]);
 
+  useEffect(() => {
+    return () => {
+      if (editThumbnailPendingUrl) {
+        URL.revokeObjectURL(editThumbnailPendingUrl);
+      }
+    };
+  }, [editThumbnailPendingUrl]);
+
+  const clearEditThumbnailLocalPreview = useCallback(() => {
+    setEditThumbnailPendingUrl((current) => {
+      if (current) {
+        URL.revokeObjectURL(current);
+      }
+      return null;
+    });
+  }, []);
+
+  const pinEditThumbnailLocalPreview = useCallback((file: File) => {
+    setEditThumbnailPendingUrl((current) => {
+      if (current) {
+        URL.revokeObjectURL(current);
+      }
+      return URL.createObjectURL(file);
+    });
+  }, []);
+
+  const setEditThumbnailPreviewFile = useCallback(
+    (file: File | null) => {
+      clearEditThumbnailLocalPreview();
+      if (file) {
+        setEditThumbnailPendingUrl(URL.createObjectURL(file));
+      }
+      setEditThumbnailFile(file);
+    },
+    [clearEditThumbnailLocalPreview]
+  );
+
   const openEdit = (row: EventMediaDTO) => {
+    if (row.id == null) return;
     setEditError(null);
+    clearEditThumbnailLocalPreview();
     setEditThumbnailFile(null);
+    setEditThumbnailRevision(Date.now());
     setEditing(row);
     setEditTitle(row.title || '');
     setEditDescription(row.description || '');
@@ -408,6 +745,17 @@ export default function OfficialDocumentsClient({
     setEditCategoryId(
       row.officialDocumentCategoryId != null ? row.officialDocumentCategoryId : ''
     );
+
+    void (async () => {
+      const fresh = await fetchOfficialDocumentMediaByIdServer(row.id!);
+      if (!fresh?.id) return;
+      // The by-id read can briefly return the previous thumbnail after a replace; keep the
+      // row's newer thumbnail rather than blindly overwriting with a possibly-stale read.
+      const merged = mergeEventMediaPreservingNewerThumbnail(row, fresh);
+      setEditing(merged);
+      setEditThumbnailRevision(Date.now());
+      setDocuments((prev) => prev.map((d) => (d.id === merged.id ? { ...d, ...merged } : d)));
+    })();
   };
 
   const handleSaveEdit = async () => {
@@ -434,9 +782,31 @@ export default function OfficialDocumentsClient({
         setEditError(r.message);
         return;
       }
+      const saved = r.media;
+      const freshAfterSave = await fetchOfficialDocumentMediaByIdServer(editing.id);
+      // Take freshly-saved metadata, but keep the thumbnail already held in edit state — a
+      // metadata PATCH never changes the thumbnail, and the by-id read can lag behind it.
+      const base = freshAfterSave ?? saved;
+      const merged: EventMediaDTO = {
+        ...base,
+        thumbnailUrl: editing.thumbnailUrl ?? base.thumbnailUrl,
+        thumbnailPreSignedUrl: editing.thumbnailPreSignedUrl ?? base.thumbnailPreSignedUrl,
+        thumbnailPreSignedUrlExpiresAt:
+          editing.thumbnailPreSignedUrlExpiresAt ?? base.thumbnailPreSignedUrlExpiresAt,
+      };
+      if (merged.id != null) {
+        setDocuments((prev) =>
+          prev.map((d) => (d.id === merged.id ? { ...d, ...merged } : d))
+        );
+      }
+      clearEditThumbnailLocalPreview();
       setEditing(null);
       await reloadDocuments(currentPage);
-      router.refresh();
+      if (merged.id != null) {
+        setDocuments((prev) =>
+          prev.map((d) => (d.id === merged.id ? { ...d, ...merged } : d))
+        );
+      }
     } catch (e) {
       setEditError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -445,30 +815,42 @@ export default function OfficialDocumentsClient({
   };
 
   const handleUploadEditThumbnail = async () => {
-    if (!editing?.id || !editThumbnailFile || !tenantId) return;
+    if (!editing?.id || !editThumbnailFile) return;
     setEditThumbnailBusy(true);
     setEditError(null);
     try {
-      const form = new FormData();
-      form.append('thumbnailFile', editThumbnailFile);
-      const res = await fetch(
-        `/api/proxy/event-medias/upload-official-document-thumbnail/${editing.id}`,
-        {
-          method: 'POST',
-          headers: { 'X-Tenant-ID': tenantId },
-          body: form,
-        }
-      );
-      if (!res.ok) {
-        const t = await res.text().catch(() => '');
-        setEditError(t || `Thumbnail upload failed (${res.status})`);
+      const r = await uploadOfficialDocumentThumbnailServer(editing.id, editThumbnailFile);
+      if (!r.ok) {
+        setEditError(r.message);
         return;
       }
-      const updated = (await res.json()) as EventMediaDTO;
-      setEditing(updated);
+      // Keep showing the uploaded file locally until the modal closes — the proxy/S3 path
+      // may still serve the previous object briefly after replace (same key, CDN cache).
+      pinEditThumbnailLocalPreview(editThumbnailFile);
+      const fresh = await fetchOfficialDocumentMediaByIdServer(editing.id);
+      // The upload response (r.media) is the authoritative write result for the new thumbnail;
+      // a by-id read right after can still carry the previous thumbnail, so force r.media's.
+      const nextMedia: EventMediaDTO = {
+        ...(fresh ?? r.media),
+        thumbnailUrl: r.media.thumbnailUrl ?? fresh?.thumbnailUrl,
+        thumbnailPreSignedUrl: r.media.thumbnailPreSignedUrl ?? fresh?.thumbnailPreSignedUrl,
+        thumbnailPreSignedUrlExpiresAt:
+          r.media.thumbnailPreSignedUrlExpiresAt ?? fresh?.thumbnailPreSignedUrlExpiresAt,
+      };
+      setEditing(nextMedia);
+      setEditThumbnailRevision(Date.now());
       setEditThumbnailFile(null);
+      if (nextMedia.id != null) {
+        setDocuments((prev) =>
+          prev.map((d) => (d.id === nextMedia.id ? { ...d, ...nextMedia } : d))
+        );
+      }
       await reloadDocuments(currentPage);
-      router.refresh();
+      if (nextMedia.id != null) {
+        setDocuments((prev) =>
+          prev.map((d) => (d.id === nextMedia.id ? { ...d, ...nextMedia } : d))
+        );
+      }
     } catch (e) {
       setEditError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -713,22 +1095,101 @@ export default function OfficialDocumentsClient({
     listLoading || totalElements === 0 || currentPage >= totalPagesForNav - 1;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <nav className="mb-8 flex flex-wrap items-center gap-4 text-sm">
-        <Link
-          href="/admin"
-          className="inline-flex items-center font-medium text-blue-600 hover:text-blue-800"
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Admin Dashboard
-        </Link>
-        <span className="text-gray-300">|</span>
-        <Link href="/admin/official-document-categories" className="font-medium text-blue-600 hover:text-blue-800">
-          Browse categories (list)
-        </Link>
-      </nav>
+    <div className="min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '118px' }}>
+      <div className="flex justify-center mb-8">
+        <div className="bg-white rounded-xl shadow-lg p-6 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <Link
+              href="/admin"
+              className={`${NAV_GRID_LINK} bg-blue-50 hover:bg-blue-100 text-blue-800`}
+              title="Admin Home"
+              aria-label="Admin Home"
+            >
+              <div className={`${NAV_GRID_ICON} bg-blue-100`}>
+                <FaHome className="w-8 h-8 text-blue-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Admin Home</span>
+            </Link>
+            <Link
+              href="/admin/manage-usage"
+              className={`${NAV_GRID_LINK} bg-indigo-50 hover:bg-indigo-100 text-indigo-800`}
+              title="Manage Usage"
+              aria-label="Manage Usage"
+            >
+              <div className={`${NAV_GRID_ICON} bg-indigo-100`}>
+                <FaUsers className="w-8 h-8 text-indigo-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Manage Usage</span>
+            </Link>
+            <Link
+              href="/admin/manage-events"
+              className={`${NAV_GRID_LINK} bg-green-50 hover:bg-green-100 text-green-800`}
+              title="Manage Events"
+              aria-label="Manage Events"
+            >
+              <div className={`${NAV_GRID_ICON} bg-green-100`}>
+                <FaCalendarAlt className="w-8 h-8 text-green-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Manage Events</span>
+            </Link>
+            <Link
+              href="/admin/official-document-categories"
+              className={`${NAV_GRID_LINK} bg-purple-50 hover:bg-purple-100 text-purple-800`}
+              title="Document Categories"
+              aria-label="Document Categories"
+            >
+              <div className={`${NAV_GRID_ICON} bg-purple-100`}>
+                <FaTags className="w-8 h-8 text-purple-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Document Categories</span>
+            </Link>
+            <Link
+              href="/admin/official-documents"
+              className={`${NAV_GRID_LINK} bg-violet-50 hover:bg-violet-100 text-violet-800 ring-2 ring-violet-300`}
+              title="Official Documents"
+              aria-label="Official Documents"
+            >
+              <div className={`${NAV_GRID_ICON} bg-violet-100`}>
+                <FaFileAlt className="w-8 h-8 text-violet-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Official Documents</span>
+            </Link>
+            <Link
+              href="#bulk-upload"
+              className={`${NAV_GRID_LINK} bg-teal-50 hover:bg-teal-100 text-teal-800`}
+              title="Bulk Upload"
+              aria-label="Bulk Upload"
+            >
+              <div className={`${NAV_GRID_ICON} bg-teal-100`}>
+                <FaUpload className="w-8 h-8 text-teal-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Bulk Upload</span>
+            </Link>
+            <Link
+              href="#document-list"
+              className={`${NAV_GRID_LINK} bg-cyan-50 hover:bg-cyan-100 text-cyan-800`}
+              title="Document List"
+              aria-label="Document List"
+            >
+              <div className={`${NAV_GRID_ICON} bg-cyan-100`}>
+                <FaListUl className="w-8 h-8 text-cyan-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Document List</span>
+            </Link>
+            <Link
+              href="#year-bundle"
+              className={`${NAV_GRID_LINK} bg-amber-50 hover:bg-amber-100 text-amber-800`}
+              title="Year Bundle Cover"
+              aria-label="Year Bundle Cover"
+            >
+              <div className={`${NAV_GRID_ICON} bg-amber-100`}>
+                <FaFolderOpen className="w-8 h-8 text-amber-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Year Bundle Cover</span>
+            </Link>
+          </div>
+        </div>
+      </div>
 
       <h1 className="text-3xl font-bold text-gray-900 mb-2">Official documents</h1>
       {categoryMessage && (
@@ -789,7 +1250,7 @@ export default function OfficialDocumentsClient({
         </ol>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <div id="bulk-upload" className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12 scroll-mt-28">
         <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Bulk upload</h2>
           <form onSubmit={handleBulkUpload} className="space-y-4">
@@ -870,7 +1331,7 @@ export default function OfficialDocumentsClient({
                 Applied to every file in this batch (PDF/Office previews on the public downloads page).
               </p>
               <OfficialDocumentThumbnailUploadGuidance className="mb-3" />
-              <label className={solidFileLabel(solidBtnViolet)}>
+              <AdminFileButton color="violet" label="Choose thumbnail">
                 <input
                   ref={bulkThumbnailInputRef}
                   type="file"
@@ -878,8 +1339,7 @@ export default function OfficialDocumentsClient({
                   onChange={(e) => setBulkThumbnailFile(e.target.files?.[0] ?? null)}
                   className="sr-only"
                 />
-                Choose thumbnail
-              </label>
+              </AdminFileButton>
               {bulkThumbnailFile && (
                 <p className="text-sm text-gray-700 mt-2">{bulkThumbnailFile.name}</p>
               )}
@@ -892,7 +1352,7 @@ export default function OfficialDocumentsClient({
                 list).
               </p>
               <div className="flex flex-wrap gap-2 mb-2">
-                <label className={solidFileLabel(solidBtnBlue)}>
+                <AdminFileButton color="blue" label="Choose files">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -900,9 +1360,8 @@ export default function OfficialDocumentsClient({
                     onChange={handleFileInputChange}
                     className="sr-only"
                   />
-                  Choose files
-                </label>
-                <label className={solidFileLabel(solidBtnGreen)}>
+                </AdminFileButton>
+                <AdminFileButton color="green" label="Upload folder">
                   <input
                     ref={folderInputRef}
                     type="file"
@@ -911,8 +1370,7 @@ export default function OfficialDocumentsClient({
                     className="sr-only"
                     {...({ webkitdirectory: '' } as React.InputHTMLAttributes<HTMLInputElement>)}
                   />
-                  Upload folder
-                </label>
+                </AdminFileButton>
               </div>
               {files && files.length > 0 && (
                 <p className="text-sm text-gray-700 mb-1">
@@ -927,13 +1385,19 @@ export default function OfficialDocumentsClient({
             {message && (
               <div className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3">{message}</div>
             )}
-            <button
+            <AdminActionButton
               type="submit"
+              color="blue"
+              fullWidth
               disabled={loading}
-              className={solidBtnBlueLg}
+              icon={
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+              }
             >
-              <span className="font-semibold">{loading ? 'Uploading…' : 'Upload batch'}</span>
-            </button>
+              {loading ? 'Uploading…' : 'Upload batch'}
+            </AdminActionButton>
           </form>
         </div>
 
@@ -971,35 +1435,50 @@ export default function OfficialDocumentsClient({
                 )}
               </select>
             </div>
-            <button
+            <AdminActionButton
               type="button"
+              color="blue"
               onClick={() => void reloadDocuments(0)}
-              className={solidBtnBlue}
               title="Apply year and category filters"
               aria-label="Apply year and category filters"
+              icon={
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              }
             >
               Apply
-            </button>
-            <button
+            </AdminActionButton>
+            <AdminActionButton
               type="button"
+              color="indigo"
               onClick={() => void reloadCategories()}
-              className={solidBtnIndigo}
               title="Refresh category list"
               aria-label="Refresh category list"
+              icon={
+                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              }
             >
               Refresh categories
-            </button>
+            </AdminActionButton>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <button
+            <AdminActionButton
               type="button"
+              color="teal"
               onClick={() => setQuickAddOpen(true)}
-              className={solidBtnTeal}
               title="Add a single official document file"
               aria-label="Add a single official document file"
+              icon={
+                <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              }
             >
               Add one file…
-            </button>
+            </AdminActionButton>
             <p className="text-sm text-gray-500">
               Page {currentPage + 1} — {totalElements} total. Year/category filters apply when you click Apply;
               text search above the table updates automatically.
@@ -1008,7 +1487,7 @@ export default function OfficialDocumentsClient({
         </div>
       </div>
 
-      <div className="mb-12 rounded-lg border border-violet-200 bg-violet-50/60 p-6 shadow-sm">
+      <div id="year-bundle" className="mb-12 rounded-lg border border-violet-200 bg-violet-50/60 p-6 shadow-sm scroll-mt-28">
         <h2 className="text-lg font-semibold text-gray-900 mb-2">Year bundle cover</h2>
         <p className="text-sm text-gray-600 mb-4">
           Matches the <strong>category slug</strong> and <strong>year</strong> from bulk upload above. Create a bundle
@@ -1033,20 +1512,25 @@ export default function OfficialDocumentsClient({
             </div>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end flex-wrap">
-            <button
+            <AdminActionButton
               type="button"
+              color="violet"
               disabled={
                 bundleBusy ||
                 selectedCategoryId == null ||
                 currentBundle != null
               }
               onClick={() => void handleCreateYearBundle()}
-              className={solidBtnViolet}
               title="Create year bundle for selected category and year"
               aria-label="Create year bundle"
+              icon={
+                <svg className="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              }
             >
               {bundleBusy ? 'Working…' : 'Create year bundle'}
-            </button>
+            </AdminActionButton>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Cover image (from uploads)</label>
               <select
@@ -1056,7 +1540,7 @@ export default function OfficialDocumentsClient({
                   setCoverSelectId(v === 'none' ? 'none' : parseInt(v, 10));
                 }}
                 disabled={!currentBundle?.id}
-                className="border border-gray-300 rounded-lg px-3 py-2 min-w-[220px] text-sm disabled:bg-gray-100"
+                className="border border-gray-300 rounded-lg px-3 py-2 min-w-[220px] text-sm disabled:bg-violet-50 disabled:text-violet-400"
               >
                 <option value="none">No cover</option>
                 {coverSelectOptions.map((d) => (
@@ -1066,16 +1550,21 @@ export default function OfficialDocumentsClient({
                 ))}
               </select>
             </div>
-            <button
+            <AdminActionButton
               type="button"
+              color="emerald"
               disabled={bundleBusy || !currentBundle?.id}
               onClick={() => void handleSaveCover()}
-              className={solidBtnEmerald}
               title="Save cover image for year bundle"
               aria-label="Save cover"
+              icon={
+                <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              }
             >
               Save cover
-            </button>
+            </AdminActionButton>
           </div>
           {coverPreview && (
             <div className="relative h-24 w-40 overflow-hidden rounded-lg border border-gray-200 bg-white">
@@ -1106,7 +1595,7 @@ export default function OfficialDocumentsClient({
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+      <div id="document-list" className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 scroll-mt-28">
         <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Tenant official documents</h2>
           {listLoading && (
@@ -1158,25 +1647,35 @@ export default function OfficialDocumentsClient({
               </select>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button
+              <AdminActionButton
                 type="button"
+                color="blue"
                 onClick={() => void reloadDocuments(0)}
-                className={solidBtnBlue}
                 title="Search documents"
                 aria-label="Search documents"
+                icon={
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                }
               >
                 Search
-              </button>
-              <button
+              </AdminActionButton>
+              <AdminActionButton
                 type="button"
+                color="orange"
                 onClick={handleClearSearch}
                 disabled={!searchTerm && filterIsPublic === '' && searchField === 'title'}
-                className={solidBtnOrange}
                 title="Clear search filters"
                 aria-label="Clear search filters"
+                icon={
+                  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                }
               >
                 Clear
-              </button>
+              </AdminActionButton>
             </div>
           </div>
         </div>
@@ -1233,11 +1732,11 @@ export default function OfficialDocumentsClient({
                           type="button"
                           onClick={() => openEdit(d)}
                           disabled={d.id == null}
-                          className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-40"
+                          className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-40"
                           title="Edit"
                           aria-label="Edit document"
                         >
-                          <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>
                         </button>
@@ -1245,11 +1744,11 @@ export default function OfficialDocumentsClient({
                           type="button"
                           onClick={() => setDeleting(d)}
                           disabled={d.id == null}
-                          className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-40"
+                          className="flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-40"
                           title="Delete"
                           aria-label="Delete document"
                         >
-                          <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         </button>
@@ -1317,7 +1816,10 @@ export default function OfficialDocumentsClient({
 
       <Modal
         isOpen={!!editing}
-        onClose={() => setEditing(null)}
+        onClose={() => {
+          clearEditThumbnailLocalPreview();
+          setEditing(null);
+        }}
         title="Edit official document"
         size="lg"
       >
@@ -1382,53 +1884,36 @@ export default function OfficialDocumentsClient({
             <div className="rounded-lg border border-gray-200 p-4 space-y-3">
               <p className="text-sm font-medium text-gray-800">Card thumbnail</p>
               <OfficialDocumentThumbnailUploadGuidance />
-              {(() => {
-                const previewUrl = getEventMediaDisplayThumbnailUrl({
-                  fileUrl: editing.fileUrl,
-                  thumbnailUrl: editing.thumbnailUrl,
-                  thumbnailPreSignedUrl: editing.thumbnailPreSignedUrl,
-                  fileDataContentType: editing.fileDataContentType || editing.contentType,
-                  title: editing.title,
-                }, {
-                  thumbnailExpiresAtIso: editing.thumbnailPreSignedUrlExpiresAt,
-                  fileExpiresAtIso: editing.preSignedUrlExpiresAt,
-                });
-                const kind = getOfficialDocumentPlaceholderKind({
-                  fileUrl: editing.fileUrl,
-                  fileDataContentType: editing.fileDataContentType || editing.contentType,
-                  title: editing.title,
-                });
-                return previewUrl ? (
-                  <div className="relative h-28 w-full max-w-xs overflow-hidden rounded-lg border border-gray-200">
-                    <Image src={previewUrl} alt="" fill className="object-cover" unoptimized />
-                  </div>
-                ) : (
-                  <div
-                    className={`h-28 max-w-xs rounded-lg border border-gray-200 flex items-center justify-center bg-gradient-to-br ${placeholderGradient(kind)}`}
-                  >
-                    <span className="text-lg font-bold text-gray-600">{placeholderLabel(kind)}</span>
-                  </div>
-                );
-              })()}
+              <EditThumbnailPreview
+                editing={editing}
+                thumbnailRevision={editThumbnailRevision}
+                localPreviewUrl={editThumbnailPendingUrl}
+              />
               <div className="flex flex-wrap gap-2 items-center">
-                <label className={solidFileLabel(solidBtnViolet)}>
+                <AdminFileButton color="violet" label="Replace thumbnail">
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => setEditThumbnailFile(e.target.files?.[0] ?? null)}
+                    onChange={(e) => setEditThumbnailPreviewFile(e.target.files?.[0] ?? null)}
                     className="sr-only"
                   />
-                  Replace thumbnail
-                </label>
+                </AdminFileButton>
                 {editThumbnailFile && (
-                  <button
+                  <AdminActionButton
                     type="button"
+                    color="violet"
                     disabled={editThumbnailBusy}
                     onClick={() => void handleUploadEditThumbnail()}
-                    className={`px-3 py-2 rounded-xl ${SOLID_BTN} bg-violet-600 hover:bg-violet-700 text-white border-violet-700 hover:border-violet-800`}
+                    title="Upload thumbnail"
+                    aria-label="Upload thumbnail"
+                    icon={
+                      <svg className="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                      </svg>
+                    }
                   >
                     {editThumbnailBusy ? 'Uploading…' : 'Upload thumbnail'}
-                  </button>
+                  </AdminActionButton>
                 )}
               </div>
             </div>
@@ -1436,23 +1921,16 @@ export default function OfficialDocumentsClient({
           {editError && (
             <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">{editError}</div>
           )}
-          <div className="flex justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={() => setEditing(null)}
-              className={solidBtnSlate}
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              disabled={editSaving}
-              onClick={() => void handleSaveEdit()}
-              className={solidBtnBlue}
-            >
-              {editSaving ? 'Saving…' : 'Save'}
-            </button>
-          </div>
+          <AdminModalFooter
+            onCancel={() => {
+              clearEditThumbnailLocalPreview();
+              setEditing(null);
+            }}
+            onSave={() => void handleSaveEdit()}
+            saveLabel="Save"
+            saving={editSaving}
+            saveColor="green"
+          />
         </div>
       </Modal>
 
@@ -1537,15 +2015,14 @@ export default function OfficialDocumentsClient({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Card thumbnail (optional)</label>
             <OfficialDocumentThumbnailUploadGuidance className="mb-3" />
-            <label className={solidFileLabel(solidBtnViolet)}>
+            <AdminFileButton color="violet" label="Choose thumbnail">
               <input
                 type="file"
                 accept="image/*"
                 onChange={(e) => setQaThumbnailFile(e.target.files?.[0] ?? null)}
                 className="sr-only"
               />
-              Choose thumbnail
-            </label>
+            </AdminFileButton>
             {qaThumbnailFile && (
               <p className="text-sm text-gray-700 mt-2">{qaThumbnailFile.name}</p>
             )}
@@ -1561,20 +2038,36 @@ export default function OfficialDocumentsClient({
           {qaError && (
             <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">{qaError}</div>
           )}
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex flex-row gap-2 sm:gap-3 pt-2">
             <button
               type="button"
               onClick={() => setQuickAddOpen(false)}
-              className={solidBtnSlate}
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-0 sm:gap-3 transition-all duration-300 hover:scale-105"
+              title="Cancel"
+              aria-label="Cancel"
             >
-              Cancel
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <span className="font-semibold text-red-700 hidden sm:inline">Cancel</span>
             </button>
             <button
               type="submit"
               disabled={qaBusy}
-              className={solidBtnTeal}
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-0 sm:gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Upload"
+              aria-label="Upload"
             >
-              {qaBusy ? 'Uploading…' : 'Upload'}
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+              </div>
+              <span className="font-semibold text-teal-700 hidden sm:inline">
+                {qaBusy ? 'Uploading…' : 'Upload'}
+              </span>
             </button>
           </div>
         </form>
@@ -1590,10 +2083,15 @@ export default function OfficialDocumentsClient({
           </AlertDialogHeader>
           <AlertDialogFooter className="flex flex-row gap-3 sm:gap-4">
             <AlertDialogCancel
-              className={`flex-1 flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 ${SOLID_BTN} bg-slate-600 hover:bg-slate-700 text-white border-slate-700 hover:border-slate-800`}
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               disabled={deleteBusy}
             >
-              <span className="font-semibold">Cancel</span>
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Keep Document</span>
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
@@ -1601,9 +2099,21 @@ export default function OfficialDocumentsClient({
                 void handleConfirmDelete();
               }}
               disabled={deleteBusy}
-              className={`flex-1 flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 ${SOLID_BTN} bg-red-600 hover:bg-red-700 text-white border-red-700 hover:border-red-800`}
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              <span className="font-semibold">{deleteBusy ? 'Deleting…' : 'Delete'}</span>
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                {deleteBusy ? (
+                  <svg className="animate-spin w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                ) : (
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                )}
+              </div>
+              <span className="font-semibold text-red-700">{deleteBusy ? 'Deleting…' : 'Delete'}</span>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

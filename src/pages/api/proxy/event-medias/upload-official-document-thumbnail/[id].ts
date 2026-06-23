@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
-import { getApiBaseUrl } from '@/lib/env';
+import { getRawBody } from '@/lib/getRawBody';
+import { getApiBaseUrl, getTenantId } from '@/lib/env';
 
 const API_BASE_URL = getApiBaseUrl();
 
@@ -40,33 +41,52 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const apiUrl = `${API_BASE_URL}/api/event-medias/${mediaId}/upload-official-document-thumbnail`;
-    const fetch = (await import('node-fetch')).default;
+
+    // Buffer multipart body (more reliable than streaming IncomingMessage)
+    const rawBody = await getRawBody(req);
 
     const headers: Record<string, string> = {
       Authorization: `Bearer ${token}`,
+      'X-Tenant-ID': getTenantId(),
+      'content-length': String(rawBody.length),
     };
     if (req.headers['content-type']) {
-      headers['content-type'] = req.headers['content-type'] as string;
-    }
-    if (req.headers['content-length']) {
-      headers['content-length'] = req.headers['content-length'] as string;
-    }
-    const xTenant = req.headers['x-tenant-id'];
-    if (xTenant) {
-      headers['x-tenant-id'] = Array.isArray(xTenant) ? xTenant[0] : xTenant;
+      headers['content-type'] = Array.isArray(req.headers['content-type'])
+        ? req.headers['content-type'][0]
+        : req.headers['content-type'];
     }
 
+    // Native fetch (undici) — node-fetch can Premature-close on multipart responses
     const apiRes = await fetch(apiUrl, {
       method: 'POST',
       headers,
-      body: req as unknown as import('node-fetch').BodyInit,
-      duplex: 'half',
+      body: rawBody,
     });
 
-    const text = await apiRes.text();
-    res.status(apiRes.status);
-    res.setHeader('Content-Type', apiRes.headers.get('content-type') || 'application/json');
-    res.send(text);
+    if (apiRes.status >= 200 && apiRes.status < 300) {
+      const text = await apiRes.text();
+      res.status(apiRes.status);
+      res.setHeader('Content-Type', apiRes.headers.get('content-type') || 'application/json');
+      res.send(text);
+      return;
+    }
+
+    let backendDetail = '';
+    try {
+      backendDetail = await apiRes.text();
+    } catch {
+      /* ignore */
+    }
+
+    res.status(apiRes.status >= 400 ? apiRes.status : 500);
+    res.setHeader('Content-Type', 'application/json');
+    res.json({
+      error: 'Thumbnail upload failed',
+      status: apiRes.status,
+      message: `Thumbnail upload failed with HTTP status ${apiRes.status}`,
+      details: backendDetail || undefined,
+      success: false,
+    });
   } catch (err) {
     console.error('Proxy error (upload-official-document-thumbnail):', err);
     res.status(500).json({ error: 'Internal server error', details: String(err) });

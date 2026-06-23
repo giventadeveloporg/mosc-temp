@@ -59,3 +59,7 @@ Public cards use `/api/public/official-documents/{id}/thumbnail` to mint fresh p
 
 - **v1 upload UI:** `/admin/official-documents` only  
 - **Not required:** separate thumbnail on event image uploads (use `fileUrl` as preview)
+
+## Troubleshooting
+
+- **[THUMBNAIL_STALE_DISPLAY_ISSUE.md](./THUMBNAIL_STALE_DISPLAY_ISSUE.md)** — stale preview after replace (admin edit modal + public downloads), root causes, fixes, verification

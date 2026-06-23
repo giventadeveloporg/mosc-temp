@@ -243,40 +243,62 @@ export default function DeleteConfirmationDialog({
 
           {/* Action Buttons */}
           {content.showButtons ? (
-            <div className="flex gap-4 mt-6 w-full">
+            <div className="flex flex-row flex-wrap items-stretch gap-3 sm:gap-4 mt-6 w-full">
               <button
+                type="button"
                 onClick={(e) => {
-                  console.log('[DeleteConfirmationDialog] Cancel button clicked');
                   e.preventDefault();
                   e.stopPropagation();
                   onCancel();
                 }}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+                title="Cancel"
+                aria-label="Cancel"
               >
-                Cancel
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-blue-700">Cancel</span>
               </button>
               <button
+                type="button"
                 onClick={async (e) => {
-                  console.log('[DeleteConfirmationDialog] Confirm button clicked, deleteMode:', deleteMode, 'status:', status);
                   e.preventDefault();
                   e.stopPropagation();
                   try {
-                    console.log('[DeleteConfirmationDialog] Calling onConfirm...');
                     await onConfirm();
-                    console.log('[DeleteConfirmationDialog] onConfirm completed');
                   } catch (error) {
                     console.error('[DeleteConfirmationDialog] Error calling onConfirm:', error);
                   }
                 }}
-                className={`flex-1 px-4 py-2 ${
+                className={`flex-1 flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 ${
                   deleteMode === 'activate'
-                    ? 'bg-green-600 hover:bg-green-700'
-                    : deleteMode === 'hard'
-                      ? 'bg-red-700 hover:bg-red-800'
-                      : 'bg-red-600 hover:bg-red-700'
-                } text-white rounded-lg font-semibold transition-colors`}
+                    ? 'bg-green-100 hover:bg-green-200'
+                    : 'bg-red-100 hover:bg-red-200'
+                }`}
+                title={deleteMode === 'activate' ? 'Activate event' : deleteMode === 'hard' ? 'Permanently delete event' : 'Deactivate event'}
+                aria-label={deleteMode === 'activate' ? 'Activate event' : deleteMode === 'hard' ? 'Permanently delete event' : 'Deactivate event'}
               >
-                {deleteMode === 'activate' ? 'Activate' : deleteMode === 'hard' ? 'Permanently Delete' : 'Deactivate'}
+                <div
+                  className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+                    deleteMode === 'activate' ? 'bg-green-200' : 'bg-red-200'
+                  }`}
+                >
+                  {deleteMode === 'activate' ? (
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  )}
+                </div>
+                <span className={`font-semibold ${deleteMode === 'activate' ? 'text-green-700' : 'text-red-700'}`}>
+                  {deleteMode === 'activate' ? 'Activate' : deleteMode === 'hard' ? 'Permanently Delete' : 'Deactivate'}
+                </span>
               </button>
             </div>
           ) : (

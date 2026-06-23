@@ -1,3 +1,5 @@
+'use server';
+
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
