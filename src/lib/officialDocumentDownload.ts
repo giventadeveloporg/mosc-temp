@@ -11,6 +11,24 @@ export function isAwsPresignedQueryUrl(url: string): boolean {
 }
 
 /**
+ * SSRF guard for the thumbnail proxy's optional `src` hint: only allow S3 object URLs
+ * (virtual-host or path-style) so the proxy can never be tricked into fetching an
+ * internal host or metadata endpoint. Both presigned and plain S3 URLs are accepted.
+ */
+export function isAllowedS3ObjectUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    if (u.protocol !== 'https:') {
+      return false;
+    }
+    const host = u.hostname.toLowerCase();
+    return host.endsWith('.amazonaws.com') && host.includes('s3');
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Returns true if a presigned GET URL is expired (or cannot be parsed).
  * Uses preSignedUrlExpiresAt when present; otherwise parses X-Amz-Date + X-Amz-Expires.
  */
@@ -58,11 +76,30 @@ export function getOfficialDocumentProxyDownloadPath(mediaId: number | null | un
 }
 
 /** Same-origin proxy route that resolves a fresh thumbnail/preview URL on each request. */
-export function getOfficialDocumentProxyThumbnailPath(mediaId: number | null | undefined): string | null {
+export function getOfficialDocumentProxyThumbnailPath(
+  mediaId: number | null | undefined,
+  cacheKey?: string | null,
+  /**
+   * Authoritative S3 object URL (e.g. from the upload write-response) the proxy should
+   * stream directly, bypassing a possibly-stale `GET /api/event-medias/{id}` read.
+   */
+  srcHint?: string | null
+): string | null {
   if (mediaId == null || !Number.isFinite(mediaId) || mediaId <= 0) {
     return null;
   }
-  return `/api/public/official-documents/${mediaId}/thumbnail`;
+  const base = `/api/public/official-documents/${mediaId}/thumbnail`;
+  const params = new URLSearchParams();
+  const key = cacheKey?.trim();
+  if (key) {
+    params.set('v', key);
+  }
+  const hint = srcHint?.trim();
+  if (hint && isAllowedS3ObjectUrl(hint)) {
+    params.set('src', hint);
+  }
+  const query = params.toString();
+  return query ? `${base}?${query}` : base;
 }
 
 /**

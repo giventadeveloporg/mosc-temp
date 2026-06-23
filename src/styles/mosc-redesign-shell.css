@@ -1095,3 +1095,19 @@
     height: 1rem;
   }
 }
+
+/* Downloads — official document cards: object-contain preview (institution CMS card alignment) */
+.mosc-redesign-subpage-shell.syro-layout #mainContent .download-entry-card__media {
+  line-height: 0;
+}
+
+.mosc-redesign-subpage-shell.syro-layout #mainContent .download-entry-card__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 14rem;
+  object-fit: contain;
+  object-position: center center;
+  background-color: transparent;
+  border-radius: 0.5rem;
+}

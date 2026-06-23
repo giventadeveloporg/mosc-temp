@@ -395,21 +395,19 @@ export function EventList({
                     </span>
                     {!isActive && onActivate && (
                       <button
-                        className="relative inline-flex items-center justify-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white font-bold text-xs rounded border-2 border-green-800 shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                        style={{
-                          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.3)',
-                          borderStyle: 'outset',
-                        }}
+                        type="button"
+                        className="w-full flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         onClick={() => onActivate(event)}
                         disabled={isActive}
-                        title={isActive ? "Event is already active" : "Activate event"}
+                        title="Activate event"
+                        aria-label="Activate event"
                       >
-                        <div className="flex items-center gap-1.5">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span>Activate</span>
                         </div>
+                        <span className="font-semibold text-green-700">Activate</span>
                       </button>
                     )}
                   </div>

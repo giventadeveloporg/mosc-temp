@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import type {
@@ -9,6 +10,10 @@ import type {
 } from '@/types';
 import { withTenantId } from '@/lib/withTenantId';
 import { OFFICIAL_DOCUMENT_CATEGORIES_FALLBACK } from '@/data/officialDocumentCategoriesFallback';
+
+function revalidateOfficialDocumentPublicPages(): void {
+  revalidatePath('/mosc-redesign/downloads');
+}
 
 /** Spring Data REST page or raw array */
 function parseSpringPage<T>(data: unknown): T[] {
@@ -317,9 +322,55 @@ export async function patchOfficialDocumentMediaServer(
       return { ok: false, message: t || `HTTP ${res.status}` };
     }
     const media = (await res.json()) as EventMediaDTO;
+    revalidateOfficialDocumentPublicPages();
     return { ok: true, media };
   } catch (e) {
     return { ok: false, message: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/** POST multipart thumbnail to backend (direct — avoids node-fetch proxy Premature close). */
+export async function uploadOfficialDocumentThumbnailServer(
+  mediaId: number,
+  thumbnailFile: File
+): Promise<{ ok: true; media: EventMediaDTO } | { ok: false; message: string }> {
+  try {
+    const formData = new FormData();
+    formData.append('thumbnailFile', thumbnailFile);
+
+    const url = `${getApiBaseUrl()}/api/event-medias/${mediaId}/upload-official-document-thumbnail`;
+    const res = await fetchWithJwtRetry(url, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      return { ok: false, message: t || `HTTP ${res.status}` };
+    }
+
+    const media = (await res.json()) as EventMediaDTO;
+    revalidateOfficialDocumentPublicPages();
+    return { ok: true, media };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/** Reload a single official document after thumbnail upload (fresh presign + updatedAt). */
+export async function fetchOfficialDocumentMediaByIdServer(
+  mediaId: number
+): Promise<EventMediaDTO | null> {
+  try {
+    const url = `${getApiBaseUrl()}/api/event-medias/${mediaId}`;
+    const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
+    if (!res.ok) {
+      return null;
+    }
+    return (await res.json()) as EventMediaDTO;
+  } catch (e) {
+    console.error('[official-documents] fetchOfficialDocumentMediaByIdServer:', e);
+    return null;
   }
 }
 
@@ -327,12 +378,13 @@ export async function deleteOfficialDocumentMediaServer(
   mediaId: number
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   try {
-    const url = `${getApiBaseUrl()}/api/event-medias/${mediaId}?tenantId.equals=${encodeURIComponent(getTenantId())}`;
+    const url = `${getApiBaseUrl()}/api/event-medias/${mediaId}`;
     const res = await fetchWithJwtRetry(url, { method: 'DELETE', cache: 'no-store' });
     if (!res.ok) {
       const t = await res.text().catch(() => '');
       return { ok: false, message: t || `HTTP ${res.status}` };
     }
+    revalidateOfficialDocumentPublicPages();
     return { ok: true };
   } catch (e) {
     return { ok: false, message: e instanceof Error ? e.message : String(e) };

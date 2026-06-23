@@ -5,7 +5,11 @@ import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { EventMediaDTO } from '@/types';
 import { parseHierarchyDescription } from '@/lib/officialDocumentHierarchy';
 import { resolveOfficialDocumentDownloadUrl } from '@/lib/officialDocumentDownload';
-import { getEventMediaDisplayThumbnailUrl } from '@/lib/officialDocumentThumbnail';
+import {
+  buildOfficialDocumentThumbnailCacheKey,
+  getEventMediaDisplayThumbnailUrl,
+  hasStoredOfficialDocumentThumbnail,
+} from '@/lib/officialDocumentThumbnail';
 
 /** Parse Spring Data REST pagination from response headers (body is a plain array). */
 function parseSpringTotalCountHeader(res: Response, fallback: number): number {
@@ -47,6 +51,12 @@ export type PublicOfficialDocumentTreeItem = {
   fileUrl: string | null;
   fileDataContentType: string | null;
   createdAt: string;
+  /** Stable storage path for uploaded card thumbnail (not a presigned URL). */
+  thumbnailStorageUrl: string | null;
+  /** True when a custom thumbnail exists in storage (proxy can resolve fresh presign). */
+  hasCustomThumbnail: boolean;
+  /** Changes when thumbnail/metadata updates — used to bust card preview cache. */
+  thumbnailCacheKey: string | null;
 };
 
 export type PublicOfficialDocumentTreePage = {
@@ -100,9 +110,12 @@ function mapEventMediaToTreeItem(doc: EventMediaDTO): PublicOfficialDocumentTree
         fileExpiresAtIso: doc.preSignedUrlExpiresAt,
       }
     ),
+    thumbnailStorageUrl: doc.thumbnailUrl?.split('?')[0]?.trim() || null,
+    hasCustomThumbnail: hasStoredOfficialDocumentThumbnail(doc),
     fileUrl: doc.fileUrl || null,
     fileDataContentType: doc.fileDataContentType || doc.contentType || null,
     createdAt: doc.createdAt,
+    thumbnailCacheKey: buildOfficialDocumentThumbnailCacheKey(doc),
   };
 }
 

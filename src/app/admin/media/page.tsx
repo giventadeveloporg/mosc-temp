@@ -10,6 +10,16 @@ import { formatInTimeZone } from 'date-fns-tz';
 import EventFormHelpTooltip from '@/components/EventFormHelpTooltip';
 import MediaImageSpecHelpContent from '@/components/MediaImageSpecHelpContent';
 import { getClientTenantId } from '@/lib/env';
+import { normalizeEventMediasList } from '@/lib/homepage/homepageApiNormalize';
+import {
+  buildOfficialDocumentThumbnailCacheKey,
+  getEventMediaDisplayThumbnailUrl,
+  getOfficialDocumentCardThumbnailSrc,
+  getOfficialDocumentPlaceholderKind,
+  hasStoredOfficialDocumentThumbnail,
+  placeholderGradient,
+  placeholderLabel,
+} from '@/lib/officialDocumentThumbnail';
 
 // Helper function for timezone-aware date formatting
 function formatDateInTimezone(dateString: string, timezone: string = 'America/New_York'): string {
@@ -1052,11 +1062,12 @@ export default function AdminMediaPage() {
           }
 
           const res = await fetch(url);
-          if (!res.ok) throw new Error("Failed to fetch media files");
+          if (!res.ok) {
+            throw new Error(await parseMediaUploadError(res));
+          }
 
           const data = await res.json();
-          // Backend may return array, or paged { content: [], totalElements: N } or { content: [], total_elements: N }
-          const list = Array.isArray(data) ? data : (data?.content != null ? data.content : [data]);
+          const list = normalizeEventMediasList(data);
           setMediaList(list);
 
           // Get total count from header or response (camelCase or snake_case); required for pagination
@@ -1092,6 +1103,8 @@ export default function AdminMediaPage() {
           }
         } catch (e: any) {
           setError(e.message || "Failed to load media files");
+          setMediaList([]);
+          setTotalCount(0);
         } finally {
           setLoading(false);
         }
@@ -1273,10 +1286,6 @@ export default function AdminMediaPage() {
     }
   };
 
-  if (error) {
-    return <div className="text-red-500 text-center p-8">{error}</div>;
-  }
-
   return (
     <div ref={pageTopRef} className="w-[80%] mx-auto py-8" style={{ paddingTop: '118px' }}>
       <div className="mb-8">
@@ -1440,8 +1449,15 @@ export default function AdminMediaPage() {
         </div>
       </div>
 
+      {error && (
+        <div className="mb-6 px-4 py-3 rounded-lg border-2 border-red-300 bg-red-50 shadow-sm" role="alert">
+          <p className="text-sm font-semibold text-red-800">Could not load media files</p>
+          <p className="text-sm text-red-700 mt-1">{error}</p>
+        </div>
+      )}
+
       {loading && <div className="text-center p-8">Loading media...</div>}
-      {!loading && sortedMedia.length === 0 && <div className="text-center p-8">No media found.</div>}
+      {!loading && !error && sortedMedia.length === 0 && <div className="text-center p-8">No media found.</div>}
       {!loading && sortedMedia.length > 0 && (
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-700 via-gray-800 to-gray-700 border border-gray-600/30 shadow-2xl mb-8">
           {/* Medium Dark Radial Gradient Overlay */}
@@ -1505,9 +1521,33 @@ export default function AdminMediaPage() {
           {sortedMedia.map((item, index) => {
             const serialNumber = page * pageSize + index + 1;
             const isSelected = item.id != null && selectedMediaIds.has(item.id);
+            const displayThumbnailUrl =
+              item.isEventManagementOfficialDocument && item.id != null
+                ? getOfficialDocumentCardThumbnailSrc(
+                    item.id,
+                    {
+                      fileUrl: item.fileUrl,
+                      thumbnailUrl: item.thumbnailUrl,
+                      thumbnailPreSignedUrl: item.thumbnailPreSignedUrl,
+                      fileDataContentType: item.fileDataContentType || item.contentType,
+                      title: item.title,
+                      fileName: item.fileUrl?.split('/').pop(),
+                    },
+                    {
+                      cacheKey: buildOfficialDocumentThumbnailCacheKey(item),
+                      hasStoredThumbnail: hasStoredOfficialDocumentThumbnail(item),
+                      thumbnailExpiresAtIso: item.thumbnailPreSignedUrlExpiresAt,
+                      fileExpiresAtIso: item.preSignedUrlExpiresAt,
+                    }
+                  )
+                : getEventMediaDisplayThumbnailUrl(item, {
+                    thumbnailExpiresAtIso: item.thumbnailPreSignedUrlExpiresAt,
+                    fileExpiresAtIso: item.preSignedUrlExpiresAt,
+                  });
+            const placeholderKind = getOfficialDocumentPlaceholderKind(item);
             return (
               <div
-                key={item.id}
+                key={item.id ?? `media-${serialNumber}`}
                 data-serial-number={serialNumber}
                 className="relative bg-white rounded-lg shadow-md overflow-hidden group flex flex-col justify-between"
               >
@@ -1539,9 +1579,10 @@ export default function AdminMediaPage() {
                     <div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 rounded-full text-sm font-bold z-10 shadow-lg">
                       #{serialNumber}
                     </div>
-                    {item.fileUrl && (
+                    {displayThumbnailUrl ? (
                       <img
-                        src={item.fileUrl.startsWith('http') ? item.fileUrl : `https://placehold.co/600x400?text=${item.title}`}
+                        key={displayThumbnailUrl}
+                        src={displayThumbnailUrl}
                         alt={item.altText || item.title || ''}
                         className="w-full h-full object-cover"
                         onError={(e) => {
@@ -1550,6 +1591,11 @@ export default function AdminMediaPage() {
                           target.src = `https://placehold.co/600x400?text=No+Image`;
                         }}
                       />
+                    ) : (
+                      <div className={`w-full h-full flex flex-col items-center justify-center bg-gradient-to-br ${placeholderGradient(placeholderKind)}`}>
+                        <span className="text-2xl font-bold text-gray-600">{placeholderLabel(placeholderKind)}</span>
+                        <span className="text-xs text-gray-500 mt-1 px-2 text-center truncate max-w-full">{item.eventMediaType || 'Media'}</span>
+                      </div>
                     )}
                   </div>
                   <div className="p-4">
@@ -1817,7 +1863,7 @@ export default function AdminMediaPage() {
                         {value ? 'Yes' : 'No'}
                       </span>
                     ) : value instanceof Date ? value.toLocaleString() :
-                      (key.toLowerCase().includes('date') || key.toLowerCase().includes('at')) && value ? formatDateInTimezone(value, 'America/New_York') :
+                      (key.toLowerCase().includes('date') || key.toLowerCase().includes('at')) && value != null && value !== '' ? formatDateInTimezone(String(value), 'America/New_York') :
                         value === null || value === undefined || value === '' ? <span className="text-gray-400 italic">(empty)</span> : String(value)}
                   </div>
                 </div>

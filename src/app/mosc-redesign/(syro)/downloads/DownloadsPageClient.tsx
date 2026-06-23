@@ -33,10 +33,6 @@ type Props = {
 
 type TreeItem = PublicOfficialDocumentTreePage['content'][number];
 
-type DownloadSuccessState = {
-  fileName: string;
-};
-
 type DownloadErrorState = {
   fileName: string;
   message: string;
@@ -45,6 +41,42 @@ type DownloadErrorState = {
 function getFolderPath(item: TreeItem) {
   if (item.pathSegments.length <= 1) return 'Library Root';
   return item.pathSegments.slice(0, -1).join(' / ');
+}
+
+const OFFICIAL_DOCUMENT_DISPLAY_EXTENSIONS = new Set([
+  'pdf',
+  'doc',
+  'docx',
+  'xls',
+  'xlsx',
+  'csv',
+  'ppt',
+  'pptx',
+  'txt',
+  'rtf',
+  'png',
+  'jpg',
+  'jpeg',
+  'gif',
+  'webp',
+  'svg',
+  'zip',
+  'rar',
+  '7z',
+]);
+
+/** Card title: drop known file extension (e.g. `.pdf`) for display only. */
+function stripFileExtensionForDisplay(fileName: string): string {
+  const trimmed = fileName.trim();
+  const lastDot = trimmed.lastIndexOf('.');
+  if (lastDot <= 0 || lastDot === trimmed.length - 1) {
+    return trimmed;
+  }
+  const ext = trimmed.slice(lastDot + 1).toLowerCase();
+  if (OFFICIAL_DOCUMENT_DISPLAY_EXTENSIONS.has(ext)) {
+    return trimmed.slice(0, lastDot);
+  }
+  return trimmed;
 }
 
 const DIALOG_FOOTER_BUTTON_BASE =
@@ -86,114 +118,6 @@ function DialogCloseButton({ onClose, className = '' }: { onClose: () => void; c
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
-  );
-}
-
-function DialogStep({
-  number,
-  tone,
-  children,
-}: {
-  number: number;
-  tone: 'blue' | 'green' | 'orange' | 'purple';
-  children: React.ReactNode;
-}) {
-  const toneClasses = {
-    blue: 'bg-blue-100 border-blue-300 text-blue-700',
-    green: 'bg-emerald-100 border-emerald-300 text-emerald-700',
-    orange: 'bg-orange-100 border-orange-300 text-orange-700',
-    purple: 'bg-purple-100 border-purple-300 text-purple-700',
-  }[tone];
-
-  return (
-    <li className="flex gap-3 items-start">
-      <span
-        className={`flex-shrink-0 w-8 h-8 rounded-lg border-2 font-bold text-sm flex items-center justify-center ${toneClasses}`}
-      >
-        {number}
-      </span>
-      <p className="text-sm text-gray-700 leading-relaxed pt-1">{children}</p>
-    </li>
-  );
-}
-
-function DownloadSuccessDialog({
-  state,
-  open,
-  onClose,
-}: {
-  state: DownloadSuccessState | null;
-  open: boolean;
-  onClose: () => void;
-}) {
-  if (!state) {
-    return null;
-  }
-
-  return (
-    <AlertDialog open={open} onOpenChange={(next) => !next && onClose()}>
-      <AlertDialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl border-2 border-syro-blue/40 shadow-2xl gap-0">
-        <div className="relative px-6 py-5 pr-14 text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-syro-blue">
-          <DialogCloseButton onClose={onClose} />
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-white/20 border-2 border-white/40 flex items-center justify-center shadow-lg">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-            </div>
-            <div className="min-w-0 flex-1">
-              <AlertDialogTitle className="font-syro-display text-xl sm:text-2xl text-white font-semibold pr-2">
-                Download started successfully!
-              </AlertDialogTitle>
-              <p className="text-sm text-white/90 mt-1">Your file is saving to your device.</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="px-6 py-5 bg-gradient-to-b from-amber-50/80 via-syro-bg-gray to-white">
-          <div className="rounded-xl border-2 border-syro-gold/40 bg-white px-4 py-3 mb-4 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wide text-syro-red mb-1">Your file</p>
-            <p className="font-semibold text-syro-blue break-all">{state.fileName}</p>
-          </div>
-
-          <AlertDialogDescription asChild>
-            <div>
-              <p className="text-sm font-semibold text-syro-blue mb-3">Where to find your file:</p>
-              <ol className="space-y-3 list-none m-0 p-0">
-                <DialogStep number={1} tone="green">
-                  Open your browser <strong className="text-emerald-700">Downloads page</strong>: press{' '}
-                  <strong>Ctrl+J</strong> (Windows) or <strong>Cmd+Shift+J</strong> (Mac), or click the{' '}
-                  <strong>Downloads ↓ icon</strong> in the toolbar. Your file should appear in that list — click it
-                  to open, or choose <strong>Show in folder</strong>.
-                </DialogStep>
-                <DialogStep number={2} tone="blue">
-                  Go to your <strong className="text-syro-blue">Downloads folder</strong> on your computer (File
-                  Explorer on Windows, Finder on Mac). Find <strong>{state.fileName}</strong> and double-click to
-                  open it.
-                </DialogStep>
-                <DialogStep number={3} tone="orange">
-                  If you do not see the file yet, wait a few seconds and check the download progress on the
-                  toolbar <strong>Downloads icon</strong>, then open the file from the downloads list or your
-                  Downloads folder.
-                </DialogStep>
-              </ol>
-            </div>
-          </AlertDialogDescription>
-        </div>
-
-        <DialogFooterActions
-          onClose={onClose}
-          okLabel="OK — Got it"
-          okClassName="bg-gradient-to-r from-syro-blue to-indigo-600"
-          closeClassName="bg-gradient-to-r from-syro-orange to-amber-500"
-        />
-      </AlertDialogContent>
-    </AlertDialog>
   );
 }
 
@@ -261,129 +185,159 @@ function startOfficialDocumentDownload(downloadUrl: string, fileName: string) {
 
 function DownloadCard({
   file,
+  index,
   onDownload,
   downloadingId,
 }: {
   file: TreeItem;
+  index: number;
   onDownload: (file: TreeItem) => void;
   downloadingId: number | null;
 }) {
   const isDownloading = file.id != null && downloadingId === file.id;
   const thumbInput = {
     fileUrl: file.fileUrl,
-    thumbnailUrl: file.thumbnailUrl,
+    thumbnailUrl: file.thumbnailStorageUrl ?? file.thumbnailUrl,
     fileDataContentType: file.fileDataContentType,
     fileName: file.fileName,
     title: file.fileName,
   };
   const placeholderKind = getOfficialDocumentPlaceholderKind(thumbInput);
   const [thumbFailed, setThumbFailed] = React.useState(false);
-  const displayThumb = getOfficialDocumentCardThumbnailSrc(file.id, thumbInput);
+  const displayThumb = getOfficialDocumentCardThumbnailSrc(file.id, thumbInput, {
+    cacheKey: file.thumbnailCacheKey,
+    hasStoredThumbnail: file.hasCustomThumbnail,
+    // Stream the storage path the server already resolved, bypassing a stale by-id read.
+    srcHint: file.thumbnailStorageUrl,
+  });
   const showThumbnail = Boolean(displayThumb && !thumbFailed);
 
+  React.useEffect(() => {
+    setThumbFailed(false);
+  }, [displayThumb]);
+
+  const displayTitle = stripFileExtensionForDisplay(file.fileName);
+  const folderPath = getFolderPath(file);
+  const displayIndex = String(index + 1).padStart(2, '0');
+  const metaLine = [file.categoryLabel, file.officialDocumentYear ? `Year ${file.officialDocumentYear}` : null]
+    .filter(Boolean)
+    .join(' · ');
+
   return (
-    <article className="bg-white rounded-xl border border-syro-gold/25 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col h-full">
-      <div className="relative w-full aspect-[16/10] bg-syro-bg-gray border-b border-syro-gold/20">
-        {showThumbnail ? (
-          // Native img: proxy thumbnails use 302 redirects; Next/Image lazy loading can stall on redirect chains.
-          <img
-            src={displayThumb!}
-            alt={file.fileName}
-            className="absolute inset-0 h-full w-full object-cover"
-            loading="eager"
-            decoding="async"
-            onError={() => setThumbFailed(true)}
-          />
+    <article className="download-entry-card group flex h-full flex-col overflow-hidden rounded-xl border border-burgundy/15 bg-white shadow-[rgba(50,50,93,0.18)_0px_8px_20px_-4px,rgba(0,0,0,0.2)_0px_4px_10px_-4px] transition-all duration-300 hover:border-burgundy/30 hover:shadow-[rgba(50,50,93,0.22)_0px_12px_28px_-4px,rgba(0,0,0,0.22)_0px_6px_14px_-4px]">
+      <header className="institution-entry-card__header flex items-start gap-4 border-b border-burgundy/10 bg-gradient-to-r from-burgundy-dark to-burgundy px-5 py-4">
+        <span
+          className="institution-entry-card__index flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-parchment-light/20 font-syro-display text-sm font-bold"
+          aria-hidden
+        >
+          {displayIndex}
+        </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="institution-entry-card__title font-syro-display text-base font-semibold leading-snug lg:text-lg">
+            {displayTitle}
+          </h3>
+          <p className="institution-entry-card__location mt-1 font-syro-primary text-sm line-clamp-2">{folderPath}</p>
+        </div>
+      </header>
+
+      <div className="download-entry-card__media border-b border-burgundy/10 bg-syro-bg-gray/30 px-5 py-4">
+        <div className="relative flex h-auto w-full items-center justify-center overflow-hidden rounded-lg bg-syro-bg-gray/20">
+          {showThumbnail ? (
+            <img
+              key={displayThumb}
+              src={displayThumb!}
+              alt={file.fileName}
+              className="download-entry-card__image h-auto w-full object-contain"
+              loading="lazy"
+              decoding="async"
+              onError={() => setThumbFailed(true)}
+            />
+          ) : (
+            <div
+              className={`flex min-h-[10rem] w-full flex-col items-center justify-center px-4 py-6 bg-gradient-to-br ${placeholderGradient(placeholderKind)}`}
+              aria-label={file.fileName}
+            >
+              <p className="font-syro-display text-center text-sm font-semibold leading-snug text-syro-blue/90 sm:text-base line-clamp-4 break-words">
+                {displayTitle}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col px-5 py-4">
+        {metaLine ? (
+          <p className="font-syro-primary text-xs font-semibold uppercase tracking-wide text-syro-blue">{metaLine}</p>
+        ) : null}
+        {file.description ? (
+          <p className={`font-syro-primary text-sm leading-relaxed text-syro-dark-gray lg:text-base ${metaLine ? 'mt-3' : ''} line-clamp-4`}>
+            {file.description}
+          </p>
         ) : (
-          <div
-            className={`absolute inset-0 flex flex-col items-center justify-center px-4 py-5 bg-gradient-to-br ${placeholderGradient(placeholderKind)}`}
-            aria-label={file.fileName}
-          >
-            <p className="font-syro-display text-sm sm:text-base font-semibold text-syro-blue/90 text-center leading-snug line-clamp-4">
-              {file.fileName}
-            </p>
-          </div>
+          <p className={`font-syro-primary text-sm text-gray-500 ${metaLine ? 'mt-3' : ''}`}>
+            Official document file ready for download.
+          </p>
         )}
-        <span className="absolute top-2 left-2 inline-flex items-center rounded-md bg-white/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-syro-red shadow-sm">
+      </div>
+
+      <footer className="mt-auto border-t border-burgundy/10 bg-parchment/40 px-5 py-4">
+        <p className="mb-3 font-syro-display text-xs font-semibold uppercase tracking-widest text-syro-blue">
           Download
-        </span>
-      </div>
-
-      <div className="p-5 flex flex-col flex-1">
-      {showThumbnail ? (
-        <h4 className="font-syro-display text-lg font-semibold text-syro-blue leading-snug line-clamp-2">
-          {file.fileName}
-        </h4>
-      ) : null}
-      <p className={`text-xs text-gray-500 line-clamp-2 ${showThumbnail ? 'mt-2' : ''}`}>{getFolderPath(file)}</p>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        <span className="inline-flex items-center rounded-full bg-syro-bg-gray px-2.5 py-1 text-[11px] font-semibold text-syro-blue">
-          Priority {file.priorityRanking}
-        </span>
-        {file.officialDocumentYear ? (
-          <span className="inline-flex items-center rounded-full bg-syro-bg-gray px-2.5 py-1 text-[11px] font-semibold text-syro-blue">
-            Year {file.officialDocumentYear}
-          </span>
-        ) : null}
-        {file.categoryLabel ? (
-          <span className="inline-flex items-center rounded-full bg-syro-bg-gray px-2.5 py-1 text-[11px] font-semibold text-syro-blue">
-            {file.categoryLabel}
-          </span>
-        ) : null}
-      </div>
-
-      {file.description ? (
-        <p className="text-sm text-gray-600 mt-4 line-clamp-3">{file.description}</p>
-      ) : (
-        <p className="text-sm text-gray-500 mt-4 line-clamp-3">Official document file ready for download.</p>
-      )}
-
-      <div className="mt-auto pt-4 border-t border-syro-gold/20 flex justify-end">
+        </p>
         {file.downloadUrl ? (
           <button
             type="button"
             onClick={() => onDownload(file)}
             disabled={isDownloading}
-            className="syro-primary-button inline-flex items-center gap-2 text-sm px-4 py-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-burgundy/15 bg-white px-3 py-2.5 font-syro-primary text-sm font-semibold text-syro-red transition-colors hover:border-burgundy/30 hover:bg-burgundy/5 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
             aria-busy={isDownloading}
           >
-            {isDownloading ? 'Preparing…' : 'Download'}
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            {isDownloading ? 'Preparing…' : 'Download file'}
+            <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
             </svg>
           </button>
         ) : (
-          <span className="inline-flex items-center rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-400">
-            No link
+          <span className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-400">
+            No download link
           </span>
         )}
-      </div>
-      </div>
+      </footer>
     </article>
   );
 }
 
 function DownloadsGrid({
   files,
+  page,
+  pageSize,
   onDownload,
   downloadingId,
 }: {
   files: TreeItem[];
+  page: number;
+  pageSize: number;
   onDownload: (file: TreeItem) => void;
   downloadingId: number | null;
 }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-      {files.map((file) => (
-        <DownloadCard
-          key={`file-${file.id ?? file.treePath}`}
-          file={file}
-          onDownload={onDownload}
-          downloadingId={downloadingId}
-        />
+    <ul className="m-0 grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2 md:gap-8">
+      {files.map((file, index) => (
+        <li key={`file-${file.id ?? file.treePath}`} className="h-full">
+          <DownloadCard
+            file={file}
+            index={page * pageSize + index}
+            onDownload={onDownload}
+            downloadingId={downloadingId}
+          />
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 
@@ -814,7 +768,6 @@ export default function DownloadsPageClient({
   const currentPageZeroBased = Math.min(Math.max(officialTreePage.page, 0), totalPages - 1);
 
   const [downloadingId, setDownloadingId] = React.useState<number | null>(null);
-  const [downloadSuccess, setDownloadSuccess] = React.useState<DownloadSuccessState | null>(null);
   const [downloadError, setDownloadError] = React.useState<DownloadErrorState | null>(null);
   const [searchQuery, setSearchQuery] = React.useState('');
 
@@ -873,10 +826,6 @@ export default function DownloadsPageClient({
       }
 
       startOfficialDocumentDownload(freshUrl, file.fileName);
-
-      setDownloadSuccess({
-        fileName: file.fileName,
-      });
     } catch (error) {
       setDownloadError({
         fileName: file.fileName,
@@ -909,12 +858,6 @@ export default function DownloadsPageClient({
         title="Downloads"
         breadcrumbFrom="home"
         description={BANNER_DESCRIPTION}
-      />
-
-      <DownloadSuccessDialog
-        state={downloadSuccess}
-        open={!!downloadSuccess}
-        onClose={() => setDownloadSuccess(null)}
       />
 
       <DownloadErrorDialog
@@ -1031,6 +974,8 @@ export default function DownloadsPageClient({
             ) : (
               <DownloadsGrid
                 files={filteredDownloads}
+                page={currentPageZeroBased}
+                pageSize={pageSize}
                 onDownload={handleDownload}
                 downloadingId={downloadingId}
               />

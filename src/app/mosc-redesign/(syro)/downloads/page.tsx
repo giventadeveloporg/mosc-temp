@@ -3,6 +3,8 @@ import {
   fetchPublicOfficialDocumentsTreeServer,
 } from './ApiServerActions';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DownloadsPage(props: {
   searchParams?: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>;
 }) {
