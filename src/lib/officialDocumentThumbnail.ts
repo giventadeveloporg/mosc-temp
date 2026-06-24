@@ -10,6 +10,8 @@ export type EventMediaThumbnailInput = Pick<
   'fileUrl' | 'thumbnailUrl' | 'thumbnailPreSignedUrl' | 'fileDataContentType' | 'contentType' | 'title'
 > & {
   fileName?: string;
+  preSignedUrl?: string;
+  eventMediaType?: string;
 };
 
 export type OfficialDocumentPlaceholderKind = 'pdf' | 'word' | 'excel' | 'image' | 'generic';
@@ -38,6 +40,12 @@ export const OFFICIAL_DOCUMENT_THUMBNAIL_COPY_SPEC = [
 function mimeFromMedia(media: EventMediaThumbnailInput): string {
   const mime = (media.fileDataContentType || media.contentType || '').toLowerCase();
   if (mime) return mime;
+  const row = media as Record<string, unknown>;
+  const eventMediaType =
+    readStringField(row, 'eventMediaType', 'event_media_type') || media.eventMediaType?.trim() || '';
+  if (eventMediaType.includes('/')) {
+    return eventMediaType.toLowerCase();
+  }
   const name = media.fileName || media.title || media.fileUrl || '';
   const ext = name.split('.').pop()?.toLowerCase() || '';
   if (ext === 'pdf') return 'application/pdf';
@@ -142,13 +150,18 @@ export function getEventMediaDisplayThumbnailUrl(
     return uploadedThumb;
   }
 
-  const mime = mimeFromMedia(fields);
-  if (isImageMime(mime) && fields.fileUrl) {
-    const fileUrl = fields.fileUrl;
-    if (isAwsPresignedQueryUrl(fileUrl)) {
-      return isPresignedUrlExpired(fileUrl, options?.fileExpiresAtIso) ? null : fileUrl;
+  const mime = mimeFromMedia(media);
+  if (isImageMime(mime)) {
+    const row = media as Record<string, unknown>;
+    const preSigned =
+      readStringField(row, 'preSignedUrl', 'pre_signed_url') || media.preSignedUrl?.trim() || '';
+    const imageUrl = pickUsableUrl(preSigned, fields.fileUrl, options?.fileExpiresAtIso);
+    if (imageUrl) {
+      if (isAwsPresignedQueryUrl(imageUrl)) {
+        return isPresignedUrlExpired(imageUrl, options?.fileExpiresAtIso) ? null : imageUrl;
+      }
+      return imageUrl;
     }
-    return fileUrl;
   }
 
   return null;

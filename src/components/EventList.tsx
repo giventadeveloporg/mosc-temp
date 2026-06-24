@@ -413,33 +413,33 @@ export function EventList({
                   </div>
                 </td>
                 <td className="p-2 border text-center align-middle">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="flex items-center justify-center gap-1.5">
+                  <div className="flex flex-col items-center justify-center h-full">
+                    <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={(e) => handleViewClick(event, e)}
-                        className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                        className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                         title="View event details"
                         aria-label="View event details"
                         type="button"
                       >
-                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-10 h-10 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                       </button>
                       <a
                         href={`/admin/events/${event.id}/edit`}
-                        className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                        className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                         onClick={() => onEdit?.(event)}
                         title="Edit event details"
                         aria-label="Edit event details"
                       >
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </a>
                     </div>
-                    <span className="text-[10px] text-gray-600 block font-bold leading-tight">View / Edit<br />Event Details</span>
+                    <span className="text-[9px] text-gray-700 mt-1 block font-bold leading-tight">View / Edit<br />Event Details</span>
                   </div>
                 </td>
                 {/* Deactivate Button Cell */}
