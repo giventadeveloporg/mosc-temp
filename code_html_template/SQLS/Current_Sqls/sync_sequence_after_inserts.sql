@@ -1,131 +1,116 @@
 -- ===================================================
 -- Sequence Synchronization Script
 -- ===================================================
--- Purpose: Dynamically synchronize sequence_generator after manual INSERT statements
+-- Purpose: Synchronize public.sequence_generator after manual INSERT statements
 --
 -- Usage:
---   1. Run schema file (Latest_Schema_Post__Blob_Claude_11.sql)
+--   1. Run schema file (Latest_Schema_Post__Blob_Claude_12.sql)
 --   2. Run manual INSERT statements (corrected_event_media_inserts.ordered.sql)
 --   3. Run this script to sync the sequence
 --
--- This script:
---   - Finds the maximum ID across ALL tables using sequence_generator
---   - Sets the sequence to MAX(id) + increment (50) to ensure next value is safe
---   - Handles empty tables gracefully
+-- Matches Latest_Schema_Post__Blob_Claude_12.sql and SequenceSynchronizationService.java.
+-- sequence_generator uses INCREMENT BY 1 (Hibernate allocationSize = 1).
 -- ===================================================
 
--- Step 1: Find maximum ID across all tables using sequence_generator
--- Note: Add any other tables that use sequence_generator to this list
-WITH max_ids AS (
-    SELECT MAX(id) as max_id FROM event_details
-    UNION ALL
-    SELECT MAX(id) FROM user_profile
-    UNION ALL
-    SELECT MAX(id) FROM user_payment_transaction
-    UNION ALL
-    SELECT MAX(id) FROM event_media
-    UNION ALL
-    SELECT MAX(id) FROM event_ticket_transaction
-    UNION ALL
-    SELECT MAX(id) FROM event_ticket_transaction_item
-    UNION ALL
-    SELECT MAX(id) FROM event_ticket_type
-    UNION ALL
-    SELECT MAX(id) FROM event_type_details
-    UNION ALL
-    SELECT MAX(id) FROM event_guest_pricing
-    UNION ALL
-    SELECT MAX(id) FROM discount_code
-    UNION ALL
-    SELECT MAX(id) FROM tenant_organization
-    UNION ALL
-    SELECT MAX(id) FROM tenant_settings
-    UNION ALL
-    SELECT MAX(id) FROM membership_plan
-    UNION ALL
-    SELECT MAX(id) FROM user_subscription
-    UNION ALL
-    SELECT MAX(id) FROM user_task
-    UNION ALL
-    SELECT MAX(id) FROM event_poll
-    UNION ALL
-    SELECT MAX(id) FROM event_poll_option
-    UNION ALL
-    SELECT MAX(id) FROM event_poll_response
-    UNION ALL
-    SELECT MAX(id) FROM event_calendar_entry
-    UNION ALL
-    SELECT MAX(id) FROM event_attendee
-    UNION ALL
-    SELECT MAX(id) FROM event_attendee_guest
-    UNION ALL
-    SELECT MAX(id) FROM event_admin_audit_log
-    UNION ALL
-    SELECT MAX(id) FROM bulk_operation_log
-    UNION ALL
-    SELECT MAX(id) FROM qr_code_usage
-    UNION ALL
-    SELECT MAX(id) FROM payment_provider_config
-    UNION ALL
-    SELECT MAX(id) FROM tenant_email_addresses
-    UNION ALL
-    SELECT MAX(id) FROM donation_transaction
-    UNION ALL
-    SELECT MAX(id) FROM donation_statistics
---    UNION ALL
---    SELECT MAX(id) FROM user_registration_request
-    -- Add any other tables using sequence_generator here
-)
-SELECT COALESCE(MAX(max_id), 0) as global_max_id INTO TEMP TABLE temp_max_id FROM max_ids;
+BEGIN;
 
--- Step 2: Calculate the next safe sequence value
--- Sequence increments by 50, so we need to round up to the next multiple of 50
--- Formula: CEIL((max_id + 1) / 50) * 50
--- This ensures the next sequence value is always >= max_id + 1
-DO $$
-DECLARE
-    max_id_value BIGINT;
-    next_sequence_value BIGINT;
-    sequence_increment BIGINT := 50;
-BEGIN
-    -- Get the maximum ID
-    SELECT global_max_id INTO max_id_value FROM temp_max_id;
+-- Ensure increment matches Hibernate allocationSize = 1 (safe on legacy DBs still at 50)
+ALTER SEQUENCE public.sequence_generator INCREMENT BY 1;
 
-    -- If no data exists, start from sequence default (1050)
-    IF max_id_value IS NULL OR max_id_value = 0 THEN
-        next_sequence_value := 1050;
-    ELSE
-        -- Round up to next multiple of 50
-        -- Example: max_id = 4651, next = CEIL(4651/50) * 50 = CEIL(93.02) * 50 = 94 * 50 = 4700
-        -- This ensures nextval() returns 4700, which is safe
-        next_sequence_value := CEIL(max_id_value::NUMERIC / sequence_increment) * sequence_increment;
+-- Align sequence to highest ID in use across all tables (never decrease)
+SELECT pg_catalog.setval(
+               'public.sequence_generator',
+               GREATEST(
+                   COALESCE((SELECT last_value FROM public.sequence_generator), 0),
+                   COALESCE((SELECT MAX(id) FROM public.user_profile), 0),
+                   COALESCE((SELECT MAX(id) FROM public.bulk_operation_log), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_type_details), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_details), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_content_block), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_day), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_group_member), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_participant), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_registration), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_result), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_settings), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_recurrence_series), 0),
+                   COALESCE((SELECT MAX(id) FROM public.focus_group), 0),
+                   COALESCE((SELECT MAX(id) FROM public.focus_group_members), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_focus_groups), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_guest_pricing), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_admin), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_admin_audit_log), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_attendee), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_attendee_guest), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_attendee_attachment), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_calendar_entry), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_sponsors), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_sponsors_join), 0),
+                   COALESCE((SELECT MAX(id) FROM public.gallery_album), 0),
+                   COALESCE((SELECT MAX(id) FROM public.gallery_category), 0),
+                   COALESCE((SELECT MAX(id) FROM public.official_document_category), 0),
+                   COALESCE((SELECT MAX(id) FROM public.official_document_year_bundle), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_media), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_organizer), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_poll), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_poll_option), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_poll_response), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_ticket_transaction), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_ticket_transaction_item), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_ticket_type), 0),
+                   COALESCE((SELECT MAX(id) FROM public.qr_code_usage), 0),
+                   COALESCE((SELECT MAX(id) FROM public.tenant_organization), 0),
+                   COALESCE((SELECT MAX(id) FROM public.tenant_settings), 0),
+                   COALESCE((SELECT MAX(id) FROM public.tenant_email_addresses), 0),
+                   COALESCE((SELECT MAX(id) FROM public.user_payment_transaction), 0),
+                   COALESCE((SELECT MAX(id) FROM public.user_subscription), 0),
+                   COALESCE((SELECT MAX(id) FROM public.user_task), 0),
+                   COALESCE((SELECT MAX(id) FROM public.executive_committee_team_members), 0),
+                   COALESCE((SELECT MAX(id) FROM public.team_groups), 0),
+                   COALESCE((SELECT MAX(id) FROM public.team_members), 0),
+                   COALESCE((SELECT MAX(id) FROM public.communication_campaign), 0),
+                   COALESCE((SELECT MAX(id) FROM public.email_log), 0),
+                   COALESCE((SELECT MAX(id) FROM public.whatsapp_log), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_featured_performers), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_contacts), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_emails), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_program_directors), 0),
+                   COALESCE((SELECT MAX(id) FROM public.payment_provider_config), 0),
+                   COALESCE((SELECT MAX(id) FROM public.manual_payment_request), 0),
+                   COALESCE((SELECT MAX(id) FROM public.manual_payment_summary_report), 0),
+                   COALESCE((SELECT MAX(id) FROM public.platform_settlement), 0),
+                   COALESCE((SELECT MAX(id) FROM public.platform_invoice), 0),
+                   COALESCE((SELECT MAX(id) FROM public.membership_plan), 0),
+                   COALESCE((SELECT MAX(id) FROM public.membership_subscription), 0),
+                   COALESCE((SELECT MAX(id) FROM public.membership_subscription_reconciliation_log), 0),
+                   COALESCE((SELECT MAX(id) FROM public.promotion_email_template), 0),
+                   COALESCE((SELECT MAX(id) FROM public.promotion_email_sent_log), 0),
+                   COALESCE((SELECT MAX(id) FROM public.clerk_user_tenant), 0),
+                   COALESCE((SELECT MAX(id) FROM public.clerk_organization_role), 0),
+                   COALESCE((SELECT MAX(id) FROM public.clerk_webhook_event), 0),
+                   COALESCE((SELECT MAX(id) FROM public.clerk_session), 0),
+                   COALESCE((SELECT MAX(id) FROM public.donation_transaction), 0),
+                   COALESCE((SELECT MAX(id) FROM public.donation_statistics), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_category), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_article), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_section_display_config), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_sidebar_promotion), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_flash), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_live_stream_config), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_article_category), 0),
+                   COALESCE((SELECT MAX(id) FROM public.satellite_domain), 0),
+                   1
+               ),
+               true
+       );
 
-        -- Ensure we're at least one increment ahead
-        IF next_sequence_value <= max_id_value THEN
-            next_sequence_value := next_sequence_value + sequence_increment;
-        END IF;
-    END IF;
-
-    -- Set the sequence value
-    -- The 'true' parameter means nextval() will return next_sequence_value + increment
-    -- So we set it to next_sequence_value - increment to get the desired next value
-    PERFORM setval('public.sequence_generator', next_sequence_value - sequence_increment, true);
-
-    -- Log the result
-    RAISE NOTICE 'Sequence synchronized: Max ID found = %, Next sequence value = %',
-        max_id_value, next_sequence_value;
-END $$;
-
--- Step 3: Verify the synchronization
+-- Verify
 SELECT
-    (SELECT last_value FROM sequence_generator) as sequence_last_value,
-    (SELECT COALESCE(MAX(global_max_id), 0) FROM temp_max_id) as max_id_in_tables,
-    CASE
-        WHEN (SELECT last_value FROM sequence_generator) >= (SELECT COALESCE(MAX(global_max_id), 0) FROM temp_max_id)
-        THEN 'OK: Sequence is synchronized'
-        ELSE 'WARNING: Sequence may still be out of sync'
-    END as sync_status;
+    sequencename,
+    increment_by,
+    last_value
+FROM pg_sequences
+WHERE schemaname = 'public' AND sequencename = 'sequence_generator';
 
--- Cleanup
-DROP TABLE IF EXISTS temp_max_id;
-
+COMMIT;

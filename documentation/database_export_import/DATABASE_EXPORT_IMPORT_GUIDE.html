@@ -331,14 +331,17 @@
       Location: <code class="code-highlight">documentation/database_export_import/DATABASE_EXPORT_IMPORT_GUIDE.html</code><br>
       Related: <code class="code-highlight">code_html_template/batch_files/database_export_import_refresh.bat</code> ·
       <code class="code-highlight">code_html_template/SQLS/</code> ·
+      <code class="code-highlight">code_html_template/SQLS/sequence_fix_inserts/</code> ·
       <code class="code-highlight">scripts/replace-user-profile-ids-in-sql.mjs</code> ·
-      <code class="code-highlight">code_html_template/SQLS/Current_Sqls/sync_sequence_after_inserts.sql</code>
+      <code class="code-highlight">code_html_template/SQLS/Current_Sqls/sync_sequence_after_inserts.sql</code> ·
+      <code class="code-highlight">code_html_template/SQLS/Current_Sqls/sync_spring_batch_sequences.sql</code>
     </p>
 
     <div class="section-intro">
       <p>
         This guide documents the full workflow for exporting PostgreSQL data from Docker,
         reordering <code class="code-highlight">INSERT</code> statements for foreign-key safety,
+        optionally renumbering primary keys and trimming Spring Batch noise,
         preparing a production copy with Clerk user ID replacements, syncing primary-key sequences,
         and troubleshooting partial imports in DBeaver or <code class="code-highlight">psql</code>.
       </p>
@@ -353,6 +356,7 @@
         <li><a href="#mosc-tenant-import">1c. MOSC tenant duplicate import (mosc_malankara_orthodox_2)</a></li>
         <li><a href="#export">2. Export data with pg_dump (Docker)</a></li>
         <li><a href="#reorder">3. Reorder INSERT statements</a></li>
+        <li><a href="#renumber">3a. Renumber IDs and trim Spring Batch (optional)</a></li>
         <li><a href="#prod">4. Production user ID replacement</a></li>
         <li><a href="#pg-dump-comment">5. Comment out pg_dump header lines</a></li>
         <li><a href="#import">6. Import the SQL file</a></li>
@@ -360,6 +364,7 @@
         <li><a href="#analysis">8. File integrity analysis (is the ordered SQL corrupted?)</a></li>
         <li><a href="#troubleshooting">9. Troubleshooting partial imports</a></li>
         <li><a href="#option-a">10. Option A — reorder script fix (implemented)</a></li>
+        <li><a href="#renumber-detail">11. Sequence fix — files, FK repair, and verification</a></li>
       </ul>
     </nav>
 
@@ -374,6 +379,7 @@
           <li>Find Postgres container: <code class="code-highlight">docker ps | findstr postgres</code></li>
           <li>Export: <code class="code-highlight">docker exec -it &lt;container_id&gt; pg_dump ... &gt; export.sql</code></li>
           <li>Reorder: <code class="code-highlight">node reorder_sql_inserts_final.cjs</code> → <code class="code-highlight">corrected_event_media_inserts.ordered.sql</code></li>
+          <li><strong>Optional:</strong> Renumber IDs + trim Spring Batch — see <a href="#renumber">§3a</a> → <code class="code-highlight">sequence_fix_inserts/corrected_event_media_inserts.renumbered.sql</code></li>
           <li>Prod IDs (repo root): <code class="code-highlight">node scripts/replace-user-profile-ids-in-sql.mjs</code> → <code class="code-highlight">corrected_event_media_inserts.ordered_PROD.sql</code></li>
           <li>In generated SQL: Find/Replace <code class="code-highlight">pg_dump</code> → <code class="code-highlight">-- pg_dump</code> (comment out dump metadata lines)</li>
           <li>Import ordered SQL into target database (empty schema first)</li>
@@ -410,6 +416,7 @@
             <tr><td>5</td><td>Apply <code>Latest_Schema_Post__Blob_Claude_12.sql</code></td><td><code>event_site_manager_db</code> schema rebuilt</td></tr>
             <tr><td>6</td><td>Import ordered (or PROD) INSERT file</td><td>Data loaded</td></tr>
             <tr><td>7</td><td>Run <code>sync_sequence_after_inserts.sql</code></td><td>Primary-key sequence synced</td></tr>
+            <tr><td>7b</td><td>Run <code>sync_spring_batch_sequences.sql</code></td><td>Spring Batch sequences synced</td></tr>
           </tbody>
         </table>
       </div>
@@ -1085,6 +1092,150 @@ python scripts\extract_dup_tenant_sql.py code_html_template\SQLS\corrected_event
    • Total INSERT statements: 2199
    • Extra tables (not in order): none</pre>
         <p>If <strong>Extra tables (not in order)</strong> is not <code class="code-highlight">none</code>, add those table names to <code class="code-highlight">TABLE_ORDER</code> in <code class="script-name">reorder_sql_inserts_final.cjs</code> (see <a href="#option-a">Section 10</a>).</p>
+        <p>For dense primary keys starting at <strong>1</strong> per table and a smaller Spring Batch footprint, continue with <a href="#renumber">Section 3a</a>.</p>
+      </div>
+    </section>
+
+    <!-- Section 3a -->
+    <section id="renumber" aria-labelledby="h-renumber">
+      <h2 id="h-renumber">3a. Renumber IDs and trim Spring Batch (optional)</h2>
+
+      <div class="section-intro">
+        <p>
+          After <a href="#reorder">reordering</a>, the ordered file may still contain <strong>high tenant-specific IDs</strong>
+          (for example MOSC <code class="code-highlight">event_type_details</code> at <code class="code-highlight">600001+</code>),
+          <strong>thousands of Spring Batch rows</strong> (<code class="code-highlight">batch_job_execution_params</code>,
+          <code class="code-highlight">batch_job_execution_log</code>), and FK values that reference those old IDs.
+          The script <code class="script-name">renumber_sql_insert_ids.cjs</code> produces a separate import file with
+          per-table IDs starting at <code class="code-highlight">1</code>, FK columns rewritten column-aware, and Spring Batch
+          trimmed to a small sample — without overwriting the canonical
+          <code class="code-highlight">corrected_event_media_inserts.ordered.sql</code> in <code class="code-highlight">SQLS/</code>.
+        </p>
+      </div>
+
+      <div class="section-container">
+        <div class="section-header">📁 Working folder</div>
+        <table>
+          <thead>
+            <tr><th>Path (under <code>code_html_template/SQLS/</code>)</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>sequence_fix_inserts/corrected_event_media_inserts.ordered.sql</code></td><td>Input copy of the FK-ordered file (or pass <code>--input=</code>)</td></tr>
+            <tr><td><code>sequence_fix_inserts/renumber_sql_insert_ids.cjs</code></td><td>Renumber + FK rewrite + batch trim script</td></tr>
+            <tr><td><code>sequence_fix_inserts/corrected_event_media_inserts.renumbered.sql</code></td><td><strong>Output</strong> — use for import when you want IDs 1…N</td></tr>
+            <tr><td><code>sequence_fix_inserts/id-mapping-report.json</code></td><td>Per-table old→new ID map and FK warning count</td></tr>
+            <tr><td><code>Current_Sqls/Latest_Schema_Post__Blob_Claude_12.sql</code></td><td>FK metadata for column-aware rewrites</td></tr>
+            <tr><td><code>Current_Sqls/sync_sequence_after_inserts.sql</code></td><td>Run after import (Step 7)</td></tr>
+            <tr><td><code>Current_Sqls/sync_spring_batch_sequences.sql</code></td><td>Run after import (Step 7b)</td></tr>
+            <tr><td><code>reorder_sql_inserts_final.cjs</code></td><td>Upstream reorder script (<code>TABLE_ORDER</code>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="command-block expedite"
+           data-command-base="cd WORKSPACE\mosc-temp\code_html_template\SQLS\sequence_fix_inserts"
+           data-template-command="cd F:\project_workspace\mosc-temp\code_html_template\SQLS\sequence_fix_inserts">
+        <div class="command-header">
+          <span class="command-type">Navigate to sequence_fix_inserts</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'cd-renumber')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'cd-renumber')" title="Copy command" aria-label="Copy command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-content" id="cd-renumber">cd F:\project_workspace\mosc-temp\code_html_template\SQLS\sequence_fix_inserts</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="cd-renumber-single-code">cd F:\project_workspace\mosc-temp\code_html_template\SQLS\sequence_fix_inserts</code>
+        </div>
+      </div>
+
+      <div class="command-block expedite setup"
+           data-command-base="node renumber_sql_insert_ids.cjs"
+           data-template-command="node renumber_sql_insert_ids.cjs --batch-executions=3 --batch-logs=3">
+        <div class="command-header">
+          <span class="command-type">Run ID renumber script</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'node-renumber')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'node-renumber')" title="Copy customized command" aria-label="Copy customized command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-parameters">
+          <h5>🔧 Optional flags:</h5>
+          <div class="parameter-group">
+            <div class="parameter-input">
+              <label for="renumber-input">--input=</label>
+              <input type="text" id="renumber-input" placeholder="path to ordered.sql" oninput="updateRenumberCommand()">
+            </div>
+            <div class="parameter-input">
+              <label for="renumber-output">--output=</label>
+              <input type="text" id="renumber-output" placeholder="path to .renumbered.sql" oninput="updateRenumberCommand()">
+            </div>
+          </div>
+          <div class="parameter-group">
+            <div class="parameter-input">
+              <label for="renumber-batch-exec">--batch-executions=</label>
+              <input type="text" id="renumber-batch-exec" value="3" oninput="updateRenumberCommand()">
+            </div>
+            <div class="parameter-input">
+              <label for="renumber-batch-logs">--batch-logs=</label>
+              <input type="text" id="renumber-batch-logs" value="3" oninput="updateRenumberCommand()">
+            </div>
+          </div>
+          <div class="parameter-group single">
+            <div class="parameter-input">
+              <label class="flag-checkbox">
+                <input type="checkbox" id="renumber-dry-run" onchange="updateRenumberCommand()">
+                <span><code class="code-highlight">--dry-run</code> (report only, no output file)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="command-content" id="node-renumber">node renumber_sql_insert_ids.cjs --batch-executions=3 --batch-logs=3</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="node-renumber-single-code">node renumber_sql_insert_ids.cjs --batch-executions=3 --batch-logs=3</code>
+        </div>
+      </div>
+
+      <div class="section-container parameters">
+        <div class="section-header parameters">⚙️ What the script does</div>
+        <ol class="steps">
+          <li><strong>Parse</strong> every <code class="code-highlight">INSERT INTO public.&lt;table&gt;</code> (including multiline <code class="code-highlight">VALUES</code>).</li>
+          <li><strong>Trim Spring Batch:</strong> keep the first <code class="code-highlight">N</code> <code class="code-highlight">batch_job_execution</code> rows and cascade to instance, step, context, and params; keep the first <code class="code-highlight">N</code> <code class="code-highlight">batch_job_execution_log</code> rows (default <code class="code-highlight">N=3</code>).</li>
+          <li><strong>Pass 1 — PK map:</strong> assign each table’s primary key <code class="code-highlight">1, 2, 3, …</code> in encounter order (<code class="code-highlight">--start-id=1</code> default). Spring Batch uses <code class="code-highlight">job_instance_id</code>, <code class="code-highlight">job_execution_id</code>, <code class="code-highlight">step_execution_id</code> where applicable.</li>
+          <li><strong>Pass 2 — FK rewrite:</strong> update FK columns using schema <code class="code-highlight">FOREIGN KEY</code> metadata plus manual overrides (junction tables, batch chain, <code class="code-highlight">event_live_update.event_id</code>, etc.). Supports <code class="code-highlight">CREATE TABLE IF NOT EXISTS</code> in the schema file (promotion email tables).</li>
+          <li><strong>Orphan repair:</strong> synthetic aliases for demo event IDs (<code class="code-highlight">500001</code>–<code class="code-highlight">500003</code>); <code class="code-highlight">rel_event_details__discount_codes</code> rows with wrong <code class="code-highlight">event_details_id</code> are corrected via linked <code class="code-highlight">discount_code.event_id</code>.</li>
+          <li><strong>Write</strong> <code class="code-highlight">corrected_event_media_inserts.renumbered.sql</code> and <code class="code-highlight">id-mapping-report.json</code>.</li>
+        </ol>
+      </div>
+
+      <div class="section-container output">
+        <div class="section-header output">📊 Example console output (June 2026)</div>
+        <pre class="code-block">Parsed 4214 INSERT statement(s)
+Batch trim:
+  job_execution ids kept: 1, 2, 3
+  job_instance ids kept: 1, 2, 4
+  step_execution ids kept: 1, 2
+  batch_job_execution_log: 455 → 3
+  spring batch tables: 2079 → 22
+After batch trim: 1705 rows (removed 2509)
+FK warnings: 0
+Written: ...\corrected_event_media_inserts.renumbered.sql (1705 INSERTs)</pre>
+        <p>Sample renumber results: <code class="code-highlight">event_type_details</code> <code class="code-highlight">1–12</code> (was <code class="code-highlight">600001+</code> for MOSC tenant);
+          <code class="code-highlight">event_details</code> dense <code class="code-highlight">1–36</code>;
+          <code class="code-highlight">promotion_email_template.event_id</code> rewritten (e.g. <code class="code-highlight">600002</code> → <code class="code-highlight">17</code>).</p>
+      </div>
+
+      <div class="info">
+        <strong>💡 Import path:</strong> Use <code class="code-highlight">corrected_event_media_inserts.renumbered.sql</code> instead of the ordered file in
+        <a href="#import">Section 6</a> (or pass it to <code class="code-highlight">database_export_import_refresh.bat /IMPORT-FILE "…renumbered.sql"</code> with <code class="code-highlight">/SKIP-EXPORT</code>).
+        Then run <a href="#sequences">sequence sync</a> (Steps 7 and 7b). The canonical <code class="code-highlight">SQLS/corrected_event_media_inserts.ordered.sql</code> is <strong>not</strong> replaced until you validate import in Docker.
+      </div>
+
+      <div class="warning">
+        <strong>⚠️ Production Clerk IDs:</strong> Run <a href="#prod">Section 4</a> on the file you plan to import. If you renumber after PROD replacement, re-run
+        <code class="script-name">replace-user-profile-ids-in-sql.mjs</code> on the renumbered output, or renumber first then apply PROD mapping to
+        <code class="code-highlight">corrected_event_media_inserts.renumbered.sql</code> with <code class="code-highlight">--input</code> / <code class="code-highlight">--output</code> flags on that script.
       </div>
     </section>
 
@@ -1219,12 +1370,15 @@ python scripts\extract_dup_tenant_sql.py code_html_template\SQLS\corrected_event
           After manual INSERTs with explicit IDs, PostgreSQL sequences may still point at low values.
           Run <code class="code-highlight">sync_sequence_after_inserts.sql</code> so the next auto-generated
           primary key starts above the highest imported ID (typically <code class="code-highlight">MAX(id) + 50</code>).
+          If you imported Spring Batch rows (including the trimmed set from
+          <a href="#renumber">§3a</a>), also run <code class="code-highlight">sync_spring_batch_sequences.sql</code>.
         </p>
       </div>
 
       <p>Canonical paths:</p>
       <ul>
         <li><code class="code-highlight">code_html_template/SQLS/Current_Sqls/sync_sequence_after_inserts.sql</code> (this repo)</li>
+        <li><code class="code-highlight">code_html_template/SQLS/Current_Sqls/sync_spring_batch_sequences.sql</code> (Spring Batch <code class="code-highlight">batch_job_seq</code>, <code class="code-highlight">batch_job_execution_seq</code>, <code class="code-highlight">batch_step_execution_seq</code>)</li>
         <li><code class="code-highlight">E:\project_workspace\malayalees-us-site-boot\src\main\resources\sqls\sync_sequence_after_inserts.sql</code> (backend boot project)</li>
       </ul>
 
@@ -1232,9 +1386,16 @@ python scripts\extract_dup_tenant_sql.py code_html_template\SQLS\corrected_event
         <div class="section-header output">📊 Run order</div>
         <ol class="steps">
           <li>Apply schema SQL</li>
-          <li>Run ordered INSERT file</li>
+          <li>Run ordered or <a href="#renumber">renumbered</a> INSERT file</li>
           <li>Run <code class="code-highlight">sync_sequence_after_inserts.sql</code> in the same database</li>
+          <li>Run <code class="code-highlight">sync_spring_batch_sequences.sql</code> (Step 7b in <code class="script-name">database_export_import_refresh.bat</code>)</li>
         </ol>
+      </div>
+
+      <div class="info">
+        <strong>Renumbered imports:</strong> When IDs start at <code class="code-highlight">1</code> per table, sequence sync still sets each
+        <code class="code-highlight">sequence_generator</code> entry above the imported max. Spring Batch sequences must be synced separately —
+        <code class="code-highlight">batch_job_execution</code> is not driven by <code class="code-highlight">sequence_generator</code>.
       </div>
     </section>
 
@@ -1296,6 +1457,16 @@ python scripts\extract_dup_tenant_sql.py code_html_template\SQLS\corrected_event
             <td>Target DB not empty</td>
             <td>Truncate tables or use fresh schema before import</td>
           </tr>
+          <tr>
+            <td>High IDs / huge Spring Batch section after import</td>
+            <td>Ordered file preserves export PKs and full batch history</td>
+            <td>Use <a href="#renumber">§3a</a> <code class="code-highlight">renumber_sql_insert_ids.cjs</code>; import <code class="code-highlight">.renumbered.sql</code></td>
+          </tr>
+          <tr>
+            <td>FK errors on <code>promotion_email_*</code> after renumber</td>
+            <td>Schema parser missed <code>IF NOT EXISTS</code> tables (fixed June 2026)</td>
+            <td>Re-run latest <code class="script-name">renumber_sql_insert_ids.cjs</code>; confirm <code class="code-highlight">FK warnings: 0</code></td>
+          </tr>
         </tbody>
       </table>
 
@@ -1354,9 +1525,121 @@ python scripts\extract_dup_tenant_sql.py code_html_template\SQLS\corrected_event
       </div>
     </section>
 
+    <!-- Section 11 -->
+    <section id="renumber-detail" aria-labelledby="h-renumber-detail">
+      <h2 id="h-renumber-detail">11. Sequence fix — files, FK repair, and verification</h2>
+
+      <div class="section-intro">
+        <p>
+          This section consolidates the <strong>ordering + sequence correction</strong> work (March–June 2026): extending
+          <code class="code-highlight">TABLE_ORDER</code> for FK-safe reorder, fixing
+          <code class="code-highlight">sync_sequence_after_inserts.sql</code>, adding Spring Batch sequence sync to the
+          refresh batch file, and building <code class="script-name">renumber_sql_insert_ids.cjs</code> for dense IDs and
+          smaller batch imports.
+        </p>
+      </div>
+
+      <h3>End-to-end pipeline</h3>
+      <pre class="code-block">export.sql
+  → reorder_sql_inserts_final.cjs     (FK table order)
+  → corrected_event_media_inserts.ordered.sql
+  → [optional] renumber_sql_insert_ids.cjs  (PK 1..N, FK rewrite, batch trim)
+  → corrected_event_media_inserts.renumbered.sql
+  → [optional] replace-user-profile-ids-in-sql.mjs  (PROD Clerk IDs)
+  → import → sync_sequence_after_inserts.sql → sync_spring_batch_sequences.sql</pre>
+
+      <div class="section-container usage">
+        <div class="section-header usage">📋 Related source files in mosc-temp</div>
+        <table>
+          <thead>
+            <tr><th>Area</th><th>File</th><th>Role</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Reorder</td><td><code>code_html_template/SQLS/reorder_sql_inserts_final.cjs</code></td><td>Canonical reorder script; <code>TABLE_ORDER</code> lists 62+ tables</td></tr>
+            <tr><td>Reorder (legacy)</td><td><code>code_html_template/SQLS/reorder_sql_*.cjs</code></td><td>Older iterations — use <code class="script-name">reorder_sql_inserts_final.cjs</code> only</td></tr>
+            <tr><td>Sequence fix</td><td><code>code_html_template/SQLS/sequence_fix_inserts/renumber_sql_insert_ids.cjs</code></td><td>PK/FK renumber + batch trim</td></tr>
+            <tr><td>Import SQL (canonical)</td><td><code>code_html_template/SQLS/corrected_event_media_inserts.ordered.sql</code></td><td>Default batch import target</td></tr>
+            <tr><td>Import SQL (renumbered)</td><td><code>code_html_template/SQLS/sequence_fix_inserts/corrected_event_media_inserts.renumbered.sql</code></td><td>Optional; IDs from 1 per table</td></tr>
+            <tr><td>ID report</td><td><code>code_html_template/SQLS/sequence_fix_inserts/id-mapping-report.json</code></td><td>Audit old→new maps; <code>fkWarningCount</code> should be 0</td></tr>
+            <tr><td>Schema</td><td><code>code_html_template/SQLS/Current_Sqls/Latest_Schema_Post__Blob_Claude_12.sql</code></td><td>FK definitions for renumber script</td></tr>
+            <tr><td>Sequences</td><td><code>code_html_template/SQLS/Current_Sqls/sync_sequence_after_inserts.sql</code></td><td><code>sequence_generator</code> after import</td></tr>
+            <tr><td>Sequences</td><td><code>code_html_template/SQLS/Current_Sqls/sync_spring_batch_sequences.sql</code></td><td>Spring Batch sequences after import</td></tr>
+            <tr><td>Sequences (copy)</td><td><code>code_html_template/SQLS/INSERTS/sync_sequence_after_inserts.sql</code></td><td>Duplicate/alternate copy</td></tr>
+            <tr><td>Batch automation</td><td><code>code_html_template/batch_files/database_export_import_refresh.bat</code></td><td>Steps 1–7b; pass <code>/IMPORT-FILE</code> for renumbered SQL</td></tr>
+            <tr><td>PROD IDs</td><td><code>scripts/replace-user-profile-ids-in-sql.mjs</code></td><td>Clerk user ID swap in <code>user_profile</code> INSERTs</td></tr>
+            <tr><td>Markdown guide</td><td><code>documentation/INSERT_TABLE_BULK_SQL_REORDERING_AND_PG_DUMP_GUIDE.md</code></td><td>Earlier reorder + pg_dump reference</td></tr>
+            <tr><td>This guide</td><td><code>documentation/database_export_import/DATABASE_EXPORT_IMPORT_GUIDE.html</code></td><td>Full export → reorder → renumber → import workflow</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Problems addressed</h3>
+      <table>
+        <thead>
+          <tr><th>Problem</th><th>Solution</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tables appended at EOF (“extra tables”) broke FK order on import</td>
+            <td>Extended <code>TABLE_ORDER</code> in <code class="script-name">reorder_sql_inserts_final.cjs</code> — see <a href="#option-a">§10</a></td>
+          </tr>
+          <tr>
+            <td>MOSC tenant rows used high IDs (<code>600001+</code>); sequences out of sync after import</td>
+            <td><code class="script-name">renumber_sql_insert_ids.cjs</code> + <code class="code-highlight">sync_sequence_after_inserts.sql</code></td>
+          </tr>
+          <tr>
+            <td>~2,000+ Spring Batch INSERTs bloated import; wrong batch table order</td>
+            <td>Batch trim (first 3 executions + logs); <code>TABLE_ORDER</code> batch chain; <code class="code-highlight">sync_spring_batch_sequences.sql</code></td>
+          </tr>
+          <tr>
+            <td>Promotion tables (<code>CREATE TABLE IF NOT EXISTS</code>) missed by FK parser</td>
+            <td>Schema regex updated in renumber script to parse <code>IF NOT EXISTS</code> blocks</td>
+          </tr>
+          <tr>
+            <td>Bad source FKs (<code>event_details_id=4101</code>, demo <code>event_id=500001</code>)</td>
+            <td>Discount-code linkage repair + synthetic event ID aliases in renumber script</td>
+          </tr>
+          <tr>
+            <td><code>batch_job_execution</code> incorrectly in <code>sequence_generator</code> sync</td>
+            <td>Removed from <code class="code-highlight">sync_sequence_after_inserts.sql</code>; use dedicated Spring Batch sync</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Verification checklist</h3>
+      <div class="section-container output">
+        <div class="section-header output">✅ After renumber</div>
+        <ol class="steps">
+          <li>Console shows <code class="code-highlight">FK warnings: 0</code>.</li>
+          <li><code class="code-highlight">id-mapping-report.json</code> has <code class="code-highlight">"fkWarningCount": 0</code> and expected row counts per table.</li>
+          <li>Spot-check: <code class="code-highlight">event_type_details</code> starts at <code class="code-highlight">id=1</code>; no <code class="code-highlight">600001</code> in PK columns.</li>
+          <li>Spot-check: <code class="code-highlight">promotion_email_template.event_id</code> matches renumbered <code class="code-highlight">event_details.id</code>.</li>
+          <li>Import into empty Docker DB; run Steps 7 + 7b; create a new row via the app to confirm no duplicate-key errors.</li>
+        </ol>
+      </div>
+
+      <div class="command-block verify"
+           data-command-base="node renumber_sql_insert_ids.cjs --dry-run"
+           data-template-command="node renumber_sql_insert_ids.cjs --dry-run --batch-executions=3 --batch-logs=3">
+        <div class="command-header">
+          <span class="command-type">Dry-run renumber (no file write)</span>
+          <div class="command-header-buttons">
+            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'renumber-dry')" title="Copy template command" aria-label="Copy template command">📄 Template</button>
+            <button type="button" class="copy-button" onclick="copyCommand(this, 'renumber-dry')" title="Copy command" aria-label="Copy command">📋 Copy</button>
+          </div>
+        </div>
+        <div class="command-content" id="renumber-dry">node renumber_sql_insert_ids.cjs --dry-run --batch-executions=3 --batch-logs=3</div>
+        <div class="command-single-line">
+          <div class="command-single-line-label">Windows single-line:</div>
+          <code id="renumber-dry-single-code">node renumber_sql_insert_ids.cjs --dry-run --batch-executions=3 --batch-logs=3</code>
+        </div>
+      </div>
+    </section>
+
     <footer class="doc-footer">
       <p>Last updated: June 2026 · MOSC event_site_manager_db export/import workflow</p>
-      <p>See also: <code class="code-highlight">documentation/INSERT_TABLE_BULK_SQL_REORDERING_AND_PG_DUMP_GUIDE.md</code></p>
+      <p>See also: <code class="code-highlight">documentation/INSERT_TABLE_BULK_SQL_REORDERING_AND_PG_DUMP_GUIDE.md</code> ·
+        <code class="code-highlight">code_html_template/SQLS/sequence_fix_inserts/</code></p>
     </footer>
   </main>
 
@@ -1487,8 +1770,30 @@ python scripts\extract_dup_tenant_sql.py code_html_template\SQLS\corrected_event
       if (single) single.textContent = cmd;
     }
 
+    function updateRenumberCommand() {
+      const parts = ['node renumber_sql_insert_ids.cjs'];
+      const input = document.getElementById('renumber-input');
+      const output = document.getElementById('renumber-output');
+      const batchExec = document.getElementById('renumber-batch-exec');
+      const batchLogs = document.getElementById('renumber-batch-logs');
+      const dryRun = document.getElementById('renumber-dry-run');
+      if (input && input.value.trim()) parts.push('--input=' + input.value.trim());
+      if (output && output.value.trim()) parts.push('--output=' + output.value.trim());
+      if (batchExec && batchExec.value.trim()) parts.push('--batch-executions=' + batchExec.value.trim());
+      else parts.push('--batch-executions=3');
+      if (batchLogs && batchLogs.value.trim()) parts.push('--batch-logs=' + batchLogs.value.trim());
+      else parts.push('--batch-logs=3');
+      if (dryRun && dryRun.checked) parts.push('--dry-run');
+      const cmd = parts.join(' ');
+      const el = document.getElementById('node-renumber');
+      const single = document.getElementById('node-renumber-single-code');
+      if (el) el.textContent = cmd;
+      if (single) single.textContent = cmd;
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       updateBatchRefresh('batch-full');
+      updateRenumberCommand();
     });
   </script>
 </body>

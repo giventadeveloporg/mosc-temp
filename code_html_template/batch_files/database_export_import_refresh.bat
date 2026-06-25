@@ -161,6 +161,7 @@ set "ORDERED_FILE=%SQLS_DIR%\corrected_event_media_inserts.ordered.sql"
 set "PROD_FILE=%SQLS_DIR%\corrected_event_media_inserts.ordered_PROD.sql"
 set "SYNC_BOOT=%WORKSPACE_ROOT%\malayalees-us-site-boot\src\main\resources\sqls\sync_sequence_after_inserts.sql"
 set "SYNC_MOSC=%SQLS_DIR%\Current_Sqls\sync_sequence_after_inserts.sql"
+set "SYNC_BATCH_MOSC=%SQLS_DIR%\Current_Sqls\sync_spring_batch_sequences.sql"
 set "DELETE_MOSC_FILE=%SQLS_DIR%\delete_mosc_tenant.sql"
 set "MOSC_DUP_FILE=%SQLS_DIR%\mosc_dup_only.sql"
 set "MOSC_FULL_FILE=%SQLS_DIR%\corrected_event_media_inserts.ordered.mosc_malankara_orthodox_2.sql"
@@ -629,6 +630,24 @@ if !PSQL_ERR! neq 0 (
 set "S7=OK"
 call :log_ok "Step 7 complete - sequences synchronized"
 call :log_info "File: !SYNC_FILE!"
+
+if exist "%SYNC_BATCH_MOSC%" (
+  call :log_step "7b" "Sync Spring Batch sequences"
+  if "%USE_REMOTE%"=="1" (
+    call :run_psql_file "%SYNC_BATCH_MOSC%" 1
+    set "PSQL_ERR=!errorlevel!"
+  ) else (
+    docker exec -i !CONTAINER_ID! psql -U %DB_USER% -d %DB_NAME% -v ON_ERROR_STOP=1 < "%SYNC_BATCH_MOSC%"
+    set "PSQL_ERR=!errorlevel!"
+  )
+  if !PSQL_ERR! neq 0 (
+    set "S7=FAIL"
+    call :log_err "Spring Batch sequence sync failed"
+    goto :fail
+  )
+  call :log_ok "Step 7b complete - Spring Batch sequences synchronized"
+  call :log_info "File: %SYNC_BATCH_MOSC%"
+)
 
 if "%USE_REMOTE%"=="1" (
   set "RUN_MODE=FULL-REMOTE"

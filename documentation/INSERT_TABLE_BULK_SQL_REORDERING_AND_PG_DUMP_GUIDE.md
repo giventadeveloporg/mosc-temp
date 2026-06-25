@@ -1,5 +1,9 @@
 # SQL Insert Reordering and PostgreSQL Dump Guide
 
+> **Full workflow (reorder, renumber, PROD IDs, batch import, sequence sync):** see
+> [`documentation/database_export_import/DATABASE_EXPORT_IMPORT_GUIDE.html`](database_export_import/DATABASE_EXPORT_IMPORT_GUIDE.html)
+> — especially **§3a** (renumber IDs + trim Spring Batch) and **§11** (sequence fix reference).
+
 This guide covers how to reorder SQL INSERT statements and how to export/import PostgreSQL databases using `pg_dump`.
 
 ---
@@ -70,8 +74,26 @@ docker-compose exec -T postgresql psql -U event_site_app -d event_site_manager_d
 ## Table of Contents
 
 1. [SQL Insert Reordering Script](#sql-insert-reordering-script)
-2. [PostgreSQL Dump Commands (pg_dump)](#postgresql-dump-commands-pg_dump)
-3. [Common Use Cases](#common-use-cases)
+2. [Optional: Renumber IDs and trim Spring Batch](#optional-renumber-ids-and-trim-spring-batch)
+3. [PostgreSQL Dump Commands (pg_dump)](#postgresql-dump-commands-pg_dump)
+4. [Common Use Cases](#common-use-cases)
+
+---
+
+## Optional: Renumber IDs and trim Spring Batch
+
+After reordering, you may still have **high tenant-specific primary keys** (e.g. MOSC `600001+`) and **thousands of Spring Batch rows**. Use:
+
+```bash
+cd code_html_template/SQLS/sequence_fix_inserts
+node renumber_sql_insert_ids.cjs --batch-executions=3 --batch-logs=3
+```
+
+**Output:** `corrected_event_media_inserts.renumbered.sql` (does not overwrite `SQLS/corrected_event_media_inserts.ordered.sql`).
+
+**Also run after import:** `Current_Sqls/sync_sequence_after_inserts.sql` and `Current_Sqls/sync_spring_batch_sequences.sql`.
+
+Details: [DATABASE_EXPORT_IMPORT_GUIDE.html](database_export_import/DATABASE_EXPORT_IMPORT_GUIDE.html) §3a and §11.
 
 ---
 

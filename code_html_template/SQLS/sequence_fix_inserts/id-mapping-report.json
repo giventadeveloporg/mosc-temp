@@ -1,0 +1,1544 @@
+{
+  "generatedAt": "2026-06-25T19:01:03.573Z",
+  "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.ordered.sql",
+  "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
+  "startId": 1,
+  "batchExecutionsKept": 3,
+  "batchLogsKept": 3,
+  "statementCount": 1705,
+  "tables": {
+    "event_type_details": {
+      "rows": 12,
+      "minNewId": 1,
+      "maxNewId": 12,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "user_profile": {
+      "rows": 21,
+      "minNewId": 1,
+      "maxNewId": 21,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_details": {
+      "rows": 39,
+      "minNewId": 1,
+      "maxNewId": 36,
+      "sample": [
+        {
+          "old": 4,
+          "new": 1
+        },
+        {
+          "old": 7,
+          "new": 2
+        },
+        {
+          "old": 8,
+          "new": 3
+        },
+        {
+          "old": 9,
+          "new": 4
+        },
+        {
+          "old": 10,
+          "new": 5
+        }
+      ]
+    },
+    "event_guest_pricing": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_admin": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_admin_audit_log": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_attendee": {
+      "rows": 16,
+      "minNewId": 1,
+      "maxNewId": 16,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_attendee_guest": {
+      "rows": 12,
+      "minNewId": 1,
+      "maxNewId": 12,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_calendar_entry": {
+      "rows": 8,
+      "minNewId": 1,
+      "maxNewId": 8,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_live_update": {
+      "rows": 12,
+      "minNewId": 1,
+      "maxNewId": 12,
+      "sample": [
+        {
+          "old": 600001,
+          "new": 1
+        },
+        {
+          "old": 600002,
+          "new": 2
+        },
+        {
+          "old": 600003,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_live_update_attachment": {
+      "rows": 12,
+      "minNewId": 1,
+      "maxNewId": 12,
+      "sample": [
+        {
+          "old": 600001,
+          "new": 1
+        },
+        {
+          "old": 600002,
+          "new": 2
+        },
+        {
+          "old": 600003,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_sponsors": {
+      "rows": 11,
+      "minNewId": 1,
+      "maxNewId": 11,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 5,
+          "new": 4
+        },
+        {
+          "old": 4551,
+          "new": 5
+        }
+      ]
+    },
+    "event_sponsors_join": {
+      "rows": 10,
+      "minNewId": 1,
+      "maxNewId": 10,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 6,
+          "new": 4
+        },
+        {
+          "old": 7,
+          "new": 5
+        }
+      ]
+    },
+    "gallery_category": {
+      "rows": 8,
+      "minNewId": 1,
+      "maxNewId": 8,
+      "sample": [
+        {
+          "old": 611401,
+          "new": 1
+        },
+        {
+          "old": 611402,
+          "new": 2
+        },
+        {
+          "old": 611403,
+          "new": 3
+        },
+        {
+          "old": 611404,
+          "new": 4
+        },
+        {
+          "old": 611405,
+          "new": 5
+        }
+      ]
+    },
+    "gallery_album": {
+      "rows": 62,
+      "minNewId": 1,
+      "maxNewId": 62,
+      "sample": [
+        {
+          "old": 8332,
+          "new": 1
+        },
+        {
+          "old": 10688,
+          "new": 2
+        },
+        {
+          "old": 11044,
+          "new": 3
+        },
+        {
+          "old": 11045,
+          "new": 4
+        },
+        {
+          "old": 11046,
+          "new": 5
+        }
+      ]
+    },
+    "official_document_category": {
+      "rows": 90,
+      "minNewId": 1,
+      "maxNewId": 90,
+      "sample": [
+        {
+          "old": 1100,
+          "new": 1
+        },
+        {
+          "old": 1150,
+          "new": 2
+        },
+        {
+          "old": 1200,
+          "new": 3
+        },
+        {
+          "old": 1250,
+          "new": 4
+        },
+        {
+          "old": 1300,
+          "new": 5
+        }
+      ]
+    },
+    "official_document_year_bundle": {
+      "rows": 12,
+      "minNewId": 1,
+      "maxNewId": 12,
+      "sample": [
+        {
+          "old": 10273,
+          "new": 1
+        },
+        {
+          "old": 10274,
+          "new": 2
+        },
+        {
+          "old": 10275,
+          "new": 3
+        },
+        {
+          "old": 10276,
+          "new": 4
+        },
+        {
+          "old": 10277,
+          "new": 5
+        }
+      ]
+    },
+    "event_media": {
+      "rows": 807,
+      "minNewId": 1,
+      "maxNewId": 807,
+      "sample": [
+        {
+          "old": 4150,
+          "new": 1
+        },
+        {
+          "old": 4200,
+          "new": 2
+        },
+        {
+          "old": 4250,
+          "new": 3
+        },
+        {
+          "old": 4300,
+          "new": 4
+        },
+        {
+          "old": 4350,
+          "new": 5
+        }
+      ]
+    },
+    "event_organizer": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_poll": {
+      "rows": 10,
+      "minNewId": 1,
+      "maxNewId": 10,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_poll_option": {
+      "rows": 18,
+      "minNewId": 1,
+      "maxNewId": 18,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_poll_response": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_score_card": {
+      "rows": 12,
+      "minNewId": 1,
+      "maxNewId": 12,
+      "sample": [
+        {
+          "old": 600001,
+          "new": 1
+        },
+        {
+          "old": 600002,
+          "new": 2
+        },
+        {
+          "old": 600003,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_score_card_detail": {
+      "rows": 12,
+      "minNewId": 1,
+      "maxNewId": 12,
+      "sample": [
+        {
+          "old": 600001,
+          "new": 1
+        },
+        {
+          "old": 600002,
+          "new": 2
+        },
+        {
+          "old": 600003,
+          "new": 3
+        },
+        {
+          "old": 600004,
+          "new": 4
+        },
+        {
+          "old": 600005,
+          "new": 5
+        }
+      ]
+    },
+    "discount_code": {
+      "rows": 9,
+      "minNewId": 1,
+      "maxNewId": 9,
+      "sample": [
+        {
+          "old": 2,
+          "new": 1
+        },
+        {
+          "old": 4,
+          "new": 2
+        },
+        {
+          "old": 5,
+          "new": 3
+        },
+        {
+          "old": 6,
+          "new": 4
+        },
+        {
+          "old": 1,
+          "new": 5
+        }
+      ]
+    },
+    "event_ticket_type": {
+      "rows": 22,
+      "minNewId": 1,
+      "maxNewId": 22,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 3,
+          "new": 2
+        },
+        {
+          "old": 4,
+          "new": 3
+        },
+        {
+          "old": 5,
+          "new": 4
+        },
+        {
+          "old": 6,
+          "new": 5
+        }
+      ]
+    },
+    "event_ticket_transaction": {
+      "rows": 86,
+      "minNewId": 1,
+      "maxNewId": 86,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_ticket_transaction_item": {
+      "rows": 28,
+      "minNewId": 1,
+      "maxNewId": 28,
+      "sample": [
+        {
+          "old": 4251,
+          "new": 1
+        },
+        {
+          "old": 4252,
+          "new": 2
+        },
+        {
+          "old": 4253,
+          "new": 3
+        },
+        {
+          "old": 4254,
+          "new": 4
+        },
+        {
+          "old": 4301,
+          "new": 5
+        }
+      ]
+    },
+    "qr_code_usage": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "tenant_organization": {
+      "rows": 8,
+      "minNewId": 1,
+      "maxNewId": 8,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 3,
+          "new": 2
+        },
+        {
+          "old": 4,
+          "new": 3
+        },
+        {
+          "old": 5,
+          "new": 4
+        },
+        {
+          "old": 6,
+          "new": 5
+        }
+      ]
+    },
+    "tenant_settings": {
+      "rows": 8,
+      "minNewId": 1,
+      "maxNewId": 8,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 3,
+          "new": 2
+        },
+        {
+          "old": 4,
+          "new": 3
+        },
+        {
+          "old": 5,
+          "new": 4
+        },
+        {
+          "old": 6,
+          "new": 5
+        }
+      ]
+    },
+    "tenant_email_addresses": {
+      "rows": 8,
+      "minNewId": 1,
+      "maxNewId": 8,
+      "sample": [
+        {
+          "old": 4002,
+          "new": 1
+        },
+        {
+          "old": 10585,
+          "new": 2
+        },
+        {
+          "old": 4001,
+          "new": 3
+        },
+        {
+          "old": 1051,
+          "new": 4
+        },
+        {
+          "old": 604002,
+          "new": 5
+        }
+      ]
+    },
+    "satellite_domain": {
+      "rows": 3,
+      "minNewId": 1,
+      "maxNewId": 3,
+      "sample": [
+        {
+          "old": 1050,
+          "new": 1
+        },
+        {
+          "old": 1100,
+          "new": 2
+        },
+        {
+          "old": 1150,
+          "new": 3
+        }
+      ]
+    },
+    "user_payment_transaction": {
+      "rows": 48,
+      "minNewId": 1,
+      "maxNewId": 48,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "user_subscription": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "user_task": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_contacts": {
+      "rows": 13,
+      "minNewId": 1,
+      "maxNewId": 13,
+      "sample": [
+        {
+          "old": 5101,
+          "new": 1
+        },
+        {
+          "old": 5251,
+          "new": 2
+        },
+        {
+          "old": 1,
+          "new": 3
+        },
+        {
+          "old": 5102,
+          "new": 4
+        },
+        {
+          "old": 10939,
+          "new": 5
+        }
+      ]
+    },
+    "event_emails": {
+      "rows": 7,
+      "minNewId": 1,
+      "maxNewId": 7,
+      "sample": [
+        {
+          "old": 5,
+          "new": 1
+        },
+        {
+          "old": 6,
+          "new": 2
+        },
+        {
+          "old": 1,
+          "new": 3
+        },
+        {
+          "old": 2,
+          "new": 4
+        },
+        {
+          "old": 3,
+          "new": 5
+        }
+      ]
+    },
+    "event_featured_performers": {
+      "rows": 8,
+      "minNewId": 1,
+      "maxNewId": 8,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 3,
+          "new": 2
+        },
+        {
+          "old": 2,
+          "new": 3
+        },
+        {
+          "old": 10839,
+          "new": 4
+        },
+        {
+          "old": 600001,
+          "new": 5
+        }
+      ]
+    },
+    "event_program_directors": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 3,
+          "new": 2
+        },
+        {
+          "old": 4,
+          "new": 3
+        },
+        {
+          "old": 10941,
+          "new": 4
+        },
+        {
+          "old": 600003,
+          "new": 5
+        }
+      ]
+    },
+    "executive_committee_team_members": {
+      "rows": 37,
+      "minNewId": 1,
+      "maxNewId": 37,
+      "sample": [
+        {
+          "old": 3,
+          "new": 1
+        },
+        {
+          "old": 1,
+          "new": 2
+        },
+        {
+          "old": 2,
+          "new": 3
+        },
+        {
+          "old": 8320,
+          "new": 4
+        },
+        {
+          "old": 5302,
+          "new": 5
+        }
+      ]
+    },
+    "event_recurrence_series": {
+      "rows": 2,
+      "minNewId": 1,
+      "maxNewId": 2,
+      "sample": [
+        {
+          "old": 6801,
+          "new": 1
+        },
+        {
+          "old": 606801,
+          "new": 2
+        }
+      ]
+    },
+    "focus_group": {
+      "rows": 23,
+      "minNewId": 1,
+      "maxNewId": 23,
+      "sample": [
+        {
+          "old": 4001,
+          "new": 1
+        },
+        {
+          "old": 8312,
+          "new": 2
+        },
+        {
+          "old": 8313,
+          "new": 3
+        },
+        {
+          "old": 8314,
+          "new": 4
+        },
+        {
+          "old": 8315,
+          "new": 5
+        }
+      ]
+    },
+    "focus_group_members": {
+      "rows": 2,
+      "minNewId": 1,
+      "maxNewId": 2,
+      "sample": [
+        {
+          "old": 8397,
+          "new": 1
+        },
+        {
+          "old": 608397,
+          "new": 2
+        }
+      ]
+    },
+    "event_focus_groups": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 8399,
+          "new": 1
+        },
+        {
+          "old": 8401,
+          "new": 2
+        },
+        {
+          "old": 10534,
+          "new": 3
+        },
+        {
+          "old": 608399,
+          "new": 4
+        },
+        {
+          "old": 608401,
+          "new": 5
+        }
+      ]
+    },
+    "membership_plan": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 4051,
+          "new": 1
+        },
+        {
+          "old": 10686,
+          "new": 2
+        },
+        {
+          "old": 10687,
+          "new": 3
+        },
+        {
+          "old": 604051,
+          "new": 4
+        },
+        {
+          "old": 610686,
+          "new": 5
+        }
+      ]
+    },
+    "membership_subscription": {
+      "rows": 2,
+      "minNewId": 1,
+      "maxNewId": 2,
+      "sample": [
+        {
+          "old": 8301,
+          "new": 1
+        },
+        {
+          "old": 608301,
+          "new": 2
+        }
+      ]
+    },
+    "payment_provider_config": {
+      "rows": 4,
+      "minNewId": 1,
+      "maxNewId": 4,
+      "sample": [
+        {
+          "old": 7350,
+          "new": 1
+        },
+        {
+          "old": 7650,
+          "new": 2
+        },
+        {
+          "old": 607350,
+          "new": 3
+        },
+        {
+          "old": 607650,
+          "new": 4
+        }
+      ]
+    },
+    "promotion_email_template": {
+      "rows": 8,
+      "minNewId": 1,
+      "maxNewId": 8,
+      "sample": [
+        {
+          "old": 4101,
+          "new": 1
+        },
+        {
+          "old": 4102,
+          "new": 2
+        },
+        {
+          "old": 5051,
+          "new": 3
+        },
+        {
+          "old": 5052,
+          "new": 4
+        },
+        {
+          "old": 604101,
+          "new": 5
+        }
+      ]
+    },
+    "promotion_email_sent_log": {
+      "rows": 36,
+      "minNewId": 1,
+      "maxNewId": 36,
+      "sample": [
+        {
+          "old": 4151,
+          "new": 1
+        },
+        {
+          "old": 4152,
+          "new": 2
+        },
+        {
+          "old": 4153,
+          "new": 3
+        },
+        {
+          "old": 4154,
+          "new": 4
+        },
+        {
+          "old": 4155,
+          "new": 5
+        }
+      ]
+    },
+    "manual_payment_request": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 7451,
+          "new": 1
+        },
+        {
+          "old": 7452,
+          "new": 2
+        },
+        {
+          "old": 8151,
+          "new": 3
+        },
+        {
+          "old": 607451,
+          "new": 4
+        },
+        {
+          "old": 607452,
+          "new": 5
+        }
+      ]
+    },
+    "manual_payment_summary_report": {
+      "rows": 4,
+      "minNewId": 1,
+      "maxNewId": 4,
+      "sample": [
+        {
+          "old": 7602,
+          "new": 1
+        },
+        {
+          "old": 7652,
+          "new": 2
+        },
+        {
+          "old": 607602,
+          "new": 3
+        },
+        {
+          "old": 607652,
+          "new": 4
+        }
+      ]
+    },
+    "clerk_organization_role": {
+      "rows": 3,
+      "minNewId": 1,
+      "maxNewId": 3,
+      "sample": [
+        {
+          "old": 4050,
+          "new": 1
+        },
+        {
+          "old": 4100,
+          "new": 2
+        },
+        {
+          "old": 4150,
+          "new": 3
+        }
+      ]
+    },
+    "batch_job_instance": {
+      "rows": 3,
+      "minNewId": 1,
+      "maxNewId": 3,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 4,
+          "new": 3
+        }
+      ]
+    },
+    "batch_job_execution": {
+      "rows": 3,
+      "minNewId": 1,
+      "maxNewId": 3,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        }
+      ]
+    },
+    "batch_job_execution_context": {
+      "rows": 3,
+      "minNewId": 1,
+      "maxNewId": 3,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        }
+      ]
+    },
+    "batch_step_execution": {
+      "rows": 2,
+      "minNewId": 1,
+      "maxNewId": 2,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        }
+      ]
+    },
+    "batch_step_execution_context": {
+      "rows": 2,
+      "minNewId": 1,
+      "maxNewId": 2,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        }
+      ]
+    },
+    "batch_job_execution_log": {
+      "rows": 3,
+      "minNewId": 1,
+      "maxNewId": 3,
+      "sample": [
+        {
+          "old": 4001,
+          "new": 1
+        },
+        {
+          "old": 4002,
+          "new": 2
+        },
+        {
+          "old": 4003,
+          "new": 3
+        }
+      ]
+    },
+    "bulk_operation_log": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "databasechangeloglock": {
+      "rows": 6,
+      "minNewId": 1,
+      "maxNewId": 6,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    }
+  },
+  "fkWarningCount": 0,
+  "fkWarnings": []
+}
