@@ -1,0 +1,204 @@
+---
+description: Shared sequence_generator alignment, SQL reorder/renumber import pipeline, and backend changes (event-site-manager-service + batch-jobs)
+globs: code_html_template/SQLS/**/*.sql, code_html_template/SQLS/**/*.cjs, **/domain/*.java, **/SequenceSynchronization*.java
+alwaysApply: false
+---
+
+# Sequence and ID Alignment (Database + SQL + Backend)
+
+## Overview
+
+This system uses **one shared PostgreSQL sequence** (`public.sequence_generator`) for primary keys on most application tables. Hibernate/JHipster entities must stay aligned with the database. Manual INSERT seed files do **not** advance the sequence — you must sync after import.
+
+**Three-layer alignment (all required):**
+
+| Layer | Requirement |
+|-------|-------------|
+| PostgreSQL | `CREATE SEQUENCE public.sequence_generator INCREMENT BY 1` |
+| Hibernate | `@SequenceGenerator(..., sequenceName = "public.sequence_generator", allocationSize = 1)` |
+| Post-import | `sync_sequence_after_inserts.sql` and/or `POST /api/admin/sync-sequence` |
+
+**Separate from application IDs:** Spring Batch uses `batch_job_seq`, `batch_job_execution_seq`, `batch_step_execution_seq`. `batch_job_execution_log` uses `batch_job_execution_log_id_seq` (BIGSERIAL). Sync with `sync_spring_batch_sequences.sql` — never mix into `sequence_generator` scripts.
+
+---
+
+## Why Next IDs Jump to 600000+
+
+1. **MOSC tenant block** in `corrected_event_media_inserts.ordered.sql` uses explicit IDs **600001+** (tenant isolation).
+2. **One shared sequence** — every insert in any table advances the same counter.
+3. **Import without sync** — `sequence_generator.last_value` stays stale or wrong.
+4. **Legacy `INCREMENT BY 50`** — old JHipster DBs + `allocationSize = 50` caused gaps; must migrate once.
+5. **After sync with ordered (non-renumbered) data** — sequence correctly sits at global `MAX(id)` (~600k if MOSC rows exist). That is expected for that file.
+
+**To get compact new IDs:** import `sequence_fix_inserts/corrected_event_media_inserts.renumbered.sql`, then run sync. Next ID = global max across all tables (often ~800+ because `event_media` has many rows), not necessarily 37.
+
+---
+
+## SQL Import Pipeline (Canonical Paths)
+
+All paths under `code_html_template/SQLS/` unless noted.
+
+### Step 1 — Export
+
+```bash
+docker exec -it <container_id> pg_dump -U event_site_admin -d event_site_manager_db --data-only --column-inserts > export.sql
+```
+
+### Step 2 — Reorder (FK-safe table order)
+
+- **Script:** [reorder_sql_inserts_final.cjs](mdc:code_html_template/SQLS/reorder_sql_inserts_final.cjs)
+- **Input:** `export.sql`
+- **Output:** `corrected_event_media_inserts.ordered.sql`
+- **Maintain:** extend `TABLE_ORDER` when console shows `Extra tables (not in order):` — parents before children; Spring Batch chain: instance → execution → context → params → step → step_context → log.
+
+### Step 3 — Optional renumber (compact PKs + trim batch noise)
+
+- **Folder:** `sequence_fix_inserts/`
+- **Script:** [renumber_sql_insert_ids.cjs](mdc:code_html_template/SQLS/sequence_fix_inserts/renumber_sql_insert_ids.cjs)
+- **Input:** `sequence_fix_inserts/corrected_event_media_inserts.ordered.sql` (or `--input=`)
+- **Output:** `corrected_event_media_inserts.renumbered.sql`, `id-mapping-report.json`
+- **Does:** per-table PKs 1..N; column-aware FK rewrite from schema + manual overrides; trim to first N batch executions + N batch logs (default 3); orphan FK repair (demo event IDs 500001–500003; `rel_event_details__discount_codes` via `discount_code.event_id`).
+- **Does not:** replace canonical `SQLS/corrected_event_media_inserts.ordered.sql` until import is validated.
+
+```bash
+cd code_html_template/SQLS/sequence_fix_inserts
+node renumber_sql_insert_ids.cjs --batch-executions=3 --batch-logs=3
+```
+
+### Step 4 — Import
+
+Apply schema first: [Latest_Schema_Post__Blob_Claude_12.sql](mdc:code_html_template/SQLS/Current_Sqls/Latest_Schema_Post__Blob_Claude_12.sql), then ordered or renumbered INSERT file.
+
+### Step 5 — Sync sequences (mandatory on every machine that imported data)
+
+| Script | When |
+|--------|------|
+| [sync_sequence_after_inserts.sql](mdc:code_html_template/SQLS/Current_Sqls/sync_sequence_after_inserts.sql) | **Always** after manual INSERT import |
+| [sync_spring_batch_sequences.sql](mdc:code_html_template/SQLS/Current_Sqls/sync_spring_batch_sequences.sql) | After any Spring Batch table data imported |
+| [fix_sequence_generator_increment_by_one.sql](mdc:code_html_template/SQLS/Current_Sqls/fix_sequence_generator_increment_by_one.sql) | **Once** on legacy DBs still at `INCREMENT BY 50`; stop app first |
+
+**Do not use:** `SQLS/INSERTS/sync_sequence_after_inserts.sql` (legacy increment-50 copy).
+
+**Preferred canonical folder:** `SQLS/Current_Sqls/` (matches [DATABASE_EXPORT_IMPORT_GUIDE.html](mdc:documentation/database_export_import/DATABASE_EXPORT_IMPORT_GUIDE.html)).
+
+### Batch automation
+
+[database_export_import_refresh.bat](mdc:code_html_template/batch_files/database_export_import_refresh.bat): Steps 1–6 export/reorder/import; Step 7 `sync_sequence_after_inserts.sql`; Step 7b `sync_spring_batch_sequences.sql`. Use `/IMPORT-FILE` with renumbered path + `/SKIP-EXPORT` when importing pre-built SQL on another machine.
+
+---
+
+## Backend: event-site-manager-service
+
+**Repo path:** `F:/project_workspace/event-site-manager-service` (active REST API; not `malayalees-us-site-boot`).
+
+### Entity changes (required for all new/changed entities)
+
+```java
+// ✅ DO
+@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+@SequenceGenerator(
+    name = "sequenceGenerator",
+    sequenceName = "public.sequence_generator",
+    allocationSize = 1
+)
+
+// ❌ DON'T — Hibernate default allocationSize = 50 conflicts with INCREMENT BY 1
+@SequenceGenerator(name = "sequenceGenerator")
+```
+
+All ~78 domain entities under `src/main/java/com/eventsitemanager/domain/` use `allocationSize = 1`.
+
+### Runtime sequence sync
+
+| Component | Path | Role |
+|-----------|------|------|
+| `SequenceSynchronizationService` | `.../service/SequenceSynchronizationService.java` | `setval` on `sequence_generator` via static GREATEST list (matches SQL script) |
+| `SequenceSynchronizationAspect` | `.../aop/sequence/SequenceSynchronizationAspect.java` | On duplicate PK: sync sequence and retry save |
+| `AdminController` | `.../web/rest/AdminController.java` | `POST /api/admin/sync-sequence` |
+| Duplicate-key pattern | [.cursor/rules/duplicate-key-prevention.mdc](mdc:../event-site-manager-service/.cursor/rules/duplicate-key-prevention.mdc) | Clear `entity.setId(null)` on create; AOP fallback |
+
+### Schema alignment
+
+When adding tables, update **both**:
+
+1. End-of-schema `setval` GREATEST block in `Latest_Schema_Post__Blob_Claude_12.sql`
+2. `sync_sequence_after_inserts.sql` and `SequenceSynchronizationService.java` GREATEST list
+
+See [database_schema_guidelines.mdc](mdc:database_schema_guidelines.mdc).
+
+### Known gap
+
+Liquibase changelog `20250422000000_create_sequence_generator.xml` may still say `incrementBy="50"`. Fresh installs use canonical SQL schema (`INCREMENT BY 1`). Legacy envs: run `fix_sequence_generator_increment_by_one.sql` once.
+
+---
+
+## Backend: event-site-manager-batch-jobs
+
+**Repo path:** `F:/project_workspace/event-site-manager-batch-jobs`
+
+### Entity changes
+
+- Domain entities (11): `allocationSize = 1` on `@SequenceGenerator` — same pattern as main service.
+- `BatchJobExecution`: uses `GenerationType.IDENTITY` (not `sequence_generator`).
+
+### Batch-specific sequence sync
+
+| Component | Path | Role |
+|-----------|------|------|
+| `SequenceSynchronizationService` | `.../batch/service/SequenceSynchronizationService.java` | **Dynamic** sync: discovers all public tables with numeric `id`; builds GREATEST at runtime |
+| `synchronizeBatchJobExecutionLogSequence()` | same file | Syncs `batch_job_execution_log_id_seq` |
+| `BatchJobExecutionService` | `.../batch/service/BatchJobExecutionService.java` | **Pre-sync** both sequences before each job run |
+| `SequenceSynchronizationAspect` | `.../batch/aop/sequence/SequenceSynchronizationAspect.java` | Duplicate-key recovery + batch log sequence |
+| Rules | `.cursor/rules/duplicate-key-prevention.mdc` | Same ID-clearing pattern as main service |
+
+After SQL import on a batch server, run **both** `sync_sequence_after_inserts.sql` and `sync_spring_batch_sequences.sql` locally — do not rely only on runtime pre-sync if DB was restored from dump.
+
+---
+
+## Verification Queries
+
+```sql
+SELECT sequencename, increment_by, last_value
+FROM pg_sequences
+WHERE schemaname = 'public'
+  AND sequencename IN ('sequence_generator', 'batch_job_seq', 'batch_job_execution_seq', 'batch_step_execution_seq');
+
+SELECT MAX(id) FROM event_details;
+SELECT MAX(id) FROM event_type_details;
+SELECT MAX(id) FROM event_media;
+```
+
+After sync, `sequence_generator.last_value` should be ≥ global max `id` across tables in the GREATEST list (or dynamic discovery in batch-jobs service).
+
+---
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---------|--------------|-----|
+| Next ID ~600001+ | Imported **ordered** SQL with MOSC block | Expected after sync; use **renumbered** import if you want lower IDs |
+| Duplicate PK on create | Sequence behind `MAX(id)` | Run `sync_sequence_after_inserts.sql`; call `POST /api/admin/sync-sequence` |
+| IDs jump by 50 | Legacy `INCREMENT BY 50` or `allocationSize = 50` | Deploy `allocationSize = 1`; run `fix_sequence_generator_increment_by_one.sql` once |
+| Batch job duplicate PK | Spring Batch sequences stale | Run `sync_spring_batch_sequences.sql` |
+| Import OK, app still wrong on **other machine** | Sync scripts not run on that DB | Run Steps 7 + 7b on **each** database that received INSERTs |
+| Renumber FK warnings | Old script / wrong import file | Re-run latest `renumber_sql_insert_ids.cjs`; check `id-mapping-report.json` `fkWarningCount: 0` |
+
+---
+
+## Documentation
+
+- **HTML (full):** [SEQUENCE_ID_ALIGNMENT_GUIDE.html](mdc:documentation/database_export_import/SEQUENCE_ID_ALIGNMENT_GUIDE.html)
+- **Import workflow:** [DATABASE_EXPORT_IMPORT_GUIDE.html](mdc:documentation/database_export_import/DATABASE_EXPORT_IMPORT_GUIDE.html) §3a, §7, §11
+- **Schema DDL rules:** [database_schema_guidelines.mdc](mdc:database_schema_guidelines.mdc)
+
+---
+
+## Checklist (new environment)
+
+- [ ] Schema applied from `Latest_Schema_Post__Blob_Claude_12.sql` (`INCREMENT BY 1`)
+- [ ] INSERT file imported (ordered or renumbered)
+- [ ] `sync_sequence_after_inserts.sql` executed on **this** database
+- [ ] `sync_spring_batch_sequences.sql` executed if batch tables have rows
+- [ ] Backend deployed with `allocationSize = 1` on all `sequence_generator` entities
+- [ ] Legacy DB: one-time `fix_sequence_generator_increment_by_one.sql` if `increment_by = 50`
+- [ ] Verify `last_value` and create one test row via app

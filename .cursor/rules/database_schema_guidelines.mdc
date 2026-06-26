@@ -51,6 +51,7 @@ This rule defines the standard patterns for adding or modifying PostgreSQL table
   2. `corrected_event_media_inserts.ordered.sql`
   3. `sync_sequence_after_inserts.sql` (or schema end-of-file `setval` block / `POST /api/admin/sync-sequence`)
 - **Spring Batch sequences** (`batch_job_seq`, etc.) are separate — use `sync_spring_batch_sequences.sql`, not `sequence_generator` scripts.
+- **Full pipeline (reorder, renumber, sync, backend alignment):** see [sequence_id_alignment_and_import.mdc](mdc:sequence_id_alignment_and_import.mdc) and [SEQUENCE_ID_ALIGNMENT_GUIDE.html](mdc:documentation/database_export_import/SEQUENCE_ID_ALIGNMENT_GUIDE.html).
 
 - **Never leave a hardcoded shared sequence value** for `public.sequence_generator` when schema evolves (for example `setval(..., 4000, true)` only).
 - Use `GREATEST(...)` with `COALESCE(MAX(id), 0)` for all tables using `DEFAULT nextval('public.sequence_generator'::regclass)`.

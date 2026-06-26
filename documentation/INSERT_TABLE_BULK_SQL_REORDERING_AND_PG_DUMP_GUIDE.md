@@ -1,5 +1,9 @@
 # SQL Insert Reordering and PostgreSQL Dump Guide
 
+> **Sequence / ID alignment (allocationSize, sync scripts, backends):** see
+> [`documentation/database_export_import/SEQUENCE_ID_ALIGNMENT_GUIDE.html`](database_export_import/SEQUENCE_ID_ALIGNMENT_GUIDE.html)
+> and `.cursor/rules/sequence_id_alignment_and_import.mdc`.
+
 > **Full workflow (reorder, renumber, PROD IDs, batch import, sequence sync):** see
 > [`documentation/database_export_import/DATABASE_EXPORT_IMPORT_GUIDE.html`](database_export_import/DATABASE_EXPORT_IMPORT_GUIDE.html)
 > — especially **§3a** (renumber IDs + trim Spring Batch) and **§11** (sequence fix reference).
