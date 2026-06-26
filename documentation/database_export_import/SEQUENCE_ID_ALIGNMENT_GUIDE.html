@@ -89,18 +89,18 @@
     </nav>
 
     <section id="architecture">
-      <h2>1. Architecture — one shared sequence</h2>
+      <h2>1. Architecture — per-table id sequences</h2>
       <div class="section-container">
         <div class="section-header">Three-layer alignment</div>
         <table>
           <thead><tr><th>Layer</th><th>Requirement</th></tr></thead>
           <tbody>
-            <tr><td>PostgreSQL</td><td><code>CREATE SEQUENCE public.sequence_generator INCREMENT BY 1</code></td></tr>
-            <tr><td>Hibernate</td><td><code>@SequenceGenerator(..., sequenceName = "public.sequence_generator", allocationSize = 1)</code></td></tr>
-            <tr><td>After import</td><td><code>sync_sequence_after_inserts.sql</code> and/or <code>POST /api/admin/sync-sequence</code></td></tr>
+            <tr><td>PostgreSQL</td><td><code>CREATE SEQUENCE public.{table}_id_seq INCREMENT BY 1</code></td></tr>
+            <tr><td>Hibernate</td><td><code>@SequenceGenerator(..., sequenceName = "public.{table}_id_seq", allocationSize = 1)</code></td></tr>
+            <tr><td>After import</td><td><code>sync_all_table_sequences.sql</code> and/or <code>POST /api/admin/sync-sequence</code></td></tr>
           </tbody>
         </table>
-        <p>Most application tables use <code class="code-highlight">id bigint DEFAULT nextval('public.sequence_generator'::regclass)</code>.</p>
+        <p>Most application tables use <code class="code-highlight">id bigint DEFAULT nextval('public.{table}_id_seq'::regclass)</code>.</p>
         <p><strong>Separate sequences (do not merge):</strong></p>
         <ul>
           <li><code class="code-highlight">batch_job_seq</code>, <code class="code-highlight">batch_job_execution_seq</code>, <code class="code-highlight">batch_step_execution_seq</code> — Spring Batch framework</li>
@@ -115,7 +115,7 @@
         <thead><tr><th>Cause</th><th>Explanation</th></tr></thead>
         <tbody>
           <tr><td>MOSC seed block</td><td><code class="code-highlight">corrected_event_media_inserts.ordered.sql</code> includes tenant <code class="code-highlight">mosc_malankara_orthodox_2</code> rows at <strong>600001+</strong></td></tr>
-          <tr><td>Shared sequence</td><td>Every new row in any table advances the same <code class="code-highlight">sequence_generator</code></td></tr>
+          <tr><td>Per-table sequences</td><td>Each table uses <code class="code-highlight">{table}_id_seq</code>; new ids are <code class="code-highlight">MAX(id)+1</code> for that table only</td></tr>
           <tr><td>Import without sync</td><td>Manual INSERTs do not update <code class="code-highlight">last_value</code></td></tr>
           <tr><td>Sync after ordered import</td><td><code class="code-highlight">setval</code> sets sequence to global <code class="code-highlight">MAX(id)</code> — ~600k is <strong>correct</strong> for that file</td></tr>
           <tr><td>Legacy increment 50</td><td>Old JHipster DBs used <code class="code-highlight">INCREMENT BY 50</code> + <code class="code-highlight">allocationSize = 50</code></td></tr>
@@ -123,7 +123,7 @@
       </table>
       <div class="info">
         <strong>Lower new IDs:</strong> Import <code class="code-highlight">sequence_fix_inserts/corrected_event_media_inserts.renumbered.sql</code>,
-        then run sync. Global max may still be ~800+ (many <code class="code-highlight">event_media</code> rows) because one sequence serves all tables.
+        then run <code class="code-highlight">sync_all_table_sequences.sql</code>. Executive committee next id = that table's max + 1 (not inflated by <code class="code-highlight">event_media</code>).
       </div>
     </section>
 
@@ -156,18 +156,18 @@
 
       <div class="command-block verify"
            data-command-base="docker exec -i CONTAINER_ID psql -U event_site_admin -d event_site_manager_db -v ON_ERROR_STOP=1"
-           data-template-command="docker exec -i CONTAINER_ID psql -U event_site_admin -d event_site_manager_db -v ON_ERROR_STOP=1 -f code_html_template/SQLS/Current_Sqls/sync_sequence_after_inserts.sql">
+           data-template-command="docker exec -i CONTAINER_ID psql -U event_site_admin -d event_site_manager_db -v ON_ERROR_STOP=1 -f code_html_template/SQLS/Current_Sqls/sync_all_table_sequences.sql">
         <div class="command-header">
-          <span class="command-type">Step 7 — sync_sequence_after_inserts.sql</span>
+          <span class="command-type">Step 7 — sync_all_table_sequences.sql</span>
           <div class="command-header-buttons">
             <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'sync-main')" title="Copy template">📄 Template</button>
             <button type="button" class="copy-button" onclick="copyCommand(this, 'sync-main')" title="Copy">📋 Copy</button>
           </div>
         </div>
-        <div class="command-content" id="sync-main">docker exec -i CONTAINER_ID psql -U event_site_admin -d event_site_manager_db -v ON_ERROR_STOP=1 &lt; code_html_template/SQLS/Current_Sqls/sync_sequence_after_inserts.sql</div>
+        <div class="command-content" id="sync-main">docker exec -i CONTAINER_ID psql -U event_site_admin -d event_site_manager_db -v ON_ERROR_STOP=1 &lt; code_html_template/SQLS/Current_Sqls/sync_all_table_sequences.sql</div>
         <div class="command-single-line">
           <div class="command-single-line-label">Windows single-line:</div>
-          <code id="sync-main-single-code">docker exec -i CONTAINER_ID psql -U event_site_admin -d event_site_manager_db -v ON_ERROR_STOP=1 &lt; code_html_template/SQLS/Current_Sqls/sync_sequence_after_inserts.sql</code>
+          <code id="sync-main-single-code">docker exec -i CONTAINER_ID psql -U event_site_admin -d event_site_manager_db -v ON_ERROR_STOP=1 &lt; code_html_template/SQLS/Current_Sqls/sync_all_table_sequences.sql</code>
         </div>
       </div>
 
@@ -188,21 +188,8 @@
         </div>
       </div>
 
-      <div class="command-block advance"
-           data-command-base="docker exec -i CONTAINER_ID psql -U event_site_admin -d event_site_manager_db -v ON_ERROR_STOP=1"
-           data-template-command="docker exec -i CONTAINER_ID psql -U event_site_admin -d event_site_manager_db -v ON_ERROR_STOP=1 -f code_html_template/SQLS/Current_Sqls/fix_sequence_generator_increment_by_one.sql">
-        <div class="command-header">
-          <span class="command-type">One-time legacy fix — INCREMENT BY 50 → 1</span>
-          <div class="command-header-buttons">
-            <button type="button" class="copy-button-template" onclick="copyTemplateCommand(this, 'fix-inc')" title="Copy template">📄 Template</button>
-            <button type="button" class="copy-button" onclick="copyCommand(this, 'fix-inc')" title="Copy">📋 Copy</button>
-          </div>
-        </div>
-        <div class="command-content" id="fix-inc">docker exec -i CONTAINER_ID psql -U event_site_admin -d event_site_manager_db -v ON_ERROR_STOP=1 &lt; code_html_template/SQLS/Current_Sqls/fix_sequence_generator_increment_by_one.sql</div>
-        <div class="command-single-line">
-          <div class="command-single-line-label">Windows single-line:</div>
-          <code id="fix-inc-single-code">docker exec -i CONTAINER_ID psql -U event_site_admin -d event_site_manager_db -v ON_ERROR_STOP=1 &lt; code_html_template/SQLS/Current_Sqls/fix_sequence_generator_increment_by_one.sql</code>
-        </div>
+      <div class="warning">
+        <strong>Deprecated:</strong> <code class="code-highlight">fix_sequence_generator_increment_by_one.sql</code> applied only to legacy shared <code class="code-highlight">sequence_generator</code> databases. Fresh installs use per-table <code class="code-highlight">*_id_seq</code> with <code class="code-highlight">INCREMENT BY 1</code>.
       </div>
 
       <div class="warning">
@@ -220,7 +207,7 @@
         <pre class="code-block">@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
 @SequenceGenerator(
     name = "sequenceGenerator",
-    sequenceName = "public.sequence_generator",
+    sequenceName = "public.{table}_id_seq",
     allocationSize = 1
 )</pre>
         <p>All domain entities under <code class="code-highlight">src/main/java/com/eventsitemanager/domain/</code> (~78 files) must use <code class="code-highlight">allocationSize = 1</code>.</p>
@@ -237,8 +224,12 @@
       </table>
 
       <div class="info">
-        When adding a table: update <code class="code-highlight">Latest_Schema_Post__Blob_Claude_12.sql</code> setval block,
-        <code class="code-highlight">sync_sequence_after_inserts.sql</code>, and <code class="code-highlight">SequenceSynchronizationService.java</code> GREATEST list together.
+        When adding a table: add <code class="code-highlight">{table}_id_seq</code> in
+        <code class="code-highlight">Latest_Schema_Post__Blob_Claude_12.sql</code>, unique
+        <code class="code-highlight">@SequenceGenerator</code> on the entity, and run
+        <code class="code-highlight">generate_per_table_sequences.cjs</code> to refresh
+        <code class="code-highlight">sync_all_table_sequences.sql</code> (runtime sync is dynamic via
+        <code class="code-highlight">SequenceSynchronizationService</code>).
       </div>
     </section>
 
@@ -254,13 +245,13 @@
           <tr><td><code>BatchJobExecutionService</code></td><td><code>.../batch/service/BatchJobExecutionService.java</code></td><td>Pre-sync before each batch job run</td></tr>
           <tr><td><code>SequenceSynchronizationAspect</code></td><td><code>.../batch/aop/sequence/SequenceSynchronizationAspect.java</code></td><td>Duplicate-key recovery</td></tr>
           <tr><td>Domain entities (11)</td><td><code>.../batch/domain/*.java</code></td><td><code class="code-highlight">allocationSize = 1</code></td></tr>
-          <tr><td><code>BatchJobExecution</code></td><td><code>.../batch/domain/BatchJobExecution.java</code></td><td><code class="code-highlight">GenerationType.IDENTITY</code> — not <code class="code-highlight">sequence_generator</code></td></tr>
+          <tr><td><code>BatchJobExecution</code></td><td><code>.../batch/domain/BatchJobExecution.java</code></td><td><code class="code-highlight">GenerationType.IDENTITY</code> — not <code class="code-highlight">per-table id sequences</code></td></tr>
         </tbody>
       </table>
 
       <div class="warning">
         Batch runtime pre-sync does <strong>not</strong> replace post-import SQL sync on a freshly restored database.
-        Run <code class="code-highlight">sync_sequence_after_inserts.sql</code> and <code class="code-highlight">sync_spring_batch_sequences.sql</code> after import on each environment.
+        Run <code class="code-highlight">sync_all_table_sequences.sql</code> and <code class="code-highlight">sync_spring_batch_sequences.sql</code> after import on each environment.
       </div>
     </section>
 
@@ -273,10 +264,10 @@
           <li><code class="code-highlight">node reorder_sql_inserts_final.cjs</code></li>
           <li><em>Optional:</em> <code class="code-highlight">node renumber_sql_insert_ids.cjs</code></li>
           <li>Import ordered or renumbered INSERT file</li>
-          <li><strong><code class="code-highlight">sync_sequence_after_inserts.sql</code></strong></li>
+          <li><strong><code class="code-highlight">sync_all_table_sequences.sql</code></strong></li>
           <li><strong><code class="code-highlight">sync_spring_batch_sequences.sql</code></strong> (if batch data present)</li>
           <li>Deploy backends with <code class="code-highlight">allocationSize = 1</code></li>
-          <li><em>Legacy once:</em> <code class="code-highlight">fix_sequence_generator_increment_by_one.sql</code> if <code class="code-highlight">increment_by = 50</code></li>
+          <li><em>Legacy once:</em> <code class="code-highlight">fix_per-table id sequences_increment_by_one.sql</code> if <code class="code-highlight">increment_by = 50</code></li>
         </ol>
       </div>
     </section>
@@ -287,7 +278,7 @@
 FROM pg_sequences
 WHERE schemaname = 'public'
   AND sequencename IN (
-    'sequence_generator',
+    'per-table id sequences',
     'batch_job_seq',
     'batch_job_execution_seq',
     'batch_step_execution_seq'
@@ -296,7 +287,7 @@ WHERE schemaname = 'public'
 SELECT MAX(id) FROM event_details;
 SELECT MAX(id) FROM event_type_details;
 SELECT MAX(id) FROM event_media;</pre>
-      <p>After sync, <code class="code-highlight">sequence_generator.last_value</code> ≥ global max <code class="code-highlight">id</code>. Create one row via the app to confirm no duplicate PK.</p>
+      <p>After sync, <code class="code-highlight">per-table id sequences.last_value</code> ≥ global max <code class="code-highlight">id</code>. Create one row via the app to confirm no duplicate PK.</p>
     </section>
 
     <section id="troubleshooting">
@@ -321,9 +312,9 @@ SELECT MAX(id) FROM event_media;</pre>
           <tr><td>Canonical schema</td><td><code>mosc-temp/code_html_template/SQLS/Current_Sqls/Latest_Schema_Post__Blob_Claude_12.sql</code></td></tr>
           <tr><td>Reorder script</td><td><code>mosc-temp/code_html_template/SQLS/reorder_sql_inserts_final.cjs</code></td></tr>
           <tr><td>Renumber script</td><td><code>mosc-temp/code_html_template/SQLS/sequence_fix_inserts/renumber_sql_insert_ids.cjs</code></td></tr>
-          <tr><td>Sync (app tables)</td><td><code>mosc-temp/code_html_template/SQLS/Current_Sqls/sync_sequence_after_inserts.sql</code></td></tr>
+          <tr><td>Sync (app tables)</td><td><code>mosc-temp/code_html_template/SQLS/Current_Sqls/sync_all_table_sequences.sql</code></td></tr>
           <tr><td>Sync (Spring Batch)</td><td><code>mosc-temp/code_html_template/SQLS/Current_Sqls/sync_spring_batch_sequences.sql</code></td></tr>
-          <tr><td>Legacy increment fix</td><td><code>mosc-temp/code_html_template/SQLS/Current_Sqls/fix_sequence_generator_increment_by_one.sql</code></td></tr>
+          <tr><td>Legacy increment fix</td><td><code>mosc-temp/code_html_template/SQLS/Current_Sqls/fix_per-table id sequences_increment_by_one.sql</code></td></tr>
           <tr><td>Batch refresh</td><td><code>mosc-temp/code_html_template/batch_files/database_export_import_refresh.bat</code></td></tr>
           <tr><td>REST API</td><td><code>event-site-manager-service/</code></td></tr>
           <tr><td>Batch jobs</td><td><code>event-site-manager-batch-jobs/</code></td></tr>

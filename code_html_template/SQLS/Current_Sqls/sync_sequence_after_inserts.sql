@@ -17,11 +17,11 @@ BEGIN;
 -- Ensure increment matches Hibernate allocationSize = 1 (safe on legacy DBs still at 50)
 ALTER SEQUENCE public.sequence_generator INCREMENT BY 1;
 
--- Align sequence to highest ID in use across all tables (never decrease)
+-- Align sequence to highest explicit ID in table data (do NOT use sequence last_value —
+-- a bloated sequence from prior dev sessions must not survive a low-ID reimport).
 SELECT pg_catalog.setval(
                'public.sequence_generator',
                GREATEST(
-                   COALESCE((SELECT last_value FROM public.sequence_generator), 0),
                    COALESCE((SELECT MAX(id) FROM public.user_profile), 0),
                    COALESCE((SELECT MAX(id) FROM public.bulk_operation_log), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_type_details), 0),

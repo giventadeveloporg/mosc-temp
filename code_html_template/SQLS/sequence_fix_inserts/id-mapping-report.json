@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-06-25T19:01:03.573Z",
-  "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.ordered.sql",
+  "generatedAt": "2026-06-26T02:51:42.790Z",
+  "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
   "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 1705,
+  "statementCount": 1702,
   "tables": {
     "event_type_details": {
       "rows": 12,
@@ -67,23 +67,23 @@
       "maxNewId": 36,
       "sample": [
         {
-          "old": 4,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 7,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 8,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 9,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 10,
+          "old": 5,
           "new": 5
         }
       ]
@@ -256,15 +256,15 @@
       "maxNewId": 12,
       "sample": [
         {
-          "old": 600001,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 600002,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 600003,
+          "old": 3,
           "new": 3
         },
         {
@@ -283,15 +283,15 @@
       "maxNewId": 12,
       "sample": [
         {
-          "old": 600001,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 600002,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 600003,
+          "old": 3,
           "new": 3
         },
         {
@@ -322,11 +322,11 @@
           "new": 3
         },
         {
-          "old": 5,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 4551,
+          "old": 5,
           "new": 5
         }
       ]
@@ -349,11 +349,11 @@
           "new": 3
         },
         {
-          "old": 6,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 7,
+          "old": 5,
           "new": 5
         }
       ]
@@ -364,23 +364,23 @@
       "maxNewId": 8,
       "sample": [
         {
-          "old": 611401,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 611402,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 611403,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 611404,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 611405,
+          "old": 5,
           "new": 5
         }
       ]
@@ -391,23 +391,23 @@
       "maxNewId": 62,
       "sample": [
         {
-          "old": 8332,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 10688,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 11044,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 11045,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 11046,
+          "old": 5,
           "new": 5
         }
       ]
@@ -418,23 +418,23 @@
       "maxNewId": 90,
       "sample": [
         {
-          "old": 1100,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 1150,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 1200,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 1250,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 1300,
+          "old": 5,
           "new": 5
         }
       ]
@@ -445,50 +445,50 @@
       "maxNewId": 12,
       "sample": [
         {
-          "old": 10273,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 10274,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 10275,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 10276,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 10277,
+          "old": 5,
           "new": 5
         }
       ]
     },
     "event_media": {
-      "rows": 807,
+      "rows": 804,
       "minNewId": 1,
-      "maxNewId": 807,
+      "maxNewId": 804,
       "sample": [
         {
-          "old": 4150,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 4200,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 4250,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 4300,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 4350,
+          "old": 5,
           "new": 5
         }
       ]
@@ -607,15 +607,15 @@
       "maxNewId": 12,
       "sample": [
         {
-          "old": 600001,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 600002,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 600003,
+          "old": 3,
           "new": 3
         },
         {
@@ -634,23 +634,23 @@
       "maxNewId": 12,
       "sample": [
         {
-          "old": 600001,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 600002,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 600003,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 600004,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 600005,
+          "old": 5,
           "new": 5
         }
       ]
@@ -661,23 +661,23 @@
       "maxNewId": 9,
       "sample": [
         {
-          "old": 2,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 4,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 5,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 6,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 1,
+          "old": 5,
           "new": 5
         }
       ]
@@ -692,19 +692,19 @@
           "new": 1
         },
         {
-          "old": 3,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 4,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 5,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 6,
+          "old": 5,
           "new": 5
         }
       ]
@@ -742,23 +742,23 @@
       "maxNewId": 28,
       "sample": [
         {
-          "old": 4251,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 4252,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 4253,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 4254,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 4301,
+          "old": 5,
           "new": 5
         }
       ]
@@ -800,19 +800,19 @@
           "new": 1
         },
         {
-          "old": 3,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 4,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 5,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 6,
+          "old": 5,
           "new": 5
         }
       ]
@@ -827,19 +827,19 @@
           "new": 1
         },
         {
-          "old": 3,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 4,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 5,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 6,
+          "old": 5,
           "new": 5
         }
       ]
@@ -850,23 +850,23 @@
       "maxNewId": 8,
       "sample": [
         {
-          "old": 4002,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 10585,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 4001,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 1051,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 604002,
+          "old": 5,
           "new": 5
         }
       ]
@@ -877,15 +877,15 @@
       "maxNewId": 3,
       "sample": [
         {
-          "old": 1050,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 1100,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 1150,
+          "old": 3,
           "new": 3
         }
       ]
@@ -977,23 +977,23 @@
       "maxNewId": 13,
       "sample": [
         {
-          "old": 5101,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 5251,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 1,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 5102,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 10939,
+          "old": 5,
           "new": 5
         }
       ]
@@ -1004,23 +1004,23 @@
       "maxNewId": 7,
       "sample": [
         {
-          "old": 5,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 6,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 1,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 2,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 3,
+          "old": 5,
           "new": 5
         }
       ]
@@ -1035,19 +1035,19 @@
           "new": 1
         },
         {
-          "old": 3,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 2,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 10839,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 600001,
+          "old": 5,
           "new": 5
         }
       ]
@@ -1062,19 +1062,19 @@
           "new": 1
         },
         {
-          "old": 3,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 4,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 10941,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 600003,
+          "old": 5,
           "new": 5
         }
       ]
@@ -1085,23 +1085,23 @@
       "maxNewId": 37,
       "sample": [
         {
-          "old": 3,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 1,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 2,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 8320,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 5302,
+          "old": 5,
           "new": 5
         }
       ]
@@ -1112,11 +1112,11 @@
       "maxNewId": 2,
       "sample": [
         {
-          "old": 6801,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 606801,
+          "old": 2,
           "new": 2
         }
       ]
@@ -1127,23 +1127,23 @@
       "maxNewId": 23,
       "sample": [
         {
-          "old": 4001,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 8312,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 8313,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 8314,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 8315,
+          "old": 5,
           "new": 5
         }
       ]
@@ -1154,11 +1154,11 @@
       "maxNewId": 2,
       "sample": [
         {
-          "old": 8397,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 608397,
+          "old": 2,
           "new": 2
         }
       ]
@@ -1169,23 +1169,23 @@
       "maxNewId": 6,
       "sample": [
         {
-          "old": 8399,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 8401,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 10534,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 608399,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 608401,
+          "old": 5,
           "new": 5
         }
       ]
@@ -1196,23 +1196,23 @@
       "maxNewId": 6,
       "sample": [
         {
-          "old": 4051,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 10686,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 10687,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 604051,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 610686,
+          "old": 5,
           "new": 5
         }
       ]
@@ -1223,11 +1223,11 @@
       "maxNewId": 2,
       "sample": [
         {
-          "old": 8301,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 608301,
+          "old": 2,
           "new": 2
         }
       ]
@@ -1238,19 +1238,19 @@
       "maxNewId": 4,
       "sample": [
         {
-          "old": 7350,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 7650,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 607350,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 607650,
+          "old": 4,
           "new": 4
         }
       ]
@@ -1261,23 +1261,23 @@
       "maxNewId": 8,
       "sample": [
         {
-          "old": 4101,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 4102,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 5051,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 5052,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 604101,
+          "old": 5,
           "new": 5
         }
       ]
@@ -1288,23 +1288,23 @@
       "maxNewId": 36,
       "sample": [
         {
-          "old": 4151,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 4152,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 4153,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 4154,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 4155,
+          "old": 5,
           "new": 5
         }
       ]
@@ -1315,23 +1315,23 @@
       "maxNewId": 6,
       "sample": [
         {
-          "old": 7451,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 7452,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 8151,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 607451,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 607452,
+          "old": 5,
           "new": 5
         }
       ]
@@ -1342,19 +1342,19 @@
       "maxNewId": 4,
       "sample": [
         {
-          "old": 7602,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 7652,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 607602,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 607652,
+          "old": 4,
           "new": 4
         }
       ]
@@ -1365,15 +1365,15 @@
       "maxNewId": 3,
       "sample": [
         {
-          "old": 4050,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 4100,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 4150,
+          "old": 3,
           "new": 3
         }
       ]
@@ -1392,7 +1392,7 @@
           "new": 2
         },
         {
-          "old": 4,
+          "old": 3,
           "new": 3
         }
       ]
@@ -1471,15 +1471,15 @@
       "maxNewId": 3,
       "sample": [
         {
-          "old": 4001,
+          "old": 1,
           "new": 1
         },
         {
-          "old": 4002,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 4003,
+          "old": 3,
           "new": 3
         }
       ]

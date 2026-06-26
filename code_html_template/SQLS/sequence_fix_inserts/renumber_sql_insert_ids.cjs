@@ -12,13 +12,15 @@ const fs = require('fs');
 const path = require('path');
 
 const SCRIPT_DIR = __dirname;
-const DEFAULT_INPUT = path.join(SCRIPT_DIR, 'corrected_event_media_inserts.ordered.sql');
+/** Canonical import file (batch import uses SQLS/corrected_event_media_inserts.ordered.sql). */
+const DEFAULT_INPUT = path.join(SCRIPT_DIR, '..', 'corrected_event_media_inserts.ordered.sql');
 const DEFAULT_OUTPUT = path.join(SCRIPT_DIR, 'corrected_event_media_inserts.renumbered.sql');
 const SCHEMA_FILE = path.join(SCRIPT_DIR, '..', 'Current_Sqls', 'Latest_Schema_Post__Blob_Claude_12.sql');
 
 const MANUAL_FK = {
   event_live_update: { event_id: 'event_details' },
   event_score_card: { event_id: 'event_details' },
+  event_media: { uploaded_by_id: 'user_profile' },
   rel_event_details__discount_codes: {
     event_details_id: 'event_details',
     discount_codes_id: 'discount_code',
@@ -29,6 +31,28 @@ const MANUAL_FK = {
   batch_step_execution: { job_execution_id: 'batch_job_execution' },
   batch_step_execution_context: { step_execution_id: 'batch_step_execution' },
 };
+
+/** Non-FK numeric columns that may legitimately exceed 100000 (do not treat as stale IDs). */
+const NON_ID_NUMERIC_COLUMNS = new Set([
+  'file_size',
+  'total_amount',
+  'price_per_unit',
+  'tax_amount',
+  'platform_fee_amount',
+  'discount_amount',
+  'service_fee',
+  'final_amount',
+  'net_payout_amount',
+  'refund_amount',
+  'stripe_amount_discount',
+  'stripe_amount_tax',
+  'stripe_fee_amount',
+  'home_page_hero_display_duration_seconds',
+  'display_order',
+  'download_count',
+  'priority_ranking',
+  'transaction_count',
+]);
 
 const FK_FALLBACK = {
   event_details: { recurrence_series_id: ['event_recurrence_series', 'event_details'] },
@@ -399,7 +423,49 @@ function resolveFkValue(col, table, oldVal, fkMap, idMaps) {
     const mapped = idMaps[parent]?.get(oldVal);
     if (mapped != null) return mapped;
   }
+  // Source rows may already reference compact target IDs (e.g. uploaded_by_id=20 after partial export).
+  for (const parent of parentTables) {
+    const map = idMaps[parent];
+    if (!map) continue;
+    for (const newId of map.values()) {
+      if (newId === oldVal) return oldVal;
+    }
+  }
   return null;
+}
+
+function buildGlobalOldToNewLookup(idMaps) {
+  const lookup = new Map();
+  for (const map of Object.values(idMaps)) {
+    for (const [oldId, newId] of map.entries()) {
+      lookup.set(oldId, newId);
+    }
+  }
+  return lookup;
+}
+
+function applyGlobalIdSweep(row, idMaps, globalLookup) {
+  const pkCol = getPkColumn(row.table);
+  const pkIdx = pkCol ? row.columns.indexOf(pkCol) : -1;
+  for (let ci = 0; ci < row.columns.length; ci++) {
+    if (ci === pkIdx) continue;
+    const col = row.columns[ci];
+    if (NON_ID_NUMERIC_COLUMNS.has(col)) continue;
+    const tok = row.tokens[ci];
+    if (tok?.type !== 'number' || tok.value == null) continue;
+    const isIdColumn =
+      col === 'id' ||
+      col.endsWith('_id') ||
+      col === 'created_by_id' ||
+      col === 'reviewed_by_admin_id' ||
+      col === 'parent_event_id';
+    if (!isIdColumn) continue;
+    if (tok.value < 100000) continue;
+    const mapped = globalLookup.get(tok.value);
+    if (mapped != null) {
+      row.tokens[ci] = { type: 'number', raw: String(mapped), value: mapped };
+    }
+  }
 }
 
 function buildDiscountCodeIndex(parsed) {
@@ -520,6 +586,11 @@ function renumberRows(parsed, fkMap, startId) {
     return { ...row, tokens: newTokens };
   });
 
+  const globalLookup = buildGlobalOldToNewLookup(idMaps);
+  for (const row of rewritten) {
+    applyGlobalIdSweep(row, idMaps, globalLookup);
+  }
+
   for (const [table, map] of Object.entries(idMaps)) {
     const vals = [...map.values()];
     report[table] = {
@@ -531,6 +602,30 @@ function renumberRows(parsed, fkMap, startId) {
   }
 
   return { rewritten, report, warnings };
+}
+
+function validateNoHighIds(rewritten) {
+  const issues = [];
+  for (const row of rewritten) {
+    const pkCol = getPkColumn(row.table);
+    const pkIdx = pkCol ? row.columns.indexOf(pkCol) : -1;
+    for (let ci = 0; ci < row.columns.length; ci++) {
+      const col = row.columns[ci];
+      if (NON_ID_NUMERIC_COLUMNS.has(col)) continue;
+      const tok = row.tokens[ci];
+      if (tok?.type !== 'number' || tok.value < 600000) continue;
+      const isIdColumn =
+        ci === pkIdx ||
+        col.endsWith('_id') ||
+        col === 'created_by_id' ||
+        col === 'reviewed_by_admin_id' ||
+        col === 'parent_event_id';
+      if (isIdColumn) {
+        issues.push({ table: row.table, column: col, value: tok.value });
+      }
+    }
+  }
+  return issues;
 }
 
 function serializeInsert(row) {
@@ -598,6 +693,16 @@ function main() {
   );
   console.log(`Report: ${reportPath}`);
   console.log(`FK warnings: ${warnings.length}`);
+
+  const highIdIssues = validateNoHighIds(rewritten);
+  if (highIdIssues.length) {
+    console.error(`ERROR: ${highIdIssues.length} ID/FK value(s) still in 600000+ range:`);
+    for (const issue of highIdIssues.slice(0, 30)) {
+      console.error(`  ${issue.table}.${issue.column} = ${issue.value}`);
+    }
+    process.exit(1);
+  }
+  console.log('Validation: no primary keys or *_id columns >= 600000');
 
   if (opts.dryRun) {
     console.log('Dry run — no SQL file written.');
