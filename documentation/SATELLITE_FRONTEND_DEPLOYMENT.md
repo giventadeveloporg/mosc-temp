@@ -23,7 +23,7 @@ Use the shared guide when adding **new** satellite sites (copy this pattern):
 - **Clerk DNS (avoid Unverified)** — `#clerk-dns-verification`
 - **Automation scripts** — `#automation` (local `_private/scripts/` in application-deployments)
 
-Second reference deployment: `www.event-site-front-end-test-site.com` (Amplify `d1502cffqchuun`, branch `main`).
+Second reference deployment: `www.event-site-front-end-test-site.com` (Amplify `d1502cffqchuun`, production branch `release/v1.0.0`; `main` is DEVELOPMENT).
 
 ## Amplify env vars
 
