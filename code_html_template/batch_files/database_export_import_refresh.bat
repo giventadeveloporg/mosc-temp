@@ -158,9 +158,11 @@ set "SQLS_DIR=%MOSC_TEMP%\code_html_template\SQLS"
 set "SCHEMA_FILE=%SQLS_DIR%\Current_Sqls\Latest_Schema_Post__Blob_Claude_12.sql"
 set "EXPORT_FILE=%SQLS_DIR%\export.sql"
 set "ORDERED_FILE=%SQLS_DIR%\corrected_event_media_inserts.ordered.sql"
+set "RENUMBERED_FILE=%SQLS_DIR%\sequence_fix_inserts\corrected_event_media_inserts.renumbered.sql"
 set "PROD_FILE=%SQLS_DIR%\corrected_event_media_inserts.ordered_PROD.sql"
-set "SYNC_BOOT=%WORKSPACE_ROOT%\malayalees-us-site-boot\src\main\resources\sqls\sync_sequence_after_inserts.sql"
-set "SYNC_MOSC=%SQLS_DIR%\Current_Sqls\sync_sequence_after_inserts.sql"
+set "SYNC_BOOT=%WORKSPACE_ROOT%\event-site-manager-service\src\main\resources\sqls\sync_all_table_sequences.sql"
+set "SYNC_MOSC=%SQLS_DIR%\Current_Sqls\sync_all_table_sequences.sql"
+set "SYNC_BATCH_MOSC=%SQLS_DIR%\Current_Sqls\sync_spring_batch_sequences.sql"
 set "DELETE_MOSC_FILE=%SQLS_DIR%\delete_mosc_tenant.sql"
 set "MOSC_DUP_FILE=%SQLS_DIR%\mosc_dup_only.sql"
 set "MOSC_FULL_FILE=%SQLS_DIR%\corrected_event_media_inserts.ordered.mosc_malankara_orthodox_2.sql"
@@ -341,16 +343,8 @@ if not exist "%ORDERED_FILE%" (
 set "S2=OK"
 call :log_ok "Step 2 complete - ordered INSERT file created"
 call :log_info "File: %ORDERED_FILE%"
-pushd "%SQLS_DIR%"
-node patch_ordered_mosc_user_profiles.cjs
-set "MOSC_PATCH_ERR=!errorlevel!"
-popd
-if !MOSC_PATCH_ERR! neq 0 (
-  set "S2=FAIL"
-  call :log_err "patch_ordered_mosc_user_profiles.cjs failed with exit code !MOSC_PATCH_ERR!"
-  goto :fail
-)
-call :log_ok "Step 2b complete - MOSC user_profile rows normalized (600k IDs)"
+call :renumber_import_sql
+if errorlevel 1 goto :fail
 goto :step3
 
 :step2_skip
@@ -370,6 +364,10 @@ if !ORDERED_SIZE! LSS 100 (
 set "S2=SKIP"
 call :log_ok "Step 2 skipped (/SKIP-EXPORT) - ordered file left unchanged"
 call :log_info "File: %ORDERED_FILE% (!ORDERED_SIZE! bytes)"
+if not defined CUSTOM_IMPORT_FILE (
+  call :renumber_import_sql
+  if errorlevel 1 goto :fail
+)
 
 REM --- STEP 3: PROD user ID copy ---
 :step3
@@ -422,8 +420,12 @@ if defined CUSTOM_IMPORT_FILE (
   set "IMPORT_FILE=!CUSTOM_IMPORT_FILE!"
 ) else if "%USE_PROD%"=="1" (
   set "IMPORT_FILE=%PROD_FILE%"
+) else if exist "%RENUMBERED_FILE%" (
+  set "IMPORT_FILE=%RENUMBERED_FILE%"
+  call :log_info "Default import: renumbered SQL (low local IDs, no 600k user_profile)"
 ) else (
   set "IMPORT_FILE=%ORDERED_FILE%"
+  call :log_warn "Renumbered import file missing - using ordered.sql (may contain 600k IDs)"
 )
 
 :step4
@@ -601,19 +603,19 @@ if !PSQL_ERR! neq 0 (
 call :log_info "File: !IMPORT_FILE!"
 
 REM --- STEP 7: Sequence sync ---
-if exist "%SYNC_BOOT%" (
-  set "SYNC_FILE=%SYNC_BOOT%"
-) else if exist "%SYNC_MOSC%" (
+if exist "%SYNC_MOSC%" (
   set "SYNC_FILE=%SYNC_MOSC%"
+) else if exist "%SYNC_BOOT%" (
+  set "SYNC_FILE=%SYNC_BOOT%"
 ) else (
   set "S7=FAIL"
-  call :log_err "sync_sequence_after_inserts.sql not found"
+  call :log_err "sync_all_table_sequences.sql not found"
   call :log_info "Tried: %SYNC_BOOT%"
   call :log_info "Tried: %SYNC_MOSC%"
   goto :fail
 )
 
-call :log_step "7" "Sync primary-key sequences"
+call :log_step "7" "Sync per-table id sequences (application tables)"
 if "%USE_REMOTE%"=="1" (
   call :run_psql_file "!SYNC_FILE!" 1
   set "PSQL_ERR=!errorlevel!"
@@ -629,6 +631,24 @@ if !PSQL_ERR! neq 0 (
 set "S7=OK"
 call :log_ok "Step 7 complete - sequences synchronized"
 call :log_info "File: !SYNC_FILE!"
+
+if exist "%SYNC_BATCH_MOSC%" (
+  call :log_step "7b" "Sync Spring Batch sequences"
+  if "%USE_REMOTE%"=="1" (
+    call :run_psql_file "%SYNC_BATCH_MOSC%" 1
+    set "PSQL_ERR=!errorlevel!"
+  ) else (
+    docker exec -i !CONTAINER_ID! psql -U %DB_USER% -d %DB_NAME% -v ON_ERROR_STOP=1 < "%SYNC_BATCH_MOSC%"
+    set "PSQL_ERR=!errorlevel!"
+  )
+  if !PSQL_ERR! neq 0 (
+    set "S7=FAIL"
+    call :log_err "Spring Batch sequence sync failed"
+    goto :fail
+  )
+  call :log_ok "Step 7b complete - Spring Batch sequences synchronized"
+  call :log_info "File: %SYNC_BATCH_MOSC%"
+)
 
 if "%USE_REMOTE%"=="1" (
   set "RUN_MODE=FULL-REMOTE"
@@ -886,6 +906,36 @@ goto :eof
 :log_info
 echo(          %~1
 goto :eof
+
+REM --- Step 2b: Renumber INSERT PKs to local 1..N (replaces legacy 600k MOSC patch) ---
+:renumber_import_sql
+call :log_step "2b" "Renumber INSERT ids and fix display_name mojibake"
+if not exist "%ORDERED_FILE%" (
+  call :log_err "ordered import file not found: %ORDERED_FILE%"
+  exit /b 1
+)
+pushd "%SQLS_DIR%\sequence_fix_inserts"
+node renumber_sql_insert_ids.cjs
+set "REN_ERR=!errorlevel!"
+if !REN_ERR! neq 0 (
+  popd
+  call :log_err "renumber_sql_insert_ids.cjs failed with exit code !REN_ERR!"
+  exit /b 1
+)
+node fix_mojibake_display_names.cjs
+set "MOJ_ERR=!errorlevel!"
+popd
+if !MOJ_ERR! neq 0 (
+  call :log_err "fix_mojibake_display_names.cjs failed with exit code !MOJ_ERR!"
+  exit /b 1
+)
+if not exist "%RENUMBERED_FILE%" (
+  call :log_err "renumbered import file not created: %RENUMBERED_FILE%"
+  exit /b 1
+)
+call :log_ok "Step 2b complete - renumbered import ready (no 600k user_profile IDs)"
+call :log_info "File: %RENUMBERED_FILE%"
+exit /b 0
 
 :regen_mosc_sql
 if not exist "%ORDERED_FILE%" (

@@ -20,6 +20,12 @@ import {
   placeholderGradient,
   placeholderLabel,
 } from '@/lib/officialDocumentThumbnail';
+import {
+  compareHeroMediaByDisplayOrder,
+  isHeroFlaggedMedia,
+  isHeroMediaDisplayDateValid,
+} from '@/lib/hero/heroSliderMedia';
+import { HOMEPAGE_CACHE_INVALIDATE_CHANNEL } from '@/lib/homepageCacheKeys';
 
 // Helper function for timezone-aware date formatting
 function formatDateInTimezone(dateString: string, timezone: string = 'America/New_York'): string {
@@ -219,6 +225,30 @@ function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps
               onChange={(e) => setForm(prev => ({ ...prev, altText: e.target.value }))}
               className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700" htmlFor="displayOrder">
+              Display Order
+            </label>
+            <input
+              id="displayOrder"
+              type="number"
+              min={0}
+              value={form.displayOrder ?? ''}
+              onChange={(e) => {
+                const raw = e.target.value;
+                setForm((prev) => ({
+                  ...prev,
+                  displayOrder: raw === '' ? undefined : Math.max(0, parseInt(raw, 10) || 0),
+                }));
+              }}
+              className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+              placeholder="0"
+            />
+            <p className="mt-1 text-sm text-gray-500">
+              Lower numbers appear first in the homepage hero slider (0 = highest priority). Used when Home Page Hero or Hero Image is enabled.
+            </p>
           </div>
 
           <div>
@@ -1040,10 +1070,44 @@ export default function AdminMediaPage() {
         setLoading(true);
         setError(null);
         try {
-          // First load: no checkbox filters (Event Flyer / Hero) so we show a paginated list of all media.
-          // Filters are applied only after first load completes (filtersEnabled) and user checks a box.
-          // Always include tenantId so backend returns media for current tenant (required for multi-tenant).
           const tenantId = getClientTenantId();
+          const tenantQuery = tenantId ? `&tenantId.equals=${encodeURIComponent(tenantId)}` : '';
+
+          if (filtersEnabled && heroImagesOnly) {
+            // Match homepage hero slider: merge isHeroImage + isHomePageHeroImage, sort by displayOrder.
+            const [resHero, resHome] = await Promise.all([
+              fetch(`/api/proxy/event-medias?size=100&sort=displayOrder,asc&isHeroImage.equals=true${tenantQuery}`),
+              fetch(`/api/proxy/event-medias?size=100&sort=displayOrder,asc&isHomePageHeroImage.equals=true${tenantQuery}`),
+            ]);
+            if (!resHero.ok && !resHome.ok) {
+              throw new Error(await parseMediaUploadError(resHero.ok ? resHome : resHero));
+            }
+            const seenIds = new Set<number>();
+            const merged: EventMediaDTO[] = [];
+            for (const res of [resHero, resHome]) {
+              if (!res.ok) continue;
+              const data = await res.json();
+              for (const item of normalizeEventMediasList(data)) {
+                if (
+                  !isHeroFlaggedMedia(item) ||
+                  !isHeroMediaDisplayDateValid(item) ||
+                  item.id == null ||
+                  seenIds.has(item.id)
+                ) {
+                  continue;
+                }
+                seenIds.add(item.id);
+                merged.push(item);
+              }
+            }
+            merged.sort(compareHeroMediaByDisplayOrder);
+            const filtered = searchTerm
+              ? merged.filter((m) => m.title?.toLowerCase().includes(searchTerm.toLowerCase()))
+              : merged;
+            const start = page * pageSize;
+            setMediaList(filtered.slice(start, start + pageSize));
+            setTotalCount(filtered.length);
+          } else {
           let url = `/api/proxy/event-medias?page=${page}&size=${pageSize}&sort=updatedAt,desc`;
           if (tenantId) {
             url += `&tenantId.equals=${encodeURIComponent(tenantId)}`;
@@ -1055,10 +1119,6 @@ export default function AdminMediaPage() {
 
           if (filtersEnabled && eventFlyerOnly) {
             url += `&eventFlyer.equals=true`;
-          }
-
-          if (filtersEnabled && heroImagesOnly) {
-            url += `&isHeroImage.equals=true`;
           }
 
           const res = await fetch(url);
@@ -1095,6 +1155,7 @@ export default function AdminMediaPage() {
           setTotalCount(total);
           if (process.env.NODE_ENV === 'development' && total <= pageSize && list.length === pageSize) {
             console.warn('[Admin Media] Total count may be wrong (only one page). Response keys:', data && typeof data === 'object' ? Object.keys(data) : [], 'total:', total, 'list.length:', list.length);
+          }
           }
 
           // Enable filter checkboxes after first successful load (no checkbox filters applied)
@@ -1196,6 +1257,9 @@ export default function AdminMediaPage() {
       if (!res.ok) throw new Error('Failed to update media');
       const result = await res.json();
       setMediaList(prev => prev.map(m => m.id === editMedia.id ? { ...m, ...result } : m));
+      if (typeof BroadcastChannel !== 'undefined') {
+        new BroadcastChannel(HOMEPAGE_CACHE_INVALIDATE_CHANNEL).postMessage('invalidate');
+      }
       handleCloseModal();
     } catch (error: any) {
       console.error('Failed to save media:', error);
@@ -1270,7 +1334,9 @@ export default function AdminMediaPage() {
   const startItem = page * pageSize + 1;
   const endItem = Math.min((page + 1) * pageSize, totalCount);
 
-  const sortedMedia = [...mediaList].sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
+  const sortedMedia = heroImagesOnly
+    ? [...mediaList]
+    : [...mediaList].sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
   const pageItemIds = sortedMedia.filter((m): m is EventMediaDTO & { id: number } => m.id != null).map(m => m.id);
   const allOnPageSelected = pageItemIds.length > 0 && pageItemIds.every(id => selectedMediaIds.has(id));
 
@@ -1445,6 +1511,9 @@ export default function AdminMediaPage() {
           <span className="font-semibold">💡 Tip:</span>
           <span>
             Click the <strong>View</strong> button on a card to see full details. Click the × button to close the dialog.
+            {heroImagesOnly && (
+              <> Hero list matches the homepage slider (Hero or Home Page Hero flags on <strong>upcoming</strong> events), sorted by <strong>Display Order</strong>. Past events are excluded on the homepage. The default poster at the end of the slider is not stored in media.</>
+            )}
           </span>
         </div>
       </div>
@@ -1579,6 +1648,11 @@ export default function AdminMediaPage() {
                     <div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 rounded-full text-sm font-bold z-10 shadow-lg">
                       #{serialNumber}
                     </div>
+                    {heroImagesOnly && item.displayOrder != null && (
+                      <div className="absolute top-2 left-14 bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-bold z-10 shadow-lg" title="Homepage hero display order">
+                        Order {item.displayOrder}
+                      </div>
+                    )}
                     {displayThumbnailUrl ? (
                       <img
                         key={displayThumbnailUrl}
@@ -1604,16 +1678,16 @@ export default function AdminMediaPage() {
                   </div>
                 </div>
                 {/* Action Buttons: View, Edit, Delete */}
-                <div className="p-4 pt-0 flex items-center justify-start gap-1.5">
+                <div className="p-4 pt-0 flex items-center justify-start gap-2">
                   {/* View Button */}
                   <button
                     onClick={(e) => handleViewClick(item, e, serialNumber)}
-                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                     title="View details"
                     aria-label="View details"
                     type="button"
                   >
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-10 h-10 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -1621,24 +1695,24 @@ export default function AdminMediaPage() {
                   {/* Edit Button */}
                   <button
                     onClick={() => handleEditClick(item)}
-                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                     title="Edit Media"
                     aria-label="Edit Media"
                     type="button"
                   >
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
                   {/* Delete Button */}
                   <button
                     onClick={() => handleDelete(item)}
-                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    className="flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                     title="Delete Media"
                     aria-label="Delete Media"
                     type="button"
                   >
-                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>

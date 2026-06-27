@@ -1096,7 +1096,25 @@
   }
 }
 
-/* Downloads — official document cards: object-contain preview (institution CMS card alignment) */
+/* Downloads — subgrid aligns header / media / details / footer across each row */
+.mosc-redesign-subpage-shell.syro-layout #mainContent .downloads-entry-grid > .download-entry-card {
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+}
+
+.mosc-redesign-subpage-shell.syro-layout #mainContent .download-entry-card__header .institution-entry-card__title,
+.mosc-redesign-subpage-shell.syro-layout #mainContent .download-entry-card__header .institution-entry-card__location {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Avoid line-clamp clipping ascenders on category/year meta line */
+.mosc-redesign-subpage-shell.syro-layout #mainContent .download-entry-card__details > p:first-child {
+  line-height: 1.375;
+  padding-block: 1px;
+}
+
 .mosc-redesign-subpage-shell.syro-layout #mainContent .download-entry-card__media {
   line-height: 0;
 }
@@ -1104,8 +1122,8 @@
 .mosc-redesign-subpage-shell.syro-layout #mainContent .download-entry-card__image {
   display: block;
   width: 100%;
-  height: auto;
-  max-height: 14rem;
+  height: 100%;
+  max-height: 100%;
   object-fit: contain;
   object-position: center center;
   background-color: transparent;

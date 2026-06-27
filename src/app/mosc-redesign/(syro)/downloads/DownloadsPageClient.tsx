@@ -18,6 +18,7 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { formatDownloadCardTitle, getDownloadCardSubtitle } from '@/lib/downloads/formatDownloadCardTitle';
 
 const BANNER_DESCRIPTION =
   'Official documents available for download. Browse, filter, and download.';
@@ -43,40 +44,13 @@ function getFolderPath(item: TreeItem) {
   return item.pathSegments.slice(0, -1).join(' / ');
 }
 
-const OFFICIAL_DOCUMENT_DISPLAY_EXTENSIONS = new Set([
-  'pdf',
-  'doc',
-  'docx',
-  'xls',
-  'xlsx',
-  'csv',
-  'ppt',
-  'pptx',
-  'txt',
-  'rtf',
-  'png',
-  'jpg',
-  'jpeg',
-  'gif',
-  'webp',
-  'svg',
-  'zip',
-  'rar',
-  '7z',
-]);
-
-/** Card title: drop known file extension (e.g. `.pdf`) for display only. */
-function stripFileExtensionForDisplay(fileName: string): string {
-  const trimmed = fileName.trim();
-  const lastDot = trimmed.lastIndexOf('.');
-  if (lastDot <= 0 || lastDot === trimmed.length - 1) {
-    return trimmed;
-  }
-  const ext = trimmed.slice(lastDot + 1).toLowerCase();
-  if (OFFICIAL_DOCUMENT_DISPLAY_EXTENSIONS.has(ext)) {
-    return trimmed.slice(0, lastDot);
-  }
-  return trimmed;
+function getCardSubtitle(item: TreeItem) {
+  return getDownloadCardSubtitle({
+    pathSegments: item.pathSegments,
+    fileName: item.fileName,
+    title: item.title,
+    categoryLabel: item.categoryLabel,
+  });
 }
 
 const DIALOG_FOOTER_BUTTON_BASE =
@@ -216,48 +190,48 @@ function DownloadCard({
     setThumbFailed(false);
   }, [displayThumb]);
 
-  const displayTitle = stripFileExtensionForDisplay(file.fileName);
-  const folderPath = getFolderPath(file);
+  const displayTitle = formatDownloadCardTitle(file.title?.trim() || file.fileName);
+  const cardSubtitle = getCardSubtitle(file);
   const displayIndex = String(index + 1).padStart(2, '0');
   const metaLine = [file.categoryLabel, file.officialDocumentYear ? `Year ${file.officialDocumentYear}` : null]
     .filter(Boolean)
     .join(' · ');
 
   return (
-    <article className="download-entry-card group flex h-full flex-col overflow-hidden rounded-xl border border-burgundy/15 bg-white shadow-[rgba(50,50,93,0.18)_0px_8px_20px_-4px,rgba(0,0,0,0.2)_0px_4px_10px_-4px] transition-all duration-300 hover:border-burgundy/30 hover:shadow-[rgba(50,50,93,0.22)_0px_12px_28px_-4px,rgba(0,0,0,0.22)_0px_6px_14px_-4px]">
-      <header className="institution-entry-card__header flex items-start gap-4 border-b border-burgundy/10 bg-gradient-to-r from-burgundy-dark to-burgundy px-5 py-4">
+    <li className="download-entry-card group grid h-full grid-rows-subgrid overflow-hidden rounded-xl border border-burgundy/15 bg-white shadow-[rgba(50,50,93,0.18)_0px_8px_20px_-4px,rgba(0,0,0,0.2)_0px_4px_10px_-4px] transition-all duration-300 hover:border-burgundy/30 hover:shadow-[rgba(50,50,93,0.22)_0px_12px_28px_-4px,rgba(0,0,0,0.22)_0px_6px_14px_-4px] [grid-row:span_4]">
+      <header className="institution-entry-card__header download-entry-card__header flex h-full min-h-[5.25rem] items-start gap-3 self-stretch border-b border-burgundy/10 bg-gradient-to-r from-burgundy-dark to-burgundy px-4 py-3">
         <span
-          className="institution-entry-card__index flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-parchment-light/20 font-syro-display text-sm font-bold"
+          className="institution-entry-card__index mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-parchment-light/20 font-syro-display text-sm font-bold"
           aria-hidden
         >
           {displayIndex}
         </span>
         <div className="min-w-0 flex-1">
-          <h3 className="institution-entry-card__title font-syro-display text-base font-semibold leading-snug lg:text-lg">
+          <h3 className="institution-entry-card__title font-syro-display text-base font-semibold leading-snug break-words lg:text-lg">
             {displayTitle}
           </h3>
-          <p className="institution-entry-card__location mt-1 font-syro-primary text-sm line-clamp-2">{folderPath}</p>
+          <p className="institution-entry-card__location mt-1 font-syro-primary text-sm leading-snug break-words">{cardSubtitle}</p>
         </div>
       </header>
 
-      <div className="download-entry-card__media border-b border-burgundy/10 bg-syro-bg-gray/30 px-5 py-4">
-        <div className="relative flex h-auto w-full items-center justify-center overflow-hidden rounded-lg bg-syro-bg-gray/20">
+      <div className="download-entry-card__media h-[10.5rem] shrink-0 border-b border-burgundy/10 bg-syro-bg-gray/30 px-4 py-3">
+        <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-syro-bg-gray/20">
           {showThumbnail ? (
             <img
               key={displayThumb}
               src={displayThumb!}
               alt={file.fileName}
-              className="download-entry-card__image h-auto w-full object-contain"
+              className="download-entry-card__image h-full w-full object-contain"
               loading="lazy"
               decoding="async"
               onError={() => setThumbFailed(true)}
             />
           ) : (
             <div
-              className={`flex min-h-[10rem] w-full flex-col items-center justify-center px-4 py-6 bg-gradient-to-br ${placeholderGradient(placeholderKind)}`}
+              className={`flex h-full w-full flex-col items-center justify-center px-3 py-2 bg-gradient-to-br ${placeholderGradient(placeholderKind)}`}
               aria-label={file.fileName}
             >
-              <p className="font-syro-display text-center text-sm font-semibold leading-snug text-syro-blue/90 sm:text-base line-clamp-4 break-words">
+              <p className="font-syro-display text-center text-sm font-semibold leading-tight text-syro-blue/90 sm:text-base line-clamp-4 break-words">
                 {displayTitle}
               </p>
             </div>
@@ -265,22 +239,24 @@ function DownloadCard({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col px-5 py-4">
+      <div className="download-entry-card__details flex min-h-[4.75rem] flex-col justify-start px-4 py-2.5">
         {metaLine ? (
-          <p className="font-syro-primary text-xs font-semibold uppercase tracking-wide text-syro-blue">{metaLine}</p>
+          <p className="font-syro-primary text-xs font-semibold uppercase tracking-wide leading-snug text-syro-blue line-clamp-2 break-words">
+            {metaLine}
+          </p>
         ) : null}
         {file.description ? (
-          <p className={`font-syro-primary text-sm leading-relaxed text-syro-dark-gray lg:text-base ${metaLine ? 'mt-3' : ''} line-clamp-4`}>
+          <p className={`font-syro-primary text-sm leading-snug text-syro-dark-gray lg:text-base ${metaLine ? 'mt-1' : ''} line-clamp-2`}>
             {file.description}
           </p>
         ) : (
-          <p className={`font-syro-primary text-sm text-gray-500 ${metaLine ? 'mt-3' : ''}`}>
+          <p className={`font-syro-primary text-sm leading-snug text-gray-500 ${metaLine ? 'mt-1' : ''} line-clamp-2`}>
             Official document file ready for download.
           </p>
         )}
       </div>
 
-      <footer className="mt-auto border-t border-burgundy/10 bg-parchment/40 px-5 py-4">
+      <footer className="border-t border-burgundy/10 bg-parchment/40 px-5 py-4">
         <p className="mb-3 font-syro-display text-xs font-semibold uppercase tracking-widest text-syro-blue">
           Download
         </p>
@@ -308,7 +284,7 @@ function DownloadCard({
           </span>
         )}
       </footer>
-    </article>
+    </li>
   );
 }
 
@@ -326,16 +302,15 @@ function DownloadsGrid({
   downloadingId: number | null;
 }) {
   return (
-    <ul className="m-0 grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2 md:gap-8">
+    <ul className="downloads-entry-grid m-0 grid list-none grid-cols-1 gap-6 p-0 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
       {files.map((file, index) => (
-        <li key={`file-${file.id ?? file.treePath}`} className="h-full">
-          <DownloadCard
-            file={file}
-            index={page * pageSize + index}
-            onDownload={onDownload}
-            downloadingId={downloadingId}
-          />
-        </li>
+        <DownloadCard
+          key={`file-${file.id ?? file.treePath}`}
+          file={file}
+          index={page * pageSize + index}
+          onDownload={onDownload}
+          downloadingId={downloadingId}
+        />
       ))}
     </ul>
   );

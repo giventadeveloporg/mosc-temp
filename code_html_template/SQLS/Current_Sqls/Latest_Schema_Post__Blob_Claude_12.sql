@@ -127,7 +127,6 @@ DROP FUNCTION IF EXISTS public.set_transaction_reference() CASCADE;
 DROP TRIGGER IF EXISTS trg_set_transaction_reference ON public.event_ticket_transaction;
 
 -- Drop sequence if exists and recreate
-DROP SEQUENCE IF EXISTS public.sequence_generator CASCADE;
 DROP SEQUENCE IF EXISTS public.discount_code_id_seq CASCADE;
 DROP SEQUENCE IF EXISTS public.event_live_update_id_seq CASCADE;
 DROP SEQUENCE IF EXISTS public.event_score_card_detail_id_seq CASCADE;
@@ -587,16 +586,6 @@ $$;
 
 --
 -- TOC entry 224 (class 1259 OID 82754)
--- Name: sequence_generator; Type: SEQUENCE; Schema: public; Owner: giventa_event_management
---
-
-CREATE SEQUENCE public.sequence_generator
-    START WITH 1050
-    INCREMENT BY 50
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
 
 
 SET default_tablespace = '';
@@ -605,13 +594,566 @@ SET default_table_access_method = heap;
 
 
 
+-- Per-table application id sequences (replaces shared sequence_generator)
+-- =====================================================
+
+DROP SEQUENCE IF EXISTS public.sequence_generator CASCADE;
+
+CREATE SEQUENCE IF NOT EXISTS public.user_profile_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.bulk_operation_log_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_type_details_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_details_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_recurrence_series_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.focus_group_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.focus_group_members_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_focus_groups_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_guest_pricing_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_admin_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_admin_audit_log_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_attendee_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_attendee_guest_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_attendee_attachment_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_calendar_entry_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_sponsors_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_sponsors_join_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.gallery_category_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.gallery_album_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.official_document_category_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_media_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.official_document_year_bundle_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_organizer_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_poll_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_poll_option_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_poll_response_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_ticket_transaction_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_ticket_type_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_ticket_transaction_item_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.qr_code_usage_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+
+CREATE SEQUENCE IF NOT EXISTS public.tenant_organization_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.tenant_settings_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.tenant_email_addresses_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.user_payment_transaction_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.user_subscription_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.user_task_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.executive_committee_team_members_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.team_groups_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.team_members_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.communication_campaign_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.email_log_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.whatsapp_log_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_featured_performers_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_contacts_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_emails_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_program_directors_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.clerk_user_tenant_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.clerk_organization_role_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.clerk_webhook_event_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.clerk_session_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.payment_provider_config_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.manual_payment_request_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.manual_payment_summary_report_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.platform_settlement_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.platform_invoice_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.membership_plan_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.membership_subscription_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.membership_subscription_reconciliation_log_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.promotion_email_template_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.promotion_email_sent_log_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.donation_transaction_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.donation_statistics_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.satellite_domain_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.news_category_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.news_article_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.news_section_display_config_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.news_sidebar_promotion_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.news_flash_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.news_live_stream_config_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.news_article_category_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_competition_settings_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_competition_day_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_competition_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_competition_participant_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_competition_registration_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_competition_result_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_competition_content_block_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_competition_group_member_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+
 --
 -- TOC entry 230 (class 1259 OID 82796)
 -- Name: user_profile; Type: TABLE; Schema: public; Owner: giventa_event_management
 --
 
 CREATE TABLE public.user_profile (
-                                     id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                     id bigint DEFAULT nextval('public.user_profile_id_seq'::regclass) NOT NULL,
                                      tenant_id character varying(255),
                                      user_id character varying(255) NOT NULL,
                                      first_name character varying(255),
@@ -680,7 +1222,7 @@ COMMENT ON TABLE public.user_profile IS 'User profiles with tenant isolation and
 --
 
 CREATE TABLE public.bulk_operation_log (
-                                           id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                           id bigint DEFAULT nextval('public.bulk_operation_log_id_seq'::regclass) NOT NULL,
                                            tenant_id character varying(255),
                                            operation_type character varying(50) NOT NULL,
                                            operation_name character varying(255),
@@ -745,7 +1287,7 @@ CREATE TABLE public.databasechangeloglock (
 --
 
 CREATE TABLE public.event_type_details (
-                                           id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                           id bigint DEFAULT nextval('public.event_type_details_id_seq'::regclass) NOT NULL,
                                            tenant_id character varying(255),
                                            name character varying(255) NOT NULL,
                                            description text,
@@ -777,7 +1319,7 @@ COMMENT ON TABLE public.event_type_details IS 'Event type classifications with v
 --
 
 CREATE TABLE public.event_details (
-                                      id int8 DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                      id int8 DEFAULT nextval('public.event_details_id_seq'::regclass) NOT NULL,
                                       tenant_id varchar(255) NULL,
                                       title varchar(255) NOT NULL,
                                       caption varchar(500) NULL,
@@ -970,7 +1512,7 @@ COMMENT ON COLUMN public.event_details.recurrence_series_id IS 'Series identifie
 --
 
 CREATE TABLE public.event_recurrence_series (
-                                                id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                id bigint DEFAULT nextval('public.event_recurrence_series_id_seq'::regclass) NOT NULL,
                                                 tenant_id character varying(255) NULL,
                                                 parent_event_id bigint NOT NULL,
                                                 pattern character varying(50) NOT NULL,
@@ -1060,7 +1602,7 @@ COMMENT ON COLUMN public.event_recurrence_series.monthly_day IS 'Day of month (1
 -- ===================================================
 
 CREATE TABLE public.focus_group (
-                                    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                    id bigint DEFAULT nextval('public.focus_group_id_seq'::regclass) NOT NULL,
                                     tenant_id character varying(255) NOT NULL,
                                     name character varying(120) NOT NULL,
                                     slug character varying(80) NOT NULL,
@@ -1078,7 +1620,7 @@ COMMENT ON TABLE public.focus_group IS 'Tenant-scoped focus groups (Career, Cult
 
 
 CREATE TABLE public.focus_group_members (
-                                            id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                            id bigint DEFAULT nextval('public.focus_group_members_id_seq'::regclass) NOT NULL,
                                             tenant_id character varying(255) NOT NULL,
                                             focus_group_id bigint NOT NULL,
                                             user_profile_id bigint NOT NULL,
@@ -1099,7 +1641,7 @@ COMMENT ON COLUMN public.focus_group_members.status IS 'Membership status: PENDI
 
 
 CREATE TABLE public.event_focus_groups (
-                                           id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                           id bigint DEFAULT nextval('public.event_focus_groups_id_seq'::regclass) NOT NULL,
                                            tenant_id character varying(255) NOT NULL,
                                            event_id bigint NOT NULL,
                                            focus_group_id bigint NOT NULL,
@@ -1121,7 +1663,7 @@ COMMENT ON TABLE public.event_focus_groups IS 'Join table mapping events to one 
 --
 
 CREATE TABLE public.event_guest_pricing (
-                                            id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                            id bigint DEFAULT nextval('public.event_guest_pricing_id_seq'::regclass) NOT NULL,
                                             tenant_id character varying(255),
                                             event_id bigint NOT NULL,
                                             age_group character varying(20) NOT NULL,
@@ -1303,7 +1845,7 @@ COMMENT ON TABLE public.event_live_update_attachment IS 'Attachments (image, vid
 --
 
 CREATE TABLE public.event_admin (
-                                    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                    id bigint DEFAULT nextval('public.event_admin_id_seq'::regclass) NOT NULL,
                                     tenant_id character varying(255),
                                     role character varying(255) NOT NULL,
                                     permissions text[],
@@ -1325,7 +1867,7 @@ CREATE TABLE public.event_admin (
 --
 
 CREATE TABLE public.event_admin_audit_log (
-                                              id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                              id bigint DEFAULT nextval('public.event_admin_audit_log_id_seq'::regclass) NOT NULL,
                                               tenant_id character varying(255),
                                               action character varying(255) NOT NULL,
                                               table_name character varying(255) NOT NULL,
@@ -1357,7 +1899,7 @@ COMMENT ON TABLE public.event_admin_audit_log IS 'Comprehensive audit logging fo
 --
 
 CREATE TABLE public.event_attendee (
-                                       id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                       id bigint DEFAULT nextval('public.event_attendee_id_seq'::regclass) NOT NULL,
                                        tenant_id character varying(255),
                                        event_id bigint NOT NULL,
                                        user_id bigint,
@@ -1446,7 +1988,7 @@ COMMENT ON COLUMN public.event_attendee.qr_code_generated_at IS 'Timestamp when 
 --
 
 CREATE TABLE public.event_attendee_guest (
-                                             id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                             id bigint DEFAULT nextval('public.event_attendee_guest_id_seq'::regclass) NOT NULL,
                                              tenant_id character varying(255),
                                              primary_attendee_id bigint NOT NULL,
                                              age_group character varying(20) NOT NULL,
@@ -1478,7 +2020,7 @@ CREATE TABLE public.event_attendee_guest (
 );
 
 CREATE TABLE public.event_attendee_attachment (
-                                                  id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                  id bigint DEFAULT nextval('public.event_attendee_attachment_id_seq'::regclass) NOT NULL,
                                                   tenant_id character varying(255),
                                                   attendee_id bigint NOT NULL,
                                                   event_id bigint NOT NULL,
@@ -1537,7 +2079,7 @@ COMMENT ON COLUMN public.event_attendee_guest.relationship IS 'Relationship to p
 --
 
 CREATE TABLE public.event_calendar_entry (
-                                             id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                             id bigint DEFAULT nextval('public.event_calendar_entry_id_seq'::regclass) NOT NULL,
                                              tenant_id character varying(255),
                                              calendar_provider character varying(255) NOT NULL,
                                              external_event_id character varying(255),
@@ -1560,7 +2102,7 @@ CREATE TABLE public.event_calendar_entry (
 -- Table: event_sponsors
 -- Stores comprehensive sponsor/company information
 CREATE TABLE public.event_sponsors (
-                                       id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                       id bigint DEFAULT nextval('public.event_sponsors_id_seq'::regclass) NOT NULL,
                                        tenant_id character varying(255),
                                        event_id int8 NULL,
                                        name varchar(255) NOT NULL,
@@ -1610,7 +2152,7 @@ CREATE TABLE public.event_sponsors (
 -- Table: event_sponsors_join
 -- Join table for many-to-many relationship between events and sponsors
 CREATE TABLE public.event_sponsors_join (
-                                            id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                            id bigint DEFAULT nextval('public.event_sponsors_join_id_seq'::regclass) NOT NULL,
                                             tenant_id character varying(255),
                                             event_id bigint NOT NULL,
                                             sponsor_id bigint NOT NULL,
@@ -1628,7 +2170,7 @@ CREATE TABLE public.event_sponsors_join (
 --
 
 CREATE TABLE public.gallery_category (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.gallery_category_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     slug character varying(64) NOT NULL,
     display_name character varying(128) NOT NULL,
@@ -1662,7 +2204,7 @@ CREATE INDEX idx_gallery_category_tenant_active
 --
 
 CREATE TABLE public.gallery_album (
-                                    id int8 DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                    id int8 DEFAULT nextval('public.gallery_album_id_seq'::regclass) NOT NULL,
                                     tenant_id varchar(255) NOT NULL,
                                     title varchar(255) NOT NULL,
                                     description varchar(2048) NULL,
@@ -1729,7 +2271,7 @@ COMMENT ON COLUMN public.gallery_album.event_location IS
 --
 
 CREATE TABLE public.official_document_category (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.official_document_category_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     slug character varying(128) NOT NULL,
     display_name character varying(255) NOT NULL,
@@ -1771,7 +2313,7 @@ CREATE INDEX idx_official_document_category_tenant_active ON public.official_doc
 --
 
 CREATE TABLE public.event_media (
-                                    id int8 DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                    id int8 DEFAULT nextval('public.event_media_id_seq'::regclass) NOT NULL,
                                     tenant_id varchar(255) NULL,
                                     title varchar(255) NOT NULL,
                                     description varchar(2048) NULL,
@@ -1877,7 +2419,7 @@ COMMENT ON COLUMN public.event_media.home_page_hero_display_duration_seconds IS 
 --
 
 CREATE TABLE public.official_document_year_bundle (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.official_document_year_bundle_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     official_document_category_id bigint NOT NULL,
     document_year integer NOT NULL,
@@ -1910,7 +2452,7 @@ CREATE TRIGGER update_official_document_year_bundle_updated_at BEFORE UPDATE ON 
 --
 
 CREATE TABLE public.event_organizer (
-                                        id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                        id bigint DEFAULT nextval('public.event_organizer_id_seq'::regclass) NOT NULL,
                                         tenant_id character varying(255),
                                         title character varying(255) NOT NULL,
                                         designation character varying(255),
@@ -1937,7 +2479,7 @@ CREATE TABLE public.event_organizer (
 --
 
 CREATE TABLE public.event_poll (
-                                   id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                   id bigint DEFAULT nextval('public.event_poll_id_seq'::regclass) NOT NULL,
                                    tenant_id character varying(255),
                                    title character varying(255) NOT NULL,
                                    description text,
@@ -1967,7 +2509,7 @@ CREATE TABLE public.event_poll (
 --
 
 CREATE TABLE public.event_poll_option (
-                                          id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                          id bigint DEFAULT nextval('public.event_poll_option_id_seq'::regclass) NOT NULL,
                                           tenant_id character varying(255),
                                           option_text character varying(500) NOT NULL,
                                           display_order integer DEFAULT 0,
@@ -1987,7 +2529,7 @@ CREATE TABLE public.event_poll_option (
 --
 
 CREATE TABLE public.event_poll_response (
-                                            id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                            id bigint DEFAULT nextval('public.event_poll_response_id_seq'::regclass) NOT NULL,
                                             tenant_id character varying(255),
                                             comment text,
                                             response_value character varying(1000),
@@ -2153,7 +2695,7 @@ COMMENT ON TABLE public.discount_code IS 'Discount codes for ticket purchases, n
 --
 
 CREATE TABLE public.event_ticket_transaction (
-                                                 id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                 id bigint DEFAULT nextval('public.event_ticket_transaction_id_seq'::regclass) NOT NULL,
                                                  tenant_id character varying(255),
                                                  transaction_reference varchar(255) GENERATED ALWAYS AS ('TKTN' || id::text) STORED,
 email character varying(255) NOT NULL,
@@ -2233,7 +2775,7 @@ COMMENT ON COLUMN public.event_ticket_transaction.discount_amount IS 'Discount a
 --
 
 CREATE TABLE public.event_ticket_type (
-                                          id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                          id bigint DEFAULT nextval('public.event_ticket_type_id_seq'::regclass) NOT NULL,
                                           tenant_id character varying(255),
                                           name character varying(255) NOT NULL,
                                           description text,
@@ -2275,7 +2817,7 @@ COMMENT ON COLUMN public.event_ticket_type.sold_quantity IS 'Number of tickets s
 
 
 CREATE TABLE public.event_ticket_transaction_item (
-                                                      id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                      id bigint DEFAULT nextval('public.event_ticket_transaction_item_id_seq'::regclass) NOT NULL,
                                                       tenant_id character varying(255),
                                                       transaction_id BIGINT NOT NULL REFERENCES public.event_ticket_transaction(id) ON DELETE CASCADE,
                                                       ticket_type_id BIGINT NOT NULL REFERENCES public.event_ticket_type(id),
@@ -2295,7 +2837,7 @@ CREATE TABLE public.event_ticket_transaction_item (
 --
 
 CREATE TABLE public.qr_code_usage (
-                                      id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                      id bigint DEFAULT nextval('public.qr_code_usage_id_seq'::regclass) NOT NULL,
                                       tenant_id character varying(255),
                                       attendee_id bigint NOT NULL,
                                       qr_code_data character varying(1000) NOT NULL,
@@ -2355,7 +2897,7 @@ COMMENT ON TABLE public.rel_event_details__discount_codes IS 'Join table for Eve
 --
 
 CREATE TABLE public.tenant_organization (
-                                            id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                            id bigint DEFAULT nextval('public.tenant_organization_id_seq'::regclass) NOT NULL,
                                             tenant_id character varying(255) NOT NULL,
                                             organization_name character varying(255) NOT NULL,
                                             domain character varying(255),
@@ -2414,7 +2956,7 @@ COMMENT ON COLUMN public.tenant_organization.website_url IS 'Canonical public we
 --
 
 CREATE TABLE public.tenant_settings (
-                                        id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                        id bigint DEFAULT nextval('public.tenant_settings_id_seq'::regclass) NOT NULL,
                                         tenant_id character varying(255) NOT NULL,
                                         tenant_organization_id bigint,
                                         allow_user_registration boolean DEFAULT true,
@@ -2520,7 +3062,7 @@ COMMENT ON COLUMN public.tenant_settings.default_hero_include_with_events IS 'Wh
 
 
 CREATE TABLE public.tenant_email_addresses (
-                                        id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                        id bigint DEFAULT nextval('public.tenant_email_addresses_id_seq'::regclass) NOT NULL,
                                         tenant_id character varying(255) NOT NULL,
                                         email_address character varying(255) NOT NULL,
                                         copy_to_email_address character varying(255) ,
@@ -2585,7 +3127,7 @@ COMMENT ON TABLE public.discount_code IS 'Discount codes for ticket purchases';
 --
 
 CREATE TABLE public.user_payment_transaction (
-                                                 id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                 id bigint DEFAULT nextval('public.user_payment_transaction_id_seq'::regclass) NOT NULL,
                                                  tenant_id character varying(255) NOT NULL,
                                                  transaction_type character varying(20) NOT NULL,
                                                  amount numeric(21,2) NOT NULL,
@@ -2622,7 +3164,7 @@ CREATE TABLE public.user_payment_transaction (
 --
 
 CREATE TABLE public.user_subscription (
-                                          id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                          id bigint DEFAULT nextval('public.user_subscription_id_seq'::regclass) NOT NULL,
                                           tenant_id character varying(255),
                                           stripe_customer_id character varying(255),
                                           stripe_subscription_id character varying(255),
@@ -2643,7 +3185,7 @@ CREATE TABLE public.user_subscription (
 
 
 CREATE TABLE public.user_task (
-                                  id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                  id bigint DEFAULT nextval('public.user_task_id_seq'::regclass) NOT NULL,
                                   tenant_id character varying(255),
                                   title character varying(255) NOT NULL,
                                   description  VARCHAR(4096),
@@ -2670,7 +3212,7 @@ CREATE TABLE public.user_task (
 
 -- Create the executive_committee_team_members table
 CREATE TABLE public.executive_committee_team_members (
-                                                         id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                         id bigint DEFAULT nextval('public.executive_committee_team_members_id_seq'::regclass) NOT NULL,
                                                          tenant_id character varying(255) NOT NULL,
                                                          first_name VARCHAR(255) NOT NULL,
                                                          last_name VARCHAR(255) NOT NULL,
@@ -2711,7 +3253,7 @@ COMMENT ON COLUMN public.executive_committee_team_members.is_active IS 'Whether 
 
 -- Create team_groups table (sports squad / music band roster metadata)
 CREATE TABLE public.team_groups (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.team_groups_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     team_type character varying(32) NOT NULL,
     name character varying(255) NOT NULL,
@@ -2738,7 +3280,7 @@ COMMENT ON TABLE public.team_groups IS 'Tenant-scoped squad or band roster group
 
 -- Create team_members table (roster members; optional user_profile link)
 CREATE TABLE public.team_members (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.team_members_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     team_group_id bigint NOT NULL,
     user_profile_id bigint,
@@ -3607,7 +4149,7 @@ CREATE TRIGGER validate_event_details_trigger BEFORE INSERT OR UPDATE ON public.
 -- Communication and Campaign Logging Tables (added from JDL)
 
 CREATE TABLE public.communication_campaign (
-                                               id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                               id bigint DEFAULT nextval('public.communication_campaign_id_seq'::regclass) NOT NULL,
                                                tenant_id character varying(255) NOT NULL,
                                                name character varying(255) NOT NULL,
                                                type character varying(50), -- EMAIL, WHATSAPP
@@ -3622,7 +4164,7 @@ CREATE TABLE public.communication_campaign (
 );
 
 CREATE TABLE public.email_log (
-                                  id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                  id bigint DEFAULT nextval('public.email_log_id_seq'::regclass) NOT NULL,
                                   tenant_id character varying(255) NOT NULL,
                                   recipient_email character varying(255) NOT NULL,
                                   subject character varying(255),
@@ -3637,7 +4179,7 @@ CREATE TABLE public.email_log (
 );
 
 CREATE TABLE public.whatsapp_log (
-                                     id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                     id bigint DEFAULT nextval('public.whatsapp_log_id_seq'::regclass) NOT NULL,
                                      tenant_id character varying(255) NOT NULL,
                                      recipient_phone character varying(50) NOT NULL,
                                      message_body VARCHAR(4096),
@@ -3657,7 +4199,7 @@ CREATE TABLE public.whatsapp_log (
 -- Table: event_featured_performers
 -- Stores comprehensive information about featured performers/artists for an event
 CREATE TABLE public.event_featured_performers (
-                                                  id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                  id bigint DEFAULT nextval('public.event_featured_performers_id_seq'::regclass) NOT NULL,
                                                   tenant_id character varying(255),
                                                   event_id bigint NULL,
     -- Basic performer information
@@ -3715,7 +4257,7 @@ CREATE TABLE public.event_featured_performers (
 -- Table: event_contacts
 -- Stores booking or organizing contact info for events
 CREATE TABLE public.event_contacts (
-                                       id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                       id bigint DEFAULT nextval('public.event_contacts_id_seq'::regclass) NOT NULL,
                                        tenant_id character varying(255),
                                        event_id bigint NULL,
                                        name varchar(255) NOT NULL,
@@ -3730,7 +4272,7 @@ CREATE TABLE public.event_contacts (
 -- Table: event_emails
 -- For general event-level emails (for public or organizers)
 CREATE TABLE public.event_emails (
-                                     id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                     id bigint DEFAULT nextval('public.event_emails_id_seq'::regclass) NOT NULL,
                                      tenant_id character varying(255),
                                      event_id bigint NULL,
                                      email varchar(255) NOT NULL,
@@ -3743,7 +4285,7 @@ CREATE TABLE public.event_emails (
 -- Table: event_program_directors
 -- Stores info about the event's program director
 CREATE TABLE public.event_program_directors (
-                                                id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                id bigint DEFAULT nextval('public.event_program_directors_id_seq'::regclass) NOT NULL,
                                                 tenant_id character varying(255),
                                                 event_id bigint NULL,
                                                 name varchar(255) NOT NULL,
@@ -4181,7 +4723,7 @@ END $$;
 -- A user can have different roles in different tenants
 
 CREATE TABLE IF NOT EXISTS public.clerk_user_tenant (
-                                                        id BIGINT DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                        id BIGINT DEFAULT nextval('public.clerk_user_tenant_id_seq'::regclass) NOT NULL,
     user_profile_id BIGINT NOT NULL,
     tenant_id VARCHAR(255) NOT NULL,
     role VARCHAR(100),
@@ -4221,7 +4763,7 @@ COMMENT ON COLUMN public.clerk_user_tenant.joined_at IS 'When user joined this t
 -- This table defines how Clerk org roles translate to app permissions
 
 CREATE TABLE IF NOT EXISTS public.clerk_organization_role (
-                                                              id BIGINT DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                              id BIGINT DEFAULT nextval('public.clerk_organization_role_id_seq'::regclass) NOT NULL,
     clerk_org_id VARCHAR(255) NOT NULL,
     clerk_role_name VARCHAR(100) NOT NULL,
     application_role VARCHAR(100) NOT NULL,
@@ -4261,7 +4803,7 @@ COMMENT ON COLUMN public.clerk_organization_role.permissions IS 'JSON object con
 -- Supports idempotency and retry logic
 
 CREATE TABLE IF NOT EXISTS public.clerk_webhook_event (
-                                                          id BIGINT DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                          id BIGINT DEFAULT nextval('public.clerk_webhook_event_id_seq'::regclass) NOT NULL,
     event_id VARCHAR(255) UNIQUE NOT NULL,
     event_type VARCHAR(100) NOT NULL,
     clerk_user_id VARCHAR(255),
@@ -4308,7 +4850,7 @@ COMMENT ON COLUMN public.clerk_webhook_event.retry_count IS 'Number of retry att
 -- Used for session management and audit trail
 
 CREATE TABLE IF NOT EXISTS public.clerk_session (
-                                                    id BIGINT DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                    id BIGINT DEFAULT nextval('public.clerk_session_id_seq'::regclass) NOT NULL,
     session_id VARCHAR(255) UNIQUE NOT NULL,
     clerk_user_id VARCHAR(255) NOT NULL,
     user_profile_id BIGINT,
@@ -4402,7 +4944,7 @@ CREATE TRIGGER trg_clerk_organization_role_updated_at
 --
 
 CREATE TABLE public.payment_provider_config (
-                                                id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                id bigint DEFAULT nextval('public.payment_provider_config_id_seq'::regclass) NOT NULL,
                                                 tenant_id character varying(255) NOT NULL,
                                                 provider_name character varying(50) NOT NULL,
                                                 payment_use_case character varying(50),
@@ -4454,7 +4996,7 @@ COMMENT ON COLUMN public.payment_provider_config.fallback_order IS 'Order for fa
 --
 
 CREATE TABLE public.manual_payment_request (
-                                             id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                             id bigint DEFAULT nextval('public.manual_payment_request_id_seq'::regclass) NOT NULL,
                                              tenant_id character varying(255) NOT NULL,
                                              event_id bigint,
                                              ticket_transaction_id bigint,
@@ -4490,7 +5032,7 @@ COMMENT ON TABLE public.manual_payment_request IS 'Manual payment requests with 
 --
 
 CREATE TABLE public.manual_payment_summary_report (
-                                                    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                    id bigint DEFAULT nextval('public.manual_payment_summary_report_id_seq'::regclass) NOT NULL,
                                                     tenant_id character varying(255) NOT NULL,
                                                     event_id bigint NOT NULL,
                                                     payment_method_type VARCHAR(70) NOT NULL,
@@ -4514,7 +5056,7 @@ COMMENT ON COLUMN public.manual_payment_summary_report.snapshot_date IS 'Report 
 --
 
 CREATE TABLE public.platform_settlement (
-                                            id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                            id bigint DEFAULT nextval('public.platform_settlement_id_seq'::regclass) NOT NULL,
                                             tenant_id character varying(255) NOT NULL,
                                             provider_name character varying(50) NOT NULL,
                                             settlement_date date NOT NULL,
@@ -4552,7 +5094,7 @@ COMMENT ON COLUMN public.platform_settlement.status IS 'Settlement status: PENDI
 --
 
 CREATE TABLE public.platform_invoice (
-                                         id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                         id bigint DEFAULT nextval('public.platform_invoice_id_seq'::regclass) NOT NULL,
                                          tenant_id character varying(255) NOT NULL,
                                          invoice_number character varying(100) NOT NULL,
                                          invoice_date date NOT NULL,
@@ -4592,7 +5134,7 @@ COMMENT ON COLUMN public.platform_invoice.status IS 'Invoice status: DRAFT, SENT
 --
 
 CREATE TABLE public.membership_plan (
-                                        id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                        id bigint DEFAULT nextval('public.membership_plan_id_seq'::regclass) NOT NULL,
                                         tenant_id character varying(255) NOT NULL,
                                         plan_name character varying(255) NOT NULL,
                                         plan_code character varying(100) NOT NULL,
@@ -4632,7 +5174,7 @@ COMMENT ON COLUMN public.membership_plan.features_json IS 'JSON object containin
 --
 
 CREATE TABLE public.membership_subscription (
-                                                id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                id bigint DEFAULT nextval('public.membership_subscription_id_seq'::regclass) NOT NULL,
                                                 tenant_id character varying(255) NOT NULL,
                                                 user_profile_id bigint NOT NULL,
                                                 membership_plan_id bigint NOT NULL,
@@ -4705,7 +5247,7 @@ CREATE INDEX IF NOT EXISTS idx_reconciliation_log_tenant
 -- Table: promotion_email_template
 -- ============================================
 CREATE TABLE IF NOT EXISTS public.promotion_email_template (
-                                                               id BIGINT PRIMARY KEY DEFAULT nextval('public.sequence_generator'::regclass),
+                                                               id BIGINT PRIMARY KEY DEFAULT nextval('public.membership_subscription_id_seq'::regclass),
     tenant_id VARCHAR(255) NOT NULL,
     event_id BIGINT ,
     template_name VARCHAR(255) NOT NULL,
@@ -4749,7 +5291,7 @@ CREATE INDEX IF NOT EXISTS idx_promotion_template_active ON public.promotion_ema
 -- Table: promotion_email_sent_log
 -- ============================================
 CREATE TABLE IF NOT EXISTS public.promotion_email_sent_log (
-                                                               id BIGINT PRIMARY KEY DEFAULT nextval('public.sequence_generator'::regclass),
+                                                               id BIGINT PRIMARY KEY DEFAULT nextval('public.promotion_email_sent_log_id_seq'::regclass),
     tenant_id VARCHAR(255) NOT NULL,
     template_id BIGINT, -- FK to promotion_email_template.id (nullable to preserve audit logs when template is deleted)
     event_id BIGINT,
@@ -4920,7 +5462,7 @@ CREATE TABLE IF NOT EXISTS public.BATCH_JOB_EXECUTION_CONTEXT (
 -- Used for custom tracking and auditing of batch job executions with additional metadata
 -- Note: This is NOT the same as BATCH_JOB_EXECUTION (Spring Batch framework table)
 -- Using BIGSERIAL for auto-increment (JPA @GeneratedValue with sequenceGenerator will work with this)
--- This table uses the shared sequence_generator sequence (already exists in database)
+-- This table uses batch_job_execution_log_id_seq (per-table sequence)
 CREATE TABLE IF NOT EXISTS public.batch_job_execution_log (
     id BIGSERIAL PRIMARY KEY,
     job_name VARCHAR(100) NOT NULL,
@@ -5085,7 +5627,7 @@ CREATE TRIGGER trg_membership_subscription_updated_at
 -- Description: Supports donation-based events, Mass offerings, and fundraiser events with zero-fee processing
 
 CREATE TABLE public.donation_transaction (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.donation_transaction_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     event_id bigint,
     payment_transaction_id bigint,
@@ -5155,7 +5697,7 @@ CREATE TRIGGER trg_donation_transaction_updated_at
 -- Note: This table is optional. Statistics can also be calculated on-the-fly from donation_transaction table.
 
 CREATE TABLE public.donation_statistics (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.donation_statistics_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     event_id bigint,
     total_donations integer DEFAULT 0 NOT NULL,
@@ -5198,7 +5740,7 @@ CREATE TRIGGER trg_donation_statistics_updated_at
 -- Allows runtime addition of new satellite domains without redeployment.
 
 CREATE TABLE public.satellite_domain (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.satellite_domain_id_seq'::regclass) NOT NULL,
     satellite_key character varying(100) NOT NULL,
     domain character varying(500) NOT NULL,
     hostname character varying(255) NOT NULL,
@@ -5267,12 +5809,12 @@ CREATE TRIGGER trg_satellite_domain_updated_at
 -- =====================================================
 -- NEWS PORTAL TABLES
 -- =====================================================
--- Tables follow schema standards: id bigint with sequence_generator, tenant_id, created_at/updated_at.
+-- Tables follow schema standards: id bigint with per-table {table}_id_seq, tenant_id, created_at/updated_at.
 -- See .cursor/rules/database_schema_guidelines.mdc and documentation/news_portal/backend_prd.html.
 
 -- news_category: Categories for articles (e.g. Main News, Featured News, Press Release).
 CREATE TABLE public.news_category (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.news_category_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     name character varying(255) NOT NULL,
     slug character varying(255) NOT NULL,
@@ -5293,7 +5835,7 @@ COMMENT ON TABLE public.news_category IS 'News categories (e.g. Main News, Featu
 
 -- news_article: Single news item.
 CREATE TABLE public.news_article (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.news_article_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     title character varying(500) NOT NULL,
     slug character varying(500) NOT NULL,
@@ -5319,7 +5861,7 @@ COMMENT ON TABLE public.news_article IS 'News articles with title, slug, body, s
 
 -- news_section_display_config: Per-section display settings (one row per section per tenant).
 CREATE TABLE public.news_section_display_config (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.news_section_display_config_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     section_key character varying(100) NOT NULL,
     section_title_override character varying(255),
@@ -5339,7 +5881,7 @@ COMMENT ON TABLE public.news_section_display_config IS 'Per-section display conf
 
 -- news_sidebar_promotion: Rotating banner ads / promotional items for the right sidebar (slideshow with timer).
 CREATE TABLE public.news_sidebar_promotion (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.news_sidebar_promotion_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     title character varying(255),
     image_url character varying(1024) NOT NULL,
@@ -5364,7 +5906,7 @@ COMMENT ON COLUMN public.news_sidebar_promotion.display_duration_seconds IS 'Sec
 
 -- news_flash: Short flash items for carousel/ticker.
 CREATE TABLE public.news_flash (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.news_flash_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     headline character varying(500) NOT NULL,
     link_url character varying(1024),
@@ -5387,7 +5929,7 @@ COMMENT ON TABLE public.news_flash IS 'Flash news items for carousel/ticker.';
 
 -- news_live_stream_config: Current live stream for the LIVE page (one active config per tenant).
 CREATE TABLE public.news_live_stream_config (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.news_live_stream_config_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     embed_url character varying(1024),
     title character varying(500),
@@ -5404,7 +5946,7 @@ COMMENT ON TABLE public.news_live_stream_config IS 'Live stream embed config for
 
 -- news_article_category: Many-to-many between news_article and news_category.
 CREATE TABLE public.news_article_category (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.news_article_category_id_seq'::regclass) NOT NULL,
     news_article_id bigint NOT NULL,
     news_category_id bigint NOT NULL,
     is_primary boolean DEFAULT false NOT NULL,
@@ -5460,7 +6002,7 @@ CREATE TRIGGER trg_news_live_stream_config_updated_at
 
 -- event_competition_settings: Per-event competition configuration (1:1 with event_details).
 CREATE TABLE public.event_competition_settings (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.event_competition_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     event_id bigint NOT NULL,
     audience_mode character varying(20) DEFAULT 'YOUTH' NOT NULL,
@@ -5495,7 +6037,7 @@ COMMENT ON TABLE public.event_competition_settings IS 'Per-event competition set
 
 -- event_competition_day: Multi-day festival schedule rows.
 CREATE TABLE public.event_competition_day (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.event_competition_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     event_id bigint NOT NULL,
     day_label character varying(100) NOT NULL,
@@ -5517,7 +6059,7 @@ COMMENT ON TABLE public.event_competition_day IS 'Competition festival days (ven
 
 -- event_competition: Competition catalog entries for an event.
 CREATE TABLE public.event_competition (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.event_competition_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     event_id bigint NOT NULL,
     competition_day_id bigint,
@@ -5565,7 +6107,7 @@ COMMENT ON TABLE public.event_competition IS 'Competition catalog (individual/gr
 
 -- event_competition_participant: Child, adult, or team member profiles for registrations.
 CREATE TABLE public.event_competition_participant (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.event_competition_participant_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     participant_type character varying(20) NOT NULL,
     user_profile_id bigint NOT NULL,
@@ -5601,7 +6143,7 @@ COMMENT ON TABLE public.event_competition_participant IS 'Competition participan
 
 -- event_competition_registration: Participant enrolled in a competition.
 CREATE TABLE public.event_competition_registration (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.event_competition_registration_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     event_id bigint NOT NULL,
     competition_id bigint NOT NULL,
@@ -5638,7 +6180,7 @@ COMMENT ON TABLE public.event_competition_registration IS 'Competition registrat
 
 -- event_competition_result: Placements, prizes, and winner media.
 CREATE TABLE public.event_competition_result (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.event_competition_result_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     event_id bigint NOT NULL,
     competition_id bigint NOT NULL,
@@ -5680,7 +6222,7 @@ COMMENT ON TABLE public.event_competition_result IS 'Competition results (placem
 
 -- event_competition_content_block: Markdown content blocks per event (rules, FAQ, etc.).
 CREATE TABLE public.event_competition_content_block (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.event_competition_content_block_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     event_id bigint NOT NULL,
     block_type character varying(32) NOT NULL,
@@ -5699,7 +6241,7 @@ COMMENT ON TABLE public.event_competition_content_block IS 'Per-event competitio
 
 -- event_competition_group_member: Optional normalized group roster members (v1.1).
 CREATE TABLE public.event_competition_group_member (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    id bigint DEFAULT nextval('public.event_competition_group_member_id_seq'::regclass) NOT NULL,
     tenant_id character varying(255) NOT NULL,
     registration_id bigint NOT NULL,
     participant_profile_id bigint NOT NULL,
@@ -5839,107 +6381,501 @@ SELECT pg_catalog.setval(
                true
        );
 
--- Main shared sequence_generator (for all tables using BIGINT with sequence_generator)
+-- Per-table application sequences (synced from table MAX(id))
 -- =====================================================
--- Ensure sequence_generator sequence is always ahead of existing data from all tables that use it
--- This prevents duplicate key errors (e.g. event_attendee_pkey: Key (id)=(4) already exists) by
--- ensuring the sequence is at least as high as the maximum ID in any table and never lower than
--- its current last_value (so we never decrease the sequence).
-SELECT pg_catalog.setval(
-               'public.sequence_generator',
-               GREATEST(
-                   COALESCE((SELECT last_value FROM public.sequence_generator), 0),
-                   COALESCE((SELECT MAX(id) FROM public.user_profile), 0),
-                   COALESCE((SELECT MAX(id) FROM public.bulk_operation_log), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_type_details), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_details), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_competition), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_competition_content_block), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_competition_day), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_competition_group_member), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_competition_participant), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_competition_registration), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_competition_result), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_competition_settings), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_recurrence_series), 0),
-                   COALESCE((SELECT MAX(id) FROM public.focus_group), 0),
-                   COALESCE((SELECT MAX(id) FROM public.focus_group_members), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_focus_groups), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_guest_pricing), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_admin), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_admin_audit_log), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_attendee), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_attendee_guest), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_attendee_attachment), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_calendar_entry), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_sponsors), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_sponsors_join), 0),
-                   COALESCE((SELECT MAX(id) FROM public.gallery_album), 0),
-                   COALESCE((SELECT MAX(id) FROM public.gallery_category), 0),
-                   COALESCE((SELECT MAX(id) FROM public.official_document_category), 0),
-                   COALESCE((SELECT MAX(id) FROM public.official_document_year_bundle), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_media), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_organizer), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_poll), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_poll_option), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_poll_response), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_ticket_transaction), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_ticket_transaction_item), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_ticket_type), 0),
-                   COALESCE((SELECT MAX(id) FROM public.qr_code_usage), 0),
-                   COALESCE((SELECT MAX(id) FROM public.tenant_organization), 0),
-                   COALESCE((SELECT MAX(id) FROM public.tenant_settings), 0),
-                   COALESCE((SELECT MAX(id) FROM public.tenant_email_addresses), 0),
-                   COALESCE((SELECT MAX(id) FROM public.user_payment_transaction), 0),
-                   COALESCE((SELECT MAX(id) FROM public.user_subscription), 0),
-                   COALESCE((SELECT MAX(id) FROM public.user_task), 0),
-                   COALESCE((SELECT MAX(id) FROM public.executive_committee_team_members), 0),
-                   COALESCE((SELECT MAX(id) FROM public.team_groups), 0),
-                   COALESCE((SELECT MAX(id) FROM public.team_members), 0),
-                   COALESCE((SELECT MAX(id) FROM public.communication_campaign), 0),
-                   COALESCE((SELECT MAX(id) FROM public.email_log), 0),
-                   COALESCE((SELECT MAX(id) FROM public.whatsapp_log), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_featured_performers), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_contacts), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_emails), 0),
-                   COALESCE((SELECT MAX(id) FROM public.event_program_directors), 0),
-                   COALESCE((SELECT MAX(id) FROM public.payment_provider_config), 0),
-                   COALESCE((SELECT MAX(id) FROM public.manual_payment_request), 0),
-                   COALESCE((SELECT MAX(id) FROM public.manual_payment_summary_report), 0),
-                   COALESCE((SELECT MAX(id) FROM public.platform_settlement), 0),
-                   COALESCE((SELECT MAX(id) FROM public.platform_invoice), 0),
-                   COALESCE((SELECT MAX(id) FROM public.membership_plan), 0),
-                   COALESCE((SELECT MAX(id) FROM public.membership_subscription), 0),
-                   COALESCE((SELECT MAX(id) FROM public.membership_subscription_reconciliation_log), 0),
-                   COALESCE((SELECT MAX(id) FROM public.promotion_email_template), 0),
-                   COALESCE((SELECT MAX(id) FROM public.promotion_email_sent_log), 0),
-                   COALESCE((SELECT MAX(id) FROM public.clerk_user_tenant), 0),
-                   COALESCE((SELECT MAX(id) FROM public.clerk_organization_role), 0),
-                   COALESCE((SELECT MAX(id) FROM public.clerk_webhook_event), 0),
-                   COALESCE((SELECT MAX(id) FROM public.clerk_session), 0),
-                   COALESCE((SELECT MAX(id) FROM public.donation_transaction), 0),
-                   COALESCE((SELECT MAX(id) FROM public.donation_statistics), 0),
-                   COALESCE((SELECT MAX(id) FROM public.news_category), 0),
-                   COALESCE((SELECT MAX(id) FROM public.news_article), 0),
-                   COALESCE((SELECT MAX(id) FROM public.news_section_display_config), 0),
-                   COALESCE((SELECT MAX(id) FROM public.news_sidebar_promotion), 0),
-                   COALESCE((SELECT MAX(id) FROM public.news_flash), 0),
-                   COALESCE((SELECT MAX(id) FROM public.news_live_stream_config), 0),
-                   COALESCE((SELECT MAX(id) FROM public.news_article_category), 0),
-                   COALESCE((SELECT MAX(id) FROM public.satellite_domain), 0),
-                   1
-               ),
-               true
-       );
+-- For full DB refresh after import, prefer sync_all_table_sequences.sql
+-- Spring Batch sequences below are unchanged.
+-- =====================================================
 
--- Verify sequence_generator is ahead of event_attendee (prevents event_attendee_pkey duplicate key)
+-- user_profile
+SELECT pg_catalog.setval(
+    'public.user_profile_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.user_profile), 1), 1),
+    true
+);
+-- bulk_operation_log
+SELECT pg_catalog.setval(
+    'public.bulk_operation_log_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.bulk_operation_log), 1), 1),
+    true
+);
+-- event_type_details
+SELECT pg_catalog.setval(
+    'public.event_type_details_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_type_details), 1), 1),
+    true
+);
+-- event_details
+SELECT pg_catalog.setval(
+    'public.event_details_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_details), 1), 1),
+    true
+);
+-- event_recurrence_series
+SELECT pg_catalog.setval(
+    'public.event_recurrence_series_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_recurrence_series), 1), 1),
+    true
+);
+-- focus_group
+SELECT pg_catalog.setval(
+    'public.focus_group_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.focus_group), 1), 1),
+    true
+);
+-- focus_group_members
+SELECT pg_catalog.setval(
+    'public.focus_group_members_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.focus_group_members), 1), 1),
+    true
+);
+-- event_focus_groups
+SELECT pg_catalog.setval(
+    'public.event_focus_groups_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_focus_groups), 1), 1),
+    true
+);
+-- event_guest_pricing
+SELECT pg_catalog.setval(
+    'public.event_guest_pricing_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_guest_pricing), 1), 1),
+    true
+);
+-- event_live_update
+SELECT pg_catalog.setval(
+    'public.event_live_update_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_live_update), 1), 1),
+    true
+);
+-- event_live_update_attachment
+SELECT pg_catalog.setval(
+    'public.event_live_update_attachment_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_live_update_attachment), 1), 1),
+    true
+);
+-- event_admin
+SELECT pg_catalog.setval(
+    'public.event_admin_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_admin), 1), 1),
+    true
+);
+-- event_admin_audit_log
+SELECT pg_catalog.setval(
+    'public.event_admin_audit_log_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_admin_audit_log), 1), 1),
+    true
+);
+-- event_attendee
+SELECT pg_catalog.setval(
+    'public.event_attendee_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_attendee), 1), 1),
+    true
+);
+-- event_attendee_guest
+SELECT pg_catalog.setval(
+    'public.event_attendee_guest_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_attendee_guest), 1), 1),
+    true
+);
+-- event_attendee_attachment
+SELECT pg_catalog.setval(
+    'public.event_attendee_attachment_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_attendee_attachment), 1), 1),
+    true
+);
+-- event_calendar_entry
+SELECT pg_catalog.setval(
+    'public.event_calendar_entry_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_calendar_entry), 1), 1),
+    true
+);
+-- event_sponsors
+SELECT pg_catalog.setval(
+    'public.event_sponsors_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_sponsors), 1), 1),
+    true
+);
+-- event_sponsors_join
+SELECT pg_catalog.setval(
+    'public.event_sponsors_join_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_sponsors_join), 1), 1),
+    true
+);
+-- gallery_category
+SELECT pg_catalog.setval(
+    'public.gallery_category_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.gallery_category), 1), 1),
+    true
+);
+-- gallery_album
+SELECT pg_catalog.setval(
+    'public.gallery_album_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.gallery_album), 1), 1),
+    true
+);
+-- official_document_category
+SELECT pg_catalog.setval(
+    'public.official_document_category_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.official_document_category), 1), 1),
+    true
+);
+-- event_media
+SELECT pg_catalog.setval(
+    'public.event_media_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_media), 1), 1),
+    true
+);
+-- official_document_year_bundle
+SELECT pg_catalog.setval(
+    'public.official_document_year_bundle_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.official_document_year_bundle), 1), 1),
+    true
+);
+-- event_organizer
+SELECT pg_catalog.setval(
+    'public.event_organizer_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_organizer), 1), 1),
+    true
+);
+-- event_poll
+SELECT pg_catalog.setval(
+    'public.event_poll_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_poll), 1), 1),
+    true
+);
+-- event_poll_option
+SELECT pg_catalog.setval(
+    'public.event_poll_option_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_poll_option), 1), 1),
+    true
+);
+-- event_poll_response
+SELECT pg_catalog.setval(
+    'public.event_poll_response_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_poll_response), 1), 1),
+    true
+);
+-- event_score_card
+SELECT pg_catalog.setval(
+    'public.event_score_card_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_score_card), 1), 1),
+    true
+);
+-- event_score_card_detail
+SELECT pg_catalog.setval(
+    'public.event_score_card_detail_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_score_card_detail), 1), 1),
+    true
+);
+-- discount_code
+SELECT pg_catalog.setval(
+    'public.discount_code_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.discount_code), 1), 1),
+    true
+);
+-- event_ticket_transaction
+SELECT pg_catalog.setval(
+    'public.event_ticket_transaction_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_ticket_transaction), 1), 1),
+    true
+);
+-- event_ticket_type
+SELECT pg_catalog.setval(
+    'public.event_ticket_type_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_ticket_type), 1), 1),
+    true
+);
+-- event_ticket_transaction_item
+SELECT pg_catalog.setval(
+    'public.event_ticket_transaction_item_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_ticket_transaction_item), 1), 1),
+    true
+);
+-- qr_code_usage
+SELECT pg_catalog.setval(
+    'public.qr_code_usage_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.qr_code_usage), 1), 1),
+    true
+);
+-- tenant_organization
+SELECT pg_catalog.setval(
+    'public.tenant_organization_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.tenant_organization), 1), 1),
+    true
+);
+-- tenant_settings
+SELECT pg_catalog.setval(
+    'public.tenant_settings_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.tenant_settings), 1), 1),
+    true
+);
+-- tenant_email_addresses
+SELECT pg_catalog.setval(
+    'public.tenant_email_addresses_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.tenant_email_addresses), 1), 1),
+    true
+);
+-- user_payment_transaction
+SELECT pg_catalog.setval(
+    'public.user_payment_transaction_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.user_payment_transaction), 1), 1),
+    true
+);
+-- user_subscription
+SELECT pg_catalog.setval(
+    'public.user_subscription_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.user_subscription), 1), 1),
+    true
+);
+-- user_task
+SELECT pg_catalog.setval(
+    'public.user_task_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.user_task), 1), 1),
+    true
+);
+-- executive_committee_team_members
+SELECT pg_catalog.setval(
+    'public.executive_committee_team_members_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.executive_committee_team_members), 1), 1),
+    true
+);
+-- team_groups
+SELECT pg_catalog.setval(
+    'public.team_groups_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.team_groups), 1), 1),
+    true
+);
+-- team_members
+SELECT pg_catalog.setval(
+    'public.team_members_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.team_members), 1), 1),
+    true
+);
+-- communication_campaign
+SELECT pg_catalog.setval(
+    'public.communication_campaign_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.communication_campaign), 1), 1),
+    true
+);
+-- email_log
+SELECT pg_catalog.setval(
+    'public.email_log_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.email_log), 1), 1),
+    true
+);
+-- whatsapp_log
+SELECT pg_catalog.setval(
+    'public.whatsapp_log_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.whatsapp_log), 1), 1),
+    true
+);
+-- event_featured_performers
+SELECT pg_catalog.setval(
+    'public.event_featured_performers_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_featured_performers), 1), 1),
+    true
+);
+-- event_contacts
+SELECT pg_catalog.setval(
+    'public.event_contacts_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_contacts), 1), 1),
+    true
+);
+-- event_emails
+SELECT pg_catalog.setval(
+    'public.event_emails_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_emails), 1), 1),
+    true
+);
+-- event_program_directors
+SELECT pg_catalog.setval(
+    'public.event_program_directors_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_program_directors), 1), 1),
+    true
+);
+-- clerk_user_tenant
+SELECT pg_catalog.setval(
+    'public.clerk_user_tenant_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.clerk_user_tenant), 1), 1),
+    true
+);
+-- clerk_organization_role
+SELECT pg_catalog.setval(
+    'public.clerk_organization_role_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.clerk_organization_role), 1), 1),
+    true
+);
+-- clerk_webhook_event
+SELECT pg_catalog.setval(
+    'public.clerk_webhook_event_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.clerk_webhook_event), 1), 1),
+    true
+);
+-- clerk_session
+SELECT pg_catalog.setval(
+    'public.clerk_session_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.clerk_session), 1), 1),
+    true
+);
+-- payment_provider_config
+SELECT pg_catalog.setval(
+    'public.payment_provider_config_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.payment_provider_config), 1), 1),
+    true
+);
+-- manual_payment_request
+SELECT pg_catalog.setval(
+    'public.manual_payment_request_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.manual_payment_request), 1), 1),
+    true
+);
+-- manual_payment_summary_report
+SELECT pg_catalog.setval(
+    'public.manual_payment_summary_report_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.manual_payment_summary_report), 1), 1),
+    true
+);
+-- platform_settlement
+SELECT pg_catalog.setval(
+    'public.platform_settlement_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.platform_settlement), 1), 1),
+    true
+);
+-- platform_invoice
+SELECT pg_catalog.setval(
+    'public.platform_invoice_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.platform_invoice), 1), 1),
+    true
+);
+-- membership_plan
+SELECT pg_catalog.setval(
+    'public.membership_plan_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.membership_plan), 1), 1),
+    true
+);
+-- membership_subscription
+SELECT pg_catalog.setval(
+    'public.membership_subscription_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.membership_subscription), 1), 1),
+    true
+);
+-- donation_transaction
+SELECT pg_catalog.setval(
+    'public.donation_transaction_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.donation_transaction), 1), 1),
+    true
+);
+-- donation_statistics
+SELECT pg_catalog.setval(
+    'public.donation_statistics_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.donation_statistics), 1), 1),
+    true
+);
+-- satellite_domain
+SELECT pg_catalog.setval(
+    'public.satellite_domain_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.satellite_domain), 1), 1),
+    true
+);
+-- news_category
+SELECT pg_catalog.setval(
+    'public.news_category_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.news_category), 1), 1),
+    true
+);
+-- news_article
+SELECT pg_catalog.setval(
+    'public.news_article_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.news_article), 1), 1),
+    true
+);
+-- news_section_display_config
+SELECT pg_catalog.setval(
+    'public.news_section_display_config_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.news_section_display_config), 1), 1),
+    true
+);
+-- news_sidebar_promotion
+SELECT pg_catalog.setval(
+    'public.news_sidebar_promotion_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.news_sidebar_promotion), 1), 1),
+    true
+);
+-- news_flash
+SELECT pg_catalog.setval(
+    'public.news_flash_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.news_flash), 1), 1),
+    true
+);
+-- news_live_stream_config
+SELECT pg_catalog.setval(
+    'public.news_live_stream_config_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.news_live_stream_config), 1), 1),
+    true
+);
+-- news_article_category
+SELECT pg_catalog.setval(
+    'public.news_article_category_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.news_article_category), 1), 1),
+    true
+);
+-- event_competition_settings
+SELECT pg_catalog.setval(
+    'public.event_competition_settings_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_competition_settings), 1), 1),
+    true
+);
+-- event_competition_day
+SELECT pg_catalog.setval(
+    'public.event_competition_day_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_competition_day), 1), 1),
+    true
+);
+-- event_competition
+SELECT pg_catalog.setval(
+    'public.event_competition_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_competition), 1), 1),
+    true
+);
+-- event_competition_participant
+SELECT pg_catalog.setval(
+    'public.event_competition_participant_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_competition_participant), 1), 1),
+    true
+);
+-- event_competition_registration
+SELECT pg_catalog.setval(
+    'public.event_competition_registration_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_competition_registration), 1), 1),
+    true
+);
+-- event_competition_result
+SELECT pg_catalog.setval(
+    'public.event_competition_result_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_competition_result), 1), 1),
+    true
+);
+-- event_competition_content_block
+SELECT pg_catalog.setval(
+    'public.event_competition_content_block_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_competition_content_block), 1), 1),
+    true
+);
+-- event_competition_group_member
+SELECT pg_catalog.setval(
+    'public.event_competition_group_member_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_competition_group_member), 1), 1),
+    true
+);
+-- Verify executive_committee_team_members sequence (per-table model)
 SELECT
-    (SELECT last_value FROM public.sequence_generator) AS sequence_last_value,
-    (SELECT MAX(id) FROM public.event_attendee) AS event_attendee_max_id,
+    (SELECT last_value FROM pg_sequences WHERE sequencename = 'executive_committee_team_members_id_seq') AS seq_last_value,
+    (SELECT MAX(id) FROM public.executive_committee_team_members) AS table_max_id,
     CASE
-        WHEN (SELECT last_value FROM public.sequence_generator) >= (SELECT COALESCE(MAX(id), 0) FROM public.event_attendee)
-        THEN 'OK: sequence >= max(id)'
-        ELSE 'WARNING: run full sync_sequence_after_inserts.sql'
+        WHEN (SELECT last_value FROM pg_sequences WHERE sequencename = 'executive_committee_team_members_id_seq')
+             >= COALESCE((SELECT MAX(id) FROM public.executive_committee_team_members), 0)
+        THEN 'OK: per-table sequence >= max(id)'
+        ELSE 'WARNING: run sync_all_table_sequences.sql'
     END AS status;
 
 

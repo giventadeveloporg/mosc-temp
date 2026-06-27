@@ -3,71 +3,22 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { EventWithMedia, EventMediaDTO } from '@/types';
-import { useFilteredEvents } from '@/hooks/useFilteredEvents';
-import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
+import type { EventWithMedia, EventMediaDTO, EventDetailsDTO } from '@/types';
 import { getOverlayInfo } from '@/lib/heroOverlay';
 import { getTenantId } from '@/lib/env';
+import {
+  fetchHomepageHeroMediaList,
+  getHeroMediaDurationMs,
+  getHeroSliderImageUrl,
+  isUpcomingEventForHero,
+  type HeroMediaRow,
+} from '@/lib/hero/heroSliderMedia';
 import { useDeferredFetch } from '@/hooks/usePageReady';
-import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
+import { getHomepageCacheKey, HOMEPAGE_CACHE_INVALIDATE_CHANNEL } from '@/lib/homepageCacheKeys';
 import { ArrowRight, Heart, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import GivebutterDonateButton from '@/components/GivebutterDonateButton';
 
-/** Hero media is shown only if startDisplayingFromDate is null or <= today (matches useFilteredEvents). */
-function isHeroMediaDisplayDateValid(media: EventMediaDTO & { start_displaying_from_date?: string }): boolean {
-  const displayDateValue = media.startDisplayingFromDate ?? media.start_displaying_from_date;
-  if (!displayDateValue) return true;
-  try {
-    const [year, month, day] = displayDateValue.split('-').map(Number);
-    const displayDate = new Date(year, month - 1, day);
-    displayDate.setHours(0, 0, 0, 0);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return displayDate <= today;
-  } catch {
-    return true;
-  }
-}
-
-/** True when media is not associated with any event (event_id NULL). Supports eventId, event_id, and event.id from API. */
-function isStandaloneHeroMedia(media: EventMediaDTO & { event_id?: number | null; event?: { id?: number | null } }): boolean {
-  const eid = media.eventId ?? media.event_id ?? media.event?.id;
-  return eid == null || eid === undefined;
-}
-
-/** True when media is eligible for standalone hero: is_home_page_hero_image OR is_hero_image (camel or snake_case). Used only for standalone (event_id NULL) selection. */
-function isStandaloneHeroEligible(media: EventMediaDTO & { is_hero_image?: boolean; is_home_page_hero_image?: boolean }): boolean {
-  const homePage = media.isHomePageHeroImage === true || media.is_home_page_hero_image === true;
-  const hero = media.isHeroImage === true || media.is_hero_image === true;
-  return homePage || hero;
-}
-
-/** Normalize event-medias API response: backend may return array or paged { content: [] }. */
-function normalizeEventMediasResponse(data: unknown): EventMediaDTO[] {
-  if (Array.isArray(data)) return data as EventMediaDTO[];
-  if (data && typeof data === 'object' && 'content' in data && Array.isArray((data as { content: unknown }).content)) {
-    return (data as { content: EventMediaDTO[] }).content;
-  }
-  if (data && typeof data === 'object') return [data as EventMediaDTO];
-  return [];
-}
-
-type MediaWithSnake = EventMediaDTO & {
-  event_id?: number | null;
-  file_url?: string;
-  home_page_hero_display_duration_seconds?: number | null;
-  is_hero_image?: boolean;
-  is_home_page_hero_image?: boolean;
-};
-
-function getHeroMediaUrl(media: MediaWithSnake): string | undefined {
-  return media.fileUrl ?? media.file_url;
-}
-
-function getHeroMediaDurationMs(media: MediaWithSnake): number {
-  const sec = media.homePageHeroDisplayDurationSeconds ?? media.home_page_hero_display_duration_seconds;
-  return sec != null && sec > 0 ? Math.max(1000, Math.min(600000, sec * 1000)) : 8000;
-}
+const HERO_SLIDER_CAP = 24;
 
 /** Crossfade duration — must match `.hero-crossfade-layer` opacity transition in globals.css. */
 const HERO_SLIDESHOW_CROSSFADE_MS = 420;
@@ -168,6 +119,7 @@ const DynamicHeroImage: React.FC<{
   const [slide, setSlide] = useState<HeroSlideCrossfade>({ a: 0, b: 1, showA: true });
   const [dynamicImages, setDynamicImages] = useState<string[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<EventWithMediaExtended[]>([]);
+  const [heroSlideEvents, setHeroSlideEvents] = useState<(EventWithMediaExtended | null)[]>([]);
   const [imageDurations, setImageDurations] = useState<number[]>([]); // Duration in milliseconds for each image
   const [isInitialized, setIsInitialized] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -180,6 +132,7 @@ const DynamicHeroImage: React.FC<{
   // Refs to store latest arrays to avoid stale closures in recursive function
   const dynamicImagesRef = React.useRef<string[]>([]);
   const upcomingEventsRef = React.useRef<EventWithMediaExtended[]>([]);
+  const heroSlideEventsRef = React.useRef<(EventWithMediaExtended | null)[]>([]);
   // Ref to store latest isPaused state to avoid stale closures
   const isPausedRef = React.useRef<boolean>(false);
   // Ref to track the last scheduled image index to prevent duplicate scheduling
@@ -193,9 +146,8 @@ const DynamicHeroImage: React.FC<{
     slideRef.current = slide;
   }, [slide]);
 
-  // Defer hero event data fetching until after initial paint + 500ms
   const heroFetchEnabled = useDeferredFetch(500);
-  const { filteredEvents, isLoading: eventsLoading, error } = useFilteredEvents('hero', heroFetchEnabled);
+  const [heroDataVersion, setHeroDataVersion] = useState(0);
 
   const defaultImage = "/images/hero_section/default_hero_section_second_column_poster.jpeg";
 
@@ -207,7 +159,13 @@ const DynamicHeroImage: React.FC<{
     try {
       const raw = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(CACHE_KEY) : null;
       if (!raw) return;
-      const parsed = JSON.parse(raw) as { dynamicImages?: string[]; upcomingEvents?: EventWithMediaExtended[]; imageDurations?: number[]; timestamp?: number };
+      const parsed = JSON.parse(raw) as {
+        dynamicImages?: string[];
+        upcomingEvents?: EventWithMediaExtended[];
+        heroSlideEvents?: (EventWithMediaExtended | null)[];
+        imageDurations?: number[];
+        timestamp?: number;
+      };
       if (
         parsed.timestamp != null &&
         Date.now() - parsed.timestamp < CACHE_DURATION_MS &&
@@ -218,9 +176,16 @@ const DynamicHeroImage: React.FC<{
       ) {
         setDynamicImages(parsed.dynamicImages);
         setUpcomingEvents(Array.isArray(parsed.upcomingEvents) ? parsed.upcomingEvents : []);
+        const slideEvents = Array.isArray(parsed.heroSlideEvents)
+          ? parsed.heroSlideEvents
+          : Array.isArray(parsed.upcomingEvents)
+            ? parsed.upcomingEvents.map((e) => e ?? null)
+            : [];
+        setHeroSlideEvents(slideEvents);
         setImageDurations(parsed.imageDurations);
         dynamicImagesRef.current = parsed.dynamicImages;
         upcomingEventsRef.current = Array.isArray(parsed.upcomingEvents) ? parsed.upcomingEvents : [];
+        heroSlideEventsRef.current = slideEvents;
         imageDurationsRef.current = parsed.imageDurations;
         setIsInitialized(true);
       }
@@ -229,233 +194,124 @@ const DynamicHeroImage: React.FC<{
     }
   }, [CACHE_KEY]);
 
+  // Refetch hero slides when admin updates media (same tab or another tab via BroadcastChannel).
+  useEffect(() => {
+    if (typeof BroadcastChannel === 'undefined') return;
+    const channel = new BroadcastChannel(HOMEPAGE_CACHE_INVALIDATE_CHANNEL);
+    channel.onmessage = () => {
+      try {
+        sessionStorage.removeItem(CACHE_KEY);
+      } catch {
+        /* ignore */
+      }
+      setHeroDataVersion((v) => v + 1);
+    };
+    return () => channel.close();
+  }, [CACHE_KEY]);
+
   // Store onEventChange in a ref to avoid dependency issues in the rotation effect
   const onEventChangeRef = React.useRef(onEventChange);
   React.useEffect(() => {
     onEventChangeRef.current = onEventChange;
   }, [onEventChange]);
 
-  // Initialize hero images (4-month rule: no events in 4 months → up to 6 event-assigned hero images; events in 4 months → event images + up to 2 standalone)
+  // Initialize hero images from Admin → Media hero flags, sorted by displayOrder (includes event-linked + standalone).
   useEffect(() => {
+    if (!heroFetchEnabled) return;
+
+    const resolveEventForMedia = async (
+      media: HeroMediaRow,
+      eventById: Map<number, EventWithMediaExtended>
+    ): Promise<EventWithMediaExtended | null> => {
+      const eventId = media.eventId ?? media.event_id;
+      if (eventId == null) return null;
+      if (eventById.has(eventId)) return eventById.get(eventId) ?? null;
+      try {
+        const res = await fetch(`/api/proxy/event-details/${eventId}`, { cache: 'no-store' });
+        if (!res.ok) return null;
+        const event = (await res.json()) as EventDetailsDTO;
+        const eventWithMedia = {
+          ...event,
+          thumbnailUrl: getHeroSliderImageUrl(media) ?? media.fileUrl,
+          media: [media],
+        } as EventWithMediaExtended;
+        eventById.set(eventId, eventWithMedia);
+        return eventWithMedia;
+      } catch {
+        return null;
+      }
+    };
+
     const initializeHeroImages = async () => {
       try {
         const imageUrls: string[] = [];
-        let processedEvents: EventWithMediaExtended[] = [];
         const durations: number[] = [];
+        const slideEvents: (EventWithMediaExtended | null)[] = [];
+        const tenantId = getTenantId();
+        const heroList = await fetchHomepageHeroMediaList(tenantId);
+        const capped = heroList.slice(0, HERO_SLIDER_CAP);
+        const eventById = new Map<number, EventWithMediaExtended>();
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const fourMonthsFromNow = new Date();
-        fourMonthsFromNow.setMonth(fourMonthsFromNow.getMonth() + 4);
-
-        if (filteredEvents && filteredEvents.length > 0) {
-          const oneYearFromNow = new Date();
-          oneYearFromNow.setFullYear(today.getFullYear() + 1);
-          const recurringSeriesMap = new Map<number, EventWithMediaExtended>();
-
-          filteredEvents.forEach(({ event, media }) => {
-            const durationSeconds = media.homePageHeroDisplayDurationSeconds;
-            const durationMs = durationSeconds != null && durationSeconds > 0
-              ? Math.max(1000, Math.min(600000, durationSeconds * 1000))
-              : 8000;
-
-            const eventWithMedia: EventWithMediaExtended = {
-              ...event,
-              thumbnailUrl: media.fileUrl,
-              media: [media],
-              heroDisplayDurationMs: durationMs
-            } as EventWithMediaExtended & { heroDisplayDurationMs: number };
-
-            if (isRecurringEvent(event)) {
-              const seriesId = event.recurrenceSeriesId || event.parentEventId || event.id;
-              const nextOccurrence = getNextOccurrenceDate(event, today);
-              if (!nextOccurrence || nextOccurrence > oneYearFromNow) return;
-              const nextOccurrenceStr = nextOccurrence.toISOString().split('T')[0];
-              eventWithMedia.startDate = nextOccurrenceStr;
-              const existingSeriesEvent = recurringSeriesMap.get(seriesId);
-              if (!existingSeriesEvent) {
-                recurringSeriesMap.set(seriesId, eventWithMedia);
-              } else {
-                const existingDate = new Date(existingSeriesEvent.startDate!);
-                if (nextOccurrence < existingDate) {
-                  recurringSeriesMap.set(seriesId, eventWithMedia);
-                }
-              }
-            } else {
-              processedEvents.push(eventWithMedia);
-            }
-          });
-
-          recurringSeriesMap.forEach((event) => processedEvents.push(event));
-          processedEvents.sort((a, b) => {
-            if (!a.startDate || !b.startDate) return 0;
-            return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+        if (heroList.length > HERO_SLIDER_CAP) {
+          console.log('[HeroSection] Hero cap applied:', {
+            totalEligible: heroList.length,
+            cap: HERO_SLIDER_CAP,
+            showing: capped.length,
+            tip: 'Set Display Order lower (e.g. 0, 1, 2) in Admin → Media so preferred images show first.',
           });
         }
 
-        const hasEventsInNext4Months = processedEvents.some((e) => {
-          const d = e.startDate ? new Date(e.startDate) : null;
-          if (!d) return false;
-          return d >= today && d <= fourMonthsFromNow;
-        });
-
-        if (!hasEventsInNext4Months) {
-          // No events in next 4 months: use up to STANDALONE_HERO_CAP standalone hero images (event_id NULL, is_hero_image OR is_home_page_hero_image); fetch by hero flags then filter client-side
-          const STANDALONE_HERO_CAP = 24;
-          const STANDALONE_FETCH_SIZE = 100;
-          try {
-            const tenantId = getTenantId();
-            const seenIds = new Set<number>();
-            const mergeStandalone = (raw: (EventMediaDTO & MediaWithSnake)[]) =>
-              raw
-                .filter((m) => isStandaloneHeroMedia(m) && isStandaloneHeroEligible(m) && isHeroMediaDisplayDateValid(m))
-                .filter((m) => {
-                  const id = m.id;
-                  if (id == null || seenIds.has(id)) return false;
-                  seenIds.add(id);
-                  return true;
-                });
-            let list: (EventMediaDTO & MediaWithSnake)[] = [];
-            let res = await fetch(
-              `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&isHeroImage.equals=true&size=${STANDALONE_FETCH_SIZE}&sort=displayOrder,asc`,
-              { cache: 'no-store' }
-            );
-            if (res.ok) {
-              const data = await res.json();
-              const normalized = normalizeEventMediasResponse(data) as (EventMediaDTO & MediaWithSnake)[];
-              list = mergeStandalone(normalized);
-              if (normalized.length > 0) {
-                const excludedCount = normalized.filter((m) => !isStandaloneHeroMedia(m) || !isStandaloneHeroEligible(m) || !isHeroMediaDisplayDateValid(m)).length;
-                if (excludedCount > 0) {
-                  console.log('[HeroSection] Standalone hero fetch (isHeroImage):', { fetched: normalized.length, passedFilter: list.length, excluded: excludedCount, tip: 'Excluded if linked to an event, or "Start displaying from date" is in the future.' });
-                }
-              }
-            }
-            // Always fetch isHomePageHeroImage too so media with only is_home_page_hero_image=true (and not is_hero_image) are included
-            res = await fetch(
-              `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&isHomePageHeroImage.equals=true&size=${STANDALONE_FETCH_SIZE}&sort=displayOrder,asc`,
-              { cache: 'no-store' }
-            );
-            if (res.ok) {
-              const data = await res.json();
-              const more = mergeStandalone(normalizeEventMediasResponse(data) as (EventMediaDTO & MediaWithSnake)[]);
-              list = [...list, ...more].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
-            }
-            const beforeCap = list.length;
-            const standalone = list.slice(0, STANDALONE_HERO_CAP);
-            if (beforeCap > STANDALONE_HERO_CAP) {
-              console.log('[HeroSection] Standalone hero cap applied:', { totalEligible: beforeCap, cap: STANDALONE_HERO_CAP, showing: standalone.length, omitted: beforeCap - STANDALONE_HERO_CAP, tip: 'Set Display Order lower (e.g. 0–5) in Admin → Media so preferred images show first.' });
-            }
-            processedEvents = [];
-            standalone.forEach((m) => {
-              const url = getHeroMediaUrl(m);
-              if (url) {
-                imageUrls.push(url);
-                durations.push(getHeroMediaDurationMs(m));
-              } else {
-                console.warn('[HeroSection] Standalone hero media skipped (no fileUrl):', { id: m.id, title: m.title });
-              }
+        for (const media of capped) {
+          const url = getHeroSliderImageUrl(media);
+          if (!url) {
+            console.warn('[HeroSection] Hero media skipped (no usable image URL):', {
+              id: media.id,
+              title: media.title,
+              eventId: media.eventId ?? media.event_id,
             });
-          } catch (err) {
-            console.warn('[HeroSection] Fallback hero media fetch failed:', err);
+            continue;
           }
-        } else {
-          // Events in next 4 months: event-based images first, then up to STANDALONE_HERO_CAP_WITH_EVENTS standalone (event_id NULL)
-          const STANDALONE_HERO_CAP_WITH_EVENTS = 12;
-          const STANDALONE_FETCH_SIZE_WITH_EVENTS = 50;
-          processedEvents.forEach((e, index) => {
-            if (e.thumbnailUrl) {
-              imageUrls.push(e.thumbnailUrl);
-              const eventDuration = (e as EventWithMediaExtended & { heroDisplayDurationMs?: number }).heroDisplayDurationMs ?? 8000;
-              durations.push(eventDuration);
-              console.log(`[HeroSection] Event ${index + 1} duration: ${eventDuration}ms (${eventDuration / 1000}s)`, {
-                eventId: e.id,
-                eventTitle: e.title,
-              });
-            }
-          });
-
-          try {
-            const tenantId = getTenantId();
-            // Standalone = event_id null AND (is_hero_image OR is_home_page_hero_image). Fetch hero-flagged media then filter client-side for no event (backend may not support eventId.specified=false).
-            const seenIds = new Set<number>();
-            const mergeStandalone = (raw: (EventMediaDTO & MediaWithSnake)[]) => {
-              return raw
-                .filter((m) => isStandaloneHeroMedia(m) && isStandaloneHeroEligible(m) && isHeroMediaDisplayDateValid(m))
-                .filter((m) => {
-                  const id = m.id;
-                  if (id == null || seenIds.has(id)) return false;
-                  seenIds.add(id);
-                  return true;
-                });
-            };
-            let list: (EventMediaDTO & MediaWithSnake)[] = [];
-            // 1) Fetch by isHeroImage=true (includes standalone rows with is_hero_image=true)
-            let res = await fetch(
-              `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&isHeroImage.equals=true&size=${STANDALONE_FETCH_SIZE_WITH_EVENTS}&sort=displayOrder,asc`,
-              { cache: 'no-store' }
-            );
-            if (res.ok) {
-              const data = await res.json();
-              const raw = normalizeEventMediasResponse(data) as (EventMediaDTO & MediaWithSnake)[];
-              list = mergeStandalone(raw);
-            }
-            // 2) Always fetch by isHomePageHeroImage=true and merge so media with only is_home_page_hero_image (and not is_hero_image) are included
-            res = await fetch(
-              `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&isHomePageHeroImage.equals=true&size=${STANDALONE_FETCH_SIZE_WITH_EVENTS}&sort=displayOrder,asc`,
-              { cache: 'no-store' }
-            );
-            if (res.ok) {
-              const data = await res.json();
-              const raw = normalizeEventMediasResponse(data) as (EventMediaDTO & MediaWithSnake)[];
-              list = [...list, ...mergeStandalone(raw)].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
-            }
-            const beforeCap = list.length;
-            const standalone = list.slice(0, STANDALONE_HERO_CAP_WITH_EVENTS);
-            if (beforeCap > STANDALONE_HERO_CAP_WITH_EVENTS) {
-              console.log('[HeroSection] Standalone hero cap (with events in 4mo):', { totalEligible: beforeCap, cap: STANDALONE_HERO_CAP_WITH_EVENTS, showing: standalone.length, omitted: beforeCap - STANDALONE_HERO_CAP_WITH_EVENTS });
-            }
-            if (standalone.length === 0) {
-              console.warn(
-                '[HeroSection] No standalone hero images (event_id null) found. Add media in Admin with no event selected (event_id NULL) and either "Home Page Hero Image" or "Hero Image" checked.'
-              );
-            }
-            standalone.forEach((m) => {
-              const url = getHeroMediaUrl(m);
-              if (url) {
-                imageUrls.push(url);
-                durations.push(getHeroMediaDurationMs(m));
-              }
-            });
-          } catch (err) {
-            console.warn('[HeroSection] Standalone hero media fetch failed:', err);
+          const linkedEvent = await resolveEventForMedia(media, eventById);
+          if (!linkedEvent || !isUpcomingEventForHero(linkedEvent)) {
+            continue;
           }
+          imageUrls.push(url);
+          durations.push(getHeroMediaDurationMs(media));
+          slideEvents.push(linkedEvent);
         }
 
-        // ALWAYS add default image at the end of the rotation (use default 8 seconds)
         imageUrls.push(defaultImage);
         durations.push(8000);
+        slideEvents.push(null);
+
+        const linkedUpcoming = slideEvents.filter((e): e is EventWithMediaExtended => e != null);
 
         console.log('[HeroSection] Image rotation initialized:', {
           totalImages: imageUrls.length,
-          eventImages: imageUrls.length - 1,
+          heroMediaCount: imageUrls.length - 1,
           hasDefaultImage: true,
-          hasEventsInNext4Months,
+          displayOrders: capped.map((m) => ({
+            id: m.id,
+            title: m.title,
+            displayOrder: m.displayOrder ?? m.display_order,
+            eventId: m.eventId ?? m.event_id,
+          })),
           durations: durations.map((d) => `${d}ms (${d / 1000}s)`),
         });
 
-        setUpcomingEvents(processedEvents);
+        setUpcomingEvents(linkedUpcoming);
+        setHeroSlideEvents(slideEvents);
         setDynamicImages(imageUrls);
         setImageDurations(durations);
         imageDurationsRef.current = durations;
         dynamicImagesRef.current = imageUrls;
-        upcomingEventsRef.current = processedEvents;
+        upcomingEventsRef.current = linkedUpcoming;
+        heroSlideEventsRef.current = slideEvents;
         setIsInitialized(true);
 
-        if (processedEvents.length > 0 && onEventChangeRef.current) {
-          onEventChangeRef.current(processedEvents[0]);
-        } else if (onEventChangeRef.current) {
-          onEventChangeRef.current(null);
+        const firstEvent = slideEvents[0] ?? null;
+        if (onEventChangeRef.current) {
+          onEventChangeRef.current(firstEvent);
         }
 
         try {
@@ -463,7 +319,8 @@ const DynamicHeroImage: React.FC<{
             CACHE_KEY,
             JSON.stringify({
               dynamicImages: imageUrls,
-              upcomingEvents: processedEvents,
+              upcomingEvents: linkedUpcoming,
+              heroSlideEvents: slideEvents,
               imageDurations: durations,
               timestamp: Date.now(),
             })
@@ -476,14 +333,14 @@ const DynamicHeroImage: React.FC<{
         setDynamicImages([defaultImage]);
         setImageDurations([8000]);
         setUpcomingEvents([]);
+        setHeroSlideEvents([null]);
+        heroSlideEventsRef.current = [null];
         setIsInitialized(true);
       }
     };
 
-    if (!eventsLoading && !error) {
-      initializeHeroImages();
-    }
-  }, [filteredEvents, eventsLoading, error]);
+    initializeHeroImages();
+  }, [heroFetchEnabled, CACHE_KEY, defaultImage, heroDataVersion]);
 
   // Update refs whenever state changes to avoid stale closures
   useEffect(() => {
@@ -497,6 +354,10 @@ const DynamicHeroImage: React.FC<{
   useEffect(() => {
     upcomingEventsRef.current = upcomingEvents;
   }, [upcomingEvents]);
+
+  useEffect(() => {
+    heroSlideEventsRef.current = heroSlideEvents;
+  }, [heroSlideEvents]);
 
   useEffect(() => {
     isPausedRef.current = isPaused;
@@ -523,7 +384,7 @@ const DynamicHeroImage: React.FC<{
     const n = dynamicImagesRef.current.length;
     if (n < 2) {
       setCurrentImageIndex(toIdx);
-      const ev = toIdx < upcomingEventsRef.current.length ? upcomingEventsRef.current[toIdx] : null;
+      const ev = heroSlideEventsRef.current[toIdx] ?? null;
       const cb = onEventChangeRef.current;
       if (cb) setTimeout(() => cb(ev), 0);
       return;
@@ -563,8 +424,7 @@ const DynamicHeroImage: React.FC<{
       });
 
       setCurrentImageIndex(targetIdx);
-      const latestEvents = upcomingEventsRef.current;
-      const nextEvent = targetIdx < latestEvents.length ? latestEvents[targetIdx] : null;
+      const nextEvent = heroSlideEventsRef.current[targetIdx] ?? null;
       const cb = onEventChangeRef.current;
       if (cb) setTimeout(() => cb(nextEvent), 0);
 
@@ -597,8 +457,7 @@ const DynamicHeroImage: React.FC<{
             : { a: preload, b: vIdx, showA: false };
         });
         setCurrentImageIndex(target);
-        const latestEvents = upcomingEventsRef.current;
-        const nextEvent = target < latestEvents.length ? latestEvents[target] : null;
+        const nextEvent = heroSlideEventsRef.current[target] ?? null;
         const cb = onEventChangeRef.current;
         if (cb) setTimeout(() => cb(nextEvent), 0);
       }
@@ -725,7 +584,7 @@ const DynamicHeroImage: React.FC<{
       finalizeInterruptedCrossfade();
       lastScheduledIndexRef.current = null;
     };
-  }, [isInitialized, dynamicImages.length, upcomingEvents.length, isPaused, finalizeInterruptedCrossfade]);
+  }, [isInitialized, dynamicImages.length, heroSlideEvents.length, isPaused, finalizeInterruptedCrossfade]);
 
   // Navigation functions
   const goToPrevious = () => {
