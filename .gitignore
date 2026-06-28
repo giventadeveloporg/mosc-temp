@@ -25,10 +25,14 @@ out/
 .task-master/.env*
 !.task-master/.env.example
 
+# Local MOSC migration download cache (PDF binaries)
+.mosc-downloads/
+
 # Other env-related files
 env-vars.json
 current-env.json
 code_html_template/batch_files/database_target.local.env
+code_html_template/batch_files/database_target.prod.env
 
 # Editor directories and files
 .idea
