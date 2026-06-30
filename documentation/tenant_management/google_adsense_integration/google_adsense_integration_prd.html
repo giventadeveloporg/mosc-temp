@@ -27,7 +27,8 @@
 
     <h1>Google AdSense — Tenant Settings Integration</h1>
     <p class="doc-meta">
-        <strong>Frontend repo:</strong> mosc-temp &nbsp;|&nbsp;
+        <strong>Frontend repo:</strong> mosc-temp (satellite sites) &nbsp;|&nbsp;
+        <strong>Admin repo:</strong> event-site-manager (multi-tenant settings UI) &nbsp;|&nbsp;
         <strong>Backend repo:</strong> event-site-manager-service &nbsp;|&nbsp;
         <strong>Schema baseline:</strong> <code>Latest_Schema_Post__Blob_Claude_12.sql</code>
     </p>
@@ -64,6 +65,11 @@
     <p>Endpoints unchanged: <code>GET/PATCH /api/tenant-settings</code> via existing Next.js proxy.</p>
 
     <h2>3. Admin workflow</h2>
+    <p>Configure per tenant from either admin app:</p>
+    <ul>
+        <li><strong>event-site-manager</strong> (primary, all tenants): <code>/admin/tenant-management/settings</code> → edit row → <strong>Integrations</strong> tab</li>
+        <li><strong>mosc-temp</strong> (satellite tenant admin): <code>/admin/tenant-management/settings/{id}/edit</code> → <strong>Integrations</strong> tab</li>
+    </ul>
     <ol>
         <li>Sign in as tenant admin → <code>/admin/tenant-management/settings/{id}/edit</code></li>
         <li>Open <strong>Integrations</strong> tab</li>
