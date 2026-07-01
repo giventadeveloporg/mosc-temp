@@ -7,9 +7,10 @@ import {
   uploadEmailFooterHtmlClient,
   uploadTenantLogoClient,
   uploadEmailHeaderImageClient,
-  patchTenantSetting,
-} from '@/app/admin/tenant-management/settings/ApiServerActions';
+} from '@/app/admin/tenant-management/settings/uploadClients';
+import { patchTenantSettingAction } from '@/app/admin/tenant-management/settings/actions';
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
+import { formatSaveErrorForDialog } from '@/lib/api/userFacingSaveError';
 import TenantDefaultHeroManager from '@/app/admin/tenant-management/components/TenantDefaultHeroManager';
 import TenantOrganizationSearchSelect from '@/app/admin/tenant-management/components/TenantOrganizationSearchSelect';
 import { stripDeprecatedSettingsIdentityFields } from '@/lib/resolveTenantOrganizationIdentity';
@@ -55,6 +56,9 @@ export default function TenantSettingsForm({
   const [logoUploadMessage, setLogoUploadMessage] = useState<string>('');
   const [headerImageUploadStatus, setHeaderImageUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const [headerImageUploadMessage, setHeaderImageUploadMessage] = useState<string>('');
+  const [heroSaveStatus, setHeroSaveStatus] = useState<SaveStatus>('idle');
+  const [heroSaveMessage, setHeroSaveMessage] = useState('');
+  const [heroSaveDetails, setHeroSaveDetails] = useState<string[]>([]);
   const footerHtmlFileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
   const headerImageFileInputRef = useRef<HTMLInputElement>(null);
@@ -147,17 +151,38 @@ export default function TenantSettingsForm({
     const maxCount = normalizeMaxDisplayCount(
       defaultHeroMaxDisplayCount ?? DEFAULT_HERO_MAX_DISPLAY_COUNT
     );
-    await patchTenantSetting(settingsId, {
-      defaultHeroImageUrlsJson: json,
-      defaultHeroMaxDisplayCount: maxCount,
-    });
+    try {
+      setHeroSaveStatus('saving');
+      setHeroSaveMessage('Saving homepage hero slides...');
+      setHeroSaveDetails([]);
+      await patchTenantSettingAction(settingsId, {
+        defaultHeroImageUrlsJson: json,
+        defaultHeroMaxDisplayCount: maxCount,
+      });
+      setHeroSaveStatus('success');
+      setHeroSaveMessage('Homepage hero slides saved.');
+      setTimeout(() => {
+        setHeroSaveStatus('idle');
+        setHeroSaveMessage('');
+        setHeroSaveDetails([]);
+      }, 1500);
+    } catch (err: unknown) {
+      const { summary, details } = formatSaveErrorForDialog(
+        err,
+        'Failed to save homepage hero slides.'
+      );
+      setHeroSaveStatus('error');
+      setHeroSaveMessage(summary);
+      setHeroSaveDetails(details);
+      throw err;
+    }
   };
 
   const handleMaxDisplayCountChange = async (count: number) => {
     const normalized = normalizeMaxDisplayCount(count);
     setValue('defaultHeroMaxDisplayCount', normalized);
     if (settingsId) {
-      await patchTenantSetting(settingsId, { defaultHeroMaxDisplayCount: normalized });
+      await patchTenantSettingAction(settingsId, { defaultHeroMaxDisplayCount: normalized });
     }
   };
 
@@ -190,7 +215,7 @@ export default function TenantSettingsForm({
 
       // Automatically update the settings with the new URL
       if (settingsId) {
-        await patchTenantSetting(settingsId, {
+        await patchTenantSettingAction(settingsId, {
           emailFooterHtmlUrl: result.url,
         });
       }
@@ -203,9 +228,11 @@ export default function TenantSettingsForm({
         setFooterHtmlUploadStatus('idle');
         setFooterHtmlUploadMessage('');
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setFooterHtmlUploadStatus('error');
-      setFooterHtmlUploadMessage(err.message || 'Failed to upload email footer HTML');
+      setFooterHtmlUploadMessage(
+        formatSaveErrorForDialog(err, 'Failed to upload email footer HTML').summary
+      );
     } finally {
       setUploadingFooterHtml(false);
       if (footerHtmlFileInputRef.current) {
@@ -229,7 +256,7 @@ export default function TenantSettingsForm({
 
       // Automatically update the settings with the new URL
       if (settingsId) {
-        await patchTenantSetting(settingsId, {
+        await patchTenantSettingAction(settingsId, {
           emailHeaderImageUrl: result.url,
         });
       }
@@ -242,9 +269,11 @@ export default function TenantSettingsForm({
         setHeaderImageUploadStatus('idle');
         setHeaderImageUploadMessage('');
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setHeaderImageUploadStatus('error');
-      setHeaderImageUploadMessage(err.message || 'Failed to upload email header image');
+      setHeaderImageUploadMessage(
+        formatSaveErrorForDialog(err, 'Failed to upload email header image').summary
+      );
     } finally {
       setUploadingHeaderImage(false);
       if (headerImageFileInputRef.current) {
@@ -268,7 +297,7 @@ export default function TenantSettingsForm({
 
       // Automatically update the settings with the new URL
       if (settingsId) {
-        await patchTenantSetting(settingsId, {
+        await patchTenantSettingAction(settingsId, {
           logoImageUrl: result.url,
         });
       }
@@ -281,9 +310,9 @@ export default function TenantSettingsForm({
         setLogoUploadStatus('idle');
         setLogoUploadMessage('');
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setLogoUploadStatus('error');
-      setLogoUploadMessage(err.message || 'Failed to upload logo image');
+      setLogoUploadMessage(formatSaveErrorForDialog(err, 'Failed to upload logo image').summary);
     } finally {
       setUploadingLogo(false);
       if (logoFileInputRef.current) {
@@ -413,7 +442,7 @@ export default function TenantSettingsForm({
     setFooterHtmlUploadStatus('uploading');
     setFooterHtmlUploadMessage('Removing email footer HTML...');
     try {
-      await patchTenantSetting(settingsId, {
+      await patchTenantSettingAction(settingsId, {
         emailFooterHtmlUrl: '',
       });
       setFooterHtmlUploadStatus('success');
@@ -422,9 +451,11 @@ export default function TenantSettingsForm({
         setFooterHtmlUploadStatus('idle');
         setFooterHtmlUploadMessage('');
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setFooterHtmlUploadStatus('error');
-      setFooterHtmlUploadMessage(err.message || 'Failed to remove email footer HTML');
+      setFooterHtmlUploadMessage(
+        formatSaveErrorForDialog(err, 'Failed to remove email footer HTML').summary
+      );
     }
   };
 
@@ -434,7 +465,7 @@ export default function TenantSettingsForm({
     setLogoUploadStatus('uploading');
     setLogoUploadMessage('Removing logo image...');
     try {
-      await patchTenantSetting(settingsId, {
+      await patchTenantSettingAction(settingsId, {
         logoImageUrl: '',
       });
       setLogoUploadStatus('success');
@@ -443,9 +474,9 @@ export default function TenantSettingsForm({
         setLogoUploadStatus('idle');
         setLogoUploadMessage('');
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setLogoUploadStatus('error');
-      setLogoUploadMessage(err.message || 'Failed to remove logo image');
+      setLogoUploadMessage(formatSaveErrorForDialog(err, 'Failed to remove logo image').summary);
     }
   };
 
@@ -455,7 +486,7 @@ export default function TenantSettingsForm({
     setHeaderImageUploadStatus('uploading');
     setHeaderImageUploadMessage('Removing email header image...');
     try {
-      await patchTenantSetting(settingsId, {
+      await patchTenantSettingAction(settingsId, {
         emailHeaderImageUrl: '',
       });
       setHeaderImageUploadStatus('success');
@@ -464,9 +495,11 @@ export default function TenantSettingsForm({
         setHeaderImageUploadStatus('idle');
         setHeaderImageUploadMessage('');
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setHeaderImageUploadStatus('error');
-      setHeaderImageUploadMessage(err.message || 'Failed to remove email header image');
+      setHeaderImageUploadMessage(
+        formatSaveErrorForDialog(err, 'Failed to remove email header image').summary
+      );
     }
   };
 
@@ -1785,6 +1818,26 @@ export default function TenantSettingsForm({
           if (headerImageUploadStatus === 'error') {
             setHeaderImageUploadStatus('idle');
             setHeaderImageUploadMessage('');
+          }
+        }}
+      />
+      <SaveStatusDialog
+        isOpen={heroSaveStatus !== 'idle'}
+        status={heroSaveStatus}
+        message={heroSaveMessage}
+        details={heroSaveDetails}
+        title={
+          heroSaveStatus === 'saving'
+            ? 'Saving hero slides...'
+            : heroSaveStatus === 'success'
+              ? 'Hero slides saved'
+              : 'Could not save hero slides'
+        }
+        onClose={() => {
+          if (heroSaveStatus === 'error') {
+            setHeroSaveStatus('idle');
+            setHeroSaveMessage('');
+            setHeroSaveDetails([]);
           }
         }}
       />

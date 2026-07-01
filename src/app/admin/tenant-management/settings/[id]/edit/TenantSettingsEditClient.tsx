@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TenantSettingsFormWrapper from '@/app/admin/tenant-management/components/TenantSettingsFormWrapper';
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
+import { formatSaveErrorForDialog } from '@/lib/api/userFacingSaveError';
 import { updateTenantSettingAction } from './actions';
 import type { TenantSettingsFormDTO, TenantSettingsDTO, TenantOrganizationDTO } from '@/app/admin/tenant-management/types';
 import { HOMEPAGE_CACHE_INVALIDATE_CHANNEL } from '@/lib/homepageCacheKeys';
@@ -23,6 +24,7 @@ export default function TenantSettingsEditClient({
   const [loading, setLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [saveMessage, setSaveMessage] = useState<string>('');
+  const [saveDetails, setSaveDetails] = useState<string[]>([]);
 
   async function handleSubmit(data: TenantSettingsFormDTO) {
     setLoading(true);
@@ -44,10 +46,14 @@ export default function TenantSettingsEditClient({
       setTimeout(() => {
         router.push(`/admin/tenant-management/settings/${settingsId}`);
       }, 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const { summary, details } = formatSaveErrorForDialog(
+        error,
+        'Failed to update settings. Please try again.'
+      );
       setSaveStatus('error');
-      const userMessage = error?.message || 'Failed to update settings. Please try again.';
-      setSaveMessage(userMessage);
+      setSaveMessage(summary);
+      setSaveDetails(details);
     } finally {
       setLoading(false);
     }
@@ -107,10 +113,12 @@ export default function TenantSettingsEditClient({
         isOpen={saveStatus !== 'idle'}
         status={saveStatus}
         message={saveMessage}
+        details={saveDetails}
         onClose={() => {
           if (saveStatus === 'error') {
             setSaveStatus('idle');
             setSaveMessage('');
+            setSaveDetails([]);
           }
         }}
       />

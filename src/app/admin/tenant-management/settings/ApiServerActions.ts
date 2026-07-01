@@ -1,8 +1,14 @@
+'use server';
+
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { withTenantId } from '@/lib/withTenantId';
-import { getAppUrl, getApiBaseUrl } from '@/lib/env';
+import { getApiBaseUrl } from '@/lib/env';
 import { stripDeprecatedSettingsIdentityFields } from '@/lib/resolveTenantOrganizationIdentity';
 import { normalizeDefaultHeroImageUrlsJsonForApi } from '@/lib/hero/defaultHeroImages';
+import {
+  parseJhipsterProblemErrorBody,
+  UserFacingSaveError,
+} from '@/lib/api/userFacingSaveError';
 import type {
   TenantSettingsDTO,
   TenantSettingsFormDTO,
@@ -149,39 +155,9 @@ function buildTenantSettingsWritePayload(
   return withTenantId(merged) as TenantSettingsDTO;
 }
 
-function parseTenantSettingsApiError(errorText: string, action: 'create' | 'update'): string {
-  const lower = errorText.toLowerCase();
-  if (
-    lower.includes('identityfieldsmovedtotenantorganization') ||
-    lower.includes('error.identityfieldsmovedtotenantorganization')
-  ) {
-    return 'Address and organization description are managed under Tenant Organizations, not Tenant Settings. Save again — this has been corrected automatically.';
-  }
-  if (lower.includes('duplicate key') || lower.includes('already exists')) {
-    return 'Settings for this tenant already exist. Edit the existing settings instead of creating new ones.';
-  }
-  if (lower.includes('column') && lower.includes('does not exist')) {
-    return 'The backend database is missing required columns. Apply the tenant profile migration and restart the API server.';
-  }
-  try {
-    const parsed = JSON.parse(errorText) as {
-      detail?: string;
-      title?: string;
-      message?: string;
-      error?: string;
-    };
-    if (parsed.detail) return parsed.detail;
-    if (parsed.message) return parsed.message;
-    if (parsed.title) return parsed.title;
-    if (parsed.error) return parsed.error;
-  } catch {
-    // not JSON
-  }
-  const trimmed = errorText.trim();
-  if (trimmed.length > 0 && trimmed.length <= 500) {
-    return trimmed;
-  }
-  return action === 'create' ? 'Failed to create tenant settings.' : 'Failed to update tenant settings.';
+function throwTenantSettingsApiError(errorText: string, action: 'create' | 'update'): never {
+  const { summary, details } = parseJhipsterProblemErrorBody(errorText, action);
+  throw new UserFacingSaveError(summary, details);
 }
 
 /**
@@ -210,7 +186,7 @@ export async function createTenantSetting(data: TenantSettingsFormDTO): Promise<
         statusText: response.statusText,
         body: errorText.slice(0, 2000),
       });
-      throw new Error(parseTenantSettingsApiError(errorText, 'create'));
+      throwTenantSettingsApiError(errorText, 'create');
     }
 
     return await response.json();
@@ -254,7 +230,7 @@ export async function updateTenantSetting(
         status: response.status,
         body: errorText.slice(0, 2000),
       });
-      throw new Error(parseTenantSettingsApiError(errorText, 'update'));
+      throwTenantSettingsApiError(errorText, 'update');
     }
 
     return await response.json();
@@ -311,7 +287,7 @@ export async function patchTenantSetting(
         status: response.status,
         body: errorText.slice(0, 2000),
       });
-      throw new Error(parseTenantSettingsApiError(errorText, 'update'));
+      throwTenantSettingsApiError(errorText, 'update');
     }
 
     return await response.json();
@@ -339,139 +315,4 @@ export async function deleteTenantSetting(id: number): Promise<void> {
     console.error('Error deleting tenant setting:', error);
     throw new Error('Failed to delete tenant setting');
   }
-}
-
-/**
- * Upload email footer HTML file (client-side function)
- * Note: This must be called from client components, not server actions
- */
-export async function uploadEmailFooterHtmlClient(
-  file: File
-): Promise<{ url: string }> {
-  const baseUrl = getAppUrl();
-  const formData = new FormData();
-
-  formData.append('file', file);
-
-  const url = `${baseUrl}/api/proxy/tenant-settings/upload/email-footer-html`;
-
-  const response = await fetch(url, {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    console.error(`[Client] Error uploading email footer HTML: ${response.status} ${response.statusText}`, errorBody);
-    throw new Error(`Failed to upload email footer HTML. Status: ${response.status}`);
-  }
-
-  const result = await response.json();
-  return {
-    url: result.emailFooterHtmlUrl || result.url || '',
-  };
-}
-
-/**
- * Upload tenant logo image (client-side function)
- * Note: This must be called from client components, not server actions
- */
-export async function uploadTenantLogoClient(
-  file: File
-): Promise<{ url: string }> {
-  const baseUrl = getAppUrl();
-  const formData = new FormData();
-
-  formData.append('file', file);
-
-  const url = `${baseUrl}/api/proxy/tenant-settings/upload/tenant-logo`;
-
-  const response = await fetch(url, {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    console.error(`[Client] Error uploading tenant logo: ${response.status} ${response.statusText}`, errorBody);
-    throw new Error(`Failed to upload tenant logo. Status: ${response.status}`);
-  }
-
-  const result = await response.json();
-  return {
-    url: result.logoImageUrl || result.url || '',
-  };
-}
-
-/**
- * Upload email header image (client-side function)
- * Note: This must be called from client components, not server actions
- */
-export async function uploadEmailHeaderImageClient(
-  file: File
-): Promise<{ url: string }> {
-  const baseUrl = getAppUrl();
-  const formData = new FormData();
-
-  formData.append('file', file);
-
-  const url = `${baseUrl}/api/proxy/tenant-settings/upload/email-header-image`;
-
-  const response = await fetch(url, {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    console.error(`[Client] Error uploading email header image: ${response.status} ${response.statusText}`, errorBody);
-    throw new Error(`Failed to upload email header image. Status: ${response.status}`);
-  }
-
-  const result = await response.json();
-  return {
-    url: result.emailHeaderImageUrl || result.url || '',
-  };
-}
-
-function tenantUploadQuery(tenantIdForUpload?: string): string {
-  if (!tenantIdForUpload?.trim()) return '';
-  return `?tenantId=${encodeURIComponent(tenantIdForUpload.trim())}`;
-}
-
-/**
- * Upload default homepage hero image (client-side function).
- * Optional tenantIdForUpload scopes S3 path for super-admin editing another tenant.
- */
-export async function uploadDefaultHeroImageClient(
-  file: File,
-  tenantIdForUpload?: string
-): Promise<{ url: string }> {
-  const formData = new FormData();
-  formData.append('file', file);
-
-  const url = `/api/proxy/tenant-settings/upload/default-hero-image${tenantUploadQuery(tenantIdForUpload)}`;
-
-  const response = await fetch(url, {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    console.error(
-      `[Client] Error uploading default hero image: ${response.status} ${response.statusText}`,
-      errorBody
-    );
-    throw new Error(`Failed to upload hero image. Status: ${response.status}`);
-  }
-
-  const result = await response.json();
-  return {
-    url:
-      result.defaultHeroImageUrl ||
-      result.url ||
-      result.imageUrl ||
-      '',
-  };
 }
