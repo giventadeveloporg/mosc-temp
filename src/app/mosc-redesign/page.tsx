@@ -1,22 +1,33 @@
-import { getHomepageSaintCarouselEntries } from '@/app/mosc-redesign/(syro)/saints-cms/getSaintEntriesData';
+import { getSaintEntriesData } from '@/app/mosc-redesign/(syro)/saints-cms/getSaintEntriesData';
 import type { MoscRedesignSaint } from '@/components/mosc-redesign/MoscRedesignSaintsCarousel';
 import MoscRedesignHomeClient from './MoscRedesignHomeClient';
+import { mapSaintEntriesToCarouselSaints } from './mapSaintEntriesToCarouselSaints';
 import {
-  CAROUSEL_SAINT_SLUG_BASES,
-  mapSaintEntriesToCarouselSaints,
-} from './mapSaintEntriesToCarouselSaints';
+  DEFAULT_CURRENT_CATHOLICOS,
+  getCurrentCatholicosData,
+} from './getCurrentCatholicosData';
+import type { CurrentCatholicosProfile } from './types/currentCatholicos';
 
 export const dynamic = 'force-dynamic';
 
 export default async function MoscRedesignHomePage() {
   let saints: MoscRedesignSaint[] = [];
+  let currentCatholicos: CurrentCatholicosProfile = DEFAULT_CURRENT_CATHOLICOS;
 
   try {
-    const carouselEntries = await getHomepageSaintCarouselEntries(CAROUSEL_SAINT_SLUG_BASES);
-    saints = mapSaintEntriesToCarouselSaints(carouselEntries);
+    const { entries } = await getSaintEntriesData();
+    saints = mapSaintEntriesToCarouselSaints(entries);
   } catch (error) {
     console.error('[mosc-redesign home] Failed to load saint entries from Strapi:', error);
   }
 
-  return <MoscRedesignHomeClient saints={saints} />;
+  try {
+    currentCatholicos = await getCurrentCatholicosData();
+  } catch (error) {
+    console.error('[mosc-redesign home] Failed to load current Catholicos from Strapi:', error);
+  }
+
+  return (
+    <MoscRedesignHomeClient saints={saints} currentCatholicos={currentCatholicos} />
+  );
 }

@@ -10,6 +10,7 @@ import MoscRedesignSaintsCarousel, {
   type MoscRedesignSaint,
 } from "@/components/mosc-redesign/MoscRedesignSaintsCarousel";
 import type { LiturgyReading } from "@/app/mosc/components/SyroLiturgySection";
+import type { CurrentCatholicosProfile } from "@/app/mosc-redesign/types/currentCatholicos";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Region {
@@ -130,7 +131,13 @@ const aboutUsHeritageById = Object.fromEntries(
 
 
 // ─── Component ───────────────────────────────────────────────────────────────
-export default function MoscRedesignHomeClient({ saints }: { saints: MoscRedesignSaint[] }) {
+export default function MoscRedesignHomeClient({
+  saints,
+  currentCatholicos,
+}: {
+  saints: MoscRedesignSaint[];
+  currentCatholicos: CurrentCatholicosProfile;
+}) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeRegion, setActiveRegion] = useState("india");
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
@@ -407,28 +414,35 @@ export default function MoscRedesignHomeClient({ saints }: { saints: MoscRedesig
             <div className="lg:col-span-2 flex justify-center lg:justify-start">
               <div className="w-full max-w-[320px] rounded-2xl overflow-hidden aspect-[3/4] relative shadow-xl border border-burgundy/30 hover:border-burgundy/60 transition-all duration-300 hover:shadow-burgundy/30">
                 <Image
-                  src="/images/holy-synod/H.H-Baselios-Marthoma-Mathews-III.jpg"
-                  alt="His Holiness Baselios Marthoma Mathews III, Catholicos of the East and Malankara Metropolitan, in full episcopal vestments"
+                  src={currentCatholicos.imageUrl}
+                  alt={currentCatholicos.imageAlt}
                   fill
-                  className="object-cover" />
+                  className="object-cover"
+                  unoptimized={currentCatholicos.imageUrl.startsWith('http')}
+                />
               </div>
             </div>
 
             {/* Text */}
             <div className="lg:col-span-3">
               <span className="inline-block text-warmGold-dark text-xs font-bold tracking-widest uppercase mb-3 border border-warmGold/50 px-3 py-1 rounded-full bg-warmGold/10">
-                Malankara Metropolitan
+                {currentCatholicos.badge}
               </span>
-              <p className="text-burgundy text-sm font-medium mb-2">Catholicos of the East and Malankara Metropolitan</p>
+              <p className="text-burgundy text-sm font-medium mb-2">{currentCatholicos.roleTitle}</p>
               <h2 className="text-3xl md:text-4xl font-bold text-warmBrown-dark mb-6 leading-tight">
-                His Holiness Baselios<br />
-                <span className="text-burgundy">Marthoma Mathews III</span>
+                {currentCatholicos.headingPrimary}
+                {currentCatholicos.headingAccent ? (
+                  <>
+                    <br />
+                    <span className="text-burgundy">{currentCatholicos.headingAccent}</span>
+                  </>
+                ) : null}
               </h2>
               <p className="text-warmGray-dark leading-relaxed mb-8 text-base">
-                His Holiness Baselios Marthoma Mathews III was enthroned as the Catholicos of the East & Malankara Metropolitan (the Supreme Head of the Malankara Orthodox Syrian Church of India) on Friday, 15th October 2021. His Holiness is the 92nd Primate on the Apostolic Throne of St. Thomas.
+                {currentCatholicos.excerpt}
               </p>
               <Link
-                href="/mosc-redesign/holy-synod/his-holiness-baselios-marthoma-mathews-iii"
+                href={currentCatholicos.profilePath}
                 className="inline-flex items-center gap-2 border-2 border-burgundy text-burgundy font-semibold px-6 py-3 rounded-lg hover:bg-burgundy hover:text-white transition-all duration-300 text-sm hover:shadow-lg hover:shadow-burgundy/40 hover:-translate-y-0.5 transform">
                 View Profile
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

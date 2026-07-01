@@ -3,7 +3,7 @@ import type { SaintEntry } from '@/app/mosc-redesign/(syro)/saints-cms/types';
 
 const PLACEHOLDER_IMAGE = '/images/saints/st-mary-mother-of-god.jpg';
 
-/** Slug bases for the four homepage carousel saints (order preserved). */
+/** Slug bases for optional homepage subset filtering (display order comes from Strapi priority/order). */
 export const CAROUSEL_SAINT_SLUG_BASES = [
   'st-baselios-yeldho-kothamangalam-bava',
   'st-geevarghese-mar-dionysius-vattasseril',
@@ -12,16 +12,10 @@ export const CAROUSEL_SAINT_SLUG_BASES = [
 ] as const;
 
 export function pickHomepageCarouselSaintEntries(entries: SaintEntry[]): SaintEntry[] {
-  return CAROUSEL_SAINT_SLUG_BASES.map((base) => {
-    const candidates = entries.filter((entry) => entry.slug.replace(/-mo2$/, '') === base);
-    if (candidates.length === 0) return null;
-    return candidates.sort((a, b) => {
-      const aMo2 = a.slug.endsWith('-mo2') ? 1 : 0;
-      const bMo2 = b.slug.endsWith('-mo2') ? 1 : 0;
-      if (aMo2 !== bMo2) return aMo2 - bMo2;
-      return b.name.length - a.name.length;
-    })[0];
-  }).filter((entry): entry is SaintEntry => entry != null);
+  const slugBaseSet = new Set<string>(CAROUSEL_SAINT_SLUG_BASES);
+  return entries
+    .filter((entry) => slugBaseSet.has(entry.slug.replace(/-mo2$/, '')))
+    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
 }
 
 export function mapSaintEntriesToCarouselSaints(entries: SaintEntry[]): MoscRedesignSaint[] {

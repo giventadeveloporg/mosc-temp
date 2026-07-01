@@ -20,6 +20,9 @@ import GivebutterDonateButton from '@/components/GivebutterDonateButton';
 
 const HERO_SLIDER_CAP = 24;
 
+/** Shown when no upcoming event hero images are available. */
+const HERO_FALLBACK_NO_EVENTS_IMAGE = '/images/hero_section/default_cloud_hero_image_1.webp';
+
 /** Crossfade duration — must match `.hero-crossfade-layer` opacity transition in globals.css. */
 const HERO_SLIDESHOW_CROSSFADE_MS = 420;
 
@@ -148,8 +151,6 @@ const DynamicHeroImage: React.FC<{
 
   const heroFetchEnabled = useDeferredFetch(500);
   const [heroDataVersion, setHeroDataVersion] = useState(0);
-
-  const defaultImage = "/images/hero_section/default_hero_section_second_column_poster.jpeg";
 
   const CACHE_KEY = getHomepageCacheKey('homepage_hero_section_cache');
   const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes (same as other homepage sections)
@@ -280,16 +281,18 @@ const DynamicHeroImage: React.FC<{
           slideEvents.push(linkedEvent);
         }
 
-        imageUrls.push(defaultImage);
-        durations.push(8000);
-        slideEvents.push(null);
+        if (imageUrls.length === 0) {
+          imageUrls.push(HERO_FALLBACK_NO_EVENTS_IMAGE);
+          durations.push(8000);
+          slideEvents.push(null);
+        }
 
         const linkedUpcoming = slideEvents.filter((e): e is EventWithMediaExtended => e != null);
 
         console.log('[HeroSection] Image rotation initialized:', {
           totalImages: imageUrls.length,
-          heroMediaCount: imageUrls.length - 1,
-          hasDefaultImage: true,
+          heroMediaCount: imageUrls.length,
+          usingNoEventFallback: linkedUpcoming.length === 0,
           displayOrders: capped.map((m) => ({
             id: m.id,
             title: m.title,
@@ -330,7 +333,7 @@ const DynamicHeroImage: React.FC<{
         }
       } catch (error) {
         console.error('Failed to initialize hero images:', error);
-        setDynamicImages([defaultImage]);
+        setDynamicImages([HERO_FALLBACK_NO_EVENTS_IMAGE]);
         setImageDurations([8000]);
         setUpcomingEvents([]);
         setHeroSlideEvents([null]);
@@ -340,7 +343,7 @@ const DynamicHeroImage: React.FC<{
     };
 
     initializeHeroImages();
-  }, [heroFetchEnabled, CACHE_KEY, defaultImage, heroDataVersion]);
+  }, [heroFetchEnabled, CACHE_KEY, heroDataVersion]);
 
   // Update refs whenever state changes to avoid stale closures
   useEffect(() => {
@@ -661,7 +664,7 @@ const DynamicHeroImage: React.FC<{
     };
   }, [finalizeInterruptedCrossfade]);
 
-  const currentImage = dynamicImages[currentImageIndex] || defaultImage;
+  const currentImage = dynamicImages[currentImageIndex] || HERO_FALLBACK_NO_EVENTS_IMAGE;
   const showControls = isHovered || isTouched;
   const hasMultipleImages = dynamicImages.length > 1;
 
@@ -679,7 +682,7 @@ const DynamicHeroImage: React.FC<{
         <div className="hero-crossfade-stack">
           <div className={`hero-crossfade-layer${slide.showA ? ' is-visible' : ''}`}>
             <HeroKenBurnsSlide
-              src={dynamicImages[slide.a] || defaultImage}
+              src={dynamicImages[slide.a] || HERO_FALLBACK_NO_EVENTS_IMAGE}
               alt="Featured Event"
               priority={slide.showA}
               durationMs={kenBurnsDurationMs(slide.a)}
@@ -689,7 +692,7 @@ const DynamicHeroImage: React.FC<{
           </div>
           <div className={`hero-crossfade-layer${!slide.showA ? ' is-visible' : ''}`}>
             <HeroKenBurnsSlide
-              src={dynamicImages[slide.b] || defaultImage}
+              src={dynamicImages[slide.b] || HERO_FALLBACK_NO_EVENTS_IMAGE}
               alt="Featured Event"
               priority={!slide.showA}
               durationMs={kenBurnsDurationMs(slide.b)}
