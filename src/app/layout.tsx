@@ -13,9 +13,10 @@ import TenantIdInjector from "../components/TenantIdInjector";
 import { TenantSettingsProvider } from "../components/TenantSettingsProvider";
 import { headers } from "next/headers";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { getAppUrl, getTenantId, getApiBaseUrl } from "@/lib/env";
+import { getAppUrl, getTenantId, getApiBaseUrl, getAppUrlFromRequestHeaders } from "@/lib/env";
 import { fetchWithJwtRetry } from "@/lib/proxyHandler";
 import { isAdminRole } from "@/lib/utils";
+import { resolveIsTenantAdmin } from "@/lib/resolveTenantAdminStatus";
 import { getClerkSatelliteHost, isSatelliteHostname } from "@/lib/clerkSatellite";
 
 const DEBUG_LAYOUT = process.env.NEXT_PUBLIC_DEBUG_LAYOUT === 'true';
@@ -155,14 +156,19 @@ export default async function RootLayout({
       }
 
       if (userId) {
-        const baseUrl = getAppUrl();
+        const baseUrl = await getAppUrlFromRequestHeaders();
         const tenantId = getTenantId();
         debugLog('[Layout] 🔍 Fetching user profile:', { userId, tenantId, baseUrl });
 
         // Step 1: Check if userId + tenantId combination exists
         const url = `${baseUrl}/api/proxy/user-profiles?userId.equals=${encodeURIComponent(userId)}&tenantId.equals=${encodeURIComponent(tenantId)}&size=1`;
         debugLog('[Layout] 🔍 Profile fetch URL:', url);
-        const resp = await fetch(url, { cache: 'no-store', headers: { 'Content-Type': 'application/json' } });
+        const profileFetchTimeoutMs = 8000;
+        const resp = await fetch(url, {
+          cache: 'no-store',
+          headers: { 'Content-Type': 'application/json' },
+          signal: AbortSignal.timeout(profileFetchTimeoutMs),
+        });
         debugLog('[Layout] 🔍 Profile fetch response:', { status: resp.status, ok: resp.ok });
 
         if (resp.ok) {
@@ -189,7 +195,11 @@ export default async function RootLayout({
               if (userEmail) {
                 // Check for existing profile with same email + tenantId but different userId
                 const emailCheckUrl = `${baseUrl}/api/proxy/user-profiles?email.equals=${encodeURIComponent(userEmail)}&tenantId.equals=${encodeURIComponent(tenantId)}&size=1`;
-                const emailResp = await fetch(emailCheckUrl, { cache: 'no-store', headers: { 'Content-Type': 'application/json' } });
+                const emailResp = await fetch(emailCheckUrl, {
+                  cache: 'no-store',
+                  headers: { 'Content-Type': 'application/json' },
+                  signal: AbortSignal.timeout(profileFetchTimeoutMs),
+                });
 
                 if (emailResp.ok) {
                   const emailArr = await emailResp.json();
@@ -347,6 +357,13 @@ export default async function RootLayout({
               roleValue: JSON.stringify(p?.userRole)
             });
           }
+        }
+
+        // Direct backend lookup (by-user + email fallback) when proxy path did not set admin
+        if (!isTenantAdmin) {
+          const email = currentUserData?.emailAddresses?.[0]?.emailAddress ?? null;
+          isTenantAdmin = await resolveIsTenantAdmin(userId, email);
+          debugLog('[Layout] resolveIsTenantAdmin fallback:', { isTenantAdmin, userId, email });
         }
       }
     } catch (e) {

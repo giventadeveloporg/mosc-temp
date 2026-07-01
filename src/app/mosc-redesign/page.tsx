@@ -1,7 +1,10 @@
 import { getSaintEntriesData } from '@/app/mosc-redesign/(syro)/saints-cms/getSaintEntriesData';
 import type { MoscRedesignSaint } from '@/components/mosc-redesign/MoscRedesignSaintsCarousel';
 import MoscRedesignHomeClient from './MoscRedesignHomeClient';
-import { mapSaintEntriesToCarouselSaints } from './mapSaintEntriesToCarouselSaints';
+import {
+  mapSaintEntriesToCarouselSaints,
+  pickHomepageCarouselSaintEntries,
+} from './mapSaintEntriesToCarouselSaints';
 import {
   DEFAULT_CURRENT_CATHOLICOS,
   getCurrentCatholicosData,
@@ -16,7 +19,7 @@ export default async function MoscRedesignHomePage() {
 
   try {
     const { entries } = await getSaintEntriesData();
-    saints = mapSaintEntriesToCarouselSaints(entries);
+    saints = mapSaintEntriesToCarouselSaints(pickHomepageCarouselSaintEntries(entries));
   } catch (error) {
     console.error('[mosc-redesign home] Failed to load saint entries from Strapi:', error);
   }

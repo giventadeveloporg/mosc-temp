@@ -6,6 +6,7 @@ import TenantSettingsFormWrapper from '@/app/admin/tenant-management/components/
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
 import { updateTenantSettingAction } from './actions';
 import type { TenantSettingsFormDTO, TenantSettingsDTO, TenantOrganizationDTO } from '@/app/admin/tenant-management/types';
+import { HOMEPAGE_CACHE_INVALIDATE_CHANNEL } from '@/lib/homepageCacheKeys';
 
 interface TenantSettingsEditClientProps {
   settings: TenantSettingsDTO;
@@ -30,6 +31,10 @@ export default function TenantSettingsEditClient({
 
     try {
       await updateTenantSettingAction(settingsId, data);
+
+      if (typeof BroadcastChannel !== 'undefined') {
+        new BroadcastChannel(HOMEPAGE_CACHE_INVALIDATE_CHANNEL).postMessage('invalidate');
+      }
 
       // Show success message
       setSaveStatus('success');

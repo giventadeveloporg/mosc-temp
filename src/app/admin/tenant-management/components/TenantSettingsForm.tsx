@@ -17,6 +17,7 @@ import {
   DEFAULT_HERO_MAX_DISPLAY_COUNT,
   normalizeDefaultHeroDisplayMode,
   normalizeMaxDisplayCount,
+  normalizeDefaultHeroImageUrlsJsonForApi,
   type DefaultHeroDisplayMode,
 } from '@/lib/hero/defaultHeroImages';
 
@@ -163,7 +164,11 @@ export default function TenantSettingsForm({
   // Handle form submission
   const onFormSubmit = async (data: TenantSettingsFormDTO) => {
     try {
-      await onSubmit(stripDeprecatedSettingsIdentityFields(data) as TenantSettingsFormDTO);
+      const payload = stripDeprecatedSettingsIdentityFields(data) as TenantSettingsFormDTO;
+      payload.defaultHeroImageUrlsJson = normalizeDefaultHeroImageUrlsJsonForApi(
+        payload.defaultHeroImageUrlsJson
+      );
+      await onSubmit(payload);
     } catch (error) {
       console.error('Form submission error:', error);
       throw error;

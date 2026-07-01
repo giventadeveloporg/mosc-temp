@@ -619,8 +619,8 @@ export default function TenantDefaultHeroManager({
               className="mt-1 h-4 w-4 rounded border-gray-400 text-teal-600 focus:ring-teal-500"
             />
             <span className="text-sm text-gray-700">
-              Include default hero slides when upcoming events also have hero images (appended after
-              event heroes).
+              Show default hero slides on the homepage (active slides only). When enabled, slides
+              are appended after upcoming event hero images when those exist.
             </span>
           </label>
         </div>

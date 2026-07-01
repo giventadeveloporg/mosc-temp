@@ -13,6 +13,8 @@ import {
   isUpcomingEventForHero,
   type HeroMediaRow,
 } from '@/lib/hero/heroSliderMedia';
+import { resolveHeroImages } from '@/lib/hero/defaultHeroImages';
+import { useTenantSettings } from '@/components/TenantSettingsProvider';
 import { useDeferredFetch } from '@/hooks/usePageReady';
 import { getHomepageCacheKey, HOMEPAGE_CACHE_INVALIDATE_CHANNEL } from '@/lib/homepageCacheKeys';
 import { ArrowRight, Heart, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -117,6 +119,7 @@ function HeroKenBurnsSlide({
 const DynamicHeroImage: React.FC<{
   onEventChange?: (event: EventWithMediaExtended | null) => void;
 }> = ({ onEventChange }) => {
+  const { settings: tenantSettings, loading: tenantSettingsLoading } = useTenantSettings();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   /** Two stacked slide indices for crossfade (only used when length ≥ 2). */
   const [slide, setSlide] = useState<HeroSlideCrossfade>({ a: 0, b: 1, showA: true });
@@ -218,7 +221,7 @@ const DynamicHeroImage: React.FC<{
 
   // Initialize hero images from Admin → Media hero flags, sorted by displayOrder (includes event-linked + standalone).
   useEffect(() => {
-    if (!heroFetchEnabled) return;
+    if (!heroFetchEnabled || tenantSettingsLoading) return;
 
     const resolveEventForMedia = async (
       media: HeroMediaRow,
@@ -245,9 +248,9 @@ const DynamicHeroImage: React.FC<{
 
     const initializeHeroImages = async () => {
       try {
-        const imageUrls: string[] = [];
-        const durations: number[] = [];
-        const slideEvents: (EventWithMediaExtended | null)[] = [];
+        const eventImageUrls: string[] = [];
+        const eventDurations: number[] = [];
+        const eventSlideEvents: (EventWithMediaExtended | null)[] = [];
         const tenantId = getTenantId();
         const heroList = await fetchHomepageHeroMediaList(tenantId);
         const capped = heroList.slice(0, HERO_SLIDER_CAP);
@@ -276,23 +279,40 @@ const DynamicHeroImage: React.FC<{
           if (!linkedEvent || !isUpcomingEventForHero(linkedEvent)) {
             continue;
           }
-          imageUrls.push(url);
-          durations.push(getHeroMediaDurationMs(media));
-          slideEvents.push(linkedEvent);
+          eventImageUrls.push(url);
+          eventDurations.push(getHeroMediaDurationMs(media));
+          eventSlideEvents.push(linkedEvent);
         }
 
-        if (imageUrls.length === 0) {
-          imageUrls.push(HERO_FALLBACK_NO_EVENTS_IMAGE);
-          durations.push(8000);
-          slideEvents.push(null);
-        }
+        const resolved = resolveHeroImages({
+          eventImageUrls,
+          eventDurationsMs: eventDurations,
+          tenantSettings: tenantSettings
+            ? {
+                defaultHeroImageUrlsJson: tenantSettings.defaultHeroImageUrlsJson,
+                defaultHeroDisplayMode: tenantSettings.defaultHeroDisplayMode,
+                defaultHeroIncludeWithEvents: tenantSettings.defaultHeroIncludeWithEvents,
+                defaultHeroMaxDisplayCount: tenantSettings.defaultHeroMaxDisplayCount,
+              }
+            : null,
+          noImagesFallbackUrl: HERO_FALLBACK_NO_EVENTS_IMAGE,
+        });
+
+        const imageUrls = resolved.imageUrls;
+        const durations = resolved.durationsMs;
+        const slideEvents: (EventWithMediaExtended | null)[] = resolved.imageUrls.map(
+          (_, index) =>
+            index < resolved.eventSlideCount ? eventSlideEvents[index] ?? null : null
+        );
 
         const linkedUpcoming = slideEvents.filter((e): e is EventWithMediaExtended => e != null);
 
         console.log('[HeroSection] Image rotation initialized:', {
           totalImages: imageUrls.length,
-          heroMediaCount: imageUrls.length,
-          usingNoEventFallback: linkedUpcoming.length === 0,
+          eventSlideCount: resolved.eventSlideCount,
+          tenantDefaultSlideCount: resolved.defaultSlideCount,
+          includeTenantDefaults: tenantSettings?.defaultHeroIncludeWithEvents ?? true,
+          usingNoEventFallback: linkedUpcoming.length === 0 && resolved.defaultSlideCount === 0,
           displayOrders: capped.map((m) => ({
             id: m.id,
             title: m.title,
@@ -343,7 +363,7 @@ const DynamicHeroImage: React.FC<{
     };
 
     initializeHeroImages();
-  }, [heroFetchEnabled, CACHE_KEY, heroDataVersion]);
+  }, [heroFetchEnabled, CACHE_KEY, heroDataVersion, tenantSettings, tenantSettingsLoading]);
 
   // Update refs whenever state changes to avoid stale closures
   useEffect(() => {

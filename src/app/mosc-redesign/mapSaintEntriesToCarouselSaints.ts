@@ -3,18 +3,16 @@ import type { SaintEntry } from '@/app/mosc-redesign/(syro)/saints-cms/types';
 
 const PLACEHOLDER_IMAGE = '/images/saints/st-mary-mother-of-god.jpg';
 
-/** Slug bases for optional homepage subset filtering (display order comes from Strapi priority/order). */
-export const CAROUSEL_SAINT_SLUG_BASES = [
-  'st-baselios-yeldho-kothamangalam-bava',
-  'st-geevarghese-mar-dionysius-vattasseril',
-  'st-gregorios-of-parumala-metropolitan-geevarghese-mar-gregorios',
-  'st-mary-mother-of-god',
-] as const;
+/** Homepage carousel shows only Strapi saint-entries with order 1–4 (lower = higher priority). */
+export const HOMEPAGE_CAROUSEL_ORDER_MIN = 1;
+export const HOMEPAGE_CAROUSEL_ORDER_MAX = 4;
 
 export function pickHomepageCarouselSaintEntries(entries: SaintEntry[]): SaintEntry[] {
-  const slugBaseSet = new Set<string>(CAROUSEL_SAINT_SLUG_BASES);
   return entries
-    .filter((entry) => slugBaseSet.has(entry.slug.replace(/-mo2$/, '')))
+    .filter(
+      (entry) =>
+        entry.order >= HOMEPAGE_CAROUSEL_ORDER_MIN && entry.order <= HOMEPAGE_CAROUSEL_ORDER_MAX,
+    )
     .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
 }
 
