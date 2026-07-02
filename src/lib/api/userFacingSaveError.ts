@@ -54,6 +54,14 @@ const TENANT_SETTINGS_ERROR_MESSAGES: Record<string, { summary: string; details?
       'Use the format ca-pub-XXXXXXXXXXXXXXXX, or turn off Google AdSense.',
     ],
   },
+  googleAdsensePublisherIdRequired: {
+    summary: 'Google AdSense is enabled but Publisher ID is missing.',
+    details: [
+      'You turned on Enable Google AdSense, so Publisher ID is required.',
+      'Enter your ca-pub-... ID on the Integrations tab.',
+      'Or turn off Enable Google AdSense on the Integrations tab if you do not intend to use this feature.',
+    ],
+  },
   identityFieldsMovedToTenantOrganization: {
     summary: 'Address and description are saved under Tenant Organizations.',
     details: ['Update organization details there, then save tenant settings again.'],
@@ -124,6 +132,15 @@ export function parseJhipsterProblemErrorBody(
 
   const lower = errorText.toLowerCase();
   if (lower.includes('duplicate key') || lower.includes('already exists')) {
+    if (action === 'update' && lower.includes('tenant_settings_tenant_id')) {
+      return {
+        summary: 'Could not save because the tenant ID would conflict with another settings record.',
+        details: [
+          'Open Tenant Settings for your tenant from the settings list (do not reuse another tenant\'s settings ID in the URL).',
+          'If you manage multiple tenants, edit the row that matches the tenant you intend to change.',
+        ],
+      };
+    }
     return {
       summary: 'Settings for this tenant already exist.',
       details: ['Edit the existing settings instead of creating new ones.'],

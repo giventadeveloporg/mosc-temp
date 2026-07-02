@@ -1,11 +1,27 @@
 import { Suspense } from 'react';
-import { fetchTenantSettings } from './ApiServerActions';
+import { redirect } from 'next/navigation';
+import { fetchTenantSettings, fetchTenantSettingsByTenantId } from './ApiServerActions';
 import TenantSettingsList from '@/app/admin/tenant-management/components/TenantSettingsList';
 import AdminNavigation from '@/components/AdminNavigation';
 import Link from 'next/link';
+import {
+  getAppScopedTenantId,
+  isSatelliteTenantSettingsScope,
+} from '@/lib/tenantSettingsScope';
 
 export default async function TenantSettingsPage() {
-  // Fetch initial data for server-side rendering
+  if (isSatelliteTenantSettingsScope()) {
+    const configuredTenantId = getAppScopedTenantId();
+    const forConfiguredTenant = await fetchTenantSettingsByTenantId(configuredTenantId);
+    if (forConfiguredTenant?.id) {
+      redirect(`/admin/tenant-management/settings/${forConfiguredTenant.id}/edit`);
+    }
+    redirect(
+      `/admin/tenant-management/settings/new?tenantId=${encodeURIComponent(configuredTenantId)}`
+    );
+  }
+
+  // Fetch initial data for server-side rendering (primary domain — all tenants)
   let initialData = [];
   let initialTotalCount = 0;
   let error = null;

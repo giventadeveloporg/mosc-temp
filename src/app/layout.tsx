@@ -18,6 +18,7 @@ import { fetchWithJwtRetry } from "@/lib/proxyHandler";
 import { isAdminRole } from "@/lib/utils";
 import { resolveIsTenantAdmin } from "@/lib/resolveTenantAdminStatus";
 import { getClerkSatelliteHost, isSatelliteHostname } from "@/lib/clerkSatellite";
+import { getSharedAdsensePublisherIdForMeta } from "@/lib/adsense/sharedPublisherId";
 
 const DEBUG_LAYOUT = process.env.NEXT_PUBLIC_DEBUG_LAYOUT === 'true';
 const debugLog = (...args: unknown[]) => { if (DEBUG_LAYOUT) console.log(...args); };
@@ -387,9 +388,13 @@ export default async function RootLayout({
 
   // Clerk v7 / Core 3: ClerkProvider must be inside <body>, not wrapping <html>.
   // We inline the ClerkProvider wrapping instead of using a separate layoutContent variable.
+  const sharedAdsensePublisherId = getSharedAdsensePublisherIdForMeta();
+
   return (
       <html lang="en" suppressHydrationWarning>
         <head>
+          {/* Google AdSense account association (Model A shared Publisher ID — giventa.com) */}
+          <meta name="google-adsense-account" content={sharedAdsensePublisherId} />
           {/* Header Design System Fonts - DM Serif Display + Plus Jakarta Sans */}
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

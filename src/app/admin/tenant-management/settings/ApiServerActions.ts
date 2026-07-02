@@ -3,6 +3,10 @@
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { withTenantId } from '@/lib/withTenantId';
 import { getApiBaseUrl } from '@/lib/env';
+import {
+  getAppScopedTenantId,
+  isSatelliteTenantSettingsScope,
+} from '@/lib/tenantSettingsScope';
 import { stripDeprecatedSettingsIdentityFields } from '@/lib/resolveTenantOrganizationIdentity';
 import { normalizeDefaultHeroImageUrlsJsonForApi } from '@/lib/hero/defaultHeroImages';
 import {
@@ -40,8 +44,11 @@ export async function fetchTenantSettings(
     if (filters.search) {
       params.append('tenantId.contains', filters.search);
     }
-    if (filters.tenantId) {
-      params.append('tenantId.equals', filters.tenantId);
+    const scopedTenantId = isSatelliteTenantSettingsScope()
+      ? getAppScopedTenantId()
+      : filters.tenantId;
+    if (scopedTenantId) {
+      params.append('tenantId.equals', scopedTenantId);
     }
 
     // Add sorting
@@ -80,6 +87,22 @@ export async function fetchTenantSettings(
  */
 export async function fetchTenantSetting(id: number): Promise<TenantSettingsDTO | null> {
   try {
+    if (isSatelliteTenantSettingsScope()) {
+      const forConfiguredTenant = await fetchTenantSettingsByTenantId(getAppScopedTenantId());
+      if (!forConfiguredTenant?.id) {
+        return null;
+      }
+      if (forConfiguredTenant.id !== id) {
+        console.warn(
+          '[fetchTenantSetting] Satellite scope: ignoring settings id=%s; using id=%s for tenant %s',
+          id,
+          forConfiguredTenant.id,
+          getAppScopedTenantId()
+        );
+      }
+      return forConfiguredTenant;
+    }
+
     const response = await fetchWithJwtRetry(
       `${getApiBase()}/api/tenant-settings/${id}`,
       { cache: 'no-store' }
@@ -93,7 +116,8 @@ export async function fetchTenantSetting(id: number): Promise<TenantSettingsDTO 
       throw new Error(`Failed to fetch tenant setting: ${response.statusText}`);
     }
 
-    return await response.json();
+    const setting: TenantSettingsDTO = await response.json();
+    return setting;
   } catch (error) {
     console.error('Error fetching tenant setting:', error);
     throw new Error('Failed to fetch tenant setting');
@@ -152,7 +176,51 @@ function buildTenantSettingsWritePayload(
     );
   }
 
-  return withTenantId(merged) as TenantSettingsDTO;
+  return merged as TenantSettingsDTO;
+}
+
+function finalizeTenantSettingsWritePayload(
+  payload: TenantSettingsDTO,
+  existingSetting: TenantSettingsDTO
+): TenantSettingsDTO {
+  if (isSatelliteTenantSettingsScope()) {
+    return withTenantId(payload) as TenantSettingsDTO;
+  }
+  return {
+    ...payload,
+    tenantId: existingSetting.tenantId,
+  };
+}
+
+async function resolveTenantSettingsForMutation(
+  id: number
+): Promise<{ targetId: number; existingSetting: TenantSettingsDTO }> {
+  if (isSatelliteTenantSettingsScope()) {
+    const configuredTenantId = getAppScopedTenantId();
+    const existingSetting = await fetchTenantSettingsByTenantId(configuredTenantId);
+    if (!existingSetting?.id) {
+      throw new Error(
+        `No tenant settings found for this app (tenant: ${configuredTenantId}). Create settings for your tenant first.`
+      );
+    }
+    if (existingSetting.tenantId !== configuredTenantId) {
+      throw new Error('Tenant settings do not match this app configuration.');
+    }
+    if (existingSetting.id !== id) {
+      console.warn(
+        '[resolveTenantSettingsForMutation] Satellite: saving id=%s instead of requested id=%s',
+        existingSetting.id,
+        id
+      );
+    }
+    return { targetId: existingSetting.id, existingSetting };
+  }
+
+  const existingSetting = await fetchTenantSetting(id);
+  if (!existingSetting) {
+    throw new Error('Tenant setting not found');
+  }
+  return { targetId: id, existingSetting };
 }
 
 function throwTenantSettingsApiError(errorText: string, action: 'create' | 'update'): never {
@@ -207,16 +275,11 @@ export async function updateTenantSetting(
   data: Partial<TenantSettingsFormDTO>
 ): Promise<TenantSettingsDTO> {
   try {
-    // First fetch the existing tenant setting to preserve fields not in form
-    const existingSetting = await fetchTenantSetting(id);
+    const { targetId, existingSetting } = await resolveTenantSettingsForMutation(id);
+    const merged = buildTenantSettingsWritePayload(existingSetting, data, targetId);
+    const payload = finalizeTenantSettingsWritePayload(merged, existingSetting);
 
-    if (!existingSetting) {
-      throw new Error('Tenant setting not found');
-    }
-
-    const payload = buildTenantSettingsWritePayload(existingSetting, data, id);
-
-    const response = await fetchWithJwtRetry(`${getApiBase()}/api/tenant-settings/${id}`, {
+    const response = await fetchWithJwtRetry(`${getApiBase()}/api/tenant-settings/${targetId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -249,11 +312,7 @@ export async function patchTenantSetting(
   data: Partial<TenantSettingsFormDTO>
 ): Promise<TenantSettingsDTO> {
   try {
-    const existingSetting = await fetchTenantSetting(id);
-
-    if (!existingSetting) {
-      throw new Error('Tenant setting not found');
-    }
+    const { targetId, existingSetting } = await resolveTenantSettingsForMutation(id);
 
     const stripped = stripDeprecatedSettingsIdentityFields(
       data as Record<string, unknown>
@@ -261,7 +320,7 @@ export async function patchTenantSetting(
 
     const patchPayload: Partial<TenantSettingsFormDTO> & { id: number; updatedAt: string } = {
       ...stripped,
-      id,
+      id: targetId,
       updatedAt: new Date().toISOString(),
     };
 
@@ -271,9 +330,12 @@ export async function patchTenantSetting(
       );
     }
 
-    const payload = withTenantId(patchPayload);
+    const payload = finalizeTenantSettingsWritePayload(
+      patchPayload as TenantSettingsDTO,
+      existingSetting
+    );
 
-    const response = await fetchWithJwtRetry(`${getApiBase()}/api/tenant-settings/${id}`, {
+    const response = await fetchWithJwtRetry(`${getApiBase()}/api/tenant-settings/${targetId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/merge-patch+json',
@@ -303,7 +365,9 @@ export async function patchTenantSetting(
  */
 export async function deleteTenantSetting(id: number): Promise<void> {
   try {
-    const response = await fetchWithJwtRetry(`${getApiBase()}/api/tenant-settings/${id}`, {
+    const { targetId } = await resolveTenantSettingsForMutation(id);
+
+    const response = await fetchWithJwtRetry(`${getApiBase()}/api/tenant-settings/${targetId}`, {
       method: 'DELETE',
     });
 

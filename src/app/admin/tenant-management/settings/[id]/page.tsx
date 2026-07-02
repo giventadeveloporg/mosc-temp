@@ -1,11 +1,15 @@
 import { Suspense } from 'react';
-import { notFound } from 'next/navigation';
-import { fetchTenantSetting } from '@/app/admin/tenant-management/settings/ApiServerActions';
+import { notFound, redirect } from 'next/navigation';
+import { fetchTenantSetting, fetchTenantSettingsByTenantId } from '@/app/admin/tenant-management/settings/ApiServerActions';
 import { fetchTenantOrganization, fetchTenantOrganizations } from '@/app/admin/tenant-management/organizations/ApiServerActions';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';
 import { TenantSettingsDTO, TenantOrganizationDTO } from '@/app/admin/tenant-management/types';
 import TenantSettingsViewClient from './TenantSettingsViewClient';
+import {
+  getAppScopedTenantId,
+  isSatelliteTenantSettingsScope,
+} from '@/lib/tenantSettingsScope';
 
 interface PageProps {
   params: { id: string };
@@ -19,6 +23,17 @@ export default async function TenantSettingsViewPage({ params }: PageProps) {
 
   if (isNaN(settingsId)) {
     notFound();
+  }
+
+  if (isSatelliteTenantSettingsScope()) {
+    const configuredTenantId = getAppScopedTenantId();
+    const forConfiguredTenant = await fetchTenantSettingsByTenantId(configuredTenantId);
+    if (forConfiguredTenant?.id && forConfiguredTenant.id !== settingsId) {
+      redirect(`/admin/tenant-management/settings/${forConfiguredTenant.id}`);
+    }
+    if (!forConfiguredTenant) {
+      notFound();
+    }
   }
 
   // Fetch settings data
