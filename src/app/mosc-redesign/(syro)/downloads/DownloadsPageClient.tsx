@@ -264,9 +264,6 @@ function DownloadCard({
       </div>
 
       <footer className="border-t border-burgundy/10 bg-parchment/40 px-5 py-4">
-        <p className="mb-3 font-syro-display text-xs font-semibold uppercase tracking-widest text-syro-blue">
-          Download
-        </p>
         {file.downloadUrl ? (
           <button
             type="button"

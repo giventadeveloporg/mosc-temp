@@ -14,16 +14,68 @@ export type DownloadSearchItem = {
 };
 
 const DOWNLOAD_YEAR_TOKEN_RE = /\b(19|20)\d{2}\b/g;
+/** e.g. 2022 - 2027, 2022-2027, 2017-22 (abbreviated end year) */
+const DOWNLOAD_YEAR_RANGE_RE = /\b((19|20)\d{2})\s*[-–—]\s*(((19|20)\d{2})|(\d{2}))\b/g;
 
 function isValidDownloadYear(year: number): boolean {
   return Number.isFinite(year) && year >= 1900 && year <= 2100;
 }
 
+function parseDownloadYearRangeEnd(startYear: number, endPart: string): number {
+  if (endPart.length === 4) {
+    return Number(endPart);
+  }
+  const twoDigit = Number(endPart);
+  const century = Math.floor(startYear / 100) * 100;
+  let endYear = century + twoDigit;
+  if (endYear < startYear) {
+    endYear += 100;
+  }
+  return endYear;
+}
+
+/** Lowest year from explicit spans like "2022 - 2027" in category/title/path text. */
+function extractDownloadYearRangeMinYear(text: string): number | null {
+  let minYear: number | null = null;
+
+  for (const match of text.matchAll(DOWNLOAD_YEAR_RANGE_RE)) {
+    const startYear = Number(match[1]);
+    const endPart = match[3];
+    if (!isValidDownloadYear(startYear)) {
+      continue;
+    }
+    const endYear = parseDownloadYearRangeEnd(startYear, endPart);
+    if (!isValidDownloadYear(endYear)) {
+      continue;
+    }
+    const rangeMin = Math.min(startYear, endYear);
+    if (minYear === null || rangeMin < minYear) {
+      minYear = rangeMin;
+    }
+  }
+
+  return minYear;
+}
+
 /** Meta line under the card thumbnail (category · document year, without the word "Year"). */
 export function buildDownloadCardMetaLine(item: DownloadSearchItem): string {
-  return [item.categoryLabel, item.officialDocumentYear ? String(item.officialDocumentYear) : null]
-    .filter(Boolean)
-    .join(' · ');
+  const category = item.categoryLabel?.trim() ?? null;
+  const yearStr =
+    item.officialDocumentYear != null && isValidDownloadYear(item.officialDocumentYear)
+      ? String(item.officialDocumentYear)
+      : null;
+
+  const metaLine = [category, yearStr].filter(Boolean).join(' · ');
+
+  // Category label already includes the term range; trailing year is redundant on these cards.
+  if (metaLine === 'Malankara Association (2022 - 2027) · 2022') {
+    return 'Malankara Association (2022 - 2027)';
+  }
+  if (metaLine === 'Malankara Association 2022 · 2022') {
+    return 'Malankara Association 2022';
+  }
+
+  return metaLine;
 }
 
 /** Collect years from the stored year field and from title / tagline / path text. */
@@ -70,8 +122,25 @@ export function matchesDownloadYearFilter(item: DownloadSearchItem, year: number
   return extractDownloadItemYears(item).includes(year);
 }
 
-/** Primary sort year: highest year found on the card (stored field or title/tagline/path). */
+/**
+ * Primary sort year for newest-first ordering.
+ * Year periods (e.g. "2022 - 2027") use the lowest year so MA (2022 - 2027) sorts as 2022.
+ * Otherwise uses the highest year found on the card.
+ */
 export function getDownloadItemPrimarySortYear(item: DownloadSearchItem): number {
+  const rangeSourceText = [
+    item.categoryLabel ?? '',
+    item.title ?? '',
+    item.treePath ?? '',
+    ...item.pathSegments,
+    item.description ?? '',
+  ].join(' ');
+
+  const rangeMinYear = extractDownloadYearRangeMinYear(rangeSourceText);
+  if (rangeMinYear != null) {
+    return rangeMinYear;
+  }
+
   const years = extractDownloadItemYears(item);
   return years.length > 0 ? Math.max(...years) : 0;
 }
