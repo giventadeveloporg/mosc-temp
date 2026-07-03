@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-07-02T21:45:28.133Z",
+  "generatedAt": "2026-07-03T02:55:21.422Z",
   "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
   "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2282,
+  "statementCount": 2285,
   "tables": {
     "event_type_details": {
       "rows": 12,
@@ -791,9 +791,9 @@
       ]
     },
     "tenant_organization": {
-      "rows": 8,
+      "rows": 9,
       "minNewId": 1,
-      "maxNewId": 8,
+      "maxNewId": 9,
       "sample": [
         {
           "old": 1,
@@ -818,9 +818,9 @@
       ]
     },
     "tenant_settings": {
-      "rows": 8,
+      "rows": 9,
       "minNewId": 1,
-      "maxNewId": 8,
+      "maxNewId": 9,
       "sample": [
         {
           "old": 1,
@@ -872,9 +872,9 @@
       ]
     },
     "satellite_domain": {
-      "rows": 4,
+      "rows": 5,
       "minNewId": 1,
-      "maxNewId": 4,
+      "maxNewId": 5,
       "sample": [
         {
           "old": 1,
@@ -891,6 +891,10 @@
         {
           "old": 4,
           "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
         }
       ]
     },
