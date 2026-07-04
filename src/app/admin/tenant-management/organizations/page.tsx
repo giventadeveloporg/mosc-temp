@@ -11,7 +11,7 @@ export default async function TenantOrganizationsPage() {
         <AdminNavigation />
       </div>
       {/* Main Content Section - Constrained Width */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8" style={{ paddingTop: '160px' }}>
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 sm:p-4 md:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
             <div>

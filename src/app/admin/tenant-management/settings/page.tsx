@@ -45,7 +45,7 @@ export default async function TenantSettingsPage() {
         <AdminNavigation />
       </div>
       {/* Main Content Section - Constrained Width */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8" style={{ paddingTop: '160px' }}>
         {/* Page Header */}
         <div className="mb-4 sm:mb-6 md:mb-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
