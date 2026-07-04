@@ -203,6 +203,17 @@ DROP TABLE IF EXISTS public.rel_event_details__discount_codes CASCADE;
 DROP TABLE IF EXISTS public.user_task CASCADE;
 DROP TABLE IF EXISTS public.user_subscription CASCADE;
 DROP TABLE IF EXISTS public.event_type_details CASCADE;
+-- Gas station COO module (children before gas_station_location)
+DROP TABLE IF EXISTS public.gas_station_recommendation CASCADE;
+DROP TABLE IF EXISTS public.gas_station_daily_metrics CASCADE;
+DROP TABLE IF EXISTS public.gas_station_integration CASCADE;
+DROP TABLE IF EXISTS public.gas_station_location CASCADE;
+-- Personal profile site module
+DROP TABLE IF EXISTS public.profile_media_asset CASCADE;
+DROP TABLE IF EXISTS public.profile_affiliation CASCADE;
+DROP TABLE IF EXISTS public.profile_achievement CASCADE;
+DROP TABLE IF EXISTS public.profile_writing CASCADE;
+DROP TABLE IF EXISTS public.public_profile CASCADE;
 DROP TABLE IF EXISTS public.tenant_settings CASCADE;
 DROP TABLE IF EXISTS public.user_profile CASCADE;
 DROP TABLE IF EXISTS public.tenant_organization CASCADE;
