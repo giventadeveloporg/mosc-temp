@@ -152,6 +152,7 @@ export default function TenantSettingsForm({
       defaultHeroIncludeWithEvents: initialData?.defaultHeroIncludeWithEvents ?? true,
       defaultHeroMaxDisplayCount:
         initialData?.defaultHeroMaxDisplayCount ?? DEFAULT_HERO_MAX_DISPLAY_COUNT,
+      displayEventHeroImages: initialData?.displayEventHeroImages ?? true,
       // Operational contact (identity fields live on tenant_organization)
       phoneNumber: initialData?.phoneNumber || '',
       email: initialData?.email || '',
@@ -168,6 +169,7 @@ export default function TenantSettingsForm({
   register('defaultHeroDisplayMode');
   register('defaultHeroIncludeWithEvents');
   register('defaultHeroMaxDisplayCount');
+  register('displayEventHeroImages');
 
   // Get settings ID from prop or initialData (for edit mode)
   const settingsId = propSettingsId || initialData?.id;
@@ -181,6 +183,7 @@ export default function TenantSettingsForm({
   const defaultHeroDisplayMode = watch('defaultHeroDisplayMode');
   const defaultHeroIncludeWithEvents = watch('defaultHeroIncludeWithEvents');
   const defaultHeroMaxDisplayCount = watch('defaultHeroMaxDisplayCount');
+  const displayEventHeroImages = watch('displayEventHeroImages');
   const tenantIdForUpload =
     watch('tenantId')?.trim() || initialData?.tenantId?.trim() || undefined;
 
@@ -1720,6 +1723,17 @@ export default function TenantSettingsForm({
           <div className="space-y-6">
             <input type="hidden" {...register('defaultHeroImageUrlsJson')} />
             <input type="hidden" {...register('defaultHeroMaxDisplayCount')} />
+
+            <div className="bg-teal-50 border border-teal-200 rounded-lg p-4">
+              <ToggleSwitch
+                name="displayEventHeroImages"
+                label="Show event hero images"
+                description="When enabled, upcoming events with hero media appear in the homepage hero slideshow. When disabled, only tenant default hero slides (if configured) or the fallback image are shown."
+                checked={displayEventHeroImages ?? true}
+                onChange={(checked) => setValue('displayEventHeroImages', checked)}
+              />
+            </div>
+
             <TenantDefaultHeroManager
               settingsId={settingsId}
               mode={mode}

@@ -738,6 +738,8 @@ export interface TenantSettingsDTO {
   defaultHeroDisplayMode?: 'slideshow' | 'random' | 'single';
   defaultHeroIncludeWithEvents?: boolean;
   defaultHeroMaxDisplayCount?: number;
+  /** When true, show event hero images in the homepage hero section */
+  displayEventHeroImages?: boolean;
   /** When true, render Google AdSense regions on public satellite pages */
   enableGoogleAdsense?: boolean;
   /** AdSense publisher ID (ca-pub-...) */

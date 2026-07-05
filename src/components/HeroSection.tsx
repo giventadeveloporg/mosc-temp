@@ -251,37 +251,41 @@ const DynamicHeroImage: React.FC<{
         const eventImageUrls: string[] = [];
         const eventDurations: number[] = [];
         const eventSlideEvents: (EventWithMediaExtended | null)[] = [];
-        const tenantId = getTenantId();
-        const heroList = await fetchHomepageHeroMediaList(tenantId);
-        const capped = heroList.slice(0, HERO_SLIDER_CAP);
-        const eventById = new Map<number, EventWithMediaExtended>();
+        const displayEventHeroImages = tenantSettings?.displayEventHeroImages ?? true;
 
-        if (heroList.length > HERO_SLIDER_CAP) {
-          console.log('[HeroSection] Hero cap applied:', {
-            totalEligible: heroList.length,
-            cap: HERO_SLIDER_CAP,
-            showing: capped.length,
-            tip: 'Set Display Order lower (e.g. 0, 1, 2) in Admin → Media so preferred images show first.',
-          });
-        }
+        if (displayEventHeroImages) {
+          const tenantId = getTenantId();
+          const heroList = await fetchHomepageHeroMediaList(tenantId);
+          const capped = heroList.slice(0, HERO_SLIDER_CAP);
+          const eventById = new Map<number, EventWithMediaExtended>();
 
-        for (const media of capped) {
-          const url = getHeroSliderImageUrl(media);
-          if (!url) {
-            console.warn('[HeroSection] Hero media skipped (no usable image URL):', {
-              id: media.id,
-              title: media.title,
-              eventId: media.eventId ?? media.event_id,
+          if (heroList.length > HERO_SLIDER_CAP) {
+            console.log('[HeroSection] Hero cap applied:', {
+              totalEligible: heroList.length,
+              cap: HERO_SLIDER_CAP,
+              showing: capped.length,
+              tip: 'Set Display Order lower (e.g. 0, 1, 2) in Admin → Media so preferred images show first.',
             });
-            continue;
           }
-          const linkedEvent = await resolveEventForMedia(media, eventById);
-          if (!linkedEvent || !isUpcomingEventForHero(linkedEvent)) {
-            continue;
+
+          for (const media of capped) {
+            const url = getHeroSliderImageUrl(media);
+            if (!url) {
+              console.warn('[HeroSection] Hero media skipped (no usable image URL):', {
+                id: media.id,
+                title: media.title,
+                eventId: media.eventId ?? media.event_id,
+              });
+              continue;
+            }
+            const linkedEvent = await resolveEventForMedia(media, eventById);
+            if (!linkedEvent || !isUpcomingEventForHero(linkedEvent)) {
+              continue;
+            }
+            eventImageUrls.push(url);
+            eventDurations.push(getHeroMediaDurationMs(media));
+            eventSlideEvents.push(linkedEvent);
           }
-          eventImageUrls.push(url);
-          eventDurations.push(getHeroMediaDurationMs(media));
-          eventSlideEvents.push(linkedEvent);
         }
 
         const resolved = resolveHeroImages({
@@ -311,14 +315,9 @@ const DynamicHeroImage: React.FC<{
           totalImages: imageUrls.length,
           eventSlideCount: resolved.eventSlideCount,
           tenantDefaultSlideCount: resolved.defaultSlideCount,
+          displayEventHeroImages,
           includeTenantDefaults: tenantSettings?.defaultHeroIncludeWithEvents ?? true,
           usingNoEventFallback: linkedUpcoming.length === 0 && resolved.defaultSlideCount === 0,
-          displayOrders: capped.map((m) => ({
-            id: m.id,
-            title: m.title,
-            displayOrder: m.displayOrder ?? m.display_order,
-            eventId: m.eventId ?? m.event_id,
-          })),
           durations: durations.map((d) => `${d}ms (${d / 1000}s)`),
         });
 

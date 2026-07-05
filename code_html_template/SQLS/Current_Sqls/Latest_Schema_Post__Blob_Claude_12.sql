@@ -586,6 +586,18 @@ END IF;
         RAISE EXCEPTION 'Event capacity must be greater than zero, got: %', NEW.capacity;
 END IF;
 
+    IF NEW.description IS NOT NULL AND char_length(NEW.description) > 900 THEN
+        RAISE EXCEPTION 'Event description cannot exceed 900 characters, got: %', char_length(NEW.description);
+    END IF;
+
+    IF NEW.directions_to_venue IS NOT NULL AND char_length(NEW.directions_to_venue) > 600 THEN
+        RAISE EXCEPTION 'Directions to venue cannot exceed 600 characters, got: %', char_length(NEW.directions_to_venue);
+    END IF;
+
+    IF NEW.caption IS NOT NULL AND char_length(NEW.caption) > 255 THEN
+        RAISE EXCEPTION 'Event caption cannot exceed 255 characters, got: %', char_length(NEW.caption);
+    END IF;
+
     -- Log the validation success
     RAISE NOTICE 'Event validation passed for event: %', NEW.title;
 
@@ -1396,8 +1408,8 @@ CREATE TABLE public.event_details (
                                       id int8 DEFAULT nextval('public.event_details_id_seq'::regclass) NOT NULL,
                                       tenant_id varchar(255) NULL,
                                       title varchar(255) NOT NULL,
-                                      caption varchar(500) NULL,
-                                      description text NULL,
+                                      caption varchar(255) NULL,
+                                      description varchar(900) NULL,
                                       start_date date NOT NULL,
                                       promotion_start_date date NOT NULL,
                                       end_date date NOT NULL,
@@ -1405,7 +1417,7 @@ CREATE TABLE public.event_details (
                                       end_time varchar(100) NOT NULL,
                                       timezone varchar(64) NOT NULL,
                                       "location" varchar(500) NULL,
-                                      directions_to_venue text NULL,
+                                      directions_to_venue varchar(600) NULL,
                                       capacity int4 NULL,
                                       admission_type varchar(50) NULL,
                                       is_active bool DEFAULT true NULL,
@@ -1454,6 +1466,9 @@ CREATE TABLE public.event_details (
                                       CONSTRAINT check_deadlines CHECK (((registration_deadline IS NULL) OR (cancellation_deadline IS NULL) OR (cancellation_deadline <= registration_deadline))),
                                       CONSTRAINT check_event_dates CHECK ((end_date >= start_date)),
                                       CONSTRAINT event_details_max_guests_per_attendee_check CHECK ((max_guests_per_attendee >= 0)),
+                                      CONSTRAINT event_details_description_len_chk CHECK ((description IS NULL OR char_length(description) <= 900)),
+                                      CONSTRAINT event_details_directions_len_chk CHECK ((directions_to_venue IS NULL OR char_length(directions_to_venue) <= 600)),
+                                      CONSTRAINT event_details_caption_len_chk CHECK ((caption IS NULL OR char_length(caption) <= 255)),
                                       CONSTRAINT event_details_pkey PRIMARY KEY (id),
                                       CONSTRAINT fk_event__created_by_id FOREIGN KEY (created_by_id) REFERENCES public.user_profile(id) ON DELETE SET NULL,
                                       CONSTRAINT fk_event__event_type_id FOREIGN KEY (event_type_id) REFERENCES public.event_type_details(id) ON DELETE SET NULL,
@@ -3081,6 +3096,7 @@ CREATE TABLE public.tenant_settings (
                                         default_hero_display_mode character varying(32) DEFAULT 'slideshow',
                                         default_hero_include_with_events boolean DEFAULT true,
                                         default_hero_max_display_count INTEGER null,
+                                        display_event_hero_images boolean DEFAULT true NOT NULL,
                                         facebook_url varchar(1024) NULL,
                                         instagram_url varchar(1024) NULL,
                                         twitter_url varchar(1024) NULL,

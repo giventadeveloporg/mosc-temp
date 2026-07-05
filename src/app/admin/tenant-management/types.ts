@@ -86,6 +86,8 @@ export interface TenantSettingsDTO {
   defaultHeroIncludeWithEvents?: boolean;
   /** Max active slides shown on homepage rotation (1–6, default 6) */
   defaultHeroMaxDisplayCount?: number;
+  /** When true, show event hero images in the homepage hero section */
+  displayEventHeroImages?: boolean;
   /** When true, render Google AdSense regions on public satellite pages */
   enableGoogleAdsense?: boolean;
   /** AdSense publisher ID (ca-pub-...) */

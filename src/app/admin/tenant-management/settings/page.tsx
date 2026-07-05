@@ -39,13 +39,8 @@ export default async function TenantSettingsPage() {
   }
 
   return (
-    <div className="w-full overflow-x-hidden box-border" style={{ paddingTop: '120px' }}>
-      {/* Navigation Section - Full Width, Separate Responsive Container */}
-      <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-6 sm:mb-8">
-        <AdminNavigation />
-      </div>
-      {/* Main Content Section - Constrained Width */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8" style={{ paddingTop: '160px' }}>
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8" style={{ paddingTop: '120px' }}>
+      <AdminNavigation />
         {/* Page Header */}
         <div className="mb-4 sm:mb-6 md:mb-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -268,7 +263,6 @@ export default async function TenantSettingsPage() {
             </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );
