@@ -24,6 +24,39 @@ export function normalizeEventMediasResponse(data: unknown): EventMediaDTO[] {
   return [];
 }
 
+function normalizeEventDetailsList(data: unknown): EventDetailsDTO[] {
+  if (Array.isArray(data)) return data as EventDetailsDTO[];
+  if (data && typeof data === 'object' && 'content' in data && Array.isArray((data as { content: unknown }).content)) {
+    return (data as { content: EventDetailsDTO[] }).content;
+  }
+  if (data && typeof data === 'object' && 'id' in data) return [data as EventDetailsDTO];
+  return [];
+}
+
+/**
+ * Load a single event scoped to the current tenant.
+ * GET /api/event-details/{id} can return a stale row when IDs are reused across tenants;
+ * criteria lookup with tenantId.equals returns the correct tenant event.
+ */
+export async function fetchEventDetailsByIdForTenant(
+  eventId: number,
+  tenantId: string
+): Promise<EventDetailsDTO | null> {
+  try {
+    const params = new URLSearchParams({
+      'id.equals': String(eventId),
+      'tenantId.equals': tenantId,
+      size: '1',
+    });
+    const res = await fetch(`/api/proxy/event-details?${params.toString()}`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return normalizeEventDetailsList(data)[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** Hero media is shown only if startDisplayingFromDate is null or <= today. */
 export function isHeroMediaDisplayDateValid(media: HeroMediaRow): boolean {
   const displayDateValue = media.startDisplayingFromDate ?? media.start_displaying_from_date;
@@ -130,18 +163,11 @@ export function isUpcomingEventForHero(event: EventDetailsDTO): boolean {
   return start.getTime() >= today.getTime();
 }
 
-async function fetchEventDetailsById(eventId: number): Promise<EventDetailsDTO | null> {
-  try {
-    const res = await fetch(`/api/proxy/event-details/${eventId}`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    return (await res.json()) as EventDetailsDTO;
-  } catch {
-    return null;
-  }
-}
-
 /** Resolve which event IDs from hero media rows are upcoming (parallel lookup, deduped). */
-async function resolveUpcomingEventIdsForHeroMedia(mediaList: HeroMediaRow[]): Promise<Set<number>> {
+async function resolveUpcomingEventIdsForHeroMedia(
+  mediaList: HeroMediaRow[],
+  tenantId: string
+): Promise<Set<number>> {
   const eventIds = [
     ...new Set(
       mediaList
@@ -153,7 +179,7 @@ async function resolveUpcomingEventIdsForHeroMedia(mediaList: HeroMediaRow[]): P
   const upcomingIds = new Set<number>();
   await Promise.all(
     eventIds.map(async (eventId) => {
-      const event = await fetchEventDetailsById(eventId);
+      const event = await fetchEventDetailsByIdForTenant(eventId, tenantId);
       if (event && isUpcomingEventForHero(event)) {
         upcomingIds.add(eventId);
       }
@@ -199,7 +225,7 @@ export async function fetchHomepageHeroMediaList(tenantId: string): Promise<Hero
 
   merged.sort(compareHeroMediaByDisplayOrder);
 
-  const upcomingEventIds = await resolveUpcomingEventIdsForHeroMedia(merged);
+  const upcomingEventIds = await resolveUpcomingEventIdsForHeroMedia(merged, tenantId);
   return merged.filter((item) => {
     const eventId = item.eventId ?? item.event_id;
     if (eventId == null) return false;
