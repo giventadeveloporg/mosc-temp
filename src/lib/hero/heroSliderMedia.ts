@@ -141,10 +141,20 @@ export function getHeroMediaDurationMs(media: HeroMediaRow): number {
   return sec != null && sec > 0 ? Math.max(1000, Math.min(600000, sec * 1000)) : 8000;
 }
 
-/** True when the linked event is active and still upcoming (start today or later; recurring uses next occurrence). */
-export function isUpcomingEventForHero(event: EventDetailsDTO): boolean {
-  if (event.isActive === false) return false;
+function parseLocalDateOnly(iso: string): Date | null {
+  const [year, month, day] = iso.split('-').map(Number);
+  if (!year || !month || !day) return null;
+  const d = new Date(year, month - 1, day);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
 
+/**
+ * True when the linked event is still upcoming or ongoing (not ended).
+ * Recurring events use the next occurrence. Inactive events are allowed when
+ * media is flagged for the homepage hero — admins opt in via Hero / Home Page Hero checkboxes.
+ */
+export function isUpcomingEventForHero(event: EventDetailsDTO): boolean {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -156,10 +166,14 @@ export function isUpcomingEventForHero(event: EventDetailsDTO): boolean {
   }
 
   if (!event.startDate) return false;
-  const [year, month, day] = event.startDate.split('-').map(Number);
-  if (!year || !month || !day) return false;
-  const start = new Date(year, month - 1, day);
-  start.setHours(0, 0, 0, 0);
+
+  const end = event.endDate ? parseLocalDateOnly(event.endDate) : null;
+  if (end && end.getTime() >= today.getTime()) {
+    return true;
+  }
+
+  const start = parseLocalDateOnly(event.startDate);
+  if (!start) return false;
   return start.getTime() >= today.getTime();
 }
 
@@ -215,7 +229,7 @@ export async function fetchHomepageHeroMediaList(tenantId: string): Promise<Hero
 
   for (const flag of queries) {
     const res = await fetch(
-      `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&${flag}&size=${HERO_FETCH_PAGE_SIZE}&sort=displayOrder,asc`,
+      `/api/proxy/event-medias?${flag}&size=${HERO_FETCH_PAGE_SIZE}&sort=displayOrder,asc`,
       { cache: 'no-store' }
     );
     if (!res.ok) continue;
