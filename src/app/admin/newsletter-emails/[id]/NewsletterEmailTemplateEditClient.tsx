@@ -70,6 +70,12 @@ export default function NewsletterEmailTemplateEditClient({
   const footerFileInputRef = useRef<HTMLInputElement>(null);
   const [isEmailListEmpty, setIsEmailListEmpty] = useState(false);
   const [fromEmailError, setFromEmailError] = useState<string | null>(null);
+  const [copiedSizeHint, setCopiedSizeHint] = useState<'header' | 'footer' | null>(null);
+
+  const HEADER_SIZE_GUIDANCE =
+    'Recommended for email: 600 × 200 px (or 1200 × 400 px for retina). Keep important content centered; email clients typically display at ~600 px wide.';
+  const FOOTER_SIZE_GUIDANCE =
+    'Recommended for email: 600 × 100–150 px (or 1200 × 200–300 px for retina). Use a shorter landscape strip so it fits the ~600 px email content width.';
 
   useEffect(() => {
     if (template) {
@@ -140,6 +146,18 @@ export default function NewsletterEmailTemplateEditClient({
       }));
     } catch (err) {
       console.error('Failed to copy example HTML:', err);
+    }
+  };
+
+  const handleCopySizeGuidance = async (kind: 'header' | 'footer') => {
+    const text = kind === 'header' ? HEADER_SIZE_GUIDANCE : FOOTER_SIZE_GUIDANCE;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedSizeHint(kind);
+      setTimeout(() => setCopiedSizeHint((prev) => (prev === kind ? null : prev)), 2000);
+    } catch (err) {
+      console.error('Failed to copy size guidance:', err);
+      setError('Failed to copy size guidance to clipboard');
     }
   };
 
@@ -563,6 +581,22 @@ export default function NewsletterEmailTemplateEditClient({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Header Image
             </label>
+            <div className="flex items-start gap-2 mb-2">
+              <p className="text-xs text-blue-700 leading-relaxed flex-1">
+                <strong>Recommended for email:</strong> 600 × 200 px (or 1200 × 400 px for retina).
+                Keep important content centered; email clients typically display at ~600 px wide.
+              </p>
+              <button
+                type="button"
+                onClick={() => handleCopySizeGuidance('header')}
+                className="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-300 transition-colors"
+                title="Copy header size guidance"
+                aria-label="Copy header size guidance"
+              >
+                <FaCopy className="w-3 h-3" />
+                {copiedSizeHint === 'header' ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
             {formData.headerImageUrl ? (
               <div className="relative inline-block">
                 <img
@@ -625,6 +659,22 @@ export default function NewsletterEmailTemplateEditClient({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Footer Image
             </label>
+            <div className="flex items-start gap-2 mb-2">
+              <p className="text-xs text-blue-700 leading-relaxed flex-1">
+                <strong>Recommended for email:</strong> 600 × 100–150 px (or 1200 × 200–300 px for retina).
+                Use a shorter landscape strip so it fits the ~600 px email content width.
+              </p>
+              <button
+                type="button"
+                onClick={() => handleCopySizeGuidance('footer')}
+                className="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-300 transition-colors"
+                title="Copy footer size guidance"
+                aria-label="Copy footer size guidance"
+              >
+                <FaCopy className="w-3 h-3" />
+                {copiedSizeHint === 'footer' ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
             {formData.footerImageUrl ? (
               <div className="relative inline-block">
                 <img

@@ -25,6 +25,7 @@
     "test:admin:all": "node TestSprite/admin-tests/run-admin-tests-all.js",
     "test:admin:diagnose": "node TestSprite/admin-tests/diagnose-event-discovery.js",
     "test:install-playwright": "npx playwright install chromium",
+    "test:e2e:hero": "npx playwright test tests/e2e/hero-slider-conditions.spec.ts --config=tests/e2e/playwright.config.ts",
     "mosc:migration:dry": "node scripts/mosc-in-migration/fetch-urls.mjs --manifest scripts/mosc-in-migration/url-list.example.json --dry-run",
     "mosc:migration:fetch": "node scripts/mosc-in-migration/fetch-urls.mjs --manifest scripts/mosc-in-migration/url-list.json",
     "mosc:migration:fetch:mosc-in": "node scripts/mosc-in-migration/fetch-urls.mjs --manifest scripts/mosc-in-migration/url-list.mosc-in.generated.json --ignore-robots --skip-existing",
