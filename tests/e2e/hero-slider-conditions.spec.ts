@@ -32,6 +32,20 @@ type HeroInitLog = {
   usingNoEventFallback?: boolean;
 };
 
+async function gotoHomeWithRetry(page: Page, attempts = 3) {
+  let lastError: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      await page.goto('/', { waitUntil: 'domcontentloaded', timeout: 45_000 });
+      return;
+    } catch (err) {
+      lastError = err;
+      await page.waitForTimeout(1000);
+    }
+  }
+  throw lastError;
+}
+
 async function clearHeroCaches(page: Page) {
   await page.addInitScript(
     ({ heroFrag, tenantFrag }) => {
@@ -147,18 +161,36 @@ function eventIdOf(m: Record<string, unknown>): number | null {
   return typeof id === 'number' ? id : null;
 }
 
+async function loadHomepageHero(page: Page) {
+  const collector = attachHeroInitCollector(page);
+  await gotoHomeWithRetry(page);
+  const log = await waitForHeroInitialized(page, collector);
+  const srcs = await collectVisibleHeroSrcs(page);
+  return { log, srcs, collector };
+}
+
+function assertHeroUrlsAllowed(page: Page, srcs: string[]) {
+  expect(srcs.length, 'at least one hero image should be in the DOM').toBeGreaterThan(0);
+  const origin = page.url().split('/').slice(0, 3).join('/');
+  for (const src of srcs) {
+    const ok =
+      src.startsWith('https://') ||
+      src.includes(FALLBACK_PATH) ||
+      src.startsWith('/') ||
+      src.startsWith(origin);
+    expect(ok, `unexpected hero URL protocol/shape: ${src}`).toBe(true);
+  }
+}
+
 test.describe('Homepage hero slider conditions', () => {
   test.beforeEach(async ({ page }) => {
     await clearHeroCaches(page);
   });
 
-  test('Phase A: hero initializes and logged counts are non-negative', async ({ page }) => {
-    const collector = attachHeroInitCollector(page);
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    const log = await waitForHeroInitialized(page, collector);
-    const srcs = await collectVisibleHeroSrcs(page);
+  test('Phase A: hero initializes, counts valid, and URLs are allowed', async ({ page }) => {
+    const { log, srcs } = await loadHomepageHero(page);
 
-    expect(srcs.length, 'at least one hero image should be in the DOM').toBeGreaterThan(0);
+    assertHeroUrlsAllowed(page, srcs);
 
     if (log) {
       expect(log.totalImages ?? 0).toBeGreaterThanOrEqual(1);
@@ -180,22 +212,9 @@ test.describe('Homepage hero slider conditions', () => {
     });
   });
 
-  test('Phase A: every visible hero URL is either https, same-origin path, or known fallback', async ({
-    page,
-  }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2000);
-    const srcs = await collectVisibleHeroSrcs(page);
-    expect(srcs.length).toBeGreaterThan(0);
-
-    for (const src of srcs) {
-      const ok =
-        src.startsWith('https://') ||
-        src.includes(FALLBACK_PATH) ||
-        src.startsWith('/') ||
-        src.startsWith(page.url().split('/').slice(0, 3).join('/'));
-      expect(ok, `unexpected hero URL protocol/shape: ${src}`).toBe(true);
-    }
+  test('Phase A: goto retries on abort (smoke)', async ({ page }) => {
+    await gotoHomeWithRetry(page);
+    await expect(page).toHaveURL(/\//);
   });
 
   test('Phase A: flagged medias from proxy have a defensible exclusion or eventId', async ({

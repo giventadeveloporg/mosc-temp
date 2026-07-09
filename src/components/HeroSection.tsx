@@ -11,6 +11,7 @@ import {
   fetchHomepageHeroMediaList,
   getHeroMediaDurationMs,
   getHeroSliderImageUrl,
+  HERO_SLIDER_CAP,
   isUpcomingEventForHero,
   type HeroMediaRow,
 } from '@/lib/hero/heroSliderMedia';
@@ -20,8 +21,6 @@ import { useDeferredFetch } from '@/hooks/usePageReady';
 import { getHomepageCacheKey, HOMEPAGE_CACHE_INVALIDATE_CHANNEL } from '@/lib/homepageCacheKeys';
 import { ArrowRight, Heart, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import GivebutterDonateButton from '@/components/GivebutterDonateButton';
-
-const HERO_SLIDER_CAP = 24;
 
 /** Shown only after init when no event/tenant hero images are available. */
 const HERO_FALLBACK_NO_EVENTS_IMAGE = '/images/hero_section/default_cloud_hero_image_1.webp';
