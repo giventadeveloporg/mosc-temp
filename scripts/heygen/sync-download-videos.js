@@ -59,8 +59,22 @@ function downloadVideo(apiKey, videoId, destPath) {
     return { ok: false, status: data.status, error: data.error };
   }
   fs.mkdirSync(path.dirname(destPath), { recursive: true });
-  curlDownload(data.video_url, destPath);
-  return { ok: true, status: 'completed', videoUrl: data.video_url };
+  const mp4Url = data.video_url_caption || data.video_url;
+  curlDownload(mp4Url, destPath);
+  const srtPath = destPath.replace(/\.mp4$/i, '.srt');
+  if (data.caption_url) {
+    try {
+      curlDownload(data.caption_url, srtPath, 300);
+    } catch (_) { /* optional */ }
+  }
+  return {
+    ok: true,
+    status: 'completed',
+    videoUrl: data.video_url,
+    videoUrlCaption: data.video_url_caption || null,
+    captionUrl: data.caption_url || null,
+    burnedInCaptions: Boolean(data.video_url_caption),
+  };
 }
 
 function main() {

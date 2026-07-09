@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-07-09T15:51:51.295Z",
-  "input": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
-  "output": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
+  "generatedAt": "2026-07-09T21:06:42.114Z",
+  "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
+  "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2128,
+  "statementCount": 2007,
   "tables": {
     "event_type_details": {
       "rows": 12,
@@ -463,9 +463,9 @@
       ]
     },
     "event_media": {
-      "rows": 1352,
+      "rows": 1239,
       "minNewId": 1,
-      "maxNewId": 1352,
+      "maxNewId": 1239,
       "sample": [
         {
           "old": 1,
@@ -1321,9 +1321,9 @@
       ]
     },
     "promotion_email_template": {
-      "rows": 5,
+      "rows": 4,
       "minNewId": 1,
-      "maxNewId": 5,
+      "maxNewId": 4,
       "sample": [
         {
           "old": 1,
@@ -1340,17 +1340,13 @@
         {
           "old": 4,
           "new": 4
-        },
-        {
-          "old": 5,
-          "new": 5
         }
       ]
     },
     "promotion_email_sent_log": {
-      "rows": 11,
+      "rows": 4,
       "minNewId": 1,
-      "maxNewId": 11,
+      "maxNewId": 4,
       "sample": [
         {
           "old": 1,
@@ -1367,10 +1363,6 @@
         {
           "old": 4,
           "new": 4
-        },
-        {
-          "old": 5,
-          "new": 5
         }
       ]
     },

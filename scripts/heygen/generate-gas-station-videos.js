@@ -130,7 +130,7 @@ async function waitForVideo(apiKey, videoId, pollSec, maxPollMin) {
     const { data } = getVideoStatus(apiKey, videoId);
     const status = data?.status;
     if (status === 'completed') {
-      return data.video_url;
+      return data;
     }
     if (status === 'failed') {
       throw new Error(data?.error || 'HeyGen reported failed status');
@@ -139,6 +139,29 @@ async function waitForVideo(apiKey, videoId, pollSec, maxPollMin) {
     await sleep(pollSec * 1000);
   }
   throw new Error(`Timed out after ${maxPollMin} minutes`);
+}
+
+/** Download MP4 (prefer HeyGen burn-in caption track) + optional .srt sidecar. */
+function downloadCompletedVideo(statusData, outPath) {
+  const mp4Url = statusData.video_url_caption || statusData.video_url;
+  if (!mp4Url) throw new Error('No video URL in HeyGen status');
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  curlDownload(mp4Url, outPath);
+  const srtPath = outPath.replace(/\.mp4$/i, '.srt');
+  if (statusData.caption_url) {
+    try {
+      curlDownload(statusData.caption_url, srtPath, 300);
+    } catch (err) {
+      console.warn(`  [warn] SRT download failed: ${err.message}`);
+    }
+  }
+  return {
+    videoUrl: statusData.video_url,
+    videoUrlCaption: statusData.video_url_caption || null,
+    captionUrl: statusData.caption_url || null,
+    srtFile: statusData.caption_url ? path.basename(srtPath) : null,
+    burnedInCaptions: Boolean(statusData.video_url_caption),
+  };
 }
 
 async function processJob(apiKey, job, manifest, opts) {
@@ -153,13 +176,12 @@ async function processJob(apiKey, job, manifest, opts) {
   if (opts.resume && existing?.videoId && existing?.status === 'processing') {
     console.log(`[resume] ${job.key} video_id=${existing.videoId}`);
     try {
-      const url = await waitForVideo(apiKey, existing.videoId, opts.pollSec, opts.maxPollMin);
-      fs.mkdirSync(path.dirname(outPath), { recursive: true });
-      curlDownload(url, outPath);
+      const statusData = await waitForVideo(apiKey, existing.videoId, opts.pollSec, opts.maxPollMin);
+      const captionMeta = downloadCompletedVideo(statusData, outPath);
       manifest.jobs[job.key] = {
         ...existing,
         status: 'completed',
-        videoUrl: url,
+        ...captionMeta,
         outputFile: job.outputFile,
         completedAt: new Date().toISOString(),
       };
@@ -202,13 +224,12 @@ async function processJob(apiKey, job, manifest, opts) {
   saveManifest(manifest);
 
   console.log(`  video_id: ${videoId}`);
-  const url = await waitForVideo(apiKey, videoId, opts.pollSec, opts.maxPollMin);
-  fs.mkdirSync(path.dirname(outPath), { recursive: true });
-  curlDownload(url, outPath);
+  const statusData = await waitForVideo(apiKey, videoId, opts.pollSec, opts.maxPollMin);
+  const captionMeta = downloadCompletedVideo(statusData, outPath);
   manifest.jobs[job.key] = {
     ...manifest.jobs[job.key],
     status: 'completed',
-    videoUrl: url,
+    ...captionMeta,
     completedAt: new Date().toISOString(),
   };
   saveManifest(manifest);
