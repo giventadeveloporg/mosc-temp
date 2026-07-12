@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-07-12T02:00:56.790Z",
+  "generatedAt": "2026-07-12T22:54:43.764Z",
   "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
   "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2064,
+  "statementCount": 2053,
   "tables": {
     "event_type_details": {
       "rows": 12,
@@ -463,9 +463,9 @@
       ]
     },
     "event_media": {
-      "rows": 1296,
+      "rows": 1286,
       "minNewId": 1,
-      "maxNewId": 1296,
+      "maxNewId": 1286,
       "sample": [
         {
           "old": 1,
@@ -964,9 +964,9 @@
       ]
     },
     "gas_station_recommendation": {
-      "rows": 6,
+      "rows": 5,
       "minNewId": 1,
-      "maxNewId": 6,
+      "maxNewId": 5,
       "sample": [
         {
           "old": 1,
@@ -1334,11 +1334,11 @@
           "new": 2
         },
         {
-          "old": 4,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 3,
+          "old": 4,
           "new": 4
         }
       ]
