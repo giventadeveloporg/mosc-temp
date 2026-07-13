@@ -1926,6 +1926,9 @@ export default function TenantSettingsForm({
 
             {/* Email Header Image Upload */}
             <div className="border-t border-gray-200 pt-6">
+              <p className="mb-2 inline-flex rounded-md border border-amber-300 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-900">
+                [This could also be the header and footer for the contact us email used from the contact forms]
+              </p>
               <h4 className="text-md font-medium text-gray-900 mb-4">Email Header Image</h4>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -2018,6 +2021,9 @@ export default function TenantSettingsForm({
 
             {/* Email Footer HTML Upload */}
             <div className="border-t border-gray-200 pt-6">
+              <p className="mb-2 inline-flex rounded-md border border-amber-300 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-900">
+                [This could also be the header and footer for the contact us email used from the contact forms]
+              </p>
               <h4 className="text-md font-medium text-gray-900 mb-4">Email Footer HTML</h4>
 
               <div className="rounded-lg border border-purple-200 bg-purple-50/60 p-4 mb-4">
