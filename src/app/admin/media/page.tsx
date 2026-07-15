@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { EventMediaDTO } from "@/types";
 import { FaUsers, FaPhotoVideo, FaCalendarAlt, FaTimes, FaChevronLeft, FaChevronRight, FaTicketAlt, FaUpload, FaTags, FaHome, FaFolderOpen } from 'react-icons/fa';
+import AdminListSearchCombobox from '@/components/admin/AdminListSearchCombobox';
 import AdminNavigation from '@/components/AdminNavigation';
 import { Modal } from "@/components/Modal";
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
@@ -1483,13 +1484,17 @@ export default function AdminMediaPage() {
             <label htmlFor="search-input" className="block text-sm font-medium text-gray-700 mb-1">
               Search by Title
             </label>
-            <input
-              id="search-input"
-              type="text"
+            <AdminListSearchCombobox
+              items={mediaList}
+              committedValue={searchTerm}
+              onCommit={setSearchTerm}
+              getSearchFields={(m) => [m.title, m.id, m.eventMediaType]}
+              getCommitValue={(m) => m.title || String(m.id ?? '')}
+              formatPrimary={(m) => m.title || `Media #${m.id}`}
+              formatSecondary={(m) => m.eventMediaType || undefined}
               placeholder="Enter media title to search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              inputId="search-input"
+              inputClassName="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 

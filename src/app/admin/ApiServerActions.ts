@@ -231,6 +231,77 @@ export async function fetchEventsFilteredServer(params: {
   }
 }
 
+const EVENT_TYPEAHEAD_LIMIT = 20;
+
+function normalizeEventList(data: unknown): EventDetailsDTO[] {
+  if (Array.isArray(data)) return data;
+  if (data && typeof data === 'object' && Array.isArray((data as { content?: unknown }).content)) {
+    return (data as { content: EventDetailsDTO[] }).content;
+  }
+  return [];
+}
+
+function mergeEventsById(...lists: EventDetailsDTO[][]): EventDetailsDTO[] {
+  const byKey = new Map<string, EventDetailsDTO>();
+  for (const list of lists) {
+    for (const event of list) {
+      const key =
+        event.id != null
+          ? `id:${event.id}`
+          : event.title
+            ? `title:${event.title}`
+            : null;
+      if (!key || byKey.has(key)) continue;
+      byKey.set(key, event);
+    }
+  }
+  return Array.from(byKey.values());
+}
+
+/**
+ * Multi-field typeahead for Manage Events:
+ * matches title, caption, and numeric id (parallel criteria queries).
+ */
+export async function searchEventsForTypeaheadServer(
+  query: string,
+): Promise<EventDetailsDTO[]> {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  const tenantId = getTenantId();
+  const baseParams = () => {
+    const params = new URLSearchParams();
+    params.append('tenantId.equals', tenantId);
+    params.append('page', '0');
+    params.append('size', String(EVENT_TYPEAHEAD_LIMIT));
+    params.append('sort', 'startDate,asc');
+    return params;
+  };
+
+  const fetchBy = async (apply: (params: URLSearchParams) => void) => {
+    const params = baseParams();
+    apply(params);
+    const res = await fetchWithJwtRetry(
+      `${getApiBase()}/api/event-details?${params.toString()}`,
+      { cache: 'no-store' },
+    );
+    if (!res.ok) return [] as EventDetailsDTO[];
+    return normalizeEventList(await res.json());
+  };
+
+  const jobs: Promise<EventDetailsDTO[]>[] = [
+    fetchBy((p) => p.append('title.contains', trimmed)),
+    fetchBy((p) => p.append('caption.contains', trimmed)),
+  ];
+
+  if (!Number.isNaN(Number(trimmed))) {
+    jobs.push(fetchBy((p) => p.append('id.equals', String(Number(trimmed)))));
+  }
+
+  const results = await Promise.all(jobs);
+  return mergeEventsById(...results).slice(0, EVENT_TYPEAHEAD_LIMIT);
+}
+
 export async function fetchEventDetailsServer(eventId: number): Promise<EventDetailsDTO | null> {
   const tenantId = getTenantId();
   const url = `${getApiBase()}/api/event-details/${eventId}?tenantId.equals=${tenantId}`;

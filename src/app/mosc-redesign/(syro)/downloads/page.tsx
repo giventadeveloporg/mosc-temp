@@ -1,7 +1,17 @@
+import type { Metadata } from 'next';
 import DownloadsPageClient from './DownloadsPageClient';
 import {
   fetchPublicOfficialDocumentsTreeServer,
 } from './ApiServerActions';
+
+export const metadata: Metadata = {
+  title: {
+    absolute: 'Downloads | Malankara Orthodox Syrian Church',
+  },
+  description:
+    'Official documents, Kalpana, prayer books, PDFs, and downloadable resources of the Malankara Orthodox Syrian Church.',
+  keywords: ['Downloads', 'official documents', 'Kalpana', 'Malankara Orthodox Syrian Church'],
+};
 
 export const dynamic = 'force-dynamic';
 

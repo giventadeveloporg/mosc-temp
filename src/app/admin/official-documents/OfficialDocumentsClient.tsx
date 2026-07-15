@@ -24,6 +24,7 @@ import {
   type OfficialDocumentSearchField,
 } from './ApiServerActions';
 import Modal from '@/components/ui/Modal';
+import AdminListSearchCombobox from '@/components/admin/AdminListSearchCombobox';
 import {
   composeOfficialDocumentThumbnailCacheKey,
   getOfficialDocumentCardThumbnailSrc,
@@ -1620,16 +1621,18 @@ export default function OfficialDocumentsClient({
                     </option>
                   ))}
                 </select>
-                <input
-                  type={searchField === 'id' ? 'number' : 'text'}
+                <AdminListSearchCombobox
+                  items={documents}
+                  committedValue={searchTerm}
+                  onCommit={setSearchTerm}
+                  getSearchFields={(d) => [d.title, d.description, d.id]}
+                  getCommitValue={(d) => d.title || String(d.id ?? '')}
+                  formatPrimary={(d) => d.title || `Document #${d.id}`}
+                  formatSecondary={(d) => d.description || undefined}
                   placeholder={`Search by ${DOCUMENT_SEARCH_FIELDS.find((f) => f.value === searchField)?.label ?? 'field'}…`}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') void reloadDocuments(0);
-                  }}
-                  className="block w-full border border-gray-400 border-l-0 rounded-r-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-2.5 text-sm min-h-[44px]"
-                  aria-label="Search term"
+                  className="flex-1 min-w-0"
+                  inputClassName="block w-full border border-gray-400 border-l-0 rounded-r-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-2.5 text-sm min-h-[44px]"
+                  ariaLabel="Search term"
                 />
               </div>
             </div>

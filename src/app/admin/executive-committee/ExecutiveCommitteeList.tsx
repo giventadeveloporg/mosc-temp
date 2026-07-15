@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ExecutiveCommitteeTeamMemberDTO } from '@/types/executiveCommitteeTeamMember';
 import ReactDOM from 'react-dom';
+import AdminListSearchCombobox from '@/components/admin/AdminListSearchCombobox';
 
 interface ExecutiveCommitteeListProps {
   members: ExecutiveCommitteeTeamMemberDTO[];
@@ -155,7 +156,8 @@ export default function ExecutiveCommitteeList({
         const title = (m.title || '').toLowerCase();
         const designation = (m.designation || '').toLowerCase();
         const department = (m.department || '').toLowerCase();
-        return first.includes(q) || last.includes(q) || title.includes(q) || designation.includes(q) || department.includes(q);
+        const idStr = String(m.id ?? '').toLowerCase();
+        return first.includes(q) || last.includes(q) || title.includes(q) || designation.includes(q) || department.includes(q) || idStr.includes(q);
       })
     : members;
   const filteredCount = filteredMembers.length;
@@ -230,14 +232,19 @@ export default function ExecutiveCommitteeList({
       {/* Search bar */}
       <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
         <label htmlFor="exec-committee-search" className="sr-only">Search members</label>
-        <input
-          id="exec-committee-search"
-          type="search"
+        <AdminListSearchCombobox<ExecutiveCommitteeTeamMemberDTO & Record<string, unknown>>
+          items={members as (ExecutiveCommitteeTeamMemberDTO & Record<string, unknown>)[]}
+          committedValue={searchTerm}
+          onCommit={setSearchTerm}
+          inputId="exec-committee-search"
+          ariaLabel="Search members by name, title, designation, or department"
           placeholder="Search by first name, last name, title, designation, or department..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full max-w-xl px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          aria-label="Search members by name, title, designation, or department"
+          className="relative w-full max-w-xl"
+          inputClassName="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          getSearchFields={(m) => [m.firstName, m.lastName, m.title, m.designation, m.department, m.id]}
+          getCommitValue={(m) => m.title?.trim() || `${m.firstName} ${m.lastName}`.trim()}
+          formatPrimary={(m) => `${m.firstName} ${m.lastName}`.trim()}
+          formatSecondary={(m) => [m.title, m.designation, m.department].filter(Boolean).join(' · ')}
         />
         {searchTerm.trim() && (
           <p className="mt-2 text-sm text-gray-600">

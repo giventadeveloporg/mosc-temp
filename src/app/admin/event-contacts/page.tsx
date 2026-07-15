@@ -5,6 +5,7 @@ import { FaPlus, FaSearch, FaFilter } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import AdminListSearchCombobox from '@/components/admin/AdminListSearchCombobox';
 import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import AdminNavigation from '@/components/AdminNavigation';
 import type { EventContactsDTO, EventDetailsDTO } from '@/types';
@@ -197,9 +198,12 @@ export default function EventContactsPage() {
   };
 
   const filteredContacts = contacts.filter(contact => {
-    const matchesSearch = contact.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    const q = searchTerm.toLowerCase();
+    const matchesSearch = !searchTerm ||
+      contact.name?.toLowerCase().includes(q) ||
+      contact.phone?.toLowerCase().includes(q) ||
+      contact.email?.toLowerCase().includes(q) ||
+      String(contact.id ?? '').toLowerCase().includes(q);
 
     const matchesEventFilter = !eventFilter || contact.event?.id?.toString() === eventFilter;
 
@@ -291,13 +295,18 @@ export default function EventContactsPage() {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
             <div className="flex-1 min-w-0">
               <div className="relative">
-                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-                <input
-                  type="text"
+                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 z-10 pointer-events-none" />
+                <AdminListSearchCombobox<EventContactsDTO & Record<string, unknown>>
+                  items={contacts as (EventContactsDTO & Record<string, unknown>)[]}
+                  committedValue={searchTerm}
+                  onCommit={setSearchTerm}
                   placeholder="Search contacts..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+                  className="relative w-full"
+                  inputClassName="pl-10 pr-10 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+                  getSearchFields={(c) => [c.name, c.phone, c.email, c.id]}
+                  getCommitValue={(c) => c.name || ''}
+                  formatPrimary={(c) => c.name || 'Unnamed contact'}
+                  formatSecondary={(c) => [c.email, c.phone].filter(Boolean).join(' · ')}
                 />
               </div>
             </div>

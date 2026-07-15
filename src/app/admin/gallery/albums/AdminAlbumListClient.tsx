@@ -1,14 +1,61 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import type { GalleryAlbumDTO, GalleryCategoryDTO } from '@/types';
-import { fetchAlbumsServer, deleteAlbumServer, createAlbumServer, resolveGalleryCategoryIdForSaveServer } from './ApiServerActions';
+import {
+  fetchAlbumsServer,
+  deleteAlbumServer,
+  createAlbumServer,
+  resolveGalleryCategoryIdForSaveServer,
+  type GalleryAlbumListFilters,
+} from './ApiServerActions';
+import GalleryAlbumSearchCombobox from './GalleryAlbumSearchCombobox';
 import { GalleryCategoryTypeahead } from '@/components/admin/gallery/GalleryCategoryTypeahead';
 import { uploadGalleryAlbumCoverFile } from '@/lib/gallery/uploadGalleryAlbumCoverClient';
 import Image from 'next/image';
 import { Modal } from '@/components/Modal';
+
+type SearchField = 'title' | 'description' | 'id';
+type VisibilityFilter = 'all' | 'public' | 'private';
+
+const SEARCH_FIELDS: { value: SearchField; label: string }[] = [
+  { value: 'title', label: 'Title' },
+  { value: 'description', label: 'Description' },
+  { value: 'id', label: 'Album ID' },
+];
+
+const SORT_OPTIONS = [
+  { value: 'displayOrder,asc', label: 'Display order (asc)' },
+  { value: 'displayOrder,desc', label: 'Display order (desc)' },
+  { value: 'title,asc', label: 'Title (A–Z)' },
+  { value: 'title,desc', label: 'Title (Z–A)' },
+  { value: 'createdAt,desc', label: 'Newest first' },
+  { value: 'createdAt,asc', label: 'Oldest first' },
+  { value: 'updatedAt,desc', label: 'Recently updated' },
+];
+
+function buildAlbumListFilters(
+  searchField: SearchField,
+  searchQuery: string,
+  visibility: VisibilityFilter,
+  sort: string
+): GalleryAlbumListFilters {
+  const filters: GalleryAlbumListFilters = {
+    sort: sort.trim() || 'displayOrder,asc',
+  };
+  if (visibility === 'public') filters.isPublic = true;
+  else if (visibility === 'private') filters.isPublic = false;
+
+  const q = searchQuery.trim();
+  if (!q) return filters;
+
+  if (searchField === 'id') filters.id = q;
+  else if (searchField === 'title') filters.title = q;
+  else if (searchField === 'description') filters.description = q;
+
+  return filters;
+}
 
 interface AdminAlbumListClientProps {
   initialAlbums: GalleryAlbumDTO[];
@@ -25,7 +72,6 @@ export default function AdminAlbumListClient({
   initialSearchTerm,
   categories,
 }: AdminAlbumListClientProps) {
-  const router = useRouter();
   const [categoryList, setCategoryList] = useState<GalleryCategoryDTO[]>(categories);
   const [pendingCategoryName, setPendingCategoryName] = useState<string | null>(null);
   const [albums, setAlbums] = useState<GalleryAlbumDTO[]>(initialAlbums);
@@ -33,7 +79,10 @@ export default function AdminAlbumListClient({
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(initialTotalCount);
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+  const [searchField, setSearchField] = useState<SearchField>('title');
+  const [committedSearchQuery, setCommittedSearchQuery] = useState(initialSearchTerm);
+  const [visibility, setVisibility] = useState<VisibilityFilter>('all');
+  const [sort, setSort] = useState('displayOrder,asc');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -50,6 +99,44 @@ export default function AdminAlbumListClient({
     eventLocation: '',
   });
   const pageSize = 12;
+
+  const filterSignatureRef = useRef(
+    ['title', initialSearchTerm, 'all', 'displayOrder,asc'].join('|')
+  );
+  const filterSignature = [searchField, committedSearchQuery, visibility, sort].join('|');
+
+  useEffect(() => {
+    if (filterSignatureRef.current === filterSignature) return;
+    filterSignatureRef.current = filterSignature;
+    setCurrentPage(0);
+  }, [filterSignature]);
+
+  const loadAlbumsAt = useCallback(
+    async (page: number) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const filters = buildAlbumListFilters(
+          searchField,
+          committedSearchQuery,
+          visibility,
+          sort
+        );
+        const result = await fetchAlbumsServer(page, pageSize, filters);
+        setAlbums(result.albums);
+        setTotalCount(result.totalCount);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load albums');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [searchField, committedSearchQuery, visibility, sort, pageSize]
+  );
+
+  useEffect(() => {
+    void loadAlbumsAt(currentPage);
+  }, [currentPage, loadAlbumsAt]);
 
   const validateEventDates = (): string | null => {
     const start = formData.eventDateStart.trim();
@@ -69,36 +156,10 @@ export default function AdminAlbumListClient({
     eventLocation: formData.eventLocation.trim() || null,
   });
 
-  // Load albums
-  const loadAlbums = async (page: number, search: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await fetchAlbumsServer(page, pageSize, search);
-      setAlbums(result.albums);
-      setTotalCount(result.totalCount);
-      setCurrentPage(page);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load albums');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle search
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    router.push(`/admin/gallery/albums?page=0&search=${encodeURIComponent(searchTerm)}`);
-    loadAlbums(0, searchTerm);
-  };
-
-  // Handle page change
   const handlePageChange = (newPage: number) => {
-    router.push(`/admin/gallery/albums?page=${newPage}&search=${encodeURIComponent(searchTerm)}`);
-    loadAlbums(newPage, searchTerm);
+    setCurrentPage(newPage);
   };
 
-  // Handle delete
   const handleDelete = async (albumId: number) => {
     if (!confirm(`Are you sure you want to delete album "${albums.find(a => a.id === albumId)?.title}"? This action cannot be undone.`)) {
       return;
@@ -106,12 +167,17 @@ export default function AdminAlbumListClient({
 
     try {
       await deleteAlbumServer(albumId);
-      // Refresh the list
-      loadAlbums(currentPage, searchTerm);
+      const nextPage = albums.length <= 1 && currentPage > 0 ? currentPage - 1 : currentPage;
+      if (nextPage !== currentPage) setCurrentPage(nextPage);
+      else void loadAlbumsAt(currentPage);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to delete album');
     }
   };
+
+  const searchFieldLabel = SEARCH_FIELDS.find((f) => f.value === searchField)?.label ?? 'Title';
+  const hasActiveFilters =
+    Boolean(committedSearchQuery.trim()) || visibility !== 'all' || sort !== 'displayOrder,asc';
 
   // Handle create album
   const handleCreateAlbum = async (e: React.FormEvent) => {
@@ -151,7 +217,7 @@ export default function AdminAlbumListClient({
               ? `Album created, but cover upload failed: ${uploadErr.message}`
               : 'Album created, but cover upload failed.'
           );
-          await loadAlbums(currentPage, searchTerm);
+          await loadAlbumsAt(currentPage);
           return;
         }
       }
@@ -173,7 +239,7 @@ export default function AdminAlbumListClient({
       setIsCreateModalOpen(false);
 
       // Refresh the list
-      await loadAlbums(currentPage, searchTerm);
+      await loadAlbumsAt(currentPage);
     } catch (err) {
       setCreateError(err instanceof Error ? err.message : 'Failed to create album');
     } finally {
@@ -277,32 +343,73 @@ export default function AdminAlbumListClient({
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="bg-white rounded-lg shadow-md p-4">
-        <form onSubmit={handleSearch} className="flex gap-2">
-          <div className="flex-1 relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+      {/* Search & filters */}
+      <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 mb-6">
+        <div className="text-base font-semibold text-blue-800 mb-4">Search &amp; filters</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-end">
+          <div className="flex flex-col min-w-0">
+            <label
+              htmlFor="gallery-album-search"
+              className="block text-sm font-medium text-gray-700 mb-1 whitespace-nowrap leading-5"
+            >
+              Search
+            </label>
+            <div className="flex h-12 min-w-0">
+              <select
+                value={searchField}
+                onChange={(e) => setSearchField(e.target.value as SearchField)}
+                className="box-border h-12 shrink-0 border border-gray-400 border-r-0 rounded-l-xl focus:ring-blue-500 focus:border-blue-500 px-3 text-base bg-white"
+                aria-label="Search by field"
+              >
+                {SEARCH_FIELDS.map((f) => (
+                  <option key={f.value} value={f.value}>{f.label}</option>
+                ))}
+              </select>
+              <GalleryAlbumSearchCombobox
+                searchField={searchField}
+                committedValue={committedSearchQuery}
+                onCommit={setCommittedSearchQuery}
+                localAlbums={albums}
+                fieldLabel={searchFieldLabel}
+                disabled={loading}
+              />
             </div>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search albums by title..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              disabled={loading}
-            />
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            Search
-          </button>
-        </form>
+
+          <div className="flex flex-col min-w-0">
+            <label htmlFor="album-visibility" className="block text-sm font-medium text-gray-700 mb-1 whitespace-nowrap leading-5">
+              Visibility
+            </label>
+            <select
+              id="album-visibility"
+              value={visibility}
+              onChange={(e) => setVisibility(e.target.value as VisibilityFilter)}
+              className="box-border block w-full h-12 border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 text-base bg-white"
+              aria-label="Visibility filter"
+            >
+              <option value="all">All Visibility</option>
+              <option value="public">Public</option>
+              <option value="private">Private</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col min-w-0">
+            <label htmlFor="album-sort" className="block text-sm font-medium text-gray-700 mb-1 whitespace-nowrap leading-5">
+              Sort
+            </label>
+            <select
+              id="album-sort"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="box-border block w-full h-12 border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 text-base bg-white"
+              aria-label="Sort albums"
+            >
+              {SORT_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Error State */}
@@ -343,7 +450,9 @@ export default function AdminAlbumListClient({
           </svg>
           <h3 className="mt-2 text-sm font-medium text-gray-900">No albums found</h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm ? 'Try adjusting your search terms.' : 'Get started by creating a new album.'}
+            {hasActiveFilters
+              ? 'Try adjusting your search filters.'
+              : 'Get started by creating a new album.'}
           </p>
         </div>
       ) : (

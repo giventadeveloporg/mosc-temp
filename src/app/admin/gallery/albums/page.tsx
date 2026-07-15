@@ -7,10 +7,11 @@ export default async function AdminAlbumsPage({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
+  // Initial SSR load; client re-fetches with full filters (search field, visibility, sort).
   const page = typeof searchParams?.page === 'string' ? parseInt(searchParams.page, 10) : 0;
   const searchTerm = typeof searchParams?.search === 'string' ? searchParams.search : '';
 
-  const { albums, totalCount } = await fetchAlbumsServer(page, 12, searchTerm);
+  const { albums, totalCount } = await fetchAlbumsServer(page, 12, searchTerm || undefined);
   const categories = await fetchGalleryCategoriesForAdminServer();
 
   return (

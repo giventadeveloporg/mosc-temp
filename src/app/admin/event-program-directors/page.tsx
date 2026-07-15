@@ -5,6 +5,7 @@ import { FaPlus, FaSearch, FaFilter } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import AdminListSearchCombobox from '@/components/admin/AdminListSearchCombobox';
 import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import AdminNavigation from '@/components/AdminNavigation';
 import type { EventProgramDirectorsDTO, EventDetailsDTO } from '@/types';
@@ -182,10 +183,13 @@ export default function GlobalEventProgramDirectorsPage() {
   };
 
   // Filter and sort directors
-  const filteredDirectors = directors.filter(director =>
-    director.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    director.bio?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredDirectors = directors.filter(director => {
+    const q = searchTerm.toLowerCase();
+    return !searchTerm ||
+      director.name?.toLowerCase().includes(q) ||
+      director.bio?.toLowerCase().includes(q) ||
+      String(director.id ?? '').toLowerCase().includes(q);
+  });
 
   const sortedDirectors = [...filteredDirectors].sort((a, b) => {
     if (!sortKey) return 0;
@@ -291,13 +295,18 @@ export default function GlobalEventProgramDirectorsPage() {
             <div className="mb-6 flex flex-wrap gap-4">
               <div className="flex-1 min-w-64">
                 <div className="relative">
-                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10 pointer-events-none" />
+                  <AdminListSearchCombobox<EventProgramDirectorsDTO & Record<string, unknown>>
+                    items={directors as (EventProgramDirectorsDTO & Record<string, unknown>)[]}
+                    committedValue={searchTerm}
+                    onCommit={setSearchTerm}
                     placeholder="Search directors..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="relative w-full"
+                    inputClassName="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    getSearchFields={(d) => [d.name, d.bio, d.id]}
+                    getCommitValue={(d) => d.name || ''}
+                    formatPrimary={(d) => d.name || 'Unnamed director'}
+                    formatSecondary={(d) => (d.bio ? d.bio.slice(0, 80) : '')}
                   />
                 </div>
               </div>

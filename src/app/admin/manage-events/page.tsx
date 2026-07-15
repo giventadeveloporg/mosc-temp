@@ -20,6 +20,7 @@ import {
   hardDeleteEventWithChildrenServer,
   activateEventWithChildrenServer,
 } from '../ApiServerActions';
+import ManageEventsSearchCombobox from './ManageEventsSearchCombobox';
 import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
 
 const MANAGE_EVENTS_CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes, same as homepage
@@ -574,17 +575,26 @@ export default function ManageEventsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold mb-1">{searchField === 'id' ? 'Event ID' : searchField.charAt(0).toUpperCase() + searchField.slice(1)}</label>
-              <input
-                type={searchField === 'id' ? 'number' : 'text'}
-                className="border px-3 py-2 rounded w-48"
-                value={searchField === 'title' ? searchTitle : searchField === 'id' ? searchId : searchCaption}
-                onChange={e => {
-                  if (searchField === 'title') setSearchTitle(e.target.value);
-                  else if (searchField === 'id') setSearchId(e.target.value);
-                  else setSearchCaption(e.target.value);
+              <label htmlFor="manage-events-search" className="block text-xs font-semibold mb-1">
+                {searchField === 'id' ? 'Event ID' : searchField.charAt(0).toUpperCase() + searchField.slice(1)}
+              </label>
+              <ManageEventsSearchCombobox
+                searchField={searchField}
+                committedValue={
+                  searchField === 'title'
+                    ? searchTitle
+                    : searchField === 'id'
+                      ? searchId
+                      : searchCaption
+                }
+                onCommit={(value) => {
+                  if (searchField === 'title') setSearchTitle(value);
+                  else if (searchField === 'id') setSearchId(value);
+                  else setSearchCaption(value);
+                  setPage(0);
                 }}
-                placeholder={`Search by ${searchField}`}
+                localEvents={events}
+                disabled={loading}
               />
             </div>
             <div>

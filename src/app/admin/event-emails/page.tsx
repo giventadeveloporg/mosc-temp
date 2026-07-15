@@ -5,6 +5,7 @@ import { FaPlus, FaSearch } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import AdminListSearchCombobox from '@/components/admin/AdminListSearchCombobox';
 import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import AdminNavigation from '@/components/AdminNavigation';
 import type { EventEmailsDTO } from '@/types';
@@ -150,9 +151,12 @@ export default function GlobalEventEmailsPage() {
   };
 
   // Filter and sort emails
-  const filteredEmails = emails.filter(email =>
-    email.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredEmails = emails.filter(item => {
+    const q = searchTerm.toLowerCase();
+    return !searchTerm ||
+      item.email?.toLowerCase().includes(q) ||
+      String(item.id ?? '').toLowerCase().includes(q);
+  });
 
   const sortedEmails = [...filteredEmails].sort((a, b) => {
     if (!sortKey) return 0;
@@ -234,13 +238,18 @@ export default function GlobalEventEmailsPage() {
             {/* Search */}
             <div className="mb-6">
               <div className="relative">
-                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
+                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10 pointer-events-none" />
+                <AdminListSearchCombobox<EventEmailsDTO & Record<string, unknown>>
+                  items={emails as (EventEmailsDTO & Record<string, unknown>)[]}
+                  committedValue={searchTerm}
+                  onCommit={setSearchTerm}
                   placeholder="Search emails..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="relative w-full"
+                  inputClassName="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  getSearchFields={(e) => [e.email, e.id]}
+                  getCommitValue={(e) => e.email || ''}
+                  formatPrimary={(e) => e.email || 'No email'}
+                  formatSecondary={(e) => (e.id != null ? `ID ${e.id}` : '')}
                 />
               </div>
             </div>
