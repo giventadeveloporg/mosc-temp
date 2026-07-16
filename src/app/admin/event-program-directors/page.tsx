@@ -8,6 +8,7 @@ import DataTable, { Column } from '@/components/ui/DataTable';
 import AdminListSearchCombobox from '@/components/admin/AdminListSearchCombobox';
 import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import AdminNavigation from '@/components/AdminNavigation';
+import EventTypeaheadSelect from '@/components/admin/EventTypeaheadSelect';
 import type { EventProgramDirectorsDTO, EventDetailsDTO } from '@/types';
 import {
   fetchEventProgramDirectorsServer,
@@ -15,17 +16,15 @@ import {
   updateEventProgramDirectorServer,
   deleteEventProgramDirectorServer,
 } from './ApiServerActions';
-import { fetchEventsFilteredServer } from '../ApiServerActions';
 
 export default function GlobalEventProgramDirectorsPage() {
   const { userId } = useAuth();
   const router = useRouter();
 
   const [directors, setDirectors] = useState<EventProgramDirectorsDTO[]>([]);
-  const [events, setEvents] = useState<EventDetailsDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [eventFilter, setEventFilter] = useState<string>('');
+  const [eventFilter, setEventFilter] = useState<EventDetailsDTO | null>(null);
 
   // Pagination state
   const [page, setPage] = useState(0);
@@ -56,21 +55,8 @@ export default function GlobalEventProgramDirectorsPage() {
   useEffect(() => {
     if (userId) {
       loadDirectors();
-      loadEvents();
     }
   }, [userId, page]);
-
-  const loadEvents = async () => {
-    try {
-      const result = await fetchEventsFilteredServer({
-        pageSize: 1000, // Load all events for dropdown
-        sort: 'startDate,desc'
-      });
-      setEvents(result.events);
-    } catch (err: any) {
-      console.error('Failed to load events:', err);
-    }
-  };
 
   const loadDirectors = async () => {
     try {
@@ -312,19 +298,15 @@ export default function GlobalEventProgramDirectorsPage() {
               </div>
               <div className="min-w-48">
                 <div className="relative">
-                  <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <select
-                    value={eventFilter}
-                    onChange={(e) => setEventFilter(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
-                  >
-                    <option value="">All Events</option>
-                    {events.map(event => (
-                      <option key={event.id} value={event.id?.toString()}>
-                        {event.title}
-                      </option>
-                    ))}
-                  </select>
+                  <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10 pointer-events-none" />
+                  <EventTypeaheadSelect
+                    selectedEvent={eventFilter}
+                    onSelect={setEventFilter}
+                    clearLabel="All Events"
+                    placeholder="All Events"
+                    className="relative w-full"
+                    inputClassName="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  />
                 </div>
               </div>
             </div>
@@ -441,7 +423,6 @@ export default function GlobalEventProgramDirectorsPage() {
           }}
           loading={loading}
           submitText="Create Director"
-          events={events}
         />
       </Modal>
 
@@ -467,7 +448,6 @@ export default function GlobalEventProgramDirectorsPage() {
           }}
           loading={loading}
           submitText="Update Director"
-          events={events}
         />
       </Modal>
 
@@ -496,10 +476,9 @@ interface DirectorFormProps {
   onCancel: () => void;
   loading: boolean;
   submitText: string;
-  events: EventDetailsDTO[];
 }
 
-function DirectorForm({ formData, setFormData, onSubmit, onCancel, loading, submitText, events }: DirectorFormProps) {
+function DirectorForm({ formData, setFormData, onSubmit, onCancel, loading, submitText }: DirectorFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -517,25 +496,12 @@ function DirectorForm({ formData, setFormData, onSubmit, onCancel, loading, subm
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Event (Optional)
           </label>
-          <select
-            name="event"
-            value={formData.event?.id?.toString() || ''}
-            onChange={(e) => {
-              const eventId = e.target.value ? parseInt(e.target.value) : undefined;
-              setFormData(prev => ({
-                ...prev,
-                event: eventId ? { id: eventId } as EventDetailsDTO : undefined
-              }));
-            }}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="">No Event (Global)</option>
-            {events.map(event => (
-              <option key={event.id} value={event.id?.toString()}>
-                {event.title} {event.startDate ? `(${event.startDate})` : ''}
-              </option>
-            ))}
-          </select>
+          <EventTypeaheadSelect
+            selectedEvent={formData.event ?? null}
+            onSelect={(event) => setFormData(prev => ({ ...prev, event: event ?? undefined }))}
+            clearLabel="No Event (Global)"
+            placeholder="No Event (Global)"
+          />
         </div>
 
         <div>

@@ -172,11 +172,14 @@ export default function ManageEventsPage() {
       else if (searchField === 'caption') filterParams.caption = searchCaption;
 
       // Parallel data fetches instead of sequential
-      const [eventsData, types, calendarEventsResult] = await Promise.all([
+      const [eventsData, types] = await Promise.all([
         fetchEventsFilteredServer(filterParams),
         fetchEventTypesServer(),
-        fetchCalendarEventsServer(),
       ]);
+      // Fetch calendar entries scoped to the events on this page only
+      const calendarEventsResult = await fetchCalendarEventsServer(
+        eventsData.events.map((e) => e.id).filter((id): id is number => id != null)
+      );
       setEvents(eventsData.events);
       setTotalCount(eventsData.totalCount);
       setEventTypes(types);

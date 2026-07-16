@@ -38,9 +38,16 @@ export async function fetchEventTypesServer(): Promise<EventTypeDetailsDTO[]> {
   }
 }
 
-export async function fetchCalendarEventsServer(): Promise<EventCalendarEntryDTO[]> {
+export async function fetchCalendarEventsServer(eventIds: number[] = []): Promise<EventCalendarEntryDTO[]> {
   try {
-    const url = `${getApiBase()}/api/event-calendar-entries?size=1000&tenantId.equals=${getTenantId()}`;
+    const ids = eventIds.filter((id) => id != null);
+    if (ids.length === 0) return [];
+    // Scope the fetch to the events actually being enriched (repeated eventId.in params)
+    const params = new URLSearchParams();
+    ids.forEach((id) => params.append('eventId.in', String(id)));
+    params.append('size', String(ids.length));
+    params.append('tenantId.equals', getTenantId());
+    const url = `${getApiBase()}/api/event-calendar-entries?${params.toString()}`;
     const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
     if (!res.ok) {
       console.error('[fetchCalendarEventsServer] Failed:', res.status);
@@ -133,12 +140,12 @@ export async function createCalendarEventServer(event: EventDetailsDTO, userProf
 }
 
 export async function findCalendarEventByEventIdServer(eventId: number): Promise<EventCalendarEntryDTO | null> {
-  const url = `${getApiBase()}/api/event-calendar-entries?size=1000&tenantId.equals=${getTenantId()}`;
+  const url = `${getApiBase()}/api/event-calendar-entries?eventId.equals=${eventId}&size=1&tenantId.equals=${getTenantId()}`;
   const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
   if (!res.ok) return null;
   const data = await res.json();
-  if (!Array.isArray(data)) return null;
-  return data.find((ce: EventCalendarEntryDTO) => ce.event && ce.event.id === eventId) || null;
+  if (!Array.isArray(data) || data.length === 0) return null;
+  return data[0];
 }
 
 export async function updateCalendarEventForEventServer(event: EventDetailsDTO, userProfile: UserProfileDTO) {

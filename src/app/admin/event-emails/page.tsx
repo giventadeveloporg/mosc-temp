@@ -10,7 +10,7 @@ import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import AdminNavigation from '@/components/AdminNavigation';
 import type { EventEmailsDTO } from '@/types';
 import {
-  fetchEventEmailsServer,
+  fetchEventEmailsPageServer,
   createEventEmailServer,
   updateEventEmailServer,
   deleteEventEmailServer,
@@ -24,9 +24,10 @@ export default function GlobalEventEmailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Pagination state
+  // Pagination state (server-driven)
   const [page, setPage] = useState(0);
   const [pageSize] = useState(20);
+  const [totalCount, setTotalCount] = useState(0);
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -50,13 +51,19 @@ export default function GlobalEventEmailsPage() {
     if (userId) {
       loadEmails();
     }
-  }, [userId]);
+  }, [userId, page, searchTerm, sortKey, sortDirection]);
 
   const loadEmails = async () => {
     try {
       setLoading(true);
-      const emailsData = await fetchEventEmailsServer();
-      setEmails(emailsData);
+      const result = await fetchEventEmailsPageServer({
+        page,
+        size: pageSize,
+        search: searchTerm,
+        sort: sortKey ? `${sortKey},${sortDirection}` : undefined,
+      });
+      setEmails(result.data);
+      setTotalCount(result.totalCount);
     } catch (err: any) {
       setError(err.message || 'Failed to load emails');
     } finally {
@@ -84,8 +91,8 @@ export default function GlobalEventEmailsPage() {
       console.log('📝 Form data:', formData);
       console.log('📤 Email data being sent:', emailData);
 
-      const newEmail = await createEventEmailServer(emailData);
-      setEmails(prev => [...prev, newEmail]);
+      await createEventEmailServer(emailData);
+      await loadEmails();
       setIsCreateModalOpen(false);
       resetForm();
       setToastMessage({ type: 'success', message: 'Email created successfully' });
@@ -120,7 +127,7 @@ export default function GlobalEventEmailsPage() {
     try {
       setLoading(true);
       await deleteEventEmailServer(selectedEmail.id!);
-      setEmails(prev => prev.filter(e => e.id !== selectedEmail.id));
+      await loadEmails();
       setIsDeleteModalOpen(false);
       setSelectedEmail(null);
       setToastMessage({ type: 'success', message: 'Email deleted successfully' });
@@ -150,31 +157,10 @@ export default function GlobalEventEmailsPage() {
     setIsDeleteModalOpen(true);
   };
 
-  // Filter and sort emails
-  const filteredEmails = emails.filter(item => {
-    const q = searchTerm.toLowerCase();
-    return !searchTerm ||
-      item.email?.toLowerCase().includes(q) ||
-      String(item.id ?? '').toLowerCase().includes(q);
-  });
-
-  const sortedEmails = [...filteredEmails].sort((a, b) => {
-    if (!sortKey) return 0;
-
-    const aValue = a[sortKey as keyof EventEmailsDTO];
-    const bValue = b[sortKey as keyof EventEmailsDTO];
-
-    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-    return 0;
-  });
-
-  // Client-side pagination
-  const totalCount = sortedEmails.length;
+  // Server-side pagination totals (X-Total-Count); search/sort are query params
   const totalPages = Math.ceil(totalCount / pageSize) || 1;
   const startItem = totalCount > 0 ? page * pageSize + 1 : 0;
-  const endItem = totalCount > 0 ? Math.min((page + 1) * pageSize, totalCount) : 0;
-  const paginatedEmails = sortedEmails.slice(page * pageSize, (page + 1) * pageSize);
+  const endItem = totalCount > 0 ? Math.min(page * pageSize + emails.length, totalCount) : 0;
 
   // Reset to first page when search term changes
   useEffect(() => {
@@ -256,7 +242,7 @@ export default function GlobalEventEmailsPage() {
 
             {/* Data Table */}
             <DataTable
-              data={paginatedEmails}
+              data={emails}
               columns={columns}
               onEdit={openEditModal}
               onDelete={openDeleteModal}
