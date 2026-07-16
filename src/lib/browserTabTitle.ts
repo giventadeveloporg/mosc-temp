@@ -204,7 +204,11 @@ export function titleReflectsPath(pathname: string, title: string): boolean {
     // Home /admin only
     if (pathname === '/' || pathname === '') return t.includes('home');
     if (pathname === '/admin' || pathname === '/admin/') return t.includes('admin');
-    return false;
+    // Section roots (/mosc, /mosc-redesign, /mosc-old) and dynamic-only paths have no
+    // content keywords. Compare against the full derived title so this check converges after
+    // one rewrite — returning false unconditionally kept shouldApplyPathDerivedTitle true
+    // forever, which made BrowserTabTitle's MutationObserver rewrite <title> in an infinite loop.
+    return t === buildBrowserTabTitle(pathname).toLowerCase();
   }
   // Require the most specific (last) path keyword so "Downloads" must appear for /downloads
   const primary = keywords[keywords.length - 1].toLowerCase();

@@ -45,8 +45,10 @@ export default function BrowserTabTitle() {
     const timers = [50, 200, 500, 1000].map((ms) => window.setTimeout(apply, ms));
 
     // If framework overwrites <title> later, put ours back when it no longer matches the path.
+    // The `document.title !== desired` guard is load-bearing: assigning document.title mutates
+    // <title> and re-fires this observer, so an unconditional set loops forever and freezes the tab.
     const observer = new MutationObserver(() => {
-      if (shouldApplyPathDerivedTitle(pathname, document.title)) {
+      if (document.title !== desired && shouldApplyPathDerivedTitle(pathname, document.title)) {
         document.title = desired;
       }
     });

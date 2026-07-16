@@ -31,6 +31,15 @@ export const MOSC_REDESIGN_NAV_LINKS = [
   { label: "Saints", href: "/mosc-redesign/saints-cms" },
 ] as const;
 
+/**
+ * Downloads runs the full public-official-documents pagination loop server-side;
+ * prefetching it from nav/menus floods the server. Returns false for that route,
+ * undefined (Next default) otherwise.
+ */
+export function moscRedesignNavPrefetch(href: string): false | undefined {
+  return href.startsWith('/mosc-redesign/downloads') ? false : undefined;
+}
+
 export const MOSC_REDESIGN_FOOTER_QUICK_LINKS = [
   { label: "Catholicate News", href: "/mosc-redesign/news" },
   { label: "Downloads", href: "/mosc-redesign/downloads" },
