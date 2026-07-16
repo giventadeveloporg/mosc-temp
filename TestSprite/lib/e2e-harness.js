@@ -999,4 +999,21 @@ export const ADMIN_HOME_BUTTONS = [
   { label: 'Document categories', href: '/admin/official-document-categories' },
 ];
 
+/** Paths that must not be inventory-smoked (redirect loops / intentional navigations). */
+export const SMOKE_SKIP_PATH_PREFIXES = [
+  '/auth/signout-redirect',
+];
+
+/**
+ * Whether an inventory / smoke path should be skipped (prefix match, query stripped).
+ * @param {string} routePath
+ */
+export function shouldSkipSmokePath(routePath) {
+  const p = String(routePath || '').split('?')[0].replace(/\/$/, '') || '/';
+  return SMOKE_SKIP_PATH_PREFIXES.some((prefix) => {
+    const norm = prefix.replace(/\/$/, '');
+    return p === norm || p.startsWith(`${norm}/`);
+  });
+}
+
 export const E2E_PREFIX = '[E2E]';
