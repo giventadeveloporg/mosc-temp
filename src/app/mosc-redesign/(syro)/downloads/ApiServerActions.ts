@@ -244,7 +244,7 @@ export async function fetchPublicOfficialDocumentsTreeServer(input?: {
   search?: string;
 }): Promise<PublicOfficialDocumentTreePage> {
   const page = Math.max(0, input?.page ?? 0);
-  const size = Math.min(Math.max(1, input?.size ?? 24), 100);
+  const size = Math.min(Math.max(1, input?.size ?? 20), 100);
   const searchQuery = input?.search?.trim() ?? '';
 
   try {

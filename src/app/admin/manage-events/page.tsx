@@ -35,7 +35,7 @@ export default function ManageEventsPage() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
-  const pageSize = 10;
+  const pageSize = 20;
   // Search/filter state
   const [searchTitle, setSearchTitle] = useState('');
   const [searchCaption, setSearchCaption] = useState('');

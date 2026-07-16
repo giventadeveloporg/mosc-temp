@@ -98,7 +98,7 @@ export default function AdminAlbumListClient({
     eventDateEnd: '',
     eventLocation: '',
   });
-  const pageSize = 12;
+  const pageSize = 20;
 
   const filterSignatureRef = useRef(
     ['title', initialSearchTerm, 'all', 'displayOrder,asc'].join('|')

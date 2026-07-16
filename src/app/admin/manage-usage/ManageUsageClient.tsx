@@ -544,7 +544,7 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
   const [bulkMessage, setBulkMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [page, setPage] = useState(1); // 1-indexed for UI
-  const pageSize = 10;
+  const pageSize = 20;
 
   // Fetch users (paginated)
   async function fetchUsers() {

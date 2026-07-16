@@ -58,7 +58,7 @@ export default async function DownloadsOldPage(props: {
     totalElements: 0,
     totalPages: 0,
     page: 0,
-    size: 24,
+    size: 20,
     categoryOptions: [],
   };
   if (dataDriven) {
@@ -67,7 +67,7 @@ export default async function DownloadsOldPage(props: {
       officialLibraryCards = mapOfficialDocsToCards(docs);
       officialTreePage = await fetchPublicOfficialDocumentsTreeServer({
         page,
-        size: 24,
+        size: 20,
         categoryId: Number.isFinite(categoryId) && categoryId > 0 ? categoryId : undefined,
         year: Number.isFinite(year) && year > 0 ? year : undefined,
       });

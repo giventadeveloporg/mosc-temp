@@ -178,7 +178,7 @@ export default function NewsletterEmailTemplateList({
   const [deleting, setDeleting] = useState(false);
   const [page, setPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
-  const pageSize = 10;
+  const pageSize = 20;
   const tooltipTimer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {

@@ -1402,10 +1402,10 @@ export default function OfficialDocumentsClient({
           </form>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200 min-w-0 overflow-hidden">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Filters</h2>
-          <div className="flex flex-wrap gap-4 items-end mb-4">
-            <div>
+          <div className="flex flex-wrap gap-4 items-end mb-4 min-w-0">
+            <div className="shrink-0">
               <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
               <input
                 type="number"
@@ -1417,14 +1417,14 @@ export default function OfficialDocumentsClient({
                 className="w-32 border border-gray-300 rounded-lg px-3 py-2"
               />
             </div>
-            <div>
+            <div className="min-w-0 w-full max-w-xs">
               <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
               <select
                 value={filterCategoryId === '' ? '' : String(filterCategoryId)}
                 onChange={(e) =>
                   setFilterCategoryId(e.target.value === '' ? '' : parseInt(e.target.value, 10))
                 }
-                className="border border-gray-300 rounded-lg px-3 py-2 min-w-[200px]"
+                className="w-full max-w-full min-w-0 border border-gray-300 rounded-lg px-3 py-2"
               >
                 <option value="">All</option>
                 {categories.map((c) =>

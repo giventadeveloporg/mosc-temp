@@ -29,7 +29,7 @@ export default function GlobalEventProgramDirectorsPage() {
 
   // Pagination state
   const [page, setPage] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
 
   // Modal states

@@ -26,7 +26,7 @@ export default function GlobalEventEmailsPage() {
 
   // Pagination state
   const [page, setPage] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(20);
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);

@@ -47,7 +47,7 @@ export default function TenantEmailAddressesPage() {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const [currentPage, setCurrentPage] = useState(0); // Zero-based page index
-  const [pageSize] = useState(10); // Items per page
+  const [pageSize] = useState(20); // Items per page
 
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [createFormMessage, setCreateFormMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);

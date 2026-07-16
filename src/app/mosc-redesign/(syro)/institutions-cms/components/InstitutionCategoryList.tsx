@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { formatPhoneNumbers } from '../../institutions/lib/formatPhone';
 import type { InstitutionEntry } from '../types';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 function entrySearchText(entry: InstitutionEntry): string {
   return [

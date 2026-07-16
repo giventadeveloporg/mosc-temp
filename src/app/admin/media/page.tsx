@@ -1037,7 +1037,7 @@ export default function AdminMediaPage() {
   const [editLoading, setEditLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [page, setPage] = useState(0);
-  const [pageSize] = useState(12);
+  const [pageSize] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [eventFlyerOnly, setEventFlyerOnly] = useState(false);

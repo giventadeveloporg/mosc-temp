@@ -28,7 +28,7 @@ export default async function TenantSettingsPage() {
 
   try {
     const result = await fetchTenantSettings(
-      { page: 0, pageSize: 10 },
+      { page: 0, pageSize: 20 },
       {}
     );
     initialData = result.data;

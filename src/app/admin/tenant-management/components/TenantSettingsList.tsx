@@ -90,7 +90,7 @@ export default function TenantSettingsList({
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(20);
 
   // Filter state
   const [filters, setFilters] = useState<TenantSettingsFilters>({

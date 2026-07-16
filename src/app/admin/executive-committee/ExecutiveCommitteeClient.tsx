@@ -28,7 +28,7 @@ export default function ExecutiveCommitteeClient({ initialMembers }: ExecutiveCo
   
   // Pagination state
   const [page, setPage] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(20);
   const totalCount = members.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 

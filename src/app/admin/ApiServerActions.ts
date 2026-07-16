@@ -8,7 +8,7 @@ function getApiBase() {
   return getApiBaseUrl();
 }
 
-export async function fetchEventsServer(pageNum = 0, pageSize = 5): Promise<EventDetailsDTO[]> {
+export async function fetchEventsServer(pageNum = 0, pageSize = 20): Promise<EventDetailsDTO[]> {
   try {
     const url = `${getApiBase()}/api/event-details?page=${pageNum}&size=${pageSize}&sort=startDate,asc&tenantId.equals=${getTenantId()}`;
     const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
@@ -200,7 +200,7 @@ export async function fetchEventsFilteredServer(params: {
     const queryParams = new URLSearchParams({
       'tenantId.equals': tenantId,
       page: String(params.pageNum || 0),
-      size: String(params.pageSize || 5),
+      size: String(params.pageSize || 20),
       sort: params.sort || 'startDate,asc'
     });
 

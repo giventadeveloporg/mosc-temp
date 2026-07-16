@@ -38,7 +38,7 @@ export default async function DownloadsPage(props: {
     totalElements: 0,
     totalPages: 0,
     page: 0,
-    size: 24,
+    size: 20,
     categoryOptions: [] as any[],
     yearOptions: [] as number[],
     allYearOptions: [] as number[],
@@ -47,7 +47,7 @@ export default async function DownloadsPage(props: {
   try {
     officialTreePage = await fetchPublicOfficialDocumentsTreeServer({
       page,
-      size: 24,
+      size: 20,
       categoryId: Number.isFinite(categoryId) && categoryId > 0 ? categoryId : undefined,
       year: Number.isFinite(year) && year > 0 ? year : undefined,
       search: search || undefined,

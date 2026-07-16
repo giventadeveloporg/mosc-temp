@@ -943,7 +943,7 @@ export default function DownloadsPageClient({
   currentFilters,
 }: Props) {
   const router = useRouter();
-  const pageSize = officialTreePage.size || 24;
+  const pageSize = officialTreePage.size || 20;
   const totalPages = Math.max(officialTreePage.totalPages || 1, 1);
   const currentPageZeroBased = Math.min(Math.max(officialTreePage.page, 0), totalPages - 1);
 

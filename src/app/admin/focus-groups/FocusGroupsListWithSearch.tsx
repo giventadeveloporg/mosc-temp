@@ -18,7 +18,7 @@ interface FocusGroupsListWithSearchProps {
 export default function FocusGroupsListWithSearch({ groups, total }: FocusGroupsListWithSearchProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(0);
-  const pageSize = 10;
+  const pageSize = 20;
 
   const filteredGroups = searchTerm.trim()
     ? groups.filter((g) => {
