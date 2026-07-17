@@ -908,6 +908,29 @@ export function resolveDynamicPath(routePath, ids = {}) {
 }
 
 /**
+ * page.evaluate has NO built-in timeout — a navigation/HMR reload racing the call
+ * can drop the CDP response and hang the await forever (observed as a suite stuck
+ * for hours with an idle renderer). Always race page evaluations with a cap.
+ */
+async function evaluateWithTimeout(page, fn, timeoutMs) {
+  let timer;
+  const timedOut = Symbol('evaluate-timeout');
+  try {
+    const result = await Promise.race([
+      page.evaluate(fn),
+      new Promise((resolve) => {
+        timer = setTimeout(() => resolve(timedOut), timeoutMs);
+      }),
+    ]);
+    return result === timedOut ? { timedOut: true } : { value: result };
+  } catch (err) {
+    return { error: err };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
  * Standard smoke check on an already-open Playwright page after goto.
  */
 export async function smokeCheckPage(page, { allowSignInRedirect = false, urlHint = '' } = {}) {
@@ -916,19 +939,30 @@ export async function smokeCheckPage(page, { allowSignInRedirect = false, urlHin
     return { ok: false, message: `Redirected to sign-in: ${finalUrl}` };
   }
 
-  const hasContent = await page.evaluate(() => {
-    const body = document.body;
-    if (!body) return false;
-    const text = (body.innerText || '').trim();
-    return !!(
-      document.querySelector('main') ||
-      document.querySelector('h1') ||
-      document.querySelector('h2') ||
-      document.querySelector('[class*="container"]') ||
-      document.querySelector('nav') ||
-      text.length > 40
-    );
-  });
+  const contentCheck = await evaluateWithTimeout(
+    page,
+    () => {
+      const body = document.body;
+      if (!body) return false;
+      const text = (body.innerText || '').trim();
+      return !!(
+        document.querySelector('main') ||
+        document.querySelector('h1') ||
+        document.querySelector('h2') ||
+        document.querySelector('[class*="container"]') ||
+        document.querySelector('nav') ||
+        text.length > 40
+      );
+    },
+    15000
+  );
+  if (contentCheck.timedOut) {
+    return { ok: false, message: 'Content check timed out after 15s (page unresponsive or mid-reload)' };
+  }
+  if (contentCheck.error) {
+    return { ok: false, message: `Content check failed: ${contentCheck.error.message}` };
+  }
+  const hasContent = contentCheck.value;
 
   if (!hasContent) {
     return { ok: false, message: 'Page appears empty / no content' };
