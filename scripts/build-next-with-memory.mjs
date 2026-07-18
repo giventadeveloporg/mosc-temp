@@ -12,10 +12,24 @@ const heapMb = Number.isFinite(parsedHeapMb) && parsedHeapMb > 0 ? parsedHeapMb 
 
 // Keep local builds from spawning multiple memory-heavy page-data workers.
 const buildWorkers = process.env.NEXT_BUILD_WORKERS || '1';
-const useSystemCa = process.env.NEXT_BUILD_USE_SYSTEM_CA !== 'false';
+
+/**
+ * `--use-system-ca` landed in Node 23.8.0. Amplify Hosting uses Node 20
+ * (`nvm use 20`), which rejects the flag with "bad option" / exit 9.
+ * Only enable it when the runtime supports it, or when forced via env.
+ */
+function supportsUseSystemCa() {
+  const [major, minor] = process.versions.node.split('.').map((n) => Number.parseInt(n, 10));
+  if (!Number.isFinite(major) || !Number.isFinite(minor)) return false;
+  return major > 23 || (major === 23 && minor >= 8);
+}
+
+const forceSystemCa = process.env.NEXT_BUILD_USE_SYSTEM_CA === 'true';
+const disableSystemCa = process.env.NEXT_BUILD_USE_SYSTEM_CA === 'false';
+const useSystemCa = !disableSystemCa && (forceSystemCa || supportsUseSystemCa());
 
 console.log(
-  `[build] Running next build with Node heap ${heapMb}MB, NEXT_BUILD_WORKERS=${buildWorkers}, system CA=${useSystemCa}`
+  `[build] Running next build with Node heap ${heapMb}MB, NEXT_BUILD_WORKERS=${buildWorkers}, system CA=${useSystemCa} (node ${process.versions.node})`
 );
 
 const nodeArgs = [];
