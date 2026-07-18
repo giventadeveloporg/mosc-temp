@@ -468,7 +468,7 @@ export default function ManageEventsPage() {
       <div className="flex items-center mb-8 gap-4">
         <Link
           href="/admin"
-          className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6"
+          className="ml-2.5 sm:ml-3 md:ml-4 lg:ml-6 xl:ml-8 flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6"
           title="Back to Admin"
           aria-label="Back to Admin"
         >

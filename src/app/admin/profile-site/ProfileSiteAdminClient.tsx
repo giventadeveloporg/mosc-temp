@@ -119,10 +119,24 @@ export default function ProfileSiteAdminClient({
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8" style={{ paddingTop: '160px' }}>
-      <div className="mb-6">
-        <Link href="/admin" className="text-blue-600 hover:underline text-sm">← Admin home</Link>
-        <h1 className="text-3xl font-bold mt-2">Profile site management</h1>
-        <p className="text-gray-600 mt-1">Manage public portfolio content for this tenant.</p>
+      <div className="flex items-center gap-2 sm:gap-3 md:gap-4 mb-6">
+        <Link
+          href="/admin"
+          className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+          title="Back to Admin"
+          aria-label="Back to Admin"
+        >
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </div>
+          <span className="font-semibold text-indigo-700">Back to Admin</span>
+        </Link>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-3xl font-bold">Profile site management</h1>
+          <p className="text-gray-600 mt-1">Manage public portfolio content for this tenant.</p>
+        </div>
       </div>
 
       {message && (

@@ -9,6 +9,7 @@ import AdminListSearchCombobox from '@/components/admin/AdminListSearchCombobox'
 import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import ImageUpload from '@/components/ui/ImageUpload';
 import AdminNavigation from '@/components/AdminNavigation';
+import Link from 'next/link';
 import SponsorImageUploadDialog from '@/components/sponsors/SponsorImageUploadDialog';
 import SponsorMediaGallery from '@/components/sponsors/SponsorMediaGallery';
 import type { EventSponsorsDTO } from '@/types';
@@ -318,12 +319,28 @@ export default function EventSponsorsPage() {
 
   return (
     <div className="w-full overflow-x-hidden box-border" style={{ paddingTop: '120px' }}>
-      {/* Page Title - Above admin group buttons */}
-      <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-4">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Global Sponsors</h1>
-      </div>
-      {/* Navigation Section - Full Width, Separate Responsive Container */}
-      <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-6 sm:mb-8">
+      {/* Header and navigation */}
+      <div className="w-full pt-4 sm:pt-6 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-6 sm:mb-8">
+        <div className="max-w-5xl mx-auto px-2.5 sm:px-3 md:px-4 lg:px-6 xl:px-8">
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
+            <Link
+              href="/admin"
+              className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+              title="Back to Admin"
+              aria-label="Back to Admin"
+            >
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </div>
+              <span className="font-semibold text-indigo-700">Back to Admin</span>
+            </Link>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Global Sponsors</h1>
+            </div>
+          </div>
+        </div>
         <AdminNavigation currentPage="event-sponsors" />
       </div>
       {/* Main Content Section - Constrained Width */}
