@@ -43,7 +43,7 @@ export function moscRedesignNavPrefetch(href: string): false | undefined {
 export const MOSC_REDESIGN_FOOTER_QUICK_LINKS = [
   { label: "Catholicate News", href: "/mosc-redesign/news" },
   { label: "Downloads", href: "/mosc-redesign/downloads" },
-  { label: "E-Mail", href: "/mosc-redesign/contact-form-email" },
+  // { label: "E-Mail", href: "/mosc-redesign/contact-form-email" },
   { label: "Gallery", href: "/mosc-redesign/gallery" },
   { label: "Contact Info", href: "/mosc-redesign/contact-info" },
 ] as const;

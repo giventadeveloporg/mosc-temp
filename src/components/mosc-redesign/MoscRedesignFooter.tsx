@@ -1,12 +1,12 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 import { useTenantSettings } from '@/components/TenantSettingsProvider';
-import { MOSC_REDESIGN_FOOTER_QUICK_LINKS } from './navConfig';
+import { MOSC_REDESIGN_FOOTER_QUICK_LINKS, moscRedesignNavPrefetch } from './navConfig';
 import { InstagramIcon } from '@/components/icons/InstagramIcon';
 import { buildContactFormPayload } from '@/lib/contactForm';
-import { toPublicEmailUrl } from '@/lib/publicEmailLinks';
 
 /** Primary CTA — mosc_re_design_latest_design_system.json `components.button.primary` + Liturgical Calendar active toggle */
 const FOOTER_SUBMIT_BUTTON_CLASS =
@@ -180,12 +180,14 @@ export default function MoscRedesignFooter() {
             <ul className="space-y-2">
               {MOSC_REDESIGN_FOOTER_QUICK_LINKS.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={toPublicEmailUrl(link.href)}
+                  {/* Same-origin app routes — do not use toPublicEmailUrl (rewrites to production host). */}
+                  <Link
+                    href={link.href}
+                    prefetch={moscRedesignNavPrefetch(link.href)}
                     className="text-warmGray-dark hover:text-burgundy-dark text-sm transition-colors"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -285,15 +287,15 @@ export default function MoscRedesignFooter() {
               </a>
             </p>
             <div className="flex flex-wrap justify-center gap-3 text-xs pt-1">
-              <a href={toPublicEmailUrl('/mosc-redesign/privacy-policy')} className="text-warmGray-dark/85 hover:text-burgundy-dark transition-colors">
+              <Link href="/mosc-redesign/privacy-policy" className="text-warmGray-dark/85 hover:text-burgundy-dark transition-colors">
                 Privacy Policy
-              </a>
-              <a href={toPublicEmailUrl('/mosc-redesign/terms-of-use')} className="text-warmGray-dark/85 hover:text-burgundy-dark transition-colors">
+              </Link>
+              <Link href="/mosc-redesign/terms-of-use" className="text-warmGray-dark/85 hover:text-burgundy-dark transition-colors">
                 Terms of Use
-              </a>
-              <a href={toPublicEmailUrl('/mosc-redesign/sitemap')} className="text-warmGray-dark/85 hover:text-burgundy-dark transition-colors">
+              </Link>
+              <Link href="/mosc-redesign/sitemap" className="text-warmGray-dark/85 hover:text-burgundy-dark transition-colors">
                 Sitemap
-              </a>
+              </Link>
             </div>
           </div>
         </div>
