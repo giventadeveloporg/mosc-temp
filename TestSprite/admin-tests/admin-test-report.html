@@ -103,8 +103,8 @@
 <body>
   <div class="header">
     <h1>Admin Test Suite Report</h1>
-    <p>Generated: 7/17/2026, 3:20:57 PM</p>
-    <p>Duration: 345.87s</p>
+    <p>Generated: 7/19/2026, 4:12:44 AM</p>
+    <p>Duration: 357.36s</p>
   </div>
 
   <div class="stats">
@@ -113,11 +113,11 @@
       <div class="stat-label">Total Tests</div>
     </div>
     <div class="stat-card passed">
-      <div class="stat-number">28</div>
+      <div class="stat-number">27</div>
       <div class="stat-label">Passed</div>
     </div>
     <div class="stat-card failed">
-      <div class="stat-number">3</div>
+      <div class="stat-number">4</div>
       <div class="stat-label">Failed</div>
     </div>
     <div class="stat-card skipped">
@@ -135,7 +135,7 @@
             <div>
               <div class="test-name">[admin-001] Admin Dashboard</div>
               <div class="test-details">
-                /admin • 4523ms • Priority: critical
+                /admin • 5507ms • Priority: critical
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -143,7 +143,7 @@
           
           
             <div class="test-error">
-              ⚠️ JavaScript Errors (3):
+              ⚠️ JavaScript Errors (2):
               <ul style="margin: 5px 0; padding-left: 20px;">
                 <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
@@ -158,34 +158,35 @@ It can also happen if the client has a browser extension installed which messes 
 https://react.dev/link/hydration-mismatch
 
   ...
-    <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-      <RedirectBoundary>
-        <RedirectErrorBoundary router={{...}}>
-          <InnerLayoutRouter url="/admin/eve..." tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>
-            <SegmentViewNode type="page" pagePath="admin/even...">
-              <SegmentTrieNode>
-              <EventDashboardPage>
-                <Suspense fallback={<div>}>
-                  <EventDashboardContent>
-                    <EventDashboardClient data={{...}}>
-                      <div className="max-w-7xl ...">
-                        <div>
-                        <div>
-                        <div className="grid grid-...">
-                          <div className="bg-white r...">
-                            <div>
-                            <div className="h-64 flex ...">
-                              <div className="flex flex-...">
-                                <div>
-                                <span className="text-xs text-gray-500 mt-2">
-+                                 Jul 9
--                                 Jul 10
-                                ...
+    <SegmentViewNode type="page" pagePath="admin/poll...">
+      <SegmentTrieNode>
+      <PollsPage>
+        <div className="min-h-scre..." style={{...}}>
+          <div className="max-w-5xl ...">
+            <div>
+            <PollManagementClient initialPolls={[...]}>
+              <PollList polls={[...]} onEdit={function handleEditPoll} onDelete={function handleDeletePoll} ...>
+                <div className="space-y-6">
+                  <div>
+                  <div>
+                  <div className="grid gap-6">
+                    <_c className="border-2 b...">
+                      <div ref={null} className="rounded-lg...">
+                        <_c2>
+                        <_c8>
+                          <div ref={null} className="p-6 pt-0">
+                            <div className="space-y-2 ...">
+                              <div className="flex justi...">
+                                <span>
+                                <span>
++                                 Jan 14, 2026, 08:23 AM
+-                                 Jan 14, 2026, 01:23 PM
                               ...
-                          ...
-                        ...
-            ...
-          ...
+                            ...
+                    ...
+                  ...
+              ...
+    ...
 <br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
@@ -195,18 +196,7 @@ https://react.dev/link/hydration-mismatch
 - Invalid HTML tag nesting.
 
 It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-</pre></li><li><strong>Error:</strong> Switched to client rendering because the server rendering errored:
-
-__webpack_modules__[moduleId] is not a function<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Switched to client rendering because the server rendering errored:
-
-__webpack_modules__[moduleId] is not a function
-    at Object.__webpack_require__ [as require] (C:\project_workspace\mosc-temp\.next\dev\server\webpack-runtime.js:25:42)
-    at Object.require (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:69:48307)
-    at globalThis.__next_require__ (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:69:49174)
-    at requireModule (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:340836)
-    at initializeModuleChunk (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:381328)
-    at readChunk (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:373397)
-    at getComponentNameFromType (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:78452)</pre></li><li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+</pre></li><li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
 - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
@@ -263,7 +253,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28447):
+              ⚠️ Console Warnings/Errors (65111):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/events/dashboard" used `searchParams.eventId`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at EventDashboardPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/events/dashboard/page.tsx?0:178:34)
@@ -284,7 +274,7 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4379:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4602:19)
     at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4919:16) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28437 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65101 more</li>
               </ul>
             </div>
           
@@ -301,7 +291,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-002] Manage Users (Usage)</div>
               <div class="test-details">
-                /admin/manage-usage • 7616ms • Priority: critical
+                /admin/manage-usage • 9989ms • Priority: critical
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -309,7 +299,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-error">
-              ⚠️ JavaScript Errors (3):
+              ⚠️ JavaScript Errors (2):
               <ul style="margin: 5px 0; padding-left: 20px;">
                 <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
@@ -324,34 +314,35 @@ It can also happen if the client has a browser extension installed which messes 
 https://react.dev/link/hydration-mismatch
 
   ...
-    <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-      <RedirectBoundary>
-        <RedirectErrorBoundary router={{...}}>
-          <InnerLayoutRouter url="/admin/eve..." tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>
-            <SegmentViewNode type="page" pagePath="admin/even...">
-              <SegmentTrieNode>
-              <EventDashboardPage>
-                <Suspense fallback={<div>}>
-                  <EventDashboardContent>
-                    <EventDashboardClient data={{...}}>
-                      <div className="max-w-7xl ...">
-                        <div>
-                        <div>
-                        <div className="grid grid-...">
-                          <div className="bg-white r...">
-                            <div>
-                            <div className="h-64 flex ...">
-                              <div className="flex flex-...">
-                                <div>
-                                <span className="text-xs text-gray-500 mt-2">
-+                                 Jul 9
--                                 Jul 10
-                                ...
+    <SegmentViewNode type="page" pagePath="admin/poll...">
+      <SegmentTrieNode>
+      <PollsPage>
+        <div className="min-h-scre..." style={{...}}>
+          <div className="max-w-5xl ...">
+            <div>
+            <PollManagementClient initialPolls={[...]}>
+              <PollList polls={[...]} onEdit={function handleEditPoll} onDelete={function handleDeletePoll} ...>
+                <div className="space-y-6">
+                  <div>
+                  <div>
+                  <div className="grid gap-6">
+                    <_c className="border-2 b...">
+                      <div ref={null} className="rounded-lg...">
+                        <_c2>
+                        <_c8>
+                          <div ref={null} className="p-6 pt-0">
+                            <div className="space-y-2 ...">
+                              <div className="flex justi...">
+                                <span>
+                                <span>
++                                 Jan 14, 2026, 08:23 AM
+-                                 Jan 14, 2026, 01:23 PM
                               ...
-                          ...
-                        ...
-            ...
-          ...
+                            ...
+                    ...
+                  ...
+              ...
+    ...
 <br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
@@ -361,18 +352,7 @@ https://react.dev/link/hydration-mismatch
 - Invalid HTML tag nesting.
 
 It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-</pre></li><li><strong>Error:</strong> Switched to client rendering because the server rendering errored:
-
-__webpack_modules__[moduleId] is not a function<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Switched to client rendering because the server rendering errored:
-
-__webpack_modules__[moduleId] is not a function
-    at Object.__webpack_require__ [as require] (C:\project_workspace\mosc-temp\.next\dev\server\webpack-runtime.js:25:42)
-    at Object.require (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:69:48307)
-    at globalThis.__next_require__ (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:69:49174)
-    at requireModule (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:340836)
-    at initializeModuleChunk (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:381328)
-    at readChunk (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:373397)
-    at getComponentNameFromType (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:78452)</pre></li><li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+</pre></li><li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
 - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
@@ -429,7 +409,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28446):
+              ⚠️ Console Warnings/Errors (65110):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/events/dashboard" used `searchParams.eventId`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at EventDashboardPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/events/dashboard/page.tsx?0:178:34)
@@ -450,7 +430,7 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4379:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4602:19)
     at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4919:16) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28436 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65100 more</li>
               </ul>
             </div>
           
@@ -467,7 +447,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-003] Manage Events</div>
               <div class="test-details">
-                /admin/manage-events • 11121ms • Priority: critical
+                /admin/manage-events • 10688ms • Priority: critical
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -475,7 +455,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-error">
-              ⚠️ JavaScript Errors (3):
+              ⚠️ JavaScript Errors (2):
               <ul style="margin: 5px 0; padding-left: 20px;">
                 <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
@@ -490,34 +470,35 @@ It can also happen if the client has a browser extension installed which messes 
 https://react.dev/link/hydration-mismatch
 
   ...
-    <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-      <RedirectBoundary>
-        <RedirectErrorBoundary router={{...}}>
-          <InnerLayoutRouter url="/admin/eve..." tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>
-            <SegmentViewNode type="page" pagePath="admin/even...">
-              <SegmentTrieNode>
-              <EventDashboardPage>
-                <Suspense fallback={<div>}>
-                  <EventDashboardContent>
-                    <EventDashboardClient data={{...}}>
-                      <div className="max-w-7xl ...">
-                        <div>
-                        <div>
-                        <div className="grid grid-...">
-                          <div className="bg-white r...">
-                            <div>
-                            <div className="h-64 flex ...">
-                              <div className="flex flex-...">
-                                <div>
-                                <span className="text-xs text-gray-500 mt-2">
-+                                 Jul 9
--                                 Jul 10
-                                ...
+    <SegmentViewNode type="page" pagePath="admin/poll...">
+      <SegmentTrieNode>
+      <PollsPage>
+        <div className="min-h-scre..." style={{...}}>
+          <div className="max-w-5xl ...">
+            <div>
+            <PollManagementClient initialPolls={[...]}>
+              <PollList polls={[...]} onEdit={function handleEditPoll} onDelete={function handleDeletePoll} ...>
+                <div className="space-y-6">
+                  <div>
+                  <div>
+                  <div className="grid gap-6">
+                    <_c className="border-2 b...">
+                      <div ref={null} className="rounded-lg...">
+                        <_c2>
+                        <_c8>
+                          <div ref={null} className="p-6 pt-0">
+                            <div className="space-y-2 ...">
+                              <div className="flex justi...">
+                                <span>
+                                <span>
++                                 Jan 14, 2026, 08:23 AM
+-                                 Jan 14, 2026, 01:23 PM
                               ...
-                          ...
-                        ...
-            ...
-          ...
+                            ...
+                    ...
+                  ...
+              ...
+    ...
 <br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
@@ -527,18 +508,7 @@ https://react.dev/link/hydration-mismatch
 - Invalid HTML tag nesting.
 
 It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-</pre></li><li><strong>Error:</strong> Switched to client rendering because the server rendering errored:
-
-__webpack_modules__[moduleId] is not a function<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Switched to client rendering because the server rendering errored:
-
-__webpack_modules__[moduleId] is not a function
-    at Object.__webpack_require__ [as require] (C:\project_workspace\mosc-temp\.next\dev\server\webpack-runtime.js:25:42)
-    at Object.require (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:69:48307)
-    at globalThis.__next_require__ (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:69:49174)
-    at requireModule (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:340836)
-    at initializeModuleChunk (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:381328)
-    at readChunk (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:373397)
-    at getComponentNameFromType (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:78452)</pre></li><li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+</pre></li><li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
 - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
@@ -595,7 +565,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28445):
+              ⚠️ Console Warnings/Errors (65109):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/events/dashboard" used `searchParams.eventId`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at EventDashboardPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/events/dashboard/page.tsx?0:178:34)
@@ -616,7 +586,7 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4379:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4602:19)
     at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4919:16) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28435 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65099 more</li>
               </ul>
             </div>
           
@@ -636,7 +606,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-004] Event Analytics Dashboard</div>
               <div class="test-details">
-                /admin/events/dashboard • 9552ms • Priority: high
+                /admin/events/dashboard • 9711ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -644,7 +614,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-error">
-              ⚠️ JavaScript Errors (3):
+              ⚠️ JavaScript Errors (2):
               <ul style="margin: 5px 0; padding-left: 20px;">
                 <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
@@ -659,34 +629,35 @@ It can also happen if the client has a browser extension installed which messes 
 https://react.dev/link/hydration-mismatch
 
   ...
-    <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-      <RedirectBoundary>
-        <RedirectErrorBoundary router={{...}}>
-          <InnerLayoutRouter url="/admin/eve..." tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>
-            <SegmentViewNode type="page" pagePath="admin/even...">
-              <SegmentTrieNode>
-              <EventDashboardPage>
-                <Suspense fallback={<div>}>
-                  <EventDashboardContent>
-                    <EventDashboardClient data={{...}}>
-                      <div className="max-w-7xl ...">
-                        <div>
-                        <div>
-                        <div className="grid grid-...">
-                          <div className="bg-white r...">
-                            <div>
-                            <div className="h-64 flex ...">
-                              <div className="flex flex-...">
-                                <div>
-                                <span className="text-xs text-gray-500 mt-2">
-+                                 Jul 9
--                                 Jul 10
-                                ...
+    <SegmentViewNode type="page" pagePath="admin/poll...">
+      <SegmentTrieNode>
+      <PollsPage>
+        <div className="min-h-scre..." style={{...}}>
+          <div className="max-w-5xl ...">
+            <div>
+            <PollManagementClient initialPolls={[...]}>
+              <PollList polls={[...]} onEdit={function handleEditPoll} onDelete={function handleDeletePoll} ...>
+                <div className="space-y-6">
+                  <div>
+                  <div>
+                  <div className="grid gap-6">
+                    <_c className="border-2 b...">
+                      <div ref={null} className="rounded-lg...">
+                        <_c2>
+                        <_c8>
+                          <div ref={null} className="p-6 pt-0">
+                            <div className="space-y-2 ...">
+                              <div className="flex justi...">
+                                <span>
+                                <span>
++                                 Jan 14, 2026, 08:23 AM
+-                                 Jan 14, 2026, 01:23 PM
                               ...
-                          ...
-                        ...
-            ...
-          ...
+                            ...
+                    ...
+                  ...
+              ...
+    ...
 <br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
@@ -696,18 +667,7 @@ https://react.dev/link/hydration-mismatch
 - Invalid HTML tag nesting.
 
 It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-</pre></li><li><strong>Error:</strong> Switched to client rendering because the server rendering errored:
-
-__webpack_modules__[moduleId] is not a function<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Switched to client rendering because the server rendering errored:
-
-__webpack_modules__[moduleId] is not a function
-    at Object.__webpack_require__ [as require] (C:\project_workspace\mosc-temp\.next\dev\server\webpack-runtime.js:25:42)
-    at Object.require (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:69:48307)
-    at globalThis.__next_require__ (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:69:49174)
-    at requireModule (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:340836)
-    at initializeModuleChunk (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:381328)
-    at readChunk (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:373397)
-    at getComponentNameFromType (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:78452)</pre></li><li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+</pre></li><li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
 - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
@@ -764,7 +724,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28444):
+              ⚠️ Console Warnings/Errors (65108):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/events/dashboard" used `searchParams.eventId`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at EventDashboardPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/events/dashboard/page.tsx?0:178:34)
@@ -785,7 +745,7 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4379:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4602:19)
     at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4919:16) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28434 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65098 more</li>
               </ul>
             </div>
           
@@ -802,7 +762,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-005] Event Registrations</div>
               <div class="test-details">
-                /admin/events/registrations • 7640ms • Priority: high
+                /admin/events/registrations • 7781ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -812,18 +772,58 @@ It can also happen if the client has a browser extension installed which messes 
             <div class="test-error">
               ⚠️ JavaScript Errors (2):
               <ul style="margin: 5px 0; padding-left: 20px;">
-                <li><strong>Error:</strong> Switched to client rendering because the server rendering errored:
+                <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
-__webpack_modules__[moduleId] is not a function<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Switched to client rendering because the server rendering errored:
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
 
-__webpack_modules__[moduleId] is not a function
-    at Object.__webpack_require__ [as require] (C:\project_workspace\mosc-temp\.next\dev\server\webpack-runtime.js:25:42)
-    at Object.require (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:69:48307)
-    at globalThis.__next_require__ (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:69:49174)
-    at requireModule (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:340836)
-    at initializeModuleChunk (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:381328)
-    at readChunk (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:373397)
-    at getComponentNameFromType (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:78452)</pre></li><li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <SegmentViewNode type="page" pagePath="admin/poll...">
+      <SegmentTrieNode>
+      <PollsPage>
+        <div className="min-h-scre..." style={{...}}>
+          <div className="max-w-5xl ...">
+            <div>
+            <PollManagementClient initialPolls={[...]}>
+              <PollList polls={[...]} onEdit={function handleEditPoll} onDelete={function handleDeletePoll} ...>
+                <div className="space-y-6">
+                  <div>
+                  <div>
+                  <div className="grid gap-6">
+                    <_c className="border-2 b...">
+                      <div ref={null} className="rounded-lg...">
+                        <_c2>
+                        <_c8>
+                          <div ref={null} className="p-6 pt-0">
+                            <div className="space-y-2 ...">
+                              <div className="flex justi...">
+                                <span>
+                                <span>
++                                 Jan 14, 2026, 08:23 AM
+-                                 Jan 14, 2026, 01:23 PM
+                              ...
+                            ...
+                    ...
+                  ...
+              ...
+    ...
+<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+</pre></li><li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
 - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
@@ -880,10 +880,10 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28442):
+              ⚠️ Console Warnings/Errors (65106):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28432 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65096 more</li>
               </ul>
             </div>
           
@@ -903,7 +903,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-006] Poll Management</div>
               <div class="test-details">
-                /admin/polls • 16362ms • Priority: medium
+                /admin/polls • 8962ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -913,18 +913,58 @@ It can also happen if the client has a browser extension installed which messes 
             <div class="test-error">
               ⚠️ JavaScript Errors (2):
               <ul style="margin: 5px 0; padding-left: 20px;">
-                <li><strong>Error:</strong> Switched to client rendering because the server rendering errored:
+                <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
-__webpack_modules__[moduleId] is not a function<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Switched to client rendering because the server rendering errored:
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
 
-__webpack_modules__[moduleId] is not a function
-    at Object.__webpack_require__ [as require] (C:\project_workspace\mosc-temp\.next\dev\server\webpack-runtime.js:25:42)
-    at Object.require (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:69:48307)
-    at globalThis.__next_require__ (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:69:49174)
-    at requireModule (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:340836)
-    at initializeModuleChunk (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:381328)
-    at readChunk (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:373397)
-    at getComponentNameFromType (C:\project_workspace\mosc-temp\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:2:78452)</pre></li><li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <SegmentViewNode type="page" pagePath="admin/poll...">
+      <SegmentTrieNode>
+      <PollsPage>
+        <div className="min-h-scre..." style={{...}}>
+          <div className="max-w-5xl ...">
+            <div>
+            <PollManagementClient initialPolls={[...]}>
+              <PollList polls={[...]} onEdit={function handleEditPoll} onDelete={function handleDeletePoll} ...>
+                <div className="space-y-6">
+                  <div>
+                  <div>
+                  <div className="grid gap-6">
+                    <_c className="border-2 b...">
+                      <div ref={null} className="rounded-lg...">
+                        <_c2>
+                        <_c8>
+                          <div ref={null} className="p-6 pt-0">
+                            <div className="space-y-2 ...">
+                              <div className="flex justi...">
+                                <span>
+                                <span>
++                                 Jan 14, 2026, 08:23 AM
+-                                 Jan 14, 2026, 01:23 PM
+                              ...
+                            ...
+                    ...
+                  ...
+              ...
+    ...
+<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+</pre></li><li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
 - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
@@ -981,10 +1021,10 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28441):
+              ⚠️ Console Warnings/Errors (65105):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28431 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65095 more</li>
               </ul>
             </div>
           
@@ -1004,7 +1044,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-007] Focus Groups</div>
               <div class="test-details">
-                /admin/focus-groups • 9401ms • Priority: medium
+                /admin/focus-groups • 8571ms • Priority: medium
               </div>
             </div>
             <span class="test-status failed">FAILED</span>
@@ -1071,10 +1111,10 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28440):
+              ⚠️ Console Warnings/Errors (65104):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28430 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65094 more</li>
               </ul>
             </div>
           
@@ -1085,7 +1125,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details">
-              📸 <a href="C:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-007-1784301383252.png" target="_blank">View Screenshot</a>
+              📸 <a href="C:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-007-1784434077982.png" target="_blank">View Screenshot</a>
             </div>
           
         </div>
@@ -1098,7 +1138,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-008] Membership Plans</div>
               <div class="test-details">
-                /admin/membership/plans • 9595ms • Priority: high
+                /admin/membership/plans • 13930ms • Priority: high
               </div>
             </div>
             <span class="test-status failed">FAILED</span>
@@ -1165,10 +1205,10 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28439):
+              ⚠️ Console Warnings/Errors (65103):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28429 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65093 more</li>
               </ul>
             </div>
           
@@ -1179,7 +1219,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details">
-              📸 <a href="C:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-008-1784301393113.png" target="_blank">View Screenshot</a>
+              📸 <a href="C:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-008-1784434092169.png" target="_blank">View Screenshot</a>
             </div>
           
         </div>
@@ -1189,7 +1229,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-009] Membership Subscriptions</div>
               <div class="test-details">
-                /admin/membership/subscriptions • 9764ms • Priority: high
+                /admin/membership/subscriptions • 11854ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1256,10 +1296,10 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28438):
+              ⚠️ Console Warnings/Errors (65102):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28428 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65092 more</li>
               </ul>
             </div>
           
@@ -1279,7 +1319,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-010] Email Addresses</div>
               <div class="test-details">
-                /admin/tenant-email-addresses • 11199ms • Priority: medium
+                /admin/tenant-email-addresses • 7074ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1288,10 +1328,10 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28437):
+              ⚠️ Console Warnings/Errors (65101):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28427 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65091 more</li>
               </ul>
             </div>
           
@@ -1308,7 +1348,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-011] Bulk Email</div>
               <div class="test-details">
-                /admin/bulk-email • 7013ms • Priority: medium
+                /admin/bulk-email • 6516ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1317,10 +1357,10 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28436):
+              ⚠️ Console Warnings/Errors (65100):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28426 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65090 more</li>
               </ul>
             </div>
           
@@ -1337,7 +1377,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-012] Newsletter Emails</div>
               <div class="test-details">
-                /admin/newsletter-emails • 11846ms • Priority: medium
+                /admin/newsletter-emails • 7165ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1346,10 +1386,10 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28435):
+              ⚠️ Console Warnings/Errors (65099):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28425 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65089 more</li>
               </ul>
             </div>
           
@@ -1369,7 +1409,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-013] Media Management</div>
               <div class="test-details">
-                /admin/media • 12354ms • Priority: medium
+                /admin/media • 8826ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1378,10 +1418,10 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28434):
+              ⚠️ Console Warnings/Errors (65098):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28424 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65088 more</li>
               </ul>
             </div>
           
@@ -1401,7 +1441,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-014] Executive Committee</div>
               <div class="test-details">
-                /admin/executive-committee • 11890ms • Priority: medium
+                /admin/executive-committee • 7878ms • Priority: medium
               </div>
             </div>
             <span class="test-status failed">FAILED</span>
@@ -1410,10 +1450,10 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28433):
+              ⚠️ Console Warnings/Errors (65097):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28423 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65087 more</li>
               </ul>
             </div>
           
@@ -1424,7 +1464,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details">
-              📸 <a href="C:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-014-1784301457459.png" target="_blank">View Screenshot</a>
+              📸 <a href="C:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-014-1784434141803.png" target="_blank">View Screenshot</a>
             </div>
           
         </div>
@@ -1434,7 +1474,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-015] Event Sponsors (Global)</div>
               <div class="test-details">
-                /admin/event-sponsors • 9813ms • Priority: medium
+                /admin/event-sponsors • 7947ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1443,7 +1483,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28432):
+              ⚠️ Console Warnings/Errors (65096):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/gallery/albums" used `searchParams.page`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at AdminAlbumsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/gallery/albums/page.tsx?0:19:37)
@@ -1464,7 +1504,7 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4379:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4602:19)
     at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4919:16) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28422 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65086 more</li>
               </ul>
             </div>
           
@@ -1481,7 +1521,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-016] Global Performers</div>
               <div class="test-details">
-                /admin/event-featured-performers • 11238ms • Priority: medium
+                /admin/event-featured-performers • 6897ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1490,7 +1530,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28431):
+              ⚠️ Console Warnings/Errors (65095):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/gallery/albums" used `searchParams.page`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at AdminAlbumsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/gallery/albums/page.tsx?0:19:37)
@@ -1511,7 +1551,7 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4379:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4602:19)
     at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4919:16) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28421 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65085 more</li>
               </ul>
             </div>
           
@@ -1528,7 +1568,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-017] Global Contacts</div>
               <div class="test-details">
-                /admin/event-contacts • 7940ms • Priority: medium
+                /admin/event-contacts • 7185ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1537,7 +1577,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28430):
+              ⚠️ Console Warnings/Errors (65094):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/gallery/albums" used `searchParams.page`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at AdminAlbumsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/gallery/albums/page.tsx?0:19:37)
@@ -1558,7 +1598,7 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4379:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4602:19)
     at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4919:16) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28420 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65084 more</li>
               </ul>
             </div>
           
@@ -1575,7 +1615,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-018] Global Emails</div>
               <div class="test-details">
-                /admin/event-emails • 7093ms • Priority: medium
+                /admin/event-emails • 6759ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1584,7 +1624,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28429):
+              ⚠️ Console Warnings/Errors (65093):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/gallery/albums" used `searchParams.page`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at AdminAlbumsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/gallery/albums/page.tsx?0:19:37)
@@ -1605,7 +1645,7 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4379:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4602:19)
     at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4919:16) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28419 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65083 more</li>
               </ul>
             </div>
           
@@ -1622,7 +1662,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-019] Global Program Directors</div>
               <div class="test-details">
-                /admin/event-program-directors • 7484ms • Priority: medium
+                /admin/event-program-directors • 7334ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1631,7 +1671,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28428):
+              ⚠️ Console Warnings/Errors (65092):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/gallery/albums" used `searchParams.page`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at AdminAlbumsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/gallery/albums/page.tsx?0:19:37)
@@ -1652,7 +1692,7 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4379:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4602:19)
     at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4919:16) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28418 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65082 more</li>
               </ul>
             </div>
           
@@ -1669,7 +1709,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-024] Gallery Albums</div>
               <div class="test-details">
-                /admin/gallery/albums • 14365ms • Priority: medium
+                /admin/gallery/albums • 15773ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1678,7 +1718,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28423):
+              ⚠️ Console Warnings/Errors (65087):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/gallery/albums" used `searchParams.page`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at AdminAlbumsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/gallery/albums/page.tsx?0:19:37)
@@ -1702,7 +1742,7 @@ It can also happen if the client has a browser extension installed which messes 
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28413 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65077 more</li>
               </ul>
             </div>
           
@@ -1719,7 +1759,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-030] Official Documents</div>
               <div class="test-details">
-                /admin/official-documents • 10874ms • Priority: high
+                /admin/official-documents • 13023ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1748,7 +1788,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-031] Official Document Categories</div>
               <div class="test-details">
-                /admin/official-document-categories • 7868ms • Priority: high
+                /admin/official-document-categories • 6537ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1780,7 +1820,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-020] Organizations</div>
               <div class="test-details">
-                /admin/tenant-management/organizations • 21542ms • Priority: high
+                /admin/tenant-management/organizations • 9119ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1789,7 +1829,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28427):
+              ⚠️ Console Warnings/Errors (65091):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/gallery/albums" used `searchParams.page`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at AdminAlbumsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/gallery/albums/page.tsx?0:19:37)
@@ -1811,7 +1851,7 @@ It can also happen if the client has a browser extension installed which messes 
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4602:19)
     at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4919:16) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28417 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65081 more</li>
               </ul>
             </div>
           
@@ -1828,7 +1868,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-021] Tenant Settings</div>
               <div class="test-details">
-                /admin/tenant-management/settings • 14472ms • Priority: high
+                /admin/tenant-management/settings • 11304ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1837,7 +1877,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28426):
+              ⚠️ Console Warnings/Errors (65090):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/gallery/albums" used `searchParams.page`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at AdminAlbumsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/gallery/albums/page.tsx?0:19:37)
@@ -1859,7 +1899,7 @@ It can also happen if the client has a browser extension installed which messes 
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4602:19)
     at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4919:16) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28416 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65080 more</li>
               </ul>
             </div>
           
@@ -1876,7 +1916,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-022] Tenant Management Test CRUD</div>
               <div class="test-details">
-                /admin/tenant-management/test • 5210ms • Priority: medium
+                /admin/tenant-management/test • 9363ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1885,7 +1925,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28425):
+              ⚠️ Console Warnings/Errors (65089):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/gallery/albums" used `searchParams.page`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at AdminAlbumsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/gallery/albums/page.tsx?0:19:37)
@@ -1908,7 +1948,7 @@ It can also happen if the client has a browser extension installed which messes 
     at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4919:16) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28415 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65079 more</li>
               </ul>
             </div>
           
@@ -1925,7 +1965,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-025] Homepage Cache</div>
               <div class="test-details">
-                /admin/homepage-cache • 8279ms • Priority: high
+                /admin/homepage-cache • 9572ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1934,14 +1974,14 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28421):
+              ⚠️ Console Warnings/Errors (65085):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28411 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65075 more</li>
               </ul>
             </div>
           
@@ -1961,7 +2001,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-023] Test Stripe</div>
               <div class="test-details">
-                /admin/test-stripe • 9292ms • Priority: low
+                /admin/test-stripe • 10622ms • Priority: low
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1970,7 +2010,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28424):
+              ⚠️ Console Warnings/Errors (65088):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> %c%s%c background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: Route "/admin/gallery/albums" used `searchParams.page`. `searchParams` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
     at AdminAlbumsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/gallery/albums/page.tsx?0:19:37)
@@ -1993,7 +2033,7 @@ It can also happen if the client has a browser extension installed which messes 
     at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:4919:16) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28414 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65078 more</li>
               </ul>
             </div>
           
@@ -2010,7 +2050,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-026] Admin QR Scanner</div>
               <div class="test-details">
-                /admin/qr-scanner • 10371ms • Priority: high
+                /admin/qr-scanner • 8232ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -2019,14 +2059,14 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (28420):
+              ⚠️ Console Warnings/Errors (65084):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
                 <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
     at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 28410 more</li>
+                <li style="color: #6b7280; font-style: italic;">... and 65074 more</li>
               </ul>
             </div>
           
@@ -2046,32 +2086,19 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-027] Check-In Analytics</div>
               <div class="test-details">
-                /admin/check-in-analytics • 25583ms • Priority: high
+                /admin/check-in-analytics • 60005ms • Priority: high
               </div>
             </div>
-            <span class="test-status passed">PASSED</span>
+            <span class="test-status failed">FAILED</span>
           </div>
+          <div class="test-error">❌ page.goto: Timeout 60000ms exceeded.<br>Call log:<br>[2m  - navigating to "http://localhost:3000/admin/check-in-analytics", waiting until "domcontentloaded"[22m<br></div>
           
           
-          
-            <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (23027):
-              <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
-                <li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
-    at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
-    at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
-    at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
-    at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> Camera permission error: NotFoundError: Requested device not found <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li><li><strong>[error]</strong> [QR-SCANNER] Scanner error: Error: No camera found. Please ensure your device has a camera.
-    at QrScanner.useEffect.checkPermissions (webpack-internal:///(app-pages-browser)/./src/components/qr/QrScanner.tsx:51:33) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57:31)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 23017 more</li>
-              </ul>
-            </div>
           
           
             <div class="test-details">
-              📊 Elements found: 2/0
+              📸 <a href="C:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-027-1784434312261.png" target="_blank">View Screenshot</a>
             </div>
-          
           
         </div>
       
@@ -2080,7 +2107,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-028] Sales Analytics</div>
               <div class="test-details">
-                /admin/sales-analytics • 13137ms • Priority: high
+                /admin/sales-analytics • 14206ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -2089,9 +2116,9 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (4):
+              ⚠️ Console Warnings/Errors (5):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
-                <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
+                <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27:27)</span></li>
                 
               </ul>
             </div>
@@ -2109,7 +2136,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-029] Manual Payments</div>
               <div class="test-details">
-                /admin/manual-payments • 15319ms • Priority: high
+                /admin/manual-payments • 10819ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>

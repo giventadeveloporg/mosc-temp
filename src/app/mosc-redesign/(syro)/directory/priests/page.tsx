@@ -3,8 +3,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { getPriestsData } from './getPriestsData';
-import type { Priest } from './types';
+import { formatPriestDisplayName, type Priest } from './types';
 import SyroPageBanner from '../../components/SyroPageBanner';
+import SearchInputWithClear from '../../components/SearchInputWithClear';
 
 export const metadata: Metadata = {
   title: 'Priests | Directory | Malankara Orthodox Syrian Church',
@@ -56,13 +57,14 @@ export default async function PriestsPage({ searchParams }: PageProps) {
           <div className="mb-6" role="search" aria-label="Search priests by name">
             <form method="get" action={BASE_PATH} className="flex flex-wrap gap-2 items-center">
               <label htmlFor="priests-name-search" className="sr-only">Search by name</label>
-              <input
+              <SearchInputWithClear
                 id="priests-name-search"
-                type="search"
                 name="q"
                 defaultValue={nameSearch ?? ''}
                 placeholder="Search by name..."
-                className="font-body flex-1 min-w-[200px] px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
+                wrapperClassName="flex-1 min-w-[200px]"
+                className="font-body w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
+                clearHref={hasSearch ? BASE_PATH : undefined}
               />
               <button type="submit" className="syro-primary-button inline-flex items-center gap-2 px-4 py-2">
                 Search
@@ -121,7 +123,7 @@ function PriestCard({ priest }: { priest: Priest }) {
         )}
         <div className="min-w-0 flex-1">
           <h2 className="font-heading font-semibold text-xl text-syro-blue group-hover:text-syro-red reverent-transition">
-            {priest.title ? `${priest.title} ${priest.name}` : priest.name}
+            {formatPriestDisplayName(priest.title, priest.name)}
           </h2>
           {priest.dioceseName && <p className="font-body text-sm text-syro-dark-gray mt-1">{priest.dioceseName}</p>}
           {priest.parishName && <p className="font-body text-sm text-syro-dark-gray">Vicar, {priest.parishName}</p>}

@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 import { getBishopsData } from './getBishopsData';
 import type { Bishop, BishopType } from './types';
 import SyroPageBanner from '../../components/SyroPageBanner';
+import SearchInputWithClear from '../../components/SearchInputWithClear';
 
 export const metadata: Metadata = {
   title: 'Bishops | Directory | Malankara Orthodox Syrian Church',
@@ -101,14 +102,15 @@ export default async function BishopsPage({ searchParams }: PageProps) {
               <label htmlFor="bishops-name-search" className="sr-only">
                 Search by name
               </label>
-              <input
+              <SearchInputWithClear
                 id="bishops-name-search"
-                type="search"
                 name="q"
                 defaultValue={nameSearch ?? ''}
                 placeholder="Search by name..."
-                className="font-body flex-1 min-w-[200px] px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
+                wrapperClassName="flex-1 min-w-[200px]"
+                className="font-body w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
                 aria-describedby="bishops-search-desc"
+                clearHref={hasSearch ? buildBishopsUrl(currentFilter, 1) : undefined}
               />
               <button
                 type="submit"

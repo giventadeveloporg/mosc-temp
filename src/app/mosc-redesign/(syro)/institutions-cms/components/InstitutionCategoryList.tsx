@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { formatPhoneNumbers } from '../../institutions/lib/formatPhone';
 import type { InstitutionEntry } from '../types';
+import SearchInputWithClear from '../../components/SearchInputWithClear';
 
 const PAGE_SIZE = 20;
 
@@ -210,7 +211,7 @@ export default function InstitutionCategoryList({
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[220px] flex-1">
             <svg
-              className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-burgundy/60"
+              className="pointer-events-none absolute left-3 top-1/2 z-[1] h-5 w-5 -translate-y-1/2 text-burgundy/60"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -218,13 +219,14 @@ export default function InstitutionCategoryList({
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input
+            <SearchInputWithClear
               id="institution-category-search"
-              type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onClear={() => setSearchQuery('')}
               placeholder={`Search ${itemLabel} by name, location, or contact…`}
-              className="font-syro-primary w-full rounded-lg border border-burgundy/25 bg-parchment/30 py-2.5 pl-10 pr-4 text-syro-dark-gray placeholder:text-warmBrown/60 focus:border-burgundy focus:outline-none focus:ring-2 focus:ring-burgundy/30"
+              wrapperClassName="w-full"
+              className="font-syro-primary w-full rounded-lg border border-burgundy/25 bg-parchment/30 py-2.5 pl-10 text-syro-dark-gray placeholder:text-warmBrown/60 focus:border-burgundy focus:outline-none focus:ring-2 focus:ring-burgundy/30"
             />
           </div>
           {isSearching ? (

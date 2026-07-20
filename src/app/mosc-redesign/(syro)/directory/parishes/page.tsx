@@ -6,6 +6,7 @@ import { getParishesData } from './getParishesData';
 import { getDioceseByDocumentId } from '../dioceses/getDiocesesData';
 import type { Parish } from './types';
 import SyroPageBanner from '../../components/SyroPageBanner';
+import SearchInputWithClear from '../../components/SearchInputWithClear';
 
 export const metadata: Metadata = {
   title: 'Parishes | Directory | Malankara Orthodox Syrian Church',
@@ -93,13 +94,20 @@ export default async function ParishesPage({ searchParams }: PageProps) {
                   <label htmlFor="parishes-name-search" className="font-body text-sm text-syro-dark-gray block mb-1">
                     Parish name
                   </label>
-                  <input
+                  <SearchInputWithClear
                     id="parishes-name-search"
-                    type="search"
                     name="q"
                     defaultValue={nameSearch ?? ''}
                     placeholder="Search parishes by name..."
+                    wrapperClassName="w-full"
                     className="font-body w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
+                    clearHref={
+                      hasSearch
+                        ? hasDioceseScope && dioceseForFilter
+                          ? `${BASE_PATH}?diocese=${encodeURIComponent(dioceseForFilter)}`
+                          : BASE_PATH
+                        : undefined
+                    }
                   />
                 </div>
                 <button type="submit" className="syro-primary-button inline-flex items-center gap-2 px-4 py-2 shrink-0">

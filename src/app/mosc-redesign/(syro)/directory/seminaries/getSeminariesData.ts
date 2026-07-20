@@ -1,5 +1,6 @@
 /**
- * Server-side data for Institutions CMS (Strapi GET /api/institutions).
+ * Server-side data for Seminaries (Strapi GET /api/seminaries).
+ * Collection: api::seminary.seminary
  */
 
 import 'server-only';
@@ -11,14 +12,10 @@ import {
   fetchStrapiEntryBySlug,
 } from '@/lib/strapi';
 import { unwrapStrapiRecord } from '@/lib/strapi/unwrapRecord';
-import { getMediaUrl, getMediaAlt } from '@/app/mosc-redesign/(syro)/directory/lib/strapiMedia';
-import {
-  institutionBelongsToCategory,
-  type InstitutionHubCategory,
-} from './institutionHubCategories';
-import type { InstitutionEntry, InstitutionsListResult } from './types';
+import { getMediaUrl, getMediaAlt } from '../lib/strapiMedia';
+import type { SeminaryEntry, SeminariesListResult } from './types';
 
-function parseEntry(raw: Record<string, unknown>, baseUrl: string): InstitutionEntry {
+function parseEntry(raw: Record<string, unknown>, baseUrl: string): SeminaryEntry {
   const item = unwrapStrapiRecord(raw);
   const documentId = typeof item.documentId === 'string' ? item.documentId : '';
   const name = typeof item.name === 'string' ? item.name : '';
@@ -48,15 +45,15 @@ function parseEntry(raw: Record<string, unknown>, baseUrl: string): InstitutionE
   };
 }
 
-const EMPTY_LIST: InstitutionsListResult = { entries: [] };
+const EMPTY_LIST: SeminariesListResult = { entries: [] };
 
-/** Strapi 5 caps pageSize at 100; paginate to load all tenant institutions. */
-const INSTITUTIONS_PAGE_SIZE = 100;
+/** Strapi 5 caps pageSize at 100; paginate to load all tenant seminaries. */
+const PAGE_SIZE = 100;
 
 /**
- * Fetches all institution entries for the current tenant, sorted by display order.
+ * Fetches all seminary entries for the current tenant, sorted by display order.
  */
-export async function getInstitutionsData(): Promise<InstitutionsListResult> {
+export async function getSeminariesData(): Promise<SeminariesListResult> {
   const baseUrl = getStrapiUrl();
   const base = getStrapiApiBase();
   const tenantId = getStrapiTenantId();
@@ -68,7 +65,7 @@ export async function getInstitutionsData(): Promise<InstitutionsListResult> {
   params.set('filters[tenant][tenantId][$eq]', tenantId);
   params.set('sort', 'order:asc,name:asc');
   params.set('populate[0]', 'image');
-  params.set('pagination[pageSize]', String(INSTITUTIONS_PAGE_SIZE));
+  params.set('pagination[pageSize]', String(PAGE_SIZE));
 
   try {
     const allRows: Record<string, unknown>[] = [];
@@ -77,7 +74,7 @@ export async function getInstitutionsData(): Promise<InstitutionsListResult> {
 
     while (page <= pageCount) {
       params.set('pagination[page]', String(page));
-      const url = `${base}/institutions?${params.toString()}`;
+      const url = `${base}/seminaries?${params.toString()}`;
       const res = await fetch(url, {
         headers: getStrapiHeaders(),
         cache: 'no-store',
@@ -105,9 +102,7 @@ export async function getInstitutionsData(): Promise<InstitutionsListResult> {
   }
 }
 
-export async function getInstitutionBySlug(
-  slug: string
-): Promise<InstitutionEntry | null> {
+export async function getSeminaryBySlug(slug: string): Promise<SeminaryEntry | null> {
   const baseUrl = getStrapiUrl();
   const base = getStrapiApiBase();
   const tenantId = getStrapiTenantId();
@@ -116,72 +111,14 @@ export async function getInstitutionBySlug(
   }
 
   return fetchStrapiEntryBySlug({
-    collectionPath: 'institutions',
+    collectionPath: 'seminaries',
     slug,
     baseUrl,
     apiBase: base,
     tenantId,
     populate: ['image'],
     parse: parseEntry,
-    fetchList: async () => (await getInstitutionsData()).entries,
+    fetchList: async () => (await getSeminariesData()).entries,
     isValid: (entry) => Boolean(entry.slug || entry.name),
   });
-}
-
-export function filterInstitutionsByCategory(
-  entries: InstitutionEntry[],
-  categorySlug: string
-): InstitutionEntry[] {
-  return entries.filter((entry) => institutionBelongsToCategory(entry.slug, categorySlug));
-}
-
-function firstLine(value: string | null): string | null {
-  if (!value?.trim()) return null;
-  return value.split('\n').map((line) => line.trim()).find(Boolean) ?? null;
-}
-
-function firstPhone(phones: string | null): string | null {
-  if (!phones?.trim()) return null;
-  const part = phones.split(/[,;\n/]+/).map((item) => item.trim()).find(Boolean);
-  return part ?? null;
-}
-
-/** Builds hub card preview text from Strapi institutions in a category. */
-export function buildCategoryCardDescription(
-  entries: InstitutionEntry[],
-  category: InstitutionHubCategory
-): string {
-  if (entries.length === 0) {
-    return category.fallbackDescription;
-  }
-
-  const parts = entries.slice(0, 6).map((entry) => {
-    const location = firstLine(entry.address);
-    const phone = firstPhone(entry.phones);
-    let segment = entry.name;
-    if (location && location !== entry.name) {
-      segment += ` - ${location}`;
-    }
-    if (phone) {
-      segment += ` Ph: ${phone}`;
-    }
-    return segment;
-  });
-
-  let text = parts.join(', ');
-  if (entries.length > parts.length) {
-    text += '...';
-  }
-  if (text.length > 320) {
-    return `${text.slice(0, 317)}...`;
-  }
-  return text || category.fallbackDescription;
-}
-
-export function pickCategoryCardImage(
-  entries: InstitutionEntry[],
-  category: InstitutionHubCategory
-): string {
-  const withImage = entries.find((entry) => entry.imageUrl);
-  return withImage?.imageUrl ?? category.fallbackImage;
 }

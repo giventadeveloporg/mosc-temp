@@ -5,6 +5,7 @@ import type {
   GalleryAlbumFilterOptions,
   GalleryEventFilterOptions,
 } from '@/app/gallery/ApiServerActions';
+import SearchInputWithClear from '../../components/SearchInputWithClear';
 
 export type MoscGalleryAlbumSearchFilters = {
   searchTerm: string;
@@ -133,7 +134,7 @@ export function MoscGallerySearch({
 
         <form onSubmit={handleAlbumSubmit} className="space-y-4" role="search" aria-label="Search albums">
           <div className="relative">
-            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-syro-dark-gray">
+            <span className="pointer-events-none absolute inset-y-0 left-3 z-[1] flex items-center text-syro-dark-gray">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -143,13 +144,14 @@ export function MoscGallerySearch({
                 />
               </svg>
             </span>
-            <input
-              type="search"
+            <SearchInputWithClear
               value={albumFilters.searchTerm}
               onChange={(e) => setAlbumFilters((prev) => ({ ...prev, searchTerm: e.target.value }))}
+              onClear={() => setAlbumFilters((prev) => ({ ...prev, searchTerm: '' }))}
               placeholder="Search albums by title..."
               disabled={loading}
-              className="font-body w-full pl-10 pr-4 py-2.5 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
+              wrapperClassName="w-full"
+              className="font-body w-full pl-10 py-2.5 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
             />
           </div>
 
@@ -288,7 +290,7 @@ export function MoscGallerySearch({
 
       <form onSubmit={handleEventSubmit} className="space-y-4" role="search" aria-label="Search event galleries">
         <div className="relative">
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-syro-dark-gray">
+          <span className="pointer-events-none absolute inset-y-0 left-3 z-[1] flex items-center text-syro-dark-gray">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -298,13 +300,14 @@ export function MoscGallerySearch({
               />
             </svg>
           </span>
-          <input
-            type="search"
+          <SearchInputWithClear
             value={eventFilters.searchTerm}
             onChange={(e) => setEventFilters((prev) => ({ ...prev, searchTerm: e.target.value }))}
+            onClear={() => setEventFilters((prev) => ({ ...prev, searchTerm: '' }))}
             placeholder="Search events by title..."
             disabled={loading}
-            className="font-body w-full pl-10 pr-4 py-2.5 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
+            wrapperClassName="w-full"
+            className="font-body w-full pl-10 py-2.5 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
           />
         </div>
 

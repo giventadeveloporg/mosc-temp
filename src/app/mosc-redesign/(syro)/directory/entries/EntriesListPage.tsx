@@ -5,6 +5,7 @@ import { getDirectoryEntriesData } from './getDirectoryEntriesData';
 import type { DirectoryEntry, DirectoryEntryType } from './types';
 import { DIRECTORY_ENTRY_TYPE_LABELS } from './types';
 import SyroPageBanner from '../../components/SyroPageBanner';
+import SearchInputWithClear from '../../components/SearchInputWithClear';
 
 const PAGE_SIZE = 20;
 
@@ -57,13 +58,14 @@ export default async function EntriesListPage({ directoryType, searchParams }: P
           <div className="mb-6" role="search" aria-label={`Search ${title.toLowerCase()} by name`}>
             <form method="get" action={basePath} className="flex flex-wrap gap-2 items-center">
               <label htmlFor="entries-name-search" className="sr-only">Search by name</label>
-              <input
+              <SearchInputWithClear
                 id="entries-name-search"
-                type="search"
                 name="q"
                 defaultValue={nameSearch ?? ''}
                 placeholder="Search by name..."
-                className="font-body flex-1 min-w-[200px] px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
+                wrapperClassName="flex-1 min-w-[200px]"
+                className="font-body w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
+                clearHref={hasSearch ? basePath : undefined}
               />
               <button type="submit" className="syro-primary-button inline-flex items-center gap-2 px-4 py-2">
                 Search

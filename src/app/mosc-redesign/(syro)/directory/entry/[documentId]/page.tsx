@@ -100,14 +100,6 @@ export default async function DirectoryEntryDetailPage({ params }: PageProps) {
               </div>
             )}
           </div>
-          <div className="mt-8">
-            <Link
-            href={listPath}
-            className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mt-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
-          >
-            ← Back to {typeLabel}
-          </Link>
-          </div>
         </div>
       </section>
     </div>
