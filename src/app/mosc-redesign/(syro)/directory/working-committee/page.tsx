@@ -6,6 +6,8 @@ import { getWorkingCommitteesData } from './getWorkingCommitteesData';
 import type { WorkingCommitteeEntry } from './types';
 import SyroPageBanner from '../../components/SyroPageBanner';
 import SearchInputWithClear from '../../components/SearchInputWithClear';
+import DirectoryPagination from '../components/DirectoryPagination';
+import { DIRECTORY_PAGE_SIZE } from '../types/listPagination';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +17,6 @@ export const metadata: Metadata = {
   keywords: ['MOSC Directory', 'Working Committee'],
 };
 
-const PAGE_SIZE = 20;
 const TITLE = 'Working Committee';
 const BASE_PATH = '/mosc-redesign/directory/working-committee';
 
@@ -38,22 +39,15 @@ export default async function Page({
   const searchTerm = nameSearch?.trim() ?? '';
   const hasSearch = searchTerm.length > 0;
 
-  const { entries: allEntries } = await getWorkingCommitteesData();
-  const filtered = hasSearch
-    ? allEntries.filter((entry) =>
-        entry.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : allEntries;
-
-  const total = filtered.length;
-  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const safePage = Math.min(page, pageCount);
-  const start = (safePage - 1) * PAGE_SIZE;
-  const entries = filtered.slice(start, start + PAGE_SIZE);
+  const { entries, pagination } = await getWorkingCommitteesData({
+    nameSearch: searchTerm || undefined,
+    page,
+    pageSize: DIRECTORY_PAGE_SIZE,
+  });
 
   const subtitle = hasSearch
-    ? `${total} entr${total !== 1 ? 'ies' : 'y'} matching "${searchTerm}".`
-    : `${total} entr${total !== 1 ? 'ies' : 'y'}. Data from the working committee CMS.`;
+    ? `${pagination.total} entr${pagination.total !== 1 ? 'ies' : 'y'} matching "${searchTerm}".`
+    : `${pagination.total} entr${pagination.total !== 1 ? 'ies' : 'y'}. Data from the working committee CMS.`;
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
@@ -113,31 +107,16 @@ export default async function Page({
                   <EntryCard key={entry.documentId || entry.slug} entry={entry} />
                 ))}
               </ul>
-              {pageCount > 1 && (
-                <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-                  <span className="font-body text-sm text-syro-dark-gray">
-                    Page {safePage} of {pageCount}
-                  </span>
-                  <div className="flex gap-3">
-                    {safePage > 1 && (
-                      <Link
-                        href={buildUrl(safePage - 1, nameSearch)}
-                        className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition"
-                      >
-                        Previous
-                      </Link>
-                    )}
-                    {safePage < pageCount && (
-                      <Link
-                        href={buildUrl(safePage + 1, nameSearch)}
-                        className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition"
-                      >
-                        Next
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              )}
+              <DirectoryPagination
+                page={pagination.page}
+                pageCount={pagination.pageCount}
+                total={pagination.total}
+                pageSize={DIRECTORY_PAGE_SIZE}
+                itemsOnPage={entries.length}
+                buildPageHref={(p) => buildUrl(p, nameSearch)}
+                itemLabel="members"
+                emptyLabel="No members found"
+              />
             </>
           )}
         </div>
@@ -149,12 +128,9 @@ export default async function Page({
 function EntryCard({ entry }: { entry: WorkingCommitteeEntry }) {
   return (
     <li className="h-full bg-white rounded-lg overflow-hidden sacred-shadow-sm border-l-4 border-syro-red hover:sacred-shadow reverent-transition shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
-      <Link
-        href={`${BASE_PATH}/${entry.slug}`}
-        className="flex gap-4 p-6 group h-full"
-      >
-        {entry.imageUrl ? (
-          <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-syro-bg-gray">
+      <Link href={`${BASE_PATH}/${entry.slug}`} className="flex gap-4 p-6 group h-full">
+        <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-syro-bg-gray flex items-center justify-center">
+          {entry.imageUrl ? (
             <Image
               src={entry.imageUrl}
               alt={entry.imageAlt ?? entry.name}
@@ -163,9 +139,7 @@ function EntryCard({ entry }: { entry: WorkingCommitteeEntry }) {
               sizes="96px"
               unoptimized={entry.imageUrl.startsWith('http')}
             />
-          </div>
-        ) : (
-          <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-syro-bg-gray flex items-center justify-center">
+          ) : (
             <svg
               className="w-10 h-10 text-syro-dark-gray/40"
               fill="none"
@@ -180,8 +154,8 @@ function EntryCard({ entry }: { entry: WorkingCommitteeEntry }) {
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
               />
             </svg>
-          </div>
-        )}
+          )}
+        </div>
         <div className="min-w-0 flex-1 flex flex-col">
           <h2 className="font-heading font-semibold text-xl text-syro-blue group-hover:text-syro-red reverent-transition">
             {entry.name}

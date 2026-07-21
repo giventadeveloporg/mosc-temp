@@ -1,3 +1,5 @@
+import type { DirectoryListPagination } from '@/app/mosc-redesign/(syro)/directory/types/listPagination';
+
 export interface WorkingCommitteeEntry {
   documentId: string;
   name: string;
@@ -14,4 +16,12 @@ export interface WorkingCommitteeEntry {
 
 export interface WorkingCommitteesListResult {
   entries: WorkingCommitteeEntry[];
+  pagination: DirectoryListPagination;
 }
+
+export type WorkingCommitteesListOptions = {
+  nameSearch?: string;
+  page?: number;
+  pageSize?: number;
+  loadAll?: boolean;
+};

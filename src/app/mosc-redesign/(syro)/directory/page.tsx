@@ -28,13 +28,13 @@ const FALLBACK_SECTIONS: DirectorySection[] = [
   { title: 'Dioceses', description: 'The Diocese is the basic church body which comprises all the parishes of a determined geographical area. It is governed by the Diocesan Bishop with the assistance of Diocesan Council.', href: '/mosc-redesign/directory/dioceses' },
   { title: 'Parishes', description: 'The parish is a local community of the Church having at its head a duly appointed priest and consisting of Orthodox Christians who live in accordance with the teachings of the Orthodox Church, comply with the discipline and rules of the Church, and regularly support their parish. Being subordinate to the Diocesan Authority, it is a component part of the Diocese.', href: '/mosc-redesign/directory/parishes' },
   { title: 'Priests', description: 'At the head of the parish is its Vicar. According to the teachings of the Church, he is the spiritual father and teacher of his flock and the celebrant of the liturgical worship established by the Church. He teaches and edifies the People of God entrusted to his spiritual care.', href: '/mosc-redesign/directory/priests' },
-  { title: 'Institutions', description: 'The institutions of the Malankara Orthodox Church consists of different organizations such as hospitals, schools, monasteries, orphanages, convents, medical colleges etc. Some of these Institutions are directly administered by the church and some others have its own leadership team.', href: '/mosc-redesign/directory/institutions' },
+  { title: 'Institutions', description: 'The institutions of the Malankara Orthodox Church consists of different organizations such as hospitals, schools, monasteries, orphanages, convents, medical colleges etc. Some of these Institutions are directly administered by the church and some others have its own leadership team.', href: '/mosc-redesign/institutions-cms' },
   { title: 'Church Dignitaries', description: 'The Church dignitaries consists of the Priest trustee, Lay trustee and the Association Secretary. The Priest trustee and Lay trustee are elected in the Malankara Association. The Association Secretary is elected in the Managing Committee. The tenure of the office is five years.', href: '/mosc-redesign/directory/church-dignitaries' },
   { title: 'Working Committee', description: 'It is a small body of members nominated by the Malankara Metropolitan. This body prepares the agenda for the Managing Committee and helps the Malankara Metropolitan in his administrative functions. The same body is also known as the Advisory Council.', href: '/mosc-redesign/directory/working-committee' },
   { title: 'The Managing Committee', description: 'The members of the Managing Committee are elected by the association, two priests and four lay people representing each Diocese are elected for a period of five years. Other than the elected members, a proportionate number of members are nominated to the Managing Committee by the Malankara Metropolitan.', href: '/mosc-redesign/directory/managing-committee' },
-  { title: 'Spiritual Organisations', description: 'Spiritual organisations include all types of organizations of the Church that offer spiritual guidance to the faithful. They also include religious or spiritual study groups and other organizations that teach or offer spiritual direction and advice to the members of the Church.', href: '/mosc-redesign/directory/spiritual-organisations' },
+  { title: 'Spiritual Organisations', description: 'Spiritual organisations include all types of organizations of the Church that offer spiritual guidance to the faithful. They also include religious or spiritual study groups and other organizations that teach or offer spiritual direction and advice to the members of the Church.', href: '/mosc-redesign/spiritual-organizations-cms' },
   { title: 'Pilgrim Centres', description: `The major Pilgrim centres of Malankara Orthodox Church include historical churches such as Niranam St. Mary's Valiya Pally, Thiruvathamcode Arapally, which are instituted by the Apostle St. Thomas.`, href: '/mosc-redesign/directory/pilgrim-centres' },
-  { title: 'Seminaries', description: 'There are mainly two seminaries under Malankara Orthodox Church.', href: '/mosc-redesign/directory/seminaries' },
+  { title: 'Seminaries', description: 'There are mainly two seminaries under Malankara Orthodox Church.', href: '/mosc-redesign/theological-seminaries-cms' },
 ];
 
 /** Static images for directory section cards, in same order as FALLBACK_SECTIONS (and displayCards). */
@@ -66,11 +66,29 @@ function toDisplayCard(card: DirectorySectionCard): DisplayCard {
   return {
     title: card.title,
     description: card.description,
-    linkUrl: card.linkUrl,
+    linkUrl: canonicalizeDirectorySectionHref(card.linkUrl),
     isExternal: (card.linkUrl?.startsWith('http') ?? false),
     imageUrl: card.imageUrl,
     imageAlt: card.imageAlt,
   };
+}
+
+/** Map legacy directory list URLs to canonical CMS hubs (institutions, spiritual orgs, seminaries). */
+function canonicalizeDirectorySectionHref(href: string | null | undefined): string | null {
+  if (!href?.trim()) return null;
+  const raw = href.trim();
+  const replacements: Array<[RegExp, string]> = [
+    [/\/mosc-redesign\/directory\/institutions\/?$/i, '/mosc-redesign/institutions-cms'],
+    [/\/mosc-redesign\/directory\/spiritual-organisations\/?$/i, '/mosc-redesign/spiritual-organizations-cms'],
+    [/\/mosc-redesign\/directory\/seminaries\/?$/i, '/mosc-redesign/theological-seminaries-cms'],
+  ];
+  for (const [pattern, target] of replacements) {
+    if (pattern.test(raw.replace(/\?.*$/, ''))) {
+      const qs = raw.includes('?') ? raw.slice(raw.indexOf('?')) : '';
+      return `${target}${qs}`;
+    }
+  }
+  return raw;
 }
 
 function fallbackToDisplayCard(section: DirectorySection): DisplayCard {
@@ -168,7 +186,7 @@ export default async function DirectoryPage() {
         description={leadText}
       />
 
-      {/* Quick entity selector + global name search (routes to the chosen entity's list page) */}
+      {/* Quick entity selector + global name search (routes to the chosen entity list or CMS hub) */}
       <DirectorySearch />
 
       {/* Content - same layout and design as /mosc/administration */}

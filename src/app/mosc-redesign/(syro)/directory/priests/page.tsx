@@ -6,6 +6,7 @@ import { getPriestsData } from './getPriestsData';
 import { formatPriestDisplayName, type Priest } from './types';
 import SyroPageBanner from '../../components/SyroPageBanner';
 import SearchInputWithClear from '../../components/SearchInputWithClear';
+import DirectoryPagination from '../components/DirectoryPagination';
 
 export const metadata: Metadata = {
   title: 'Priests | Directory | Malankara Orthodox Syrian Church',
@@ -91,19 +92,16 @@ export default async function PriestsPage({ searchParams }: PageProps) {
                   <PriestCard key={p.documentId} priest={p} />
                 ))}
               </ul>
-              {pagination.pageCount > 1 && (
-                <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-                  <span className="font-body text-sm text-syro-dark-gray">Page {pagination.page} of {pagination.pageCount}</span>
-                  <div className="flex gap-3">
-                    {pagination.page > 1 && (
-                      <Link href={buildUrl(pagination.page - 1, nameSearch)} className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition">Previous</Link>
-                    )}
-                    {pagination.page < pagination.pageCount && (
-                      <Link href={buildUrl(pagination.page + 1, nameSearch)} className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition">Next</Link>
-                    )}
-                  </div>
-                </div>
-              )}
+              <DirectoryPagination
+                page={pagination.page}
+                pageCount={pagination.pageCount}
+                total={pagination.total}
+                pageSize={PAGE_SIZE}
+                itemsOnPage={priests.length}
+                buildPageHref={(p) => buildUrl(p, nameSearch)}
+                itemLabel="priests"
+                emptyLabel="No priests found"
+              />
             </>
           )}
         </div>
@@ -116,11 +114,22 @@ function PriestCard({ priest }: { priest: Priest }) {
   return (
     <li className="h-full bg-white rounded-lg p-6 sacred-shadow-sm border-l-4 border-syro-red hover:sacred-shadow reverent-transition shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
       <Link href={`/mosc-redesign/directory/priests/${priest.documentId}`} className="flex gap-4 group h-full">
-        {priest.imageUrl && (
-          <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-syro-bg-gray">
-            <Image src={priest.imageUrl} alt={priest.imageAlt ?? priest.name} fill className="object-cover" sizes="80px" />
-          </div>
-        )}
+        <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-syro-bg-gray flex items-center justify-center">
+          {priest.imageUrl ? (
+            <Image
+              src={priest.imageUrl}
+              alt={priest.imageAlt ?? priest.name}
+              fill
+              className="object-cover"
+              sizes="80px"
+              unoptimized={priest.imageUrl.startsWith('http')}
+            />
+          ) : (
+            <svg className="w-10 h-10 text-syro-dark-gray/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          )}
+        </div>
         <div className="min-w-0 flex-1">
           <h2 className="font-heading font-semibold text-xl text-syro-blue group-hover:text-syro-red reverent-transition">
             {formatPriestDisplayName(priest.title, priest.name)}

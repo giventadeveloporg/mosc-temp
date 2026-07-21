@@ -6,6 +6,7 @@ import { getBishopsData } from './getBishopsData';
 import type { Bishop, BishopType } from './types';
 import SyroPageBanner from '../../components/SyroPageBanner';
 import SearchInputWithClear from '../../components/SearchInputWithClear';
+import DirectoryPagination from '../components/DirectoryPagination';
 
 export const metadata: Metadata = {
   title: 'Bishops | Directory | Malankara Orthodox Syrian Church',
@@ -180,31 +181,16 @@ export default async function BishopsPage({ searchParams }: PageProps) {
                   <BishopCard key={bishop.documentId} bishop={bishop} />
                 ))}
               </ul>
-              {pagination.pageCount > 1 && (
-                <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-                  <span className="font-body text-sm text-syro-dark-gray">
-                    Page {pagination.page} of {pagination.pageCount}
-                  </span>
-                  <div className="flex gap-3">
-                    {pagination.page > 1 && (
-                      <Link
-                        href={buildBishopsUrl(currentFilter, pagination.page - 1, nameSearch)}
-                        className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition"
-                      >
-                        Previous
-                      </Link>
-                    )}
-                    {pagination.page < pagination.pageCount && (
-                      <Link
-                        href={buildBishopsUrl(currentFilter, pagination.page + 1, nameSearch)}
-                        className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition"
-                      >
-                        Next
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              )}
+              <DirectoryPagination
+                page={pagination.page}
+                pageCount={pagination.pageCount}
+                total={pagination.total}
+                pageSize={PAGE_SIZE}
+                itemsOnPage={bishops.length}
+                buildPageHref={(p) => buildBishopsUrl(currentFilter, p, nameSearch)}
+                itemLabel="bishops"
+                emptyLabel="No bishops found"
+              />
             </>
           )}
         </div>
@@ -217,17 +203,22 @@ function BishopCard({ bishop }: { bishop: Bishop }) {
   return (
     <li className="h-full bg-white rounded-lg p-4 sacred-shadow-sm hover:sacred-shadow reverent-transition border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
       <Link href={`/mosc-redesign/directory/bishops/${bishop.documentId}`} className="flex gap-4 group h-full">
-        {bishop.imageUrl && (
-          <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center">
+        <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-syro-bg-gray flex items-center justify-center">
+          {bishop.imageUrl ? (
             <Image
               src={bishop.imageUrl}
               alt={bishop.imageAlt ?? bishop.name}
               fill
               className="object-contain object-center"
               sizes="80px"
+              unoptimized={bishop.imageUrl.startsWith('http')}
             />
-          </div>
-        )}
+          ) : (
+            <svg className="w-10 h-10 text-syro-dark-gray/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          )}
+        </div>
         <div className="min-w-0 flex-1">
           <h3 className="font-heading font-medium text-lg text-syro-blue group-hover:text-syro-red reverent-transition">
             {bishop.name}

@@ -6,6 +6,7 @@ import type { DirectoryEntry, DirectoryEntryType } from './types';
 import { DIRECTORY_ENTRY_TYPE_LABELS } from './types';
 import SyroPageBanner from '../../components/SyroPageBanner';
 import SearchInputWithClear from '../../components/SearchInputWithClear';
+import DirectoryPagination from '../components/DirectoryPagination';
 
 const PAGE_SIZE = 20;
 
@@ -94,31 +95,16 @@ export default async function EntriesListPage({ directoryType, searchParams }: P
                   <EntryCard key={entry.documentId} entry={entry} />
                 ))}
               </ul>
-              {pagination.pageCount > 1 && (
-                <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-                  <span className="font-body text-sm text-syro-dark-gray">
-                    Page {pagination.page} of {pagination.pageCount}
-                  </span>
-                  <div className="flex gap-3">
-                    {pagination.page > 1 && (
-                      <Link
-                        href={buildUrl(directoryType, pagination.page - 1, nameSearch)}
-                        className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition"
-                      >
-                        Previous
-                      </Link>
-                    )}
-                    {pagination.page < pagination.pageCount && (
-                      <Link
-                        href={buildUrl(directoryType, pagination.page + 1, nameSearch)}
-                        className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition"
-                      >
-                        Next
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              )}
+              <DirectoryPagination
+                page={pagination.page}
+                pageCount={pagination.pageCount}
+                total={pagination.total}
+                pageSize={PAGE_SIZE}
+                itemsOnPage={entries.length}
+                buildPageHref={(p) => buildUrl(directoryType, p, nameSearch)}
+                itemLabel="entries"
+                emptyLabel="No entries found"
+              />
             </>
           )}
         </div>
@@ -131,17 +117,22 @@ function EntryCard({ entry }: { entry: DirectoryEntry }) {
   return (
     <li className="h-full bg-white rounded-lg overflow-hidden sacred-shadow-sm border-l-4 border-syro-red hover:sacred-shadow reverent-transition shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
       <Link href={`/mosc-redesign/directory/entry/${entry.documentId}`} className="flex gap-4 p-6 group h-full">
-        {entry.imageUrl && (
-          <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-syro-bg-gray">
+        <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-syro-bg-gray flex items-center justify-center">
+          {entry.imageUrl ? (
             <Image
               src={entry.imageUrl}
               alt={entry.imageAlt ?? entry.name}
               fill
               className="object-cover"
               sizes="96px"
+              unoptimized={entry.imageUrl.startsWith('http')}
             />
-          </div>
-        )}
+          ) : (
+            <svg className="w-10 h-10 text-syro-dark-gray/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          )}
+        </div>
         <div className="min-w-0 flex-1">
           <h2 className="font-heading font-semibold text-xl text-syro-blue group-hover:text-syro-red reverent-transition">
             {entry.name}

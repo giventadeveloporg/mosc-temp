@@ -8,7 +8,7 @@ import SyroPageBanner from '../../../components/SyroPageBanner';
 
 export const dynamic = 'force-dynamic';
 
-const LIST_PATH = '/mosc-redesign/directory/institutions';
+const LIST_PATH = '/mosc-redesign/institutions-cms';
 const TYPE_LABEL = 'Institutions';
 
 type PageProps = { params: Promise<{ slug: string }> };

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import SearchInputWithClear from '../components/SearchInputWithClear';
 
-/** One selectable directory entity. `path` is the existing per-entity list route (all support ?q=). */
+/** One selectable directory entity. `path` is the list or CMS hub route (all support ?q=). */
 interface EntityOption {
   key: string;
   label: string;
@@ -17,13 +17,13 @@ const ENTITY_OPTIONS: EntityOption[] = [
   { key: 'dioceses', label: 'Dioceses', path: '/mosc-redesign/directory/dioceses' },
   { key: 'parishes', label: 'Parishes', path: '/mosc-redesign/directory/parishes' },
   { key: 'priests', label: 'Priests', path: '/mosc-redesign/directory/priests' },
-  { key: 'institutions', label: 'Institutions', path: '/mosc-redesign/directory/institutions' },
+  { key: 'institutions', label: 'Institutions', path: '/mosc-redesign/institutions-cms' },
   { key: 'church-dignitaries', label: 'Church Dignitaries', path: '/mosc-redesign/directory/church-dignitaries' },
   { key: 'working-committee', label: 'Working Committee', path: '/mosc-redesign/directory/working-committee' },
   { key: 'managing-committee', label: 'Managing Committee', path: '/mosc-redesign/directory/managing-committee' },
-  { key: 'spiritual-organisations', label: 'Spiritual Organisations', path: '/mosc-redesign/directory/spiritual-organisations' },
+  { key: 'spiritual-organisations', label: 'Spiritual Organisations', path: '/mosc-redesign/spiritual-organizations-cms' },
   { key: 'pilgrim-centres', label: 'Pilgrim Centres', path: '/mosc-redesign/directory/pilgrim-centres' },
-  { key: 'seminaries', label: 'Seminaries', path: '/mosc-redesign/directory/seminaries' },
+  { key: 'seminaries', label: 'Seminaries', path: '/mosc-redesign/theological-seminaries-cms' },
 ];
 
 export default function DirectorySearch() {
