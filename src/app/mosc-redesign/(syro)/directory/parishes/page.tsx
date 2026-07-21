@@ -6,8 +6,9 @@ import { getParishesData } from './getParishesData';
 import { getDioceseByDocumentId } from '../dioceses/getDiocesesData';
 import type { Parish } from './types';
 import SyroPageBanner from '../../components/SyroPageBanner';
-import SearchInputWithClear from '../../components/SearchInputWithClear';
+import LiveUrlSearch from '../../components/LiveUrlSearch';
 import DirectoryPagination from '../components/DirectoryPagination';
+import DirectoryBackLink from '../components/DirectoryBackLink';
 
 export const metadata: Metadata = {
   title: 'Parishes | Directory | Malankara Orthodox Syrian Church',
@@ -83,51 +84,23 @@ export default async function ParishesPage({ searchParams }: PageProps) {
 
       <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            className="mb-6 space-y-3"
-            role="search"
-            aria-label="Search parishes"
-          >
-            <form method="get" action={BASE_PATH} className="flex flex-col gap-3">
-              {dioceseForFilter ? <input type="hidden" name="diocese" value={dioceseForFilter} /> : null}
-              <div className="flex flex-wrap gap-2 items-end">
-                <div className="flex-1 min-w-[200px]">
-                  <label htmlFor="parishes-name-search" className="font-body text-sm text-syro-dark-gray block mb-1">
-                    Parish name
-                  </label>
-                  <SearchInputWithClear
-                    id="parishes-name-search"
-                    name="q"
-                    defaultValue={nameSearch ?? ''}
-                    placeholder="Search parishes by name..."
-                    wrapperClassName="w-full"
-                    className="font-body w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
-                    clearHref={
-                      hasSearch
-                        ? hasDioceseScope && dioceseForFilter
-                          ? `${BASE_PATH}?diocese=${encodeURIComponent(dioceseForFilter)}`
-                          : BASE_PATH
-                        : undefined
-                    }
-                  />
-                </div>
-                <button type="submit" className="syro-primary-button inline-flex items-center gap-2 px-4 py-2 shrink-0">
-                  Search
-                </button>
-              </div>
-              {(hasSearch || hasDioceseScope) && (
-                <Link
-                  href={
-                    hasDioceseScope && dioceseForFilter
-                      ? `${BASE_PATH}?diocese=${encodeURIComponent(dioceseForFilter)}`
-                      : BASE_PATH
-                  }
-                  className="font-body text-sm text-syro-dark-gray hover:text-syro-red hover:underline inline-block"
-                >
-                  {hasDioceseScope ? 'Clear search' : 'Clear all filters'}
-                </Link>
-              )}
-            </form>
+          <div className="mb-6 space-y-3" role="search" aria-label="Search parishes">
+            <LiveUrlSearch
+              id="parishes-name-search"
+              label="Parish name"
+              labelVisible
+              ariaLabel="Search parishes by name"
+              placeholder="Search parishes by name..."
+              preserveParams={dioceseForFilter ? ['diocese'] : []}
+            />
+            {hasDioceseScope && dioceseForFilter && !hasParishSearch ? (
+              <Link
+                href={BASE_PATH}
+                className="font-body text-sm text-syro-dark-gray hover:text-syro-red hover:underline inline-block"
+              >
+                Clear diocese filter
+              </Link>
+            ) : null}
           </div>
 
           {parishes.length === 0 ? (
@@ -139,9 +112,7 @@ export default async function ParishesPage({ searchParams }: PageProps) {
                     ? 'No parishes found for this diocese filter.'
                     : 'No parishes listed yet. Data is loaded from the directory Parish API.'}
               </p>
-              <Link href="/mosc-redesign/directory" className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mt-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white">
-            ← Back to Directory
-          </Link>
+              <DirectoryBackLink href="/mosc-redesign/directory" label="Back to Directory" className="mt-4" />
             </div>
           ) : (
             <>

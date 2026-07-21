@@ -26,7 +26,7 @@ export const MOSC_REDESIGN_SITEMAP: SitemapSection[] = [
       { name: 'The Church', href: `${BASE}/the-church` },
       { name: 'Holy Synod', href: `${BASE}/holy-synod` },
       { name: 'Ecumenical', href: `${BASE}/ecumenical` },
-      { name: 'Dioceses', href: `${BASE}/dioceses` },
+      { name: 'Dioceses', href: `${BASE}/dioceses-cms` },
       { name: 'Saints', href: `${BASE}/saints` },
       { name: 'Search Directory', href: `${BASE}/directory` },
     ],
@@ -84,7 +84,7 @@ export const MOSC_REDESIGN_SITEMAP: SitemapSection[] = [
     links: [
       { name: 'Directory Home', href: `${BASE}/directory` },
       { name: 'Holy Synod of Bishops', href: `${BASE}/directory/bishops` },
-      { name: 'Dioceses', href: `${BASE}/directory/dioceses` },
+      { name: 'Dioceses', href: `${BASE}/dioceses-cms` },
       { name: 'Parishes', href: `${BASE}/directory/parishes` },
       { name: 'Priests', href: `${BASE}/directory/priests` },
       { name: 'Institutions', href: `${BASE}/institutions-cms` },

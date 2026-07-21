@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getWorkingCommitteeBySlug } from '../getWorkingCommitteesData';
 import SyroPageBanner from '../../../components/SyroPageBanner';
+import DirectoryBackLink from '../../components/DirectoryBackLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,12 +75,7 @@ export default async function WorkingCommitteeDetailPage({ params }: PageProps) 
       <SyroPageBanner title={entry.name} breadcrumbFrom="directory" />
       <section className="relative bg-syro-bg-gray py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link
-            href={LIST_PATH}
-            className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mb-6 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
-          >
-            ← Back to {TYPE_LABEL}
-          </Link>
+          <DirectoryBackLink href={LIST_PATH} label={`Back to ${TYPE_LABEL}`} className="mb-6" />
 
           <div className="bg-white rounded-lg p-6 sm:p-8 sacred-shadow-sm border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
             <div className="flex flex-col sm:flex-row gap-6 items-start">

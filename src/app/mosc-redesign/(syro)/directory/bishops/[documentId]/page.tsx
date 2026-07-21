@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getBishopByDocumentId } from '../getBishopsData';
 import SyroPageBanner from '../../../components/SyroPageBanner';
+import DirectoryBackLink from '../../components/DirectoryBackLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,12 +43,7 @@ export default async function BishopDetailPage({ params }: PageProps) {
       <SyroPageBanner title={bishop.name} breadcrumbFrom="directory" />
       <section className="relative bg-syro-bg-gray py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/mosc-redesign/directory/bishops"
-            className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mb-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
-          >
-            ← Back to Bishops
-          </Link>
+          <DirectoryBackLink href="/mosc-redesign/directory/bishops" label="Back to Bishops" />
           <div className="bg-white rounded-lg sacred-shadow-sm border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] overflow-hidden">
             <div className="flex flex-col sm:flex-row gap-6 p-6 items-stretch">
               {bishop.imageUrl && (

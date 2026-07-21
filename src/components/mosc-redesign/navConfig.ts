@@ -26,7 +26,7 @@ export const MOSC_REDESIGN_NAV_LINKS = [
   { label: "The Church", href: "/mosc-redesign/the-church" },
   { label: "Holy Synod", href: "/mosc-redesign/holy-synod-cms" },
   { label: "Ecumenical", href: "/mosc-redesign/ecumenical-cms" },
-  { label: "Dioceses", href: "/mosc-redesign/dioceses" },
+  { label: "Dioceses", href: "/mosc-redesign/dioceses-cms" },
   { label: "News", href: "/mosc-redesign/news" },
   { label: "Saints", href: "/mosc-redesign/saints-cms" },
 ] as const;

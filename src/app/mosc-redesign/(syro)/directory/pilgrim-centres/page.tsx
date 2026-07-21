@@ -7,6 +7,6 @@ export const metadata: Metadata = {
   keywords: ['MOSC Directory', 'Pilgrim Centres'],
 };
 
-export default function Page({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+export default function Page({ searchParams }: { searchParams: Promise<{ page?: string; q?: string }> }) {
   return <EntriesListPage directoryType="pilgrim-centres" searchParams={searchParams} />;
 }

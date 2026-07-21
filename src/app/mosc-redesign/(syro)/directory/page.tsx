@@ -25,7 +25,7 @@ type DirectorySection = {
 
 const FALLBACK_SECTIONS: DirectorySection[] = [
   { title: 'The Holy Synod of Bishops', description: 'The Episcopal Synod with the Catholicos as its president is the apex body of all bishops. The authority of the synod is final and binding. It has exclusive rights and privileges in the matter of upholding the faith of the church, its discipline and order of Apostolic Succession. As regards temporal matters the church is guided by the Malankara Syrian Christian Association.', href: '/mosc-redesign/directory/bishops' },
-  { title: 'Dioceses', description: 'The Diocese is the basic church body which comprises all the parishes of a determined geographical area. It is governed by the Diocesan Bishop with the assistance of Diocesan Council.', href: '/mosc-redesign/directory/dioceses' },
+  { title: 'Dioceses', description: 'The Diocese is the basic church body which comprises all the parishes of a determined geographical area. It is governed by the Diocesan Bishop with the assistance of Diocesan Council.', href: '/mosc-redesign/dioceses-cms' },
   { title: 'Parishes', description: 'The parish is a local community of the Church having at its head a duly appointed priest and consisting of Orthodox Christians who live in accordance with the teachings of the Orthodox Church, comply with the discipline and rules of the Church, and regularly support their parish. Being subordinate to the Diocesan Authority, it is a component part of the Diocese.', href: '/mosc-redesign/directory/parishes' },
   { title: 'Priests', description: 'At the head of the parish is its Vicar. According to the teachings of the Church, he is the spiritual father and teacher of his flock and the celebrant of the liturgical worship established by the Church. He teaches and edifies the People of God entrusted to his spiritual care.', href: '/mosc-redesign/directory/priests' },
   { title: 'Institutions', description: 'The institutions of the Malankara Orthodox Church consists of different organizations such as hospitals, schools, monasteries, orphanages, convents, medical colleges etc. Some of these Institutions are directly administered by the church and some others have its own leadership team.', href: '/mosc-redesign/institutions-cms' },
@@ -78,6 +78,7 @@ function canonicalizeDirectorySectionHref(href: string | null | undefined): stri
   if (!href?.trim()) return null;
   const raw = href.trim();
   const replacements: Array<[RegExp, string]> = [
+    [/\/mosc-redesign\/directory\/dioceses\/?$/i, '/mosc-redesign/dioceses-cms'],
     [/\/mosc-redesign\/directory\/institutions\/?$/i, '/mosc-redesign/institutions-cms'],
     [/\/mosc-redesign\/directory\/spiritual-organisations\/?$/i, '/mosc-redesign/spiritual-organizations-cms'],
     [/\/mosc-redesign\/directory\/seminaries\/?$/i, '/mosc-redesign/theological-seminaries-cms'],
@@ -339,7 +340,7 @@ export default async function DirectoryPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link
-              href="/mosc-redesign/dioceses"
+              href="/mosc-redesign/dioceses-cms"
               className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 text-center group border-l-[7px] border-syro-red"
             >
               <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red transition-colors">

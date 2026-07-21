@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { getDirectoryEntryByDocumentId } from '../../entries/getDirectoryEntriesData';
 import { DIRECTORY_ENTRY_TYPE_LABELS } from '../../entries/types';
 import SyroPageBanner from '../../../components/SyroPageBanner';
+import DirectoryBackLink from '../../components/DirectoryBackLink';
 
 type PageProps = { params: Promise<{ documentId: string }> };
 
@@ -32,12 +33,7 @@ export default async function DirectoryEntryDetailPage({ params }: PageProps) {
       <SyroPageBanner title={entry.name} breadcrumbFrom="directory" />
       <section className="relative bg-syro-bg-gray py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link
-            href={listPath}
-            className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mb-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
-          >
-            ← Back to {typeLabel}
-          </Link>
+          <DirectoryBackLink href={listPath} label={`Back to ${typeLabel}`} />
           <div className="flex flex-col sm:flex-row gap-6 items-start">
             {entry.imageUrl && (
               <div className="relative w-40 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-syro-bg-gray sacred-shadow">

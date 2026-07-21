@@ -5,8 +5,9 @@ import { Metadata } from 'next';
 import { getPriestsData } from './getPriestsData';
 import { formatPriestDisplayName, type Priest } from './types';
 import SyroPageBanner from '../../components/SyroPageBanner';
-import SearchInputWithClear from '../../components/SearchInputWithClear';
+import LiveUrlSearch from '../../components/LiveUrlSearch';
 import DirectoryPagination from '../components/DirectoryPagination';
+import DirectoryBackLink from '../components/DirectoryBackLink';
 
 export const metadata: Metadata = {
   title: 'Priests | Directory | Malankara Orthodox Syrian Church',
@@ -55,35 +56,18 @@ export default async function PriestsPage({ searchParams }: PageProps) {
 
       <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-6" role="search" aria-label="Search priests by name">
-            <form method="get" action={BASE_PATH} className="flex flex-wrap gap-2 items-center">
-              <label htmlFor="priests-name-search" className="sr-only">Search by name</label>
-              <SearchInputWithClear
-                id="priests-name-search"
-                name="q"
-                defaultValue={nameSearch ?? ''}
-                placeholder="Search by name..."
-                wrapperClassName="flex-1 min-w-[200px]"
-                className="font-body w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
-                clearHref={hasSearch ? BASE_PATH : undefined}
-              />
-              <button type="submit" className="syro-primary-button inline-flex items-center gap-2 px-4 py-2">
-                Search
-              </button>
-              {hasSearch && (
-                <Link href={BASE_PATH} className="font-body text-sm text-syro-dark-gray hover:text-syro-red hover:underline">
-                  Clear search
-                </Link>
-              )}
-            </form>
+          <div className="mb-6">
+            <LiveUrlSearch
+              id="priests-name-search"
+              ariaLabel="Search priests by name"
+              placeholder="Search by name..."
+            />
           </div>
 
           {priests.length === 0 ? (
             <div className="bg-white rounded-lg p-8 text-center border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
               <p className="font-body text-syro-dark-gray">No priests listed yet. Data is loaded from the directory API.</p>
-              <Link href="/mosc-redesign/directory" className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mt-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white">
-            ← Back to Directory
-          </Link>
+              <DirectoryBackLink href="/mosc-redesign/directory" label="Back to Directory" className="mt-4" />
             </div>
           ) : (
             <>

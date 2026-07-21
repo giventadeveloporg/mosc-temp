@@ -7,6 +7,6 @@ export const metadata: Metadata = {
   keywords: ['MOSC Directory', 'Managing Committee'],
 };
 
-export default function Page({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+export default function Page({ searchParams }: { searchParams: Promise<{ page?: string; q?: string }> }) {
   return <EntriesListPage directoryType="managing-committee" searchParams={searchParams} />;
 }

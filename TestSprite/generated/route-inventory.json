@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-07-20T15:04:24.185Z",
+  "generatedAt": "2026-07-21T15:45:05.379Z",
   "root": "src/app",
-  "totalPages": 979,
-  "totalUniqueRoutes": 979,
+  "totalPages": 980,
+  "totalUniqueRoutes": 980,
   "byKind": {
     "public": 79,
     "admin": 104,
     "mosc": 264,
     "mosc-old": 233,
-    "mosc-redesign": 299
+    "mosc-redesign": 300
   },
   "routes": [
     {
@@ -3105,6 +3105,13 @@
       "dynamic": false,
       "dynamicParams": [],
       "sourceFile": "src/app/mosc-redesign/(syro)/dioceses/page.tsx"
+    },
+    {
+      "path": "/mosc-redesign/dioceses-cms",
+      "kind": "mosc-redesign",
+      "dynamic": false,
+      "dynamicParams": [],
+      "sourceFile": "src/app/mosc-redesign/(syro)/dioceses-cms/page.tsx"
     },
     {
       "path": "/mosc-redesign/dioceses/asia-pacific",

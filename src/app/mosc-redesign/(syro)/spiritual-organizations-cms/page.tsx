@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
-import SearchInputWithClear from '../components/SearchInputWithClear';
+import LiveUrlSearch from '../components/LiveUrlSearch';
 import { MoscHubCardMedia } from '../components/MoscHubCardMedia';
 import DirectoryPagination from '../directory/components/DirectoryPagination';
 import { DIRECTORY_PAGE_SIZE } from '../directory/types/listPagination';
@@ -73,32 +73,13 @@ export default async function SpiritualOrganizationsCmsPage({
           </h3>
           <p className="font-syro-primary text-syro-dark-gray mb-6">{subtitle}</p>
 
-          <div className="mb-8" role="search" aria-label="Search spiritual organizations by name">
-            <form method="get" action={BASE_PATH} className="flex flex-wrap gap-2 items-center">
-              <label htmlFor="cms-spiritual-name-search" className="sr-only">
-                Search by name
-              </label>
-              <SearchInputWithClear
-                id="cms-spiritual-name-search"
-                name="q"
-                defaultValue={nameSearch ?? ''}
-                placeholder="Search by name..."
-                wrapperClassName="flex-1 min-w-[200px]"
-                className="font-syro-primary w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
-                clearHref={hasSearch ? BASE_PATH : undefined}
-              />
-              <button type="submit" className="syro-primary-button inline-flex items-center gap-2 px-4 py-2">
-                Search
-              </button>
-              {hasSearch && (
-                <Link
-                  href={BASE_PATH}
-                  className="font-syro-primary text-sm text-syro-dark-gray hover:text-syro-red hover:underline"
-                >
-                  Clear search
-                </Link>
-              )}
-            </form>
+          <div className="mb-8">
+            <LiveUrlSearch
+              id="cms-spiritual-name-search"
+              ariaLabel="Search spiritual organizations by name"
+              placeholder="Search by name..."
+              inputClassName="font-syro-primary w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
+            />
           </div>
 
           {entries.length === 0 ? (

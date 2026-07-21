@@ -5,8 +5,9 @@ import { Metadata } from 'next';
 import { getBishopsData } from './getBishopsData';
 import type { Bishop, BishopType } from './types';
 import SyroPageBanner from '../../components/SyroPageBanner';
-import SearchInputWithClear from '../../components/SearchInputWithClear';
+import LiveUrlSearch from '../../components/LiveUrlSearch';
 import DirectoryPagination from '../components/DirectoryPagination';
+import DirectoryBackLink from '../components/DirectoryBackLink';
 
 export const metadata: Metadata = {
   title: 'Bishops | Directory | Malankara Orthodox Syrian Church',
@@ -88,49 +89,18 @@ export default async function BishopsPage({ searchParams }: PageProps) {
 
       <section className="py-8 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Search by name */}
+          {/* Search by name — live as you type */}
           <div className="mb-6">
-            <form
-              method="get"
-              action="/mosc-redesign/directory/bishops"
-              className="flex flex-wrap gap-2 items-center"
-              role="search"
-              aria-label="Search bishops by name"
-            >
-              {currentFilter !== 'all' && (
-                <input type="hidden" name="type" value={currentFilter} />
-              )}
-              <label htmlFor="bishops-name-search" className="sr-only">
-                Search by name
-              </label>
-              <SearchInputWithClear
-                id="bishops-name-search"
-                name="q"
-                defaultValue={nameSearch ?? ''}
-                placeholder="Search by name..."
-                wrapperClassName="flex-1 min-w-[200px]"
-                className="font-body w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
-                aria-describedby="bishops-search-desc"
-                clearHref={hasSearch ? buildBishopsUrl(currentFilter, 1) : undefined}
-              />
-              <button
-                type="submit"
-                className="syro-primary-button inline-flex items-center gap-2 px-4 py-2"
-              >
-                Search
-              </button>
-              {hasSearch && (
-                <Link
-                  href={buildBishopsUrl(currentFilter, 1)}
-                  className="font-body text-sm text-syro-dark-gray hover:text-syro-red hover:underline"
-                >
-                  Clear search
-                </Link>
-              )}
-              <p id="bishops-search-desc" className="sr-only">
-                Case-insensitive search by bishop name. Combine with category filter if needed.
-              </p>
-            </form>
+            <LiveUrlSearch
+              id="bishops-name-search"
+              ariaLabel="Search bishops by name"
+              placeholder="Search by name..."
+              preserveParams={currentFilter !== 'all' ? ['type'] : []}
+              describedBy="bishops-search-desc"
+            />
+            <p id="bishops-search-desc" className="sr-only">
+              Case-insensitive search by bishop name. Combine with category filter if needed.
+            </p>
           </div>
 
           {/* Category filter: All, Catholicos, Diocesan Bishops, Retired Bishops */}
@@ -167,12 +137,7 @@ export default async function BishopsPage({ searchParams }: PageProps) {
               <p className="font-body text-syro-dark-gray">
                 No bishops listed for this selection yet. Data is loaded from the directory API.
               </p>
-              <Link
-                href="/mosc-redesign/directory"
-                className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mt-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
-              >
-                ← Back to Directory
-              </Link>
+              <DirectoryBackLink href="/mosc-redesign/directory" label="Back to Directory" className="mt-4" />
             </div>
           ) : (
             <>
