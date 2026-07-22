@@ -9,7 +9,7 @@ import DirectoryBackLink from '../../components/DirectoryBackLink';
 
 export const dynamic = 'force-dynamic';
 
-const LIST_PATH = '/mosc-redesign/directory/working-committee';
+const LIST_PATH = '/mosc-redesign/working-committee-cms';
 const TYPE_LABEL = 'Working Committee';
 
 type PageProps = { params: Promise<{ slug: string }> };

@@ -15,14 +15,14 @@ interface EntityOption {
 const ENTITY_OPTIONS: EntityOption[] = [
   { key: 'bishops', label: 'Bishops', path: '/mosc-redesign/directory/bishops' },
   { key: 'dioceses', label: 'Dioceses', path: '/mosc-redesign/dioceses-cms' },
-  { key: 'parishes', label: 'Parishes', path: '/mosc-redesign/directory/parishes' },
-  { key: 'priests', label: 'Priests', path: '/mosc-redesign/directory/priests' },
+  { key: 'parishes', label: 'Parishes', path: '/mosc-redesign/parishes-cms' },
+  { key: 'priests', label: 'Priests', path: '/mosc-redesign/priests-cms' },
   { key: 'institutions', label: 'Institutions', path: '/mosc-redesign/institutions-cms' },
-  { key: 'church-dignitaries', label: 'Church Dignitaries', path: '/mosc-redesign/directory/church-dignitaries' },
-  { key: 'working-committee', label: 'Working Committee', path: '/mosc-redesign/directory/working-committee' },
-  { key: 'managing-committee', label: 'Managing Committee', path: '/mosc-redesign/directory/managing-committee' },
+  { key: 'church-dignitaries', label: 'Church Dignitaries', path: '/mosc-redesign/church-dignitaries-cms' },
+  { key: 'working-committee', label: 'Working Committee', path: '/mosc-redesign/working-committee-cms' },
+  { key: 'managing-committee', label: 'Managing Committee', path: '/mosc-redesign/managing-committee-cms' },
   { key: 'spiritual-organisations', label: 'Spiritual Organisations', path: '/mosc-redesign/spiritual-organizations-cms' },
-  { key: 'pilgrim-centres', label: 'Pilgrim Centres', path: '/mosc-redesign/directory/pilgrim-centres' },
+  { key: 'pilgrim-centres', label: 'Pilgrim Centres', path: '/mosc-redesign/pilgrim-centres-cms' },
   { key: 'seminaries', label: 'Seminaries', path: '/mosc-redesign/theological-seminaries-cms' },
 ];
 

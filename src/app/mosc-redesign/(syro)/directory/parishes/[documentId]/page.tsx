@@ -32,7 +32,7 @@ export default async function ParishDetailPage({ params }: PageProps) {
       <SyroPageBanner title={parish.name} breadcrumbFrom="directory" />
       <section className="relative bg-syro-bg-gray py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <DirectoryBackLink href="/mosc-redesign/directory/parishes" label="Back to Parishes" />
+          <DirectoryBackLink href="/mosc-redesign/parishes-cms" label="Back to Parishes" />
           <div className="flex flex-col sm:flex-row gap-6 items-start">
             {parish.imageUrl ? (
               <div className="relative w-40 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-syro-bg-gray sacred-shadow">

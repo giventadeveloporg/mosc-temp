@@ -32,7 +32,7 @@ export default async function DioceseDetailPage({ params }: PageProps) {
   });
   const parishTotal = parishPagination.total;
   const hasParishes = parishTotal > 0;
-  const parishesListHref = `/mosc-redesign/directory/parishes?diocese=${encodeURIComponent(documentId)}`;
+  const parishesListHref = `/mosc-redesign/parishes-cms?diocese=${encodeURIComponent(documentId)}`;
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">

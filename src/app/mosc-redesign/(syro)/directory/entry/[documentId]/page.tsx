@@ -26,7 +26,14 @@ export default async function DirectoryEntryDetailPage({ params }: PageProps) {
   if (!entry) notFound();
 
   const typeLabel = DIRECTORY_ENTRY_TYPE_LABELS[entry.directoryType];
-  const listPath = `/mosc-redesign/directory/${entry.directoryType}`;
+  const cmsListPathByType: Partial<Record<typeof entry.directoryType, string>> = {
+    'church-dignitaries': '/mosc-redesign/church-dignitaries-cms',
+    'pilgrim-centres': '/mosc-redesign/pilgrim-centres-cms',
+    'managing-committee': '/mosc-redesign/managing-committee-cms',
+    'working-committee': '/mosc-redesign/working-committee-cms',
+  };
+  const listPath =
+    cmsListPathByType[entry.directoryType] ?? `/mosc-redesign/directory/${entry.directoryType}`;
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
