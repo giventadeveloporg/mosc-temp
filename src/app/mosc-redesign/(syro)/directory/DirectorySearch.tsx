@@ -13,7 +13,7 @@ interface EntityOption {
 }
 
 const ENTITY_OPTIONS: EntityOption[] = [
-  { key: 'bishops', label: 'Bishops', path: '/mosc-redesign/directory/bishops' },
+  { key: 'bishops', label: 'Bishops', path: '/mosc-redesign/holy-synod-cms' },
   { key: 'dioceses', label: 'Dioceses', path: '/mosc-redesign/dioceses-cms' },
   { key: 'parishes', label: 'Parishes', path: '/mosc-redesign/parishes-cms' },
   { key: 'priests', label: 'Priests', path: '/mosc-redesign/priests-cms' },

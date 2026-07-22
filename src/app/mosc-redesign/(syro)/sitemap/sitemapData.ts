@@ -83,7 +83,7 @@ export const MOSC_REDESIGN_SITEMAP: SitemapSection[] = [
     description: 'Parishes, priests, dioceses, and church bodies.',
     links: [
       { name: 'Directory Home', href: `${BASE}/directory` },
-      { name: 'Holy Synod of Bishops', href: `${BASE}/directory/bishops` },
+      { name: 'Holy Synod of Bishops', href: `${BASE}/holy-synod-cms` },
       { name: 'Dioceses', href: `${BASE}/dioceses-cms` },
       { name: 'Parishes', href: `${BASE}/parishes-cms` },
       { name: 'Priests', href: `${BASE}/priests-cms` },

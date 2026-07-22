@@ -1,9 +1,9 @@
 import React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getBishopByDocumentId } from '../getBishopsData';
+import { findHolySynodMemberForBishop } from '../../../holy-synod-cms/getHolySynodMembersData';
 import SyroPageBanner from '../../../components/SyroPageBanner';
 import DirectoryBackLink from '../../components/DirectoryBackLink';
 
@@ -20,30 +20,48 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: 'Bishop Not Found | Directory | MOSC' };
   }
   return {
-    title: `${bishop.name} | Bishops | Directory | Malankara Orthodox Syrian Church`,
+    title: `${bishop.name} | ${bishop.bishopType === 'retired' ? 'Retired Bishops' : 'Holy Synod'} | Malankara Orthodox Syrian Church`,
     description: bishop.dioceseName
-      ? `${bishop.name}, ${bishop.dioceseName}. Directory of bishops.`
+      ? `${bishop.name}, ${bishop.dioceseName}.`
       : `Directory entry for ${bishop.name}.`,
   };
 }
 
+/**
+ * Active Holy Synod members redirect to CMS detail by slug.
+ * Retired (and unmatched) bishops keep this directory detail page.
+ */
 export default async function BishopDetailPage({ params }: PageProps) {
   const { documentId } = await params;
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[BishopPage] rendering', documentId);
-  }
   const bishop = await getBishopByDocumentId(documentId);
 
   if (!bishop) {
     notFound();
   }
 
+  if (bishop.bishopType !== 'retired') {
+    const member = await findHolySynodMemberForBishop({
+      name: bishop.name,
+      slug: bishop.slug,
+    });
+    if (member?.slug) {
+      redirect(`/mosc-redesign/holy-synod-cms/${member.slug}`);
+    }
+  }
+
+  const backHref =
+    bishop.bishopType === 'retired'
+      ? '/mosc-redesign/holy-synod-cms?type=retired'
+      : '/mosc-redesign/holy-synod-cms';
+  const backLabel =
+    bishop.bishopType === 'retired' ? 'Back to Retired Bishops' : 'Back to Holy Synod';
+
   return (
     <div className="min-h-screen bg-syro-bg-gray">
       <SyroPageBanner title={bishop.name} breadcrumbFrom="directory" />
       <section className="relative bg-syro-bg-gray py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <DirectoryBackLink href="/mosc-redesign/directory/bishops" label="Back to Bishops" />
+          <DirectoryBackLink href={backHref} label={backLabel} />
           <div className="bg-white rounded-lg sacred-shadow-sm border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] overflow-hidden">
             <div className="flex flex-col sm:flex-row gap-6 p-6 items-stretch">
               {bishop.imageUrl && (
@@ -65,9 +83,7 @@ export default async function BishopDetailPage({ params }: PageProps) {
                     {bishop.name}
                   </h1>
                   {bishop.dioceseName && (
-                    <p className="font-body text-syro-dark-gray mt-1">
-                      {bishop.dioceseName}
-                    </p>
+                    <p className="font-body text-syro-dark-gray mt-1">{bishop.dioceseName}</p>
                   )}
                   <p className="font-body text-sm text-syro-dark-gray mt-2 capitalize">
                     {bishop.bishopType.replace(/-/g, ' ')}
