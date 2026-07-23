@@ -44,7 +44,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
   const articleUrl = `${getAppUrl()}/mosc-redesign/news/${article.slug}`;
   const postedDate =
     article.publishedAt &&
-    new Date(article.publishedAt).toLocaleDateString('en-IN', {
+    new Date(article.publishedAt).toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',

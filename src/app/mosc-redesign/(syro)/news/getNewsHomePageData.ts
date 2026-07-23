@@ -95,19 +95,30 @@ function buildArticleQuery(filters: string, sort: string, pageSize: number, tena
 }
 
 /**
- * Builds a tenant filter that works across Strapi relation shapes:
- * - local: filters[tenant][tenantId][$eq]=tenant_demo_002
- * - some prod datasets: filters[tenant][documentId][$eq]=<tenant_document_id>
+ * Primary tenant filter: tenantId only.
+ * Do NOT combine tenantId + documentId in a single `$or` — Strapi/Knex relation
+ * joins can return each article twice (seen on /mosc-redesign/news in production).
+ * documentId-only is used as a separate fallback in getNewsHomePageData().
  */
 async function buildTenantFilterQuery(tenantId: string): Promise<string> {
-  const tenantDocumentId = await getStrapiTenantDocumentId();
-  if (tenantDocumentId) {
-    return [
-      `filters[$or][0][tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}`,
-      `filters[$or][1][tenant][documentId][$eq]=${encodeURIComponent(tenantDocumentId)}`,
-    ].join('&');
-  }
   return `filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}`;
+}
+
+/** Collapse duplicate rows from Strapi (same documentId / slug / id). */
+function dedupeArticles(articles: NewsArticle[]): NewsArticle[] {
+  const seen = new Set<string>();
+  const out: NewsArticle[] = [];
+  for (const article of articles) {
+    const key =
+      (article.documentId ? `d:${article.documentId}` : null) ||
+      (article.slug ? `s:${article.slug}` : null) ||
+      (article.id != null && article.id !== 0 ? `i:${article.id}` : null) ||
+      `t:${(article.title || '').trim().toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(article);
+  }
+  return out;
 }
 
 function getArticleCountFromResult(result: NewsHomePageData): number {
@@ -155,7 +166,8 @@ function normalizeArticle(raw: { id?: number; documentId?: string; attributes?: 
     excerpt: excerptStr || (descStr ? descStr.slice(0, 300) + (descStr.length > 300 ? '…' : '') : undefined),
     description: descriptionBlocks,
     body: bodyStr || descStr || undefined,
-    publishedAt: (attrs?.publishedAt ?? undefined) as string | undefined,
+    // Prefer Strapi draft-and-publish publishedAt; fall back to createdAt so cards always show a date
+    publishedAt: (attrs?.publishedAt ?? attrs?.createdAt ?? undefined) as string | undefined,
     views: (attrs?.views ?? undefined) as number | undefined,
     coverUrl,
     coverAlt,
@@ -371,10 +383,26 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
         const result: NewsHomePageData = {
           flash: normalizeHomepage(homepageRes?.data ?? null),
           flashNewsItems,
-          featured: (featuredList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
-          mainNews: (mainList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
-          pressRelease: (pressList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
-          mostRead: (mostReadList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
+          featured: dedupeArticles(
+            (featuredList ?? []).map((a) =>
+              normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })
+            )
+          ),
+          mainNews: dedupeArticles(
+            (mainList ?? []).map((a) =>
+              normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })
+            )
+          ),
+          pressRelease: dedupeArticles(
+            (pressList ?? []).map((a) =>
+              normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })
+            )
+          ),
+          mostRead: dedupeArticles(
+            (mostReadList ?? []).map((a) =>
+              normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })
+            )
+          ),
           sidebarPromo: normalizeSidebarPromo(sidebarRes?.data ?? null),
           adSlots: sidebarSlots,
           topAdSlots: topSlots,
@@ -559,7 +587,9 @@ export async function getRecentArticles(limit: number = 5): Promise<NewsArticle[
     const path = `/articles?${tenantFilterQuery}&filters[publishedAt][$notNull]=true&${POPULATE}&sort=publishedAt:desc&pagination[page]=1&pagination[pageSize]=${limit}`;
     const res = await fetchStrapi<unknown[]>(path);
     const list = Array.isArray(res?.data) ? res.data : [];
-    return list.map((raw) => normalizeArticle(raw as { id?: number; documentId?: string; attributes?: Record<string, unknown> }));
+    return dedupeArticles(
+      list.map((raw) => normalizeArticle(raw as { id?: number; documentId?: string; attributes?: Record<string, unknown> }))
+    );
   } catch {
     return [];
   }

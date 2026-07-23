@@ -38,8 +38,17 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
       </h2>
       {articles.length > 0 ? (
         <ul className={`grid gap-4 px-syro-lg pt-1.5 pb-1.5 ${compact ? 'grid-cols-1 max-w-2xl' : 'grid-cols-1 md:grid-cols-2'}`}>
-          {articles.map((article) => (
-            <li key={article.id} className="min-h-0">
+          {articles.map((article) => {
+            const listKey = article.documentId || article.slug || String(article.id);
+            const publishedLabel = article.publishedAt
+              ? new Date(article.publishedAt).toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })
+              : null;
+            return (
+            <li key={listKey} className="min-h-0">
               <Link
                 href={`${baseHref}/${article.documentId || article.slug || String(article.id)}`}
                 className="flex flex-col h-full group rounded-[5px] overflow-hidden border border-syro-table-border hover:shadow-syro-card-hover transition-shadow duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red focus-visible:ring-offset-2 bg-white"
@@ -72,15 +81,13 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
                   <h3 className="syro-article-card-title line-clamp-2 reverent-transition">
                     {article.title}
                   </h3>
-                  {article.publishedAt && (
+                  {publishedLabel && article.publishedAt && (
                     <time
                       className="syro-article-card-meta mt-2 flex items-center gap-1.5 flex-shrink-0"
                       dateTime={article.publishedAt}
                     >
                       <CalendarIcon className="w-4 h-4 flex-shrink-0" />
-                      {new Date(article.publishedAt).toLocaleDateString('en-IN', {
-                        dateStyle: 'long',
-                      })}
+                      <span>{publishedLabel}</span>
                     </time>
                   )}
                   {!compact && article.excerpt && (
@@ -91,7 +98,8 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
                 </div>
               </Link>
             </li>
-          ))}
+            );
+          })}
         </ul>
       ) : (
         <div className="px-syro-xxl py-8 text-center">
