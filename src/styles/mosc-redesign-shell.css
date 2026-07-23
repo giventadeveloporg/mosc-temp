@@ -175,6 +175,14 @@
   color: #8b1030 !important;
 }
 
+/* Catholicate CMS body subheadings — smaller/lighter than prose-lg defaults; theme burgundy */
+.mosc-redesign-subpage-shell.syro-layout #mainContent .catholicate-cms-body h2,
+.mosc-redesign-subpage-shell.syro-layout #mainContent .catholicate-cms-body h3,
+.mosc-redesign-subpage-shell.syro-layout #mainContent .catholicate-cms-body h4 {
+  color: #8b1030 !important;
+  font-weight: 500 !important;
+}
+
 /* ── Primary / read-more buttons — burgundy, rounded, match homepage CTAs ── */
 .mosc-redesign-subpage-shell.syro-layout a.syro-primary-button,
 .mosc-redesign-subpage-shell.syro-layout .syro-primary-button,

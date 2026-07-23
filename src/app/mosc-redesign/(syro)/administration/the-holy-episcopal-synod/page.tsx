@@ -74,7 +74,7 @@ export default function HolyEpiscopalSynodPage() {
 
                   <div className="bg-syro-red/10 rounded-lg p-6">
                     <Link
-                      href="/mosc-redesign/holy-synod"
+                      href="/mosc-redesign/holy-synod-cms"
                       className="syro-primary-button inline-flex items-center gap-2"
                     >
                       View all Episcopal Synod Members
