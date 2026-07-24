@@ -33,9 +33,9 @@ export default async function OrthodoxFaithPage({
                   <Image
                     src="/images/church/orthodox-faith.jpg"
                     alt="Orthodox Faith"
-                    width={125}
-                    height={125}
-                    className="rounded-lg w-full max-w-[125px] max-h-[125px] object-contain"
+                    width={188}
+                    height={188}
+                    className="rounded-lg w-full max-w-[188px] max-h-[188px] object-contain"
                     priority
                   />
                 </div>

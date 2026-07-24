@@ -34,8 +34,8 @@ export default async function ChurchHistoryPage({
                   <Image
                       src="/images/logos/Current_Edits/MOSC-Logo-only.png"
                       alt="MOSC - Malankara Orthodox Syrian Church"
-                      width={125} height={125}
-                      className="rounded-lg w-full max-w-[125px] max-h-[125px] object-contain" priority
+                      width={188} height={188}
+                      className="rounded-lg w-full max-w-[188px] max-h-[188px] object-contain" priority
                     />
                 </div>
 

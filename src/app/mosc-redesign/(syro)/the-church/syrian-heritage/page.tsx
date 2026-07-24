@@ -33,8 +33,8 @@ export default async function SyrianHeritagePage({
                   <Image
                       src="/images/church/syrian_heritage.jpg"
                       alt="Syrian Heritage of the St. Thomas Christians"
-                      width={125} height={125}
-                      className="rounded-lg w-full max-w-[125px] max-h-[125px] object-contain" priority
+                      width={188} height={188}
+                      className="rounded-lg w-full max-w-[188px] max-h-[188px] object-contain" priority
                     />
                 </div>
 
