@@ -24,6 +24,7 @@ export default function HolySynodCmsGrid({ members }: { members: HolySynodMember
             <MoscHubCardMedia
               src={imageSrc}
               alt={member.imageAlt ?? member.name}
+              frame="portraitUniform"
               objectPosition="top"
               frameClassName="bg-white"
               unoptimized={Boolean(member.imageUrl?.startsWith('http'))}

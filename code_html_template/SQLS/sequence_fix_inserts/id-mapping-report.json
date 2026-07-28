@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-07-20T02:10:24.257Z",
+  "generatedAt": "2026-07-28T17:46:17.463Z",
   "input": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
   "output": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2053,
+  "statementCount": 2085,
   "tables": {
     "event_type_details": {
       "rows": 12,
@@ -35,28 +35,28 @@
       ]
     },
     "user_profile": {
-      "rows": 24,
+      "rows": 33,
       "minNewId": 1,
-      "maxNewId": 24,
+      "maxNewId": 33,
       "sample": [
         {
-          "old": 1,
+          "old": 3,
           "new": 1
         },
         {
-          "old": 2,
+          "old": 4,
           "new": 2
         },
         {
-          "old": 3,
+          "old": 5,
           "new": 3
         },
         {
-          "old": 4,
+          "old": 6,
           "new": 4
         },
         {
-          "old": 5,
+          "old": 7,
           "new": 5
         }
       ]
@@ -382,9 +382,9 @@
       ]
     },
     "gallery_album": {
-      "rows": 62,
+      "rows": 67,
       "minNewId": 1,
-      "maxNewId": 62,
+      "maxNewId": 67,
       "sample": [
         {
           "old": 1,
@@ -463,9 +463,9 @@
       ]
     },
     "event_media": {
-      "rows": 1286,
+      "rows": 1287,
       "minNewId": 1,
-      "maxNewId": 1286,
+      "maxNewId": 1287,
       "sample": [
         {
           "old": 1,
@@ -544,9 +544,9 @@
       ]
     },
     "event_poll_option": {
-      "rows": 16,
+      "rows": 26,
       "minNewId": 1,
-      "maxNewId": 16,
+      "maxNewId": 26,
       "sample": [
         {
           "old": 1,
@@ -783,9 +783,9 @@
       ]
     },
     "tenant_organization": {
-      "rows": 10,
+      "rows": 11,
       "minNewId": 1,
-      "maxNewId": 10,
+      "maxNewId": 11,
       "sample": [
         {
           "old": 1,
@@ -810,9 +810,9 @@
       ]
     },
     "tenant_settings": {
-      "rows": 10,
+      "rows": 11,
       "minNewId": 1,
-      "maxNewId": 10,
+      "maxNewId": 11,
       "sample": [
         {
           "old": 1,
@@ -1108,11 +1108,11 @@
           "new": 1
         },
         {
-          "old": 2,
+          "old": 3,
           "new": 2
         },
         {
-          "old": 3,
+          "old": 2,
           "new": 3
         }
       ]
@@ -1172,9 +1172,9 @@
       ]
     },
     "executive_committee_team_members": {
-      "rows": 38,
+      "rows": 43,
       "minNewId": 1,
-      "maxNewId": 38,
+      "maxNewId": 43,
       "sample": [
         {
           "old": 1,
@@ -1288,11 +1288,11 @@
       "maxNewId": 2,
       "sample": [
         {
-          "old": 1,
+          "old": 2,
           "new": 1
         },
         {
-          "old": 2,
+          "old": 1,
           "new": 2
         }
       ]

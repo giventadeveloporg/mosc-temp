@@ -23,6 +23,7 @@ export default function RetiredBishopsGrid({ bishops }: { bishops: Bishop[] }) {
             <MoscHubCardMedia
               src={imageSrc}
               alt={bishop.imageAlt ?? bishop.name}
+              frame="portraitUniform"
               objectPosition="top"
               frameClassName="bg-white"
               unoptimized={Boolean(bishop.imageUrl?.startsWith('http'))}

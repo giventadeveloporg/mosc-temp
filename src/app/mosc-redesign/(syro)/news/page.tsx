@@ -111,9 +111,7 @@ export default async function NewsPage() {
                 title="Most Read"
                 articles={data.mostRead}
                 baseHref="/mosc-redesign/news"
-                compact
-              />
-            </div>
+              />            </div>
 
             {/* Sidebar - design system component spacing */}
             <aside className="space-y-syro-xl">
