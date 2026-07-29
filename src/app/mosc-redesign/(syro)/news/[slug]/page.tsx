@@ -37,7 +37,11 @@ export default async function NewsArticlePage({ params }: PageProps) {
 
   const [flashData, recentArticles, previousArticle] = await Promise.all([
     getFlashNewsForNewsPages(),
-    getRecentArticles(5),
+    getRecentArticles(5, {
+      excludeSlug: article.slug,
+      excludeDocumentId: article.documentId,
+      excludeTitle: article.title,
+    }),
     article.publishedAt ? getPreviousArticle(article.publishedAt) : Promise.resolve(null),
   ]);
 
@@ -157,18 +161,19 @@ export default async function NewsArticlePage({ params }: PageProps) {
                   Recent Posts
                 </h3>
                 <ul className="space-y-3">
-                  {recentArticles.map((item) => (
-                    <li key={item.id}>
+                  {recentArticles.map((item) => {
+                    const itemKey = item.documentId || item.slug || String(item.id);
+                    return (
+                    <li key={itemKey}>
                       <Link
-                        href={`/mosc-redesign/news/${item.slug}`}
-                        className={`font-body text-sm leading-snug focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red block text-syro-blue hover:text-syro-red transition-colors duration-300 ${
-                          item.slug === article.slug ? 'font-semibold' : ''
-                        }`}
+                        href={`/mosc-redesign/news/${item.documentId || item.slug || String(item.id)}`}
+                        className="font-body text-sm leading-snug focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red block text-syro-blue hover:text-syro-red transition-colors duration-300"
                       >
                         <span className="line-clamp-2">{item.title}</span>
                       </Link>
                     </li>
-                  ))}
+                    );
+                  })}
                 </ul>
               </div>
             </aside>

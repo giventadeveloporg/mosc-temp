@@ -142,6 +142,40 @@ function enrichMissingExcerpts(articles: NewsArticle[], peers: NewsArticle[]): N
   });
 }
 
+/** Prefer the fuller article when the same headline exists in multiple categories. */
+function recentArticleQualityScore(article: NewsArticle): number {
+  let score = 0;
+  if (article.excerpt?.trim()) score += 3;
+  if (typeof article.body === 'string' && article.body.trim()) score += 2;
+  if (article.coverUrl) score += 1;
+  if (article.categorySlug && article.categorySlug !== 'most-read') score += 2;
+  return score;
+}
+
+/**
+ * Collapse same-title articles for Recent Posts only (homepage section lists stay unchanged).
+ * Keeps published order; when titles collide, keeps the higher-quality copy.
+ */
+function dedupeRecentArticlesByTitle(articles: NewsArticle[]): NewsArticle[] {
+  const byTitle = new Map<string, NewsArticle>();
+  const order: string[] = [];
+  for (const article of articles) {
+    const titleKey = article.title?.trim()
+      ? normalizeFlashTitleKey(article.title)
+      : `fallback:${article.documentId || article.slug || article.id}`;
+    const existing = byTitle.get(titleKey);
+    if (!existing) {
+      byTitle.set(titleKey, article);
+      order.push(titleKey);
+      continue;
+    }
+    if (recentArticleQualityScore(article) > recentArticleQualityScore(existing)) {
+      byTitle.set(titleKey, article);
+    }
+  }
+  return order.map((key) => byTitle.get(key)!);
+}
+
 function getArticleCountFromResult(result: NewsHomePageData): number {
   return (
     result.featured.length +
@@ -717,18 +751,39 @@ export async function getArticleBySlug(slugOrId: string): Promise<NewsArticle | 
 /**
  * Fetches recent articles (by publishedAt desc) for sidebar "Recent Posts".
  * Uses same pattern as bishops: filters[tenant][tenantId][$eq], pagination[pageSize].
+ * Collapses same-title rows (e.g. Main News + Most Read stubs) so the sidebar never
+ * lists the same headline twice. Does not change the news homepage section lists.
  */
-export async function getRecentArticles(limit: number = 5): Promise<NewsArticle[]> {
+export async function getRecentArticles(
+  limit: number = 5,
+  options?: { excludeSlug?: string; excludeDocumentId?: string; excludeTitle?: string },
+): Promise<NewsArticle[]> {
   if (!getStrapiUrl()) return [];
   try {
     const tenantId = getStrapiTenantId();
     const tenantFilterQuery = await buildTenantFilterQuery(tenantId);
-    const path = `/articles?${tenantFilterQuery}&filters[publishedAt][$notNull]=true&${POPULATE}&sort=publishedAt:desc&pagination[page]=1&pagination[pageSize]=${limit}`;
+    // Over-fetch so title duplicates across categories can be collapsed and still fill `limit`
+    const fetchSize = Math.min(Math.max(limit * 6, 24), 50);
+    const path = `/articles?${tenantFilterQuery}&filters[publishedAt][$notNull]=true&${POPULATE}&sort=publishedAt:desc&pagination[page]=1&pagination[pageSize]=${fetchSize}`;
     const res = await fetchStrapi<unknown[]>(path);
     const list = Array.isArray(res?.data) ? res.data : [];
-    return dedupeArticles(
-      list.map((raw) => normalizeArticle(raw as { id?: number; documentId?: string; attributes?: Record<string, unknown> }))
+    const normalized = list.map((raw) =>
+      normalizeArticle(raw as { id?: number; documentId?: string; attributes?: Record<string, unknown> }),
     );
+
+    const excludeSlug = options?.excludeSlug?.trim();
+    const excludeDocumentId = options?.excludeDocumentId?.trim();
+    const excludeTitleKey = options?.excludeTitle?.trim()
+      ? normalizeFlashTitleKey(options.excludeTitle)
+      : '';
+    const filtered = normalized.filter((a) => {
+      if (excludeDocumentId && a.documentId && a.documentId === excludeDocumentId) return false;
+      if (excludeSlug && a.slug && a.slug === excludeSlug) return false;
+      if (excludeTitleKey && a.title && normalizeFlashTitleKey(a.title) === excludeTitleKey) return false;
+      return true;
+    });
+
+    return dedupeRecentArticlesByTitle(dedupeArticles(filtered)).slice(0, limit);
   } catch {
     return [];
   }

@@ -148,6 +148,7 @@ export default async function CatholicateCmsPage({
                       <MoscHubCardMedia
                         src={imageSrc}
                         alt={entry.imageAlt ?? entry.name}
+                        frame="portraitUniform"
                         objectPosition="top"
                         unoptimized={Boolean(entry.imageUrl?.startsWith('http'))}
                         padded={false}
