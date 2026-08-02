@@ -103,7 +103,7 @@ Help: `database_export_import_refresh.bat --help`
 | 2 | Reorder INSERTs | **Yes** |
 | 3 | PROD user ID copy | **Yes** |
 | 4 | Comment `pg_dump` header lines | **Yes** |
-| 5 | Apply `Latest_Schema_Post__Blob_Claude_12.sql` | No (unless `/DATA-ONLY`) |
+| 5 | Apply `Event_Site_Manager_Latest_Schema.sql` | No (unless `/DATA-ONLY`) |
 | 6 | Import ordered / renumbered / custom SQL | No |
 | 7 | `sync_all_table_sequences.sql` + Spring Batch sync | No |
 

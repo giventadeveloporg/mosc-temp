@@ -1,16 +1,16 @@
 {
-  "generatedAt": "2026-07-31T04:53:40.949Z",
+  "generatedAt": "2026-08-02T17:52:55.272Z",
   "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
   "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2069,
+  "statementCount": 2099,
   "tables": {
     "event_type_details": {
-      "rows": 12,
+      "rows": 13,
       "minNewId": 1,
-      "maxNewId": 12,
+      "maxNewId": 13,
       "sample": [
         {
           "old": 1,
@@ -35,9 +35,9 @@
       ]
     },
     "user_profile": {
-      "rows": 25,
+      "rows": 26,
       "minNewId": 1,
-      "maxNewId": 25,
+      "maxNewId": 26,
       "sample": [
         {
           "old": 1,
@@ -301,9 +301,9 @@
       ]
     },
     "event_sponsors": {
-      "rows": 11,
+      "rows": 15,
       "minNewId": 1,
-      "maxNewId": 11,
+      "maxNewId": 15,
       "sample": [
         {
           "old": 1,
@@ -382,9 +382,9 @@
       ]
     },
     "gallery_album": {
-      "rows": 63,
+      "rows": 64,
       "minNewId": 1,
-      "maxNewId": 63,
+      "maxNewId": 64,
       "sample": [
         {
           "old": 1,
@@ -463,9 +463,9 @@
       ]
     },
     "event_media": {
-      "rows": 1289,
+      "rows": 1310,
       "minNewId": 1,
-      "maxNewId": 1289,
+      "maxNewId": 1310,
       "sample": [
         {
           "old": 1,
@@ -1172,9 +1172,9 @@
       ]
     },
     "executive_committee_team_members": {
-      "rows": 41,
+      "rows": 43,
       "minNewId": 1,
-      "maxNewId": 41,
+      "maxNewId": 43,
       "sample": [
         {
           "old": 1,
