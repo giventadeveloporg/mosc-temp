@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-03T20:31:27.397Z",
+  "generatedAt": "2026-08-04T02:08:30.701Z",
   "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
   "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2100,
+  "statementCount": 2108,
   "tables": {
     "event_type_details": {
       "rows": 13,
@@ -35,28 +35,28 @@
       ]
     },
     "user_profile": {
-      "rows": 26,
+      "rows": 28,
       "minNewId": 1,
-      "maxNewId": 26,
+      "maxNewId": 28,
       "sample": [
         {
           "old": 1,
           "new": 1
         },
         {
-          "old": 2,
+          "old": 3,
           "new": 2
         },
         {
-          "old": 3,
+          "old": 4,
           "new": 3
         },
         {
-          "old": 4,
+          "old": 5,
           "new": 4
         },
         {
-          "old": 5,
+          "old": 6,
           "new": 5
         }
       ]
@@ -783,9 +783,9 @@
       ]
     },
     "tenant_organization": {
-      "rows": 11,
+      "rows": 12,
       "minNewId": 1,
-      "maxNewId": 11,
+      "maxNewId": 12,
       "sample": [
         {
           "old": 1,
@@ -810,9 +810,9 @@
       ]
     },
     "tenant_settings": {
-      "rows": 11,
+      "rows": 12,
       "minNewId": 1,
-      "maxNewId": 11,
+      "maxNewId": 12,
       "sample": [
         {
           "old": 1,
@@ -837,9 +837,9 @@
       ]
     },
     "tenant_email_addresses": {
-      "rows": 13,
+      "rows": 16,
       "minNewId": 1,
-      "maxNewId": 13,
+      "maxNewId": 16,
       "sample": [
         {
           "old": 1,
@@ -864,9 +864,9 @@
       ]
     },
     "satellite_domain": {
-      "rows": 5,
+      "rows": 6,
       "minNewId": 1,
-      "maxNewId": 5,
+      "maxNewId": 6,
       "sample": [
         {
           "old": 1,
