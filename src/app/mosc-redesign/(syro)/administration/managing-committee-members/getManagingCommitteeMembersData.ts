@@ -140,22 +140,35 @@ export function getManagingCommitteeMemberFilterOptions(members: ManagingCommitt
 function tokenMatchesField(text: string, token: string): boolean {
   if (!text || !token) return false;
   const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`(?:^|[^\\p{L}\\p{N}])${escaped}\\.?(?=[^\\p{L}\\p{N}]|$)`, 'iu').test(text);
+  // ASCII-friendly boundaries (plus unicode letters) — avoids soft matches inside longer words.
+  return new RegExp(`(?:^|[^a-zA-Z0-9\\p{L}\\p{N}])${escaped}\\.?(?=[^a-zA-Z0-9\\p{L}\\p{N}]|$)`, 'iu').test(
+    text
+  );
 }
 
-function memberSearchHaystack(member: ManagingCommitteeMember): string {
-  return [member.name, member.role, member.diocese, member.electedRegion, member.parish, member.address, member.notes]
-    .filter(Boolean)
-    .join(' ');
+/** Split query into tokens; strip surrounding punctuation so "K." → "k". */
+function normalizeSearchTokens(query: string): string[] {
+  return query
+    .trim()
+    .toLowerCase()
+    .split(/[\s,/]+/)
+    .map((t) => t.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ''))
+    .filter((t) => t.length > 0);
+}
+
+function nameMatchesAllTokens(name: string, tokens: string[], fullQuery: string): boolean {
+  const n = name.toLowerCase();
+  if (fullQuery && n.includes(fullQuery)) return true;
+  return tokens.every((t) => tokenMatchesField(n, t));
 }
 
 /**
- * Filter roster by free-text (name, role, diocese, region, parish, address, notes)
- * and optional exact diocese / role / region selects.
+ * Filter roster by free-text and optional exact diocese / role / region selects.
  *
- * Free-text: every whitespace-separated token must match (AND), using whole-word /
- * initial matching so "Shaji K" does not match unrelated names via a lone "K" inside
- * diocese/city words like KUNNAMKULAM / Kannur.
+ * Free-text rules (narrowed for person names):
+ * - 2+ tokens (e.g. "Shaji K. Varghese"): match the **name** only — all tokens as
+ *   whole words/initials. Avoids false hits via address/diocese letters like "K" in Kannur.
+ * - 1 token (e.g. "Kunnamkulam", "Lay"): match name, role, diocese, region, or parish.
  */
 export function filterManagingCommitteeMembers(
   members: ManagingCommitteeMember[],
@@ -182,16 +195,20 @@ export function filterManagingCommitteeMembers(
 
   const q = options.searchTerm?.trim().toLowerCase();
   if (q) {
-    const tokens = q.split(/\s+/).filter(Boolean);
+    const tokens = normalizeSearchTokens(q);
+    if (tokens.length === 0) return result;
+
     result = result.filter((m) => {
-      const name = m.name ?? '';
-      // Prefer name: all tokens appear as words/initials in the member name.
-      if (tokens.every((t) => tokenMatchesField(name, t))) return true;
-      // Full phrase anywhere (e.g. multi-word diocese typed exactly).
-      const haystack = memberSearchHaystack(m);
-      if (haystack.toLowerCase().includes(q)) return true;
-      // Otherwise every token must be a whole word/initial somewhere in the roster fields.
-      return tokens.every((t) => tokenMatchesField(haystack, t));
+      if (tokens.length >= 2) {
+        return nameMatchesAllTokens(m.name ?? '', tokens, q);
+      }
+
+      const token = tokens[0];
+      const fields = [m.name, m.role, m.diocese, m.electedRegion, m.parish].filter(Boolean) as string[];
+      return fields.some((field) => {
+        const lower = field.toLowerCase();
+        return lower.includes(token) && tokenMatchesField(field, token);
+      });
     });
   }
 

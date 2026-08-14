@@ -79,7 +79,7 @@ function ManagingCommitteeMembersFiltersInner({
         id="managing-committee-members-search"
         ariaLabel="Search Managing Committee members by name, diocese, role, or region"
         label="Search by name, diocese, role, or region"
-        placeholder="Search by name, diocese, role, or region..."
+        placeholder="Search by name (or diocese / role / region)..."
         preserveParams={['diocese', 'role', 'region']}
         inputClassName={SEARCH_INPUT_CLASS}
       />
