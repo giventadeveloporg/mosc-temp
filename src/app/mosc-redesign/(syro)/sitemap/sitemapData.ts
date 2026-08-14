@@ -106,7 +106,7 @@ export const MOSC_REDESIGN_SITEMAP: SitemapSection[] = [
       { name: 'The Holy Episcopal Synod', href: `${BASE}/administration/the-holy-episcopal-synod` },
       { name: 'Malankara Association', href: `${BASE}/administration/malankara-association` },
       { name: 'Managing Committee', href: `${BASE}/administration/the-managing-committee-cms` },
-      { name: 'Managing Committee Members', href: `${BASE}/administration/managing-committee-members` },
+      { name: 'Current Managing Committee', href: `${BASE}/administration/managing-committee-members` },
       { name: 'Working Committee', href: `${BASE}/administration/the-working-committee` },
       { name: 'Diocesan General Body', href: `${BASE}/administration/the-diocesan-general-body` },
       { name: 'Parish Managing Committee', href: `${BASE}/administration/the-parish-managing-committee` },

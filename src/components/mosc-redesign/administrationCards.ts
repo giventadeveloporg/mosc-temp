@@ -56,13 +56,13 @@ export const ADMINISTRATION_PAGE_CARDS: AdministrationCard[] = [
     imageAlt: 'The Managing Committee',
   },
   {
-    shortTitle: 'MC Members',
-    title: 'Managing Committee Members',
+    shortTitle: 'Current Managing Committee',
+    title: 'Current Managing Committee',
     excerpt:
       'Photo roster of the current Managing Committee — office bearers, metropolitans, and elected representatives for the Association term.',
     href: '/mosc-redesign/administration/managing-committee-members',
     image: '/images/administration/managing-committee.jpg',
-    imageAlt: 'Managing Committee Members',
+    imageAlt: 'Current Managing Committee',
   },
   {
     shortTitle: 'Working Committee',
