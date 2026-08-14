@@ -135,8 +135,27 @@ export function getManagingCommitteeMemberFilterOptions(members: ManagingCommitt
 }
 
 /**
+ * Whole-word / initial match so "k" matches "K." or "K Varghese" but not inside "KUNNAMKULAM".
+ */
+function tokenMatchesField(text: string, token: string): boolean {
+  if (!text || !token) return false;
+  const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(?:^|[^\\p{L}\\p{N}])${escaped}\\.?(?=[^\\p{L}\\p{N}]|$)`, 'iu').test(text);
+}
+
+function memberSearchHaystack(member: ManagingCommitteeMember): string {
+  return [member.name, member.role, member.diocese, member.electedRegion, member.parish, member.address, member.notes]
+    .filter(Boolean)
+    .join(' ');
+}
+
+/**
  * Filter roster by free-text (name, role, diocese, region, parish, address, notes)
  * and optional exact diocese / role / region selects.
+ *
+ * Free-text: every whitespace-separated token must match (AND), using whole-word /
+ * initial matching so "Shaji K" does not match unrelated names via a lone "K" inside
+ * diocese/city words like KUNNAMKULAM / Kannur.
  */
 export function filterManagingCommitteeMembers(
   members: ManagingCommitteeMember[],
@@ -163,20 +182,16 @@ export function filterManagingCommitteeMembers(
 
   const q = options.searchTerm?.trim().toLowerCase();
   if (q) {
+    const tokens = q.split(/\s+/).filter(Boolean);
     result = result.filter((m) => {
-      const haystack = [
-        m.name,
-        m.role,
-        m.diocese,
-        m.electedRegion,
-        m.parish,
-        m.address,
-        m.notes,
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
-      return haystack.includes(q);
+      const name = m.name ?? '';
+      // Prefer name: all tokens appear as words/initials in the member name.
+      if (tokens.every((t) => tokenMatchesField(name, t))) return true;
+      // Full phrase anywhere (e.g. multi-word diocese typed exactly).
+      const haystack = memberSearchHaystack(m);
+      if (haystack.toLowerCase().includes(q)) return true;
+      // Otherwise every token must be a whole word/initial somewhere in the roster fields.
+      return tokens.every((t) => tokenMatchesField(haystack, t));
     });
   }
 

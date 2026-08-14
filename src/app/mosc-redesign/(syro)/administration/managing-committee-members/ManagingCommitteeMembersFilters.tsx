@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import LiveUrlSearch from '../../components/LiveUrlSearch';
 
@@ -47,6 +47,8 @@ function ManagingCommitteeMembersFiltersInner({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  /** Bump to remount LiveUrlSearch so its local input state clears with URL filters. */
+  const [searchResetKey, setSearchResetKey] = useState(0);
 
   const dioceseValue = searchParams.get('diocese') ?? '';
   const roleValue = searchParams.get('role') ?? '';
@@ -62,17 +64,18 @@ function ManagingCommitteeMembersFiltersInner({
   };
 
   const hasAnyFilter = Boolean(
-    searchParams.get('q')?.trim() ||
-      dioceseValue ||
-      roleValue ||
-      regionValue
+    searchParams.get('q')?.trim() || dioceseValue || roleValue || regionValue
   );
 
-  const clearAllHref = pathname;
+  const clearAllFilters = () => {
+    setSearchResetKey((k) => k + 1);
+    router.replace(pathname, { scroll: false });
+  };
 
   return (
     <div className="mb-6 space-y-3" role="search" aria-label="Search and filter Managing Committee members">
       <LiveUrlSearch
+        key={searchResetKey}
         id="managing-committee-members-search"
         ariaLabel="Search Managing Committee members by name, diocese, role, or region"
         label="Search by name, diocese, role, or region"
@@ -154,7 +157,7 @@ function ManagingCommitteeMembersFiltersInner({
       {hasAnyFilter ? (
         <button
           type="button"
-          onClick={() => router.replace(clearAllHref, { scroll: false })}
+          onClick={clearAllFilters}
           className="font-syro-primary text-sm text-syro-dark-gray hover:text-syro-red hover:underline"
         >
           Clear all filters
