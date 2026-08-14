@@ -1,13 +1,17 @@
 import React from 'react';
 import QuickLinks from '../../components/QuickLinks';
 import SyroPageBanner from '../../components/SyroPageBanner';
-import LiveUrlSearch from '../../components/LiveUrlSearch';
 import { MoscHubCardMedia } from '../../components/MoscHubCardMedia';
 import DirectoryPagination from '../../directory/components/DirectoryPagination';
 import AdministrationSidebar from '../components/AdministrationSidebar';
 import { DIRECTORY_PAGE_SIZE } from '../../directory/types/listPagination';
 import { buildCmsListUrl } from '../../lib/cmsListUrl';
-import { getManagingCommitteeMembersData } from './getManagingCommitteeMembersData';
+import ManagingCommitteeMembersFilters from './ManagingCommitteeMembersFilters';
+import {
+  filterManagingCommitteeMembers,
+  getManagingCommitteeMemberFilterOptions,
+  getManagingCommitteeMembersData,
+} from './getManagingCommitteeMembersData';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,25 +30,55 @@ const TERM_YEAR = 2026;
 export default async function ManagingCommitteeMembersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; q?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    q?: string;
+    diocese?: string;
+    role?: string;
+    region?: string;
+  }>;
 }) {
   const params = await searchParams;
   const page = Math.max(1, parseInt(params.page ?? '1', 10) || 1);
-  const nameSearch = typeof params.q === 'string' ? params.q : undefined;
-  const searchTerm = nameSearch?.trim() ?? '';
-  const hasSearch = searchTerm.length > 0;
+  const searchTerm = typeof params.q === 'string' ? params.q.trim() : '';
+  const dioceseFilter = typeof params.diocese === 'string' ? params.diocese.trim() : '';
+  const roleFilter = typeof params.role === 'string' ? params.role.trim() : '';
+  const regionFilter = typeof params.region === 'string' ? params.region.trim() : '';
 
-  const { members, pagination } = await getManagingCommitteeMembersData({
-    nameSearch: searchTerm || undefined,
+  const hasSearch = searchTerm.length > 0;
+  const hasSelectFilter = Boolean(dioceseFilter || roleFilter || regionFilter);
+  const hasAnyFilter = hasSearch || hasSelectFilter;
+
+  // Load full roster so search can match diocese / role / region / address (not only name).
+  const { members: allMembers } = await getManagingCommitteeMembersData({
     termYear: TERM_YEAR,
     isCurrent: true,
-    page,
-    pageSize: DIRECTORY_PAGE_SIZE,
+    loadAll: true,
   });
 
-  const subtitle = hasSearch
-    ? `${pagination.total} member${pagination.total !== 1 ? 's' : ''} matching "${searchTerm}".`
-    : `Term ${TERM_YEAR}. ${pagination.total} member${pagination.total !== 1 ? 's' : ''}.`;
+  const filterOptions = getManagingCommitteeMemberFilterOptions(allMembers);
+  const filtered = filterManagingCommitteeMembers(allMembers, {
+    searchTerm: searchTerm || undefined,
+    diocese: dioceseFilter || undefined,
+    role: roleFilter || undefined,
+    region: regionFilter || undefined,
+  });
+
+  const total = filtered.length;
+  const pageCount = Math.max(1, Math.ceil(total / DIRECTORY_PAGE_SIZE) || 1);
+  const safePage = Math.min(page, pageCount);
+  const start = (safePage - 1) * DIRECTORY_PAGE_SIZE;
+  const members = filtered.slice(start, start + DIRECTORY_PAGE_SIZE);
+
+  const filterBits: string[] = [];
+  if (hasSearch) filterBits.push(`"${searchTerm}"`);
+  if (dioceseFilter) filterBits.push(`diocese ${dioceseFilter}`);
+  if (roleFilter) filterBits.push(`role ${roleFilter}`);
+  if (regionFilter) filterBits.push(`region ${regionFilter}`);
+
+  const subtitle = hasAnyFilter
+    ? `${total} member${total !== 1 ? 's' : ''} matching ${filterBits.join(', ')}.`
+    : `Term ${TERM_YEAR}. ${total} member${total !== 1 ? 's' : ''}.`;
 
   return (
     <div className="bg-syro-bg-gray">
@@ -67,18 +101,15 @@ export default async function ManagingCommitteeMembersPage({
               </h3>
               <p className="font-syro-primary text-syro-dark-gray mb-6">{subtitle}</p>
 
-              <div className="mb-6">
-                <LiveUrlSearch
-                  id="managing-committee-members-search"
-                  ariaLabel="Search Managing Committee members by name"
-                  placeholder="Search members by name..."
-                  inputClassName="font-syro-primary w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
-                />
-              </div>
+              <ManagingCommitteeMembersFilters
+                dioceses={filterOptions.dioceses}
+                roles={filterOptions.roles}
+                regions={filterOptions.regions}
+              />
 
               {members.length === 0 ? (
                 <p className="font-syro-primary text-syro-dark-gray mb-12">
-                  {hasSearch
+                  {hasAnyFilter
                     ? 'No members match your search.'
                     : 'Managing Committee member roster is not available yet.'}
                 </p>
@@ -113,10 +144,22 @@ export default async function ManagingCommitteeMembersPage({
                                 {member.role}
                               </p>
                             ) : null}
+                            {member.diocese ? (
+                              <p className="font-syro-primary text-sm text-syro-dark-gray mb-2">
+                                <span className="font-semibold text-syro-blue">Diocese:</span>{' '}
+                                {member.diocese}
+                              </p>
+                            ) : null}
                             {member.electedRegion ? (
                               <p className="font-syro-primary text-sm text-syro-dark-gray mb-2">
                                 <span className="font-semibold text-syro-blue">Elected region:</span>{' '}
                                 {member.electedRegion}
+                              </p>
+                            ) : null}
+                            {member.parish ? (
+                              <p className="font-syro-primary text-sm text-syro-dark-gray mb-2">
+                                <span className="font-semibold text-syro-blue">Parish:</span>{' '}
+                                {member.parish}
                               </p>
                             ) : null}
                             {member.address ? (
@@ -133,12 +176,18 @@ export default async function ManagingCommitteeMembersPage({
                   </div>
 
                   <DirectoryPagination
-                    page={pagination.page}
-                    pageCount={pagination.pageCount}
-                    total={pagination.total}
+                    page={safePage}
+                    pageCount={pageCount}
+                    total={total}
                     pageSize={DIRECTORY_PAGE_SIZE}
                     itemsOnPage={members.length}
-                    buildPageHref={(p) => buildCmsListUrl(BASE_PATH, p, searchTerm || undefined)}
+                    buildPageHref={(p) =>
+                      buildCmsListUrl(BASE_PATH, p, searchTerm || undefined, {
+                        diocese: dioceseFilter || undefined,
+                        role: roleFilter || undefined,
+                        region: regionFilter || undefined,
+                      })
+                    }
                     itemLabel="members"
                     emptyLabel="No members found"
                   />

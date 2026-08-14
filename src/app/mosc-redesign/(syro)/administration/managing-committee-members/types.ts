@@ -29,10 +29,22 @@ export interface ManagingCommitteeMembersListResult {
 }
 
 export interface ManagingCommitteeMembersListOptions {
+  /** Free-text search (name only when using Strapi paginated path). Prefer loadAll + filterManagingCommitteeMembers for multi-field. */
   nameSearch?: string;
   termYear?: number;
   isCurrent?: boolean;
   page?: number;
   pageSize?: number;
   loadAll?: boolean;
+}
+
+/** Client/server filter for roster search (name, role, diocese, region, etc.). */
+export interface ManagingCommitteeMembersFilterOptions {
+  searchTerm?: string;
+  /** Exact match on diocese (case-insensitive). */
+  diocese?: string;
+  /** Exact match on role (case-insensitive). */
+  role?: string;
+  /** Exact match on electedRegion (case-insensitive). */
+  region?: string;
 }

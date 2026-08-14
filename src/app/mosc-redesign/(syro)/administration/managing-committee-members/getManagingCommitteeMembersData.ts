@@ -17,6 +17,7 @@ import type {
   ManagingCommitteeMember,
   ManagingCommitteeMembersListResult,
   ManagingCommitteeMembersListOptions,
+  ManagingCommitteeMembersFilterOptions,
 } from './types';
 
 const STRAPI_LIST_FETCH: RequestInit = {
@@ -110,6 +111,77 @@ const EMPTY_LIST: ManagingCommitteeMembersListResult = {
   members: [],
   pagination: EMPTY_DIRECTORY_PAGINATION,
 };
+
+function uniqueSorted(values: (string | null | undefined)[]): string[] {
+  const set = new Set<string>();
+  for (const value of values) {
+    const trimmed = typeof value === 'string' ? value.trim() : '';
+    if (trimmed) set.add(trimmed);
+  }
+  return [...set].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+}
+
+/** Distinct diocese / role / region values for filter dropdowns. */
+export function getManagingCommitteeMemberFilterOptions(members: ManagingCommitteeMember[]): {
+  dioceses: string[];
+  roles: string[];
+  regions: string[];
+} {
+  return {
+    dioceses: uniqueSorted(members.map((m) => m.diocese)),
+    roles: uniqueSorted(members.map((m) => m.role)),
+    regions: uniqueSorted(members.map((m) => m.electedRegion)),
+  };
+}
+
+/**
+ * Filter roster by free-text (name, role, diocese, region, parish, address, notes)
+ * and optional exact diocese / role / region selects.
+ */
+export function filterManagingCommitteeMembers(
+  members: ManagingCommitteeMember[],
+  options?: ManagingCommitteeMembersFilterOptions
+): ManagingCommitteeMember[] {
+  if (!options) return members;
+
+  let result = members;
+
+  const diocese = options.diocese?.trim().toLowerCase();
+  if (diocese) {
+    result = result.filter((m) => (m.diocese ?? '').trim().toLowerCase() === diocese);
+  }
+
+  const role = options.role?.trim().toLowerCase();
+  if (role) {
+    result = result.filter((m) => (m.role ?? '').trim().toLowerCase() === role);
+  }
+
+  const region = options.region?.trim().toLowerCase();
+  if (region) {
+    result = result.filter((m) => (m.electedRegion ?? '').trim().toLowerCase() === region);
+  }
+
+  const q = options.searchTerm?.trim().toLowerCase();
+  if (q) {
+    result = result.filter((m) => {
+      const haystack = [
+        m.name,
+        m.role,
+        m.diocese,
+        m.electedRegion,
+        m.parish,
+        m.address,
+        m.notes,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }
+
+  return result;
+}
 
 function buildBaseParams(
   tenantId: string,
