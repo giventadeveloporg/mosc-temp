@@ -27,6 +27,31 @@ const STRAPI_LIST_FETCH: RequestInit = {
 const LOAD_ALL_PAGE_SIZE = 100;
 const DEFAULT_TERM_YEAR = 2026;
 
+/** Strip mobile/telephone lines and inline phone labels from address-like text. */
+function stripPhoneNumbers(text: string | null | undefined): string | null {
+  if (!text || typeof text !== 'string') return null;
+  const cleaned = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter(
+      (line) =>
+        !/^(mob|mobile|ph|tel|telephone|cell|fax|land\s*line)\s*[:.]/i.test(line) &&
+        !/\b(mob|mobile|ph|tel|telephone|cell|fax)\s*[:.]\s*[+\d]/i.test(line)
+    )
+    .map((line) =>
+      line
+        .replace(/\b(mob|mobile|ph|tel|telephone|cell|fax|land\s*line)\s*[:.]\s*[+\d][\d\s\-/,.]*/gi, '')
+        .replace(/(?:^|[\s,;])(?:\+?\d[\d\s\-()]{7,}\d)/g, '')
+        .replace(/\s{2,}/g, ' ')
+        .trim()
+    )
+    .filter(Boolean)
+    .join('\n')
+    .trim();
+  return cleaned || null;
+}
+
 function parseMember(raw: Record<string, unknown>, baseUrl: string): ManagingCommitteeMember {
   const item = unwrapStrapiRecord(raw);
   const documentId = typeof item.documentId === 'string' ? item.documentId : '';
@@ -35,6 +60,11 @@ function parseMember(raw: Record<string, unknown>, baseUrl: string): ManagingCom
   const role = typeof item.role === 'string' ? item.role : null;
   const diocese = typeof item.diocese === 'string' ? item.diocese : null;
   const parish = typeof item.parish === 'string' ? item.parish : null;
+  const addressRaw = typeof item.address === 'string' ? item.address : null;
+  const electedRegion =
+    typeof item.electedRegion === 'string' && item.electedRegion.trim()
+      ? item.electedRegion.trim()
+      : null;
   const serialNumber = typeof item.serialNumber === 'number' ? item.serialNumber : null;
   const order = typeof item.order === 'number' ? item.order : 0;
   const isCurrent = item.isCurrent !== false;
@@ -51,6 +81,8 @@ function parseMember(raw: Record<string, unknown>, baseUrl: string): ManagingCom
     role,
     diocese,
     parish,
+    address: stripPhoneNumbers(addressRaw),
+    electedRegion,
     serialNumber,
     order,
     isCurrent,

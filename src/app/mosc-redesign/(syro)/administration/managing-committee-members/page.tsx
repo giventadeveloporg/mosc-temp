@@ -20,7 +20,6 @@ export const metadata = {
 const BANNER_DESCRIPTION =
   'Members of the Malankara Association Managing Committee for the current term, including office bearers, metropolitans, and elected representatives.';
 
-const PLACEHOLDER_IMAGE = '/images/administration/managing-committee.jpg';
 const BASE_PATH = '/mosc-redesign/administration/managing-committee-members';
 const TERM_YEAR = 2026;
 
@@ -87,28 +86,42 @@ export default async function ManagingCommitteeMembersPage({
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
                     {members.map((member) => {
-                      const imageSrc = member.photoUrl ?? PLACEHOLDER_IMAGE;
-                      const metaParts = [member.role, member.diocese, member.parish].filter(Boolean);
+                      const hasPhoto = Boolean(member.photoUrl);
                       return (
                         <div
                           key={member.documentId || member.slug}
                           className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full"
                         >
-                          <MoscHubCardMedia
-                            src={imageSrc}
-                            alt={member.photoAlt ?? member.name}
-                            frame="portraitUniform"
-                            objectPosition="top"
-                            frameClassName="bg-white"
-                            unoptimized={Boolean(member.photoUrl?.startsWith('http'))}
-                          />
-                          <div className="p-8 pt-0 flex flex-col flex-1">
+                          {hasPhoto && member.photoUrl ? (
+                            <MoscHubCardMedia
+                              src={member.photoUrl}
+                              alt={member.photoAlt ?? member.name}
+                              frame="portraitUniform"
+                              objectPosition="top"
+                              frameClassName="bg-white"
+                              unoptimized={member.photoUrl.startsWith('http')}
+                            />
+                          ) : null}
+                          <div
+                            className={`p-8 flex flex-col flex-1 ${hasPhoto ? 'pt-0' : ''}`}
+                          >
                             <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-2 leading-snug">
                               {member.name}
                             </h3>
-                            {metaParts.length > 0 ? (
-                              <p className="font-syro-primary text-base text-syro-dark-gray flex-1 leading-relaxed">
-                                {metaParts.join(' · ')}
+                            {member.role ? (
+                              <p className="font-syro-primary text-sm font-medium text-syro-red mb-2">
+                                {member.role}
+                              </p>
+                            ) : null}
+                            {member.electedRegion ? (
+                              <p className="font-syro-primary text-sm text-syro-dark-gray mb-2">
+                                <span className="font-semibold text-syro-blue">Elected region:</span>{' '}
+                                {member.electedRegion}
+                              </p>
+                            ) : null}
+                            {member.address ? (
+                              <p className="font-syro-primary text-sm text-syro-dark-gray leading-relaxed whitespace-pre-line flex-1">
+                                {member.address}
                               </p>
                             ) : (
                               <div className="flex-1" />

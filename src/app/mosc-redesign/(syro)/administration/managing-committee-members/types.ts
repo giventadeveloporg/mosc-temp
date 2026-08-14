@@ -5,6 +5,10 @@ export interface ManagingCommitteeMember {
   role: string | null;
   diocese: string | null;
   parish: string | null;
+  /** Postal / contact address without phone numbers */
+  address: string | null;
+  /** Elected region / constituency from roster */
+  electedRegion: string | null;
   serialNumber: number | null;
   order: number;
   isCurrent: boolean;
