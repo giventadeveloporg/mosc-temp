@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-14T04:16:25.282Z",
-  "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
-  "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
+  "generatedAt": "2026-08-15T03:45:53.501Z",
+  "input": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
+  "output": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2206,
+  "statementCount": 2231,
   "tables": {
     "event_type_details": {
       "rows": 13,
@@ -62,9 +62,9 @@
       ]
     },
     "event_details": {
-      "rows": 34,
+      "rows": 38,
       "minNewId": 1,
-      "maxNewId": 31,
+      "maxNewId": 35,
       "sample": [
         {
           "old": 1,
@@ -301,9 +301,9 @@
       ]
     },
     "event_sponsors": {
-      "rows": 15,
+      "rows": 21,
       "minNewId": 1,
-      "maxNewId": 15,
+      "maxNewId": 21,
       "sample": [
         {
           "old": 1,
@@ -463,9 +463,9 @@
       ]
     },
     "event_media": {
-      "rows": 1360,
+      "rows": 1370,
       "minNewId": 1,
-      "maxNewId": 1360,
+      "maxNewId": 1370,
       "sample": [
         {
           "old": 1,
@@ -1172,9 +1172,9 @@
       ]
     },
     "executive_committee_team_members": {
-      "rows": 43,
+      "rows": 48,
       "minNewId": 1,
-      "maxNewId": 43,
+      "maxNewId": 48,
       "sample": [
         {
           "old": 1,
@@ -1596,19 +1596,6 @@
       ]
     }
   },
-  "fkWarningCount": 2,
-  "fkWarnings": [
-    {
-      "table": "event_live_update",
-      "column": "event_id",
-      "oldValue": 34,
-      "expectedParent": "event_details"
-    },
-    {
-      "table": "event_score_card",
-      "column": "event_id",
-      "oldValue": 34,
-      "expectedParent": "event_details"
-    }
-  ]
+  "fkWarningCount": 0,
+  "fkWarnings": []
 }
