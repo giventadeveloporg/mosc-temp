@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-15T06:02:52.218Z",
+  "generatedAt": "2026-08-16T02:45:33.666Z",
   "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
   "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2187,
+  "statementCount": 2183,
   "tables": {
     "event_type_details": {
       "rows": 13,
@@ -62,9 +62,9 @@
       ]
     },
     "event_details": {
-      "rows": 38,
+      "rows": 36,
       "minNewId": 1,
-      "maxNewId": 35,
+      "maxNewId": 33,
       "sample": [
         {
           "old": 1,
@@ -463,9 +463,9 @@
       ]
     },
     "event_media": {
-      "rows": 1370,
+      "rows": 1368,
       "minNewId": 1,
-      "maxNewId": 1370,
+      "maxNewId": 1368,
       "sample": [
         {
           "old": 1,
@@ -1596,6 +1596,19 @@
       ]
     }
   },
-  "fkWarningCount": 0,
-  "fkWarnings": []
+  "fkWarningCount": 2,
+  "fkWarnings": [
+    {
+      "table": "event_live_update",
+      "column": "event_id",
+      "oldValue": 34,
+      "expectedParent": "event_details"
+    },
+    {
+      "table": "event_score_card",
+      "column": "event_id",
+      "oldValue": 34,
+      "expectedParent": "event_details"
+    }
+  ]
 }
