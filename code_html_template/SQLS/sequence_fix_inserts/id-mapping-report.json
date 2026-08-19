@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-16T18:05:45.720Z",
-  "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
-  "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
+  "generatedAt": "2026-08-19T03:22:07.240Z",
+  "input": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
+  "output": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2189,
+  "statementCount": 2210,
   "tables": {
     "event_type_details": {
       "rows": 13,
@@ -62,9 +62,9 @@
       ]
     },
     "event_details": {
-      "rows": 36,
+      "rows": 39,
       "minNewId": 1,
-      "maxNewId": 33,
+      "maxNewId": 36,
       "sample": [
         {
           "old": 1,
@@ -301,9 +301,9 @@
       ]
     },
     "event_sponsors": {
-      "rows": 21,
+      "rows": 24,
       "minNewId": 1,
-      "maxNewId": 21,
+      "maxNewId": 24,
       "sample": [
         {
           "old": 1,
@@ -463,9 +463,9 @@
       ]
     },
     "event_media": {
-      "rows": 1368,
+      "rows": 1376,
       "minNewId": 1,
-      "maxNewId": 1368,
+      "maxNewId": 1376,
       "sample": [
         {
           "old": 1,
@@ -517,9 +517,9 @@
       ]
     },
     "event_poll": {
-      "rows": 9,
+      "rows": 10,
       "minNewId": 1,
-      "maxNewId": 9,
+      "maxNewId": 10,
       "sample": [
         {
           "old": 1,
@@ -544,9 +544,9 @@
       ]
     },
     "event_poll_option": {
-      "rows": 16,
+      "rows": 19,
       "minNewId": 1,
-      "maxNewId": 16,
+      "maxNewId": 19,
       "sample": [
         {
           "old": 1,
@@ -571,9 +571,9 @@
       ]
     },
     "event_poll_response": {
-      "rows": 4,
+      "rows": 5,
       "minNewId": 1,
-      "maxNewId": 4,
+      "maxNewId": 5,
       "sample": [
         {
           "old": 1,
@@ -590,6 +590,10 @@
         {
           "old": 4,
           "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
         }
       ]
     },
@@ -1541,6 +1545,21 @@
         }
       ]
     },
+    "event_competition_content_block": {
+      "rows": 2,
+      "minNewId": 1,
+      "maxNewId": 2,
+      "sample": [
+        {
+          "old": 2,
+          "new": 1
+        },
+        {
+          "old": 3,
+          "new": 2
+        }
+      ]
+    },
     "bulk_operation_log": {
       "rows": 6,
       "minNewId": 1,
@@ -1596,19 +1615,6 @@
       ]
     }
   },
-  "fkWarningCount": 2,
-  "fkWarnings": [
-    {
-      "table": "event_live_update",
-      "column": "event_id",
-      "oldValue": 34,
-      "expectedParent": "event_details"
-    },
-    {
-      "table": "event_score_card",
-      "column": "event_id",
-      "oldValue": 34,
-      "expectedParent": "event_details"
-    }
-  ]
+  "fkWarningCount": 0,
+  "fkWarnings": []
 }
