@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-19T18:11:59.940Z",
-  "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
-  "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
+  "generatedAt": "2026-08-22T03:32:10.986Z",
+  "input": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
+  "output": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2213,
+  "statementCount": 2230,
   "tables": {
     "event_type_details": {
       "rows": 13,
@@ -463,9 +463,9 @@
       ]
     },
     "event_media": {
-      "rows": 1376,
+      "rows": 1379,
       "minNewId": 1,
-      "maxNewId": 1376,
+      "maxNewId": 1379,
       "sample": [
         {
           "old": 1,
@@ -1545,10 +1545,25 @@
         }
       ]
     },
-    "event_competition": {
+    "event_competition_day": {
       "rows": 2,
       "minNewId": 1,
       "maxNewId": 2,
+      "sample": [
+        {
+          "old": 3,
+          "new": 1
+        },
+        {
+          "old": 4,
+          "new": 2
+        }
+      ]
+    },
+    "event_competition": {
+      "rows": 3,
+      "minNewId": 1,
+      "maxNewId": 3,
       "sample": [
         {
           "old": 12,
@@ -1557,6 +1572,10 @@
         {
           "old": 13,
           "new": 2
+        },
+        {
+          "old": 14,
+          "new": 3
         }
       ]
     },
@@ -1572,6 +1591,63 @@
         {
           "old": 3,
           "new": 2
+        }
+      ]
+    },
+    "event_competition_participant": {
+      "rows": 7,
+      "minNewId": 1,
+      "maxNewId": 7,
+      "sample": [
+        {
+          "old": 3,
+          "new": 1
+        },
+        {
+          "old": 4,
+          "new": 2
+        },
+        {
+          "old": 5,
+          "new": 3
+        },
+        {
+          "old": 6,
+          "new": 4
+        },
+        {
+          "old": 7,
+          "new": 5
+        }
+      ]
+    },
+    "event_competition_registration": {
+      "rows": 3,
+      "minNewId": 1,
+      "maxNewId": 3,
+      "sample": [
+        {
+          "old": 4,
+          "new": 1
+        },
+        {
+          "old": 3,
+          "new": 2
+        },
+        {
+          "old": 5,
+          "new": 3
+        }
+      ]
+    },
+    "event_competition_result": {
+      "rows": 1,
+      "minNewId": 1,
+      "maxNewId": 1,
+      "sample": [
+        {
+          "old": 2,
+          "new": 1
         }
       ]
     },

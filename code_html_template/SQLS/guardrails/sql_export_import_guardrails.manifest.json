@@ -1,14 +1,14 @@
 {
   "$schemaComment": "Baseline for export/import SQL guardrails. Refresh with: node scripts/sql_export_import_guardrails.cjs update-manifest",
   "version": 2,
-  "updatedAt": "2026-08-01",
+  "updatedAt": "2026-08-22",
   "backupKeep": 5,
   "files": {
     "export.sql": {
       "relativePath": "export.sql",
-      "minBytes": 2000000,
-      "minTotalInserts": 1800,
-      "minDistinctTables": 50
+      "minBytes": 2349536,
+      "minTotalInserts": 1825,
+      "minDistinctTables": 62
     },
     "ordered.sql": {
       "relativePath": "corrected_event_media_inserts.ordered.sql",
@@ -35,21 +35,21 @@
   },
   "criticalTables": {
     "_comment": "Lookup / configuration tables that must not be empty after a valid export. Raise mins via update-manifest after intentional data growth.",
-    "tenant_settings": 11,
-    "tenant_organization": 11,
-    "tenant_email_addresses": 10,
-    "event_type_details": 10,
-    "membership_plan": 4,
-    "payment_provider_config": 2,
-    "satellite_domain": 3,
-    "user_profile": 10,
-    "event_details": 20,
-    "event_media": 500,
-    "gallery_category": 10,
-    "gallery_album": 40,
-    "executive_committee_team_members": 20,
-    "official_document_category": 50,
-    "focus_group": 10
+    "tenant_settings": 13,
+    "tenant_organization": 14,
+    "tenant_email_addresses": 19,
+    "event_type_details": 13,
+    "membership_plan": 7,
+    "payment_provider_config": 4,
+    "satellite_domain": 7,
+    "user_profile": 30,
+    "event_details": 36,
+    "event_media": 1379,
+    "gallery_category": 16,
+    "gallery_album": 66,
+    "executive_committee_team_members": 48,
+    "official_document_category": 95,
+    "focus_group": 23
   },
   "schemaColumnSyncTables": [
     "*"
@@ -72,6 +72,13 @@
     "event_attendee",
     "event_attendee_guest",
     "event_calendar_entry",
+    "event_competition",
+    "event_competition_content_block",
+    "event_competition_day",
+    "event_competition_participant",
+    "event_competition_registration",
+    "event_competition_result",
+    "event_competition_settings",
     "event_contacts",
     "event_details",
     "event_emails",
