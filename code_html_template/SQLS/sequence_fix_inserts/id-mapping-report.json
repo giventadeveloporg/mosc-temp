@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-30T00:41:08.646Z",
-  "input": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
-  "output": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
+  "generatedAt": "2026-08-31T01:39:42.767Z",
+  "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
+  "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2249,
+  "statementCount": 2435,
   "tables": {
     "event_type_details": {
       "rows": 13,
@@ -35,9 +35,9 @@
       ]
     },
     "user_profile": {
-      "rows": 30,
+      "rows": 32,
       "minNewId": 1,
-      "maxNewId": 30,
+      "maxNewId": 32,
       "sample": [
         {
           "old": 1,
@@ -62,9 +62,9 @@
       ]
     },
     "event_details": {
-      "rows": 39,
+      "rows": 44,
       "minNewId": 1,
-      "maxNewId": 36,
+      "maxNewId": 41,
       "sample": [
         {
           "old": 1,
@@ -166,9 +166,9 @@
       ]
     },
     "event_attendee": {
-      "rows": 14,
+      "rows": 15,
       "minNewId": 1,
-      "maxNewId": 14,
+      "maxNewId": 15,
       "sample": [
         {
           "old": 1,
@@ -193,9 +193,9 @@
       ]
     },
     "event_attendee_guest": {
-      "rows": 12,
+      "rows": 13,
       "minNewId": 1,
-      "maxNewId": 12,
+      "maxNewId": 13,
       "sample": [
         {
           "old": 1,
@@ -301,9 +301,9 @@
       ]
     },
     "event_sponsors": {
-      "rows": 32,
+      "rows": 49,
       "minNewId": 1,
-      "maxNewId": 32,
+      "maxNewId": 49,
       "sample": [
         {
           "old": 1,
@@ -382,9 +382,9 @@
       ]
     },
     "gallery_album": {
-      "rows": 66,
+      "rows": 67,
       "minNewId": 1,
-      "maxNewId": 66,
+      "maxNewId": 67,
       "sample": [
         {
           "old": 1,
@@ -463,9 +463,9 @@
       ]
     },
     "event_media": {
-      "rows": 1390,
+      "rows": 1420,
       "minNewId": 1,
-      "maxNewId": 1390,
+      "maxNewId": 1420,
       "sample": [
         {
           "old": 1,
@@ -517,9 +517,9 @@
       ]
     },
     "event_poll": {
-      "rows": 10,
+      "rows": 11,
       "minNewId": 1,
-      "maxNewId": 10,
+      "maxNewId": 11,
       "sample": [
         {
           "old": 1,
@@ -544,9 +544,9 @@
       ]
     },
     "event_poll_option": {
-      "rows": 19,
+      "rows": 22,
       "minNewId": 1,
-      "maxNewId": 19,
+      "maxNewId": 22,
       "sample": [
         {
           "old": 1,
@@ -571,9 +571,9 @@
       ]
     },
     "event_poll_response": {
-      "rows": 5,
+      "rows": 6,
       "minNewId": 1,
-      "maxNewId": 5,
+      "maxNewId": 6,
       "sample": [
         {
           "old": 1,
@@ -787,6 +787,33 @@
       ]
     },
     "tenant_organization": {
+      "rows": 15,
+      "minNewId": 1,
+      "maxNewId": 15,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "tenant_settings": {
       "rows": 14,
       "minNewId": 1,
       "maxNewId": 14,
@@ -813,37 +840,10 @@
         }
       ]
     },
-    "tenant_settings": {
-      "rows": 13,
-      "minNewId": 1,
-      "maxNewId": 13,
-      "sample": [
-        {
-          "old": 1,
-          "new": 1
-        },
-        {
-          "old": 2,
-          "new": 2
-        },
-        {
-          "old": 3,
-          "new": 3
-        },
-        {
-          "old": 4,
-          "new": 4
-        },
-        {
-          "old": 5,
-          "new": 5
-        }
-      ]
-    },
     "tenant_email_addresses": {
-      "rows": 19,
+      "rows": 22,
       "minNewId": 1,
-      "maxNewId": 19,
+      "maxNewId": 22,
       "sample": [
         {
           "old": 1,
@@ -868,9 +868,9 @@
       ]
     },
     "satellite_domain": {
-      "rows": 7,
+      "rows": 8,
       "minNewId": 1,
-      "maxNewId": 7,
+      "maxNewId": 8,
       "sample": [
         {
           "old": 1,
@@ -1176,9 +1176,9 @@
       ]
     },
     "executive_committee_team_members": {
-      "rows": 48,
+      "rows": 53,
       "minNewId": 1,
-      "maxNewId": 48,
+      "maxNewId": 53,
       "sample": [
         {
           "old": 1,
@@ -1260,9 +1260,9 @@
       ]
     },
     "membership_plan": {
-      "rows": 7,
+      "rows": 8,
       "minNewId": 1,
-      "maxNewId": 7,
+      "maxNewId": 8,
       "sample": [
         {
           "old": 1,
@@ -1546,9 +1546,9 @@
       ]
     },
     "event_competition_day": {
-      "rows": 2,
+      "rows": 4,
       "minNewId": 1,
-      "maxNewId": 2,
+      "maxNewId": 4,
       "sample": [
         {
           "old": 1,
@@ -1557,13 +1557,21 @@
         {
           "old": 2,
           "new": 2
+        },
+        {
+          "old": 4,
+          "new": 3
+        },
+        {
+          "old": 5,
+          "new": 4
         }
       ]
     },
     "event_competition": {
-      "rows": 3,
+      "rows": 6,
       "minNewId": 1,
-      "maxNewId": 3,
+      "maxNewId": 6,
       "sample": [
         {
           "old": 1,
@@ -1576,13 +1584,21 @@
         {
           "old": 3,
           "new": 3
+        },
+        {
+          "old": 6,
+          "new": 4
+        },
+        {
+          "old": 7,
+          "new": 5
         }
       ]
     },
     "event_competition_content_block": {
-      "rows": 2,
+      "rows": 4,
       "minNewId": 1,
-      "maxNewId": 2,
+      "maxNewId": 4,
       "sample": [
         {
           "old": 1,
@@ -1591,13 +1607,21 @@
         {
           "old": 2,
           "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
         }
       ]
     },
     "event_competition_participant": {
-      "rows": 7,
+      "rows": 14,
       "minNewId": 1,
-      "maxNewId": 7,
+      "maxNewId": 14,
       "sample": [
         {
           "old": 1,
@@ -1622,9 +1646,9 @@
       ]
     },
     "event_competition_registration": {
-      "rows": 3,
+      "rows": 6,
       "minNewId": 1,
-      "maxNewId": 3,
+      "maxNewId": 6,
       "sample": [
         {
           "old": 1,
@@ -1637,28 +1661,44 @@
         {
           "old": 3,
           "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
         }
       ]
     },
     "event_competition_result": {
-      "rows": 1,
+      "rows": 2,
       "minNewId": 1,
-      "maxNewId": 1,
+      "maxNewId": 2,
       "sample": [
         {
           "old": 1,
           "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
         }
       ]
     },
     "event_competition_settings": {
-      "rows": 1,
+      "rows": 2,
       "minNewId": 1,
-      "maxNewId": 1,
+      "maxNewId": 2,
       "sample": [
         {
           "old": 1,
           "new": 1
+        },
+        {
+          "old": 9,
+          "new": 2
         }
       ]
     },
