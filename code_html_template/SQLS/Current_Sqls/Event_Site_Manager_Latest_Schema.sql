@@ -217,6 +217,7 @@ DROP TABLE IF EXISTS public.profile_achievement CASCADE;
 DROP TABLE IF EXISTS public.profile_writing CASCADE;
 DROP TABLE IF EXISTS public.public_profile CASCADE;
 DROP TABLE IF EXISTS public.tenant_settings CASCADE;
+DROP TABLE IF EXISTS public.tmp_tenant_clone_map CASCADE;
 DROP TABLE IF EXISTS public.user_profile CASCADE;
 DROP TABLE IF EXISTS public.tenant_organization CASCADE;
 DROP TABLE IF EXISTS public.databasechangeloglock CASCADE;
@@ -3062,6 +3063,18 @@ COMMENT ON COLUMN public.tenant_organization.site_type IS 'Product archetype for
 COMMENT ON COLUMN public.tenant_organization.site_template_version IS 'Optional theme/template variant within a site_type.';
 COMMENT ON COLUMN public.tenant_organization.stripe_subscription_id IS 'Stripe subscription id for the tenant platform subscription (gas station per-location billing).';
 
+
+--
+-- Name: tmp_tenant_clone_map; Type: TABLE; Schema: public; Owner: postgres
+-- Temporary ID map used during tenant clone operations (exported with data dumps).
+--
+
+CREATE TABLE public.tmp_tenant_clone_map (
+    tbl text NOT NULL,
+    old_id bigint NOT NULL,
+    new_id bigint NOT NULL,
+    CONSTRAINT tmp_tenant_clone_map_pkey PRIMARY KEY (tbl, old_id)
+);
 
 --
 -- TOC entry 231 (class 1259 OID 82809)
