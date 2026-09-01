@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-09-01T21:14:11.382Z",
-  "input": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
-  "output": "C:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
+  "generatedAt": "2026-09-01T23:01:07.105Z",
+  "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
+  "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2355,
+  "statementCount": 2360,
   "tables": {
     "event_type_details": {
       "rows": 13,
@@ -301,9 +301,9 @@
       ]
     },
     "event_sponsors": {
-      "rows": 50,
+      "rows": 53,
       "minNewId": 1,
-      "maxNewId": 50,
+      "maxNewId": 53,
       "sample": [
         {
           "old": 1,
@@ -382,9 +382,9 @@
       ]
     },
     "gallery_album": {
-      "rows": 67,
+      "rows": 66,
       "minNewId": 1,
-      "maxNewId": 67,
+      "maxNewId": 66,
       "sample": [
         {
           "old": 1,
@@ -463,9 +463,9 @@
       ]
     },
     "event_media": {
-      "rows": 1423,
+      "rows": 1426,
       "minNewId": 1,
-      "maxNewId": 1423,
+      "maxNewId": 1426,
       "sample": [
         {
           "old": 1,
@@ -1686,19 +1686,19 @@
           "new": 1
         },
         {
-          "old": 12,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 13,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 14,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 15,
+          "old": 5,
           "new": 5
         }
       ]
