@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-09-01T23:01:07.105Z",
+  "generatedAt": "2026-09-02T04:58:33.404Z",
   "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
   "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2360,
+  "statementCount": 2344,
   "tables": {
     "event_type_details": {
       "rows": 13,
@@ -62,9 +62,9 @@
       ]
     },
     "event_details": {
-      "rows": 44,
+      "rows": 41,
       "minNewId": 1,
-      "maxNewId": 41,
+      "maxNewId": 38,
       "sample": [
         {
           "old": 1,
@@ -166,9 +166,9 @@
       ]
     },
     "event_attendee": {
-      "rows": 15,
+      "rows": 14,
       "minNewId": 1,
-      "maxNewId": 15,
+      "maxNewId": 14,
       "sample": [
         {
           "old": 1,
@@ -193,9 +193,9 @@
       ]
     },
     "event_attendee_guest": {
-      "rows": 13,
+      "rows": 12,
       "minNewId": 1,
-      "maxNewId": 13,
+      "maxNewId": 12,
       "sample": [
         {
           "old": 1,
@@ -463,9 +463,9 @@
       ]
     },
     "event_media": {
-      "rows": 1426,
+      "rows": 1422,
       "minNewId": 1,
-      "maxNewId": 1426,
+      "maxNewId": 1422,
       "sample": [
         {
           "old": 1,
@@ -1546,9 +1546,9 @@
       ]
     },
     "event_competition_day": {
-      "rows": 4,
+      "rows": 2,
       "minNewId": 1,
-      "maxNewId": 4,
+      "maxNewId": 2,
       "sample": [
         {
           "old": 1,
@@ -1557,14 +1557,6 @@
         {
           "old": 2,
           "new": 2
-        },
-        {
-          "old": 3,
-          "new": 3
-        },
-        {
-          "old": 4,
-          "new": 4
         }
       ]
     },
@@ -1578,27 +1570,27 @@
           "new": 1
         },
         {
-          "old": 2,
+          "old": 3,
           "new": 2
         },
         {
-          "old": 3,
+          "old": 2,
           "new": 3
         },
         {
-          "old": 4,
+          "old": 20,
           "new": 4
         },
         {
-          "old": 5,
+          "old": 21,
           "new": 5
         }
       ]
     },
     "event_competition_content_block": {
-      "rows": 5,
+      "rows": 3,
       "minNewId": 1,
-      "maxNewId": 5,
+      "maxNewId": 3,
       "sample": [
         {
           "old": 1,
@@ -1609,16 +1601,8 @@
           "new": 2
         },
         {
-          "old": 3,
+          "old": 8,
           "new": 3
-        },
-        {
-          "old": 4,
-          "new": 4
-        },
-        {
-          "old": 5,
-          "new": 5
         }
       ]
     },
@@ -1650,9 +1634,9 @@
       ]
     },
     "event_competition_registration": {
-      "rows": 6,
+      "rows": 3,
       "minNewId": 1,
-      "maxNewId": 6,
+      "maxNewId": 3,
       "sample": [
         {
           "old": 1,
@@ -1665,14 +1649,6 @@
         {
           "old": 3,
           "new": 3
-        },
-        {
-          "old": 4,
-          "new": 4
-        },
-        {
-          "old": 5,
-          "new": 5
         }
       ]
     },
@@ -1686,19 +1662,19 @@
           "new": 1
         },
         {
-          "old": 2,
+          "old": 29,
           "new": 2
         },
         {
-          "old": 3,
+          "old": 30,
           "new": 3
         },
         {
-          "old": 4,
+          "old": 31,
           "new": 4
         },
         {
-          "old": 5,
+          "old": 32,
           "new": 5
         }
       ]
@@ -1713,7 +1689,7 @@
           "new": 1
         },
         {
-          "old": 2,
+          "old": 3,
           "new": 2
         }
       ]
