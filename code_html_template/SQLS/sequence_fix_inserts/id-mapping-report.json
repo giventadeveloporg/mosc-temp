@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-09-02T22:26:43.554Z",
+  "generatedAt": "2026-09-02T23:33:56.288Z",
   "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
   "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2376,
+  "statementCount": 2377,
   "tables": {
     "event_type_details": {
       "rows": 13,
@@ -463,9 +463,9 @@
       ]
     },
     "event_media": {
-      "rows": 1438,
+      "rows": 1439,
       "minNewId": 1,
-      "maxNewId": 1438,
+      "maxNewId": 1439,
       "sample": [
         {
           "old": 1,
