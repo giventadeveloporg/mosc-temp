@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-09-02T04:58:33.404Z",
+  "generatedAt": "2026-09-02T22:26:43.554Z",
   "input": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\corrected_event_media_inserts.ordered.sql",
   "output": "F:\\project_workspace\\mosc-temp\\code_html_template\\SQLS\\sequence_fix_inserts\\corrected_event_media_inserts.renumbered.sql",
   "startId": 1,
   "batchExecutionsKept": 3,
   "batchLogsKept": 3,
-  "statementCount": 2344,
+  "statementCount": 2376,
   "tables": {
     "event_type_details": {
       "rows": 13,
@@ -463,9 +463,36 @@
       ]
     },
     "event_media": {
-      "rows": 1422,
+      "rows": 1438,
       "minNewId": 1,
-      "maxNewId": 1422,
+      "maxNewId": 1438,
+      "sample": [
+        {
+          "old": 1,
+          "new": 1
+        },
+        {
+          "old": 2,
+          "new": 2
+        },
+        {
+          "old": 3,
+          "new": 3
+        },
+        {
+          "old": 4,
+          "new": 4
+        },
+        {
+          "old": 5,
+          "new": 5
+        }
+      ]
+    },
+    "event_agenda_item": {
+      "rows": 16,
+      "minNewId": 1,
+      "maxNewId": 16,
       "sample": [
         {
           "old": 1,
@@ -1570,19 +1597,19 @@
           "new": 1
         },
         {
-          "old": 3,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 2,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 20,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 21,
+          "old": 5,
           "new": 5
         }
       ]
@@ -1601,7 +1628,7 @@
           "new": 2
         },
         {
-          "old": 8,
+          "old": 3,
           "new": 3
         }
       ]
@@ -1662,19 +1689,19 @@
           "new": 1
         },
         {
-          "old": 29,
+          "old": 2,
           "new": 2
         },
         {
-          "old": 30,
+          "old": 3,
           "new": 3
         },
         {
-          "old": 31,
+          "old": 4,
           "new": 4
         },
         {
-          "old": 32,
+          "old": 5,
           "new": 5
         }
       ]
@@ -1689,7 +1716,7 @@
           "new": 1
         },
         {
-          "old": 3,
+          "old": 2,
           "new": 2
         }
       ]

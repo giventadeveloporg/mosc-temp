@@ -25,6 +25,7 @@ const TABLE_ORDER = [
   'official_document_category', // parent of event_media.official_document_category_id (fk_event_media_official_document_category_id); see Event_Site_Manager_Latest_Schema.sql
   'official_document_year_bundle', // parent rows for year bundles; must precede event_media rows that reference bundles
   'event_media',
+  'event_agenda_item', // child of event_details + event_media (fk_event_agenda_item__event / __media)
   'event_organizer',
   'event_poll',
   'event_poll_option',

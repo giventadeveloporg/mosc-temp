@@ -154,6 +154,7 @@ DROP TABLE IF EXISTS public.event_calendar_entry CASCADE;
 DROP TABLE IF EXISTS public.gallery_album CASCADE;
 DROP TABLE IF EXISTS public.gallery_category CASCADE;
 DROP TABLE IF EXISTS public.official_document_year_bundle CASCADE;
+DROP TABLE IF EXISTS public.event_agenda_item CASCADE;
 DROP TABLE IF EXISTS public.event_media CASCADE;
 DROP TABLE IF EXISTS public.official_document_category CASCADE;
 DROP TABLE IF EXISTS public.event_poll_response CASCADE;
@@ -1243,6 +1244,13 @@ CREATE SEQUENCE IF NOT EXISTS public.event_competition_content_block_id_seq
     CACHE 1;
 
 CREATE SEQUENCE IF NOT EXISTS public.event_competition_group_member_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.event_agenda_item_id_seq
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -2432,6 +2440,7 @@ CREATE TABLE public.event_media (
                                     file_size int8 NULL,
                                     is_public bool DEFAULT true NULL,
                                     event_flyer bool DEFAULT false NULL,
+                                    is_agenda_flyer bool DEFAULT false NOT NULL,
                                     is_email_header_image bool DEFAULT false NULL,
                                     is_event_management_official_document bool DEFAULT false NULL,
                                     official_document_category_id bigint NULL,
@@ -6859,6 +6868,44 @@ CREATE TRIGGER trg_event_competition_content_block_updated_at
 -- =====================================================
 
 -- =====================================================
+-- EVENT DAY AGENDA (timed program items)
+-- =====================================================
+CREATE TABLE public.event_agenda_item (
+    id bigint DEFAULT nextval('public.event_agenda_item_id_seq'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    event_id bigint NOT NULL,
+    schedule_date date NULL,
+    start_time character varying(100) NOT NULL,
+    end_time character varying(100) NULL,
+    title character varying(255) NOT NULL,
+    description character varying(500) NULL,
+    image_url character varying(1024) NULL,
+    event_media_id bigint NULL,
+    sort_order integer DEFAULT 0 NOT NULL,
+    is_published boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT event_agenda_item_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_event_agenda_item__event
+        FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE,
+    CONSTRAINT fk_event_agenda_item__media
+        FOREIGN KEY (event_media_id) REFERENCES public.event_media(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_event_agenda_item__event_date_sort
+    ON public.event_agenda_item (event_id, schedule_date, sort_order);
+CREATE INDEX idx_event_agenda_item__tenant_event
+    ON public.event_agenda_item (tenant_id, event_id);
+
+COMMENT ON TABLE public.event_agenda_item IS 'Timed event-day program items (Onam-style agenda). Overlapping times allowed; schedule_date NULL inherits the event start date.';
+
+CREATE TRIGGER trg_event_agenda_item_updated_at
+    BEFORE UPDATE ON public.event_agenda_item
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+
+-- =====================================================
 -- END OF PAYMENT ORCHESTRATION LAYER MIGRATION
 -- =====================================================
 
@@ -7492,6 +7539,12 @@ SELECT pg_catalog.setval(
 SELECT pg_catalog.setval(
     'public.event_competition_group_member_id_seq',
     GREATEST(COALESCE((SELECT MAX(id) FROM public.event_competition_group_member), 1), 1),
+    true
+);
+-- event_agenda_item
+SELECT pg_catalog.setval(
+    'public.event_agenda_item_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.event_agenda_item), 1), 1),
     true
 );
 -- Verify executive_committee_team_members sequence (per-table model)

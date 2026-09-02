@@ -1,7 +1,7 @@
 {
   "$schemaComment": "Baseline for export/import SQL guardrails. Refresh with: node scripts/sql_export_import_guardrails.cjs update-manifest",
   "version": 2,
-  "updatedAt": "2026-08-22",
+  "updatedAt": "2026-09-02",
   "backupKeep": 5,
   "files": {
     "export.sql": {
@@ -69,6 +69,7 @@
     "discount_code",
     "event_admin",
     "event_admin_audit_log",
+    "event_agenda_item",
     "event_attendee",
     "event_attendee_guest",
     "event_calendar_entry",
