@@ -635,6 +635,17 @@
           <code class="code-highlight">/SKIP-EXPORT /REMOTE</code> (no local Docker needed for step 0–1 when combined
           with <code class="code-highlight">/REMOTE</code>—the script skips container detection in that case).
         </p>
+        <div class="warning">
+          <strong>Agenda / event media URLs:</strong> Images are stored as S3 URL strings
+          (<code class="code-highlight">event_agenda_item.image_url</code>,
+          <code class="code-highlight">event_media.file_url</code>)—not as blobs in the dump.
+          After uploading or replacing agenda images, <strong>re-export before</strong>
+          <code class="code-highlight">/SKIP-EXPORT</code> or copying SQL to another machine.
+          Guardrails (<code class="script-name">sql_export_import_guardrails.cjs</code>) fail the batch if published
+          agenda rows lack <code class="code-highlight">image_url</code>, or if
+          <code class="code-highlight">export.sql</code> fingerprints do not match live Docker
+          (<code class="code-highlight">id|image_url</code> when a container is available.
+        </div>
 
         <h3><code>/REMOTE</code> — target production Postgres instead of local Docker</h3>
         <p>

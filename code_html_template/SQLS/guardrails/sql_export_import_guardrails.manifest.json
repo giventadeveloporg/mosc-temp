@@ -1,7 +1,7 @@
 {
   "$schemaComment": "Baseline for export/import SQL guardrails. Refresh with: node scripts/sql_export_import_guardrails.cjs update-manifest",
   "version": 2,
-  "updatedAt": "2026-09-02",
+  "updatedAt": "2026-09-04",
   "backupKeep": 5,
   "files": {
     "export.sql": {
@@ -45,11 +45,26 @@
     "user_profile": 30,
     "event_details": 36,
     "event_media": 1379,
+    "event_agenda_item": 8,
     "gallery_category": 16,
     "gallery_album": 66,
     "executive_committee_team_members": 48,
     "official_document_category": 95,
     "focus_group": 23
+  },
+  "contentChecks": {
+    "_comment": "Agenda/media images are S3 URL strings in SQL (not blobs). Re-export after uploading agenda images before /SKIP-EXPORT or copying SQL to another machine.",
+    "eventAgendaItemImageUrls": {
+      "enabled": true,
+      "requireImageUrlColumn": true,
+      "minRowsWithNonEmptyImageUrl": 8,
+      "failIfPublishedMissingImageUrl": true
+    },
+    "liveDockerCompare": {
+      "enabled": true,
+      "compareAgendaImageUrls": true,
+      "_note": "Compares export.sql id|image_url fingerprints to live Docker when --docker-container is passed (batch does this on local post-export/post-prepare/pre-import)."
+    }
   },
   "schemaColumnSyncTables": [
     "*"

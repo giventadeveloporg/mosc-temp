@@ -4,29 +4,45 @@
  *
  * Phases:
  *   backup        Rotate timestamped copies of export/ordered/renumbered/PROD + canonical schema (keep N)
- *   post-export   Validate export.sql after pg_dump
+ *   post-export   Validate export.sql after pg_dump (+ optional live Docker agenda URL compare)
  *   post-prepare  Validate ordered + renumbered (+ PROD if present) after reorder/PROD steps
  *   pre-import    Validate SQL files + schema CREATE TABLE vs INSERT columns before schema/data apply
  *   update-manifest  Refresh trackedTables + critical mins from a validated export.sql
+ *
+ * Agenda / media URLs:
+ *   pg_dump already exports event_agenda_item.image_url and event_media.file_url (S3 URL strings, not blobs).
+ *   Content checks + optional --docker-container live compare catch stale dumps exported before re-upload.
  *
  * Exit 0 = OK, 1 = FAIL (batch must stop), 2 = OK with warnings only (still exit 0 unless --strict-warnings)
  *
  * Usage:
  *   node scripts/sql_export_import_guardrails.cjs backup [--sqls-dir PATH] [--keep 5]
- *   node scripts/sql_export_import_guardrails.cjs post-export [--sqls-dir PATH]
- *   node scripts/sql_export_import_guardrails.cjs post-prepare [--sqls-dir PATH]
+ *   node scripts/sql_export_import_guardrails.cjs post-export [--sqls-dir PATH] [--docker-container ID]
+ *   node scripts/sql_export_import_guardrails.cjs post-prepare [--sqls-dir PATH] [--docker-container ID]
  *   node scripts/sql_export_import_guardrails.cjs pre-import [--sqls-dir PATH] [--import-file PATH]
  *   node scripts/sql_export_import_guardrails.cjs update-manifest [--sqls-dir PATH]
  */
 
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const INSERT_RE = /INSERT\s+INTO\s+public\.([a-zA-Z0-9_]+)\s*\(([^)]*)\)/gi;
+const AGENDA_INSERT_RE =
+  /INSERT\s+INTO\s+public\.event_agenda_item\s*\(([^)]*)\)\s*VALUES\s*\(([\s\S]*?)\);/gi;
 const CONFLICT_RE = /^(<<<<<<<|=======|>>>>>>>)/m;
 
 function parseArgs(argv) {
-  const out = { cmd: null, sqlsDir: null, keep: null, importFile: null, strictWarnings: false };
+  const out = {
+    cmd: null,
+    sqlsDir: null,
+    keep: null,
+    importFile: null,
+    strictWarnings: false,
+    dockerContainer: null,
+    dbUser: 'event_site_admin',
+    dbName: 'event_site_manager_db',
+  };
   const args = argv.slice(2);
   if (!args.length) return out;
   out.cmd = args[0];
@@ -44,6 +60,18 @@ function parseArgs(argv) {
       out.importFile = args[++i];
     } else if (a.startsWith('--import-file=')) {
       out.importFile = a.slice('--import-file='.length);
+    } else if (a === '--docker-container' && args[i + 1]) {
+      out.dockerContainer = args[++i];
+    } else if (a.startsWith('--docker-container=')) {
+      out.dockerContainer = a.slice('--docker-container='.length);
+    } else if (a === '--db-user' && args[i + 1]) {
+      out.dbUser = args[++i];
+    } else if (a.startsWith('--db-user=')) {
+      out.dbUser = a.slice('--db-user='.length);
+    } else if (a === '--db-name' && args[i + 1]) {
+      out.dbName = args[++i];
+    } else if (a.startsWith('--db-name=')) {
+      out.dbName = a.slice('--db-name='.length);
     } else if (a === '--strict-warnings') {
       out.strictWarnings = true;
     }
@@ -249,6 +277,200 @@ function validateSchemaColumnSync(sqlAnalysis, schemaCols, tables, issues, schem
   console.log(` [GUARDRAIL OK] schema sync: ${checked}/${tables.length} table(s) INSERT cols ⊆ CREATE TABLE`);
 }
 
+/** Parse a single pg_dump VALUES (...) tuple into JS values (strings, null, bare tokens). */
+function parseSqlValueList(valuesClause) {
+  const values = [];
+  let i = 0;
+  const s = valuesClause;
+  while (i < s.length) {
+    while (i < s.length && /[\s,]/.test(s[i])) i += 1;
+    if (i >= s.length || s[i] === ')') break;
+    if (/^NULL\b/i.test(s.slice(i))) {
+      values.push(null);
+      i += 4;
+      continue;
+    }
+    if (s[i] === "'") {
+      i += 1;
+      let out = '';
+      while (i < s.length) {
+        if (s[i] === "'" && s[i + 1] === "'") {
+          out += "'";
+          i += 2;
+          continue;
+        }
+        if (s[i] === "'") {
+          i += 1;
+          break;
+        }
+        out += s[i];
+        i += 1;
+      }
+      values.push(out);
+      continue;
+    }
+    const start = i;
+    while (i < s.length && !/[\s,]/.test(s[i]) && s[i] !== ')') i += 1;
+    values.push(s.slice(start, i));
+  }
+  return values;
+}
+
+/**
+ * Extract event_agenda_item rows from column-INSERT SQL (image_url / is_published / id).
+ * Returns { rows, fingerprints: Set("id|image_url") }.
+ */
+function extractAgendaItemRowsFromSql(text) {
+  const rows = [];
+  const fingerprints = new Set();
+  AGENDA_INSERT_RE.lastIndex = 0;
+  let m;
+  while ((m = AGENDA_INSERT_RE.exec(text)) !== null) {
+    const cols = m[1]
+      .split(',')
+      .map((c) => c.trim().replace(/^"|"$/g, '').toLowerCase())
+      .filter(Boolean);
+    const vals = parseSqlValueList(m[2]);
+    const get = (name) => {
+      const idx = cols.indexOf(name);
+      return idx >= 0 ? vals[idx] : undefined;
+    };
+    const id = get('id');
+    const imageUrl = get('image_url');
+    const isPublishedRaw = get('is_published');
+    const isPublished =
+      isPublishedRaw === true ||
+      isPublishedRaw === 'true' ||
+      isPublishedRaw === 't' ||
+      isPublishedRaw === 'TRUE';
+    const urlStr = imageUrl == null ? '' : String(imageUrl).trim();
+    rows.push({
+      id: id != null ? String(id) : '',
+      eventId: get('event_id') != null ? String(get('event_id')) : '',
+      imageUrl: urlStr,
+      isPublished,
+      hasImageUrl: urlStr.length > 0,
+    });
+    if (id != null) fingerprints.add(`${String(id)}|${urlStr}`);
+  }
+  return { rows, fingerprints };
+}
+
+function validateAgendaMediaContent(label, filePath, manifest, issues) {
+  const checks = manifest.contentChecks?.eventAgendaItemImageUrls;
+  if (!checks || checks.enabled === false) return null;
+  if (!fs.existsSync(filePath)) return null;
+
+  const text = fs.readFileSync(filePath, 'utf8');
+  const { rows, fingerprints } = extractAgendaItemRowsFromSql(text);
+  const withUrl = rows.filter((r) => r.hasImageUrl);
+  const publishedMissing = rows.filter((r) => r.isPublished && !r.hasImageUrl);
+  const minWithUrl = checks.minRowsWithNonEmptyImageUrl ?? 1;
+
+  if (checks.requireImageUrlColumn !== false && rows.length > 0) {
+    // Column presence is implied by successful parse of image_url; if zero rows parsed
+    // but INSERT count exists, fail hard (parser / dump format drift).
+    const agendaInsertCount = (text.match(/INSERT\s+INTO\s+public\.event_agenda_item\b/gi) || []).length;
+    if (agendaInsertCount > 0 && rows.length === 0) {
+      pushIssue(
+        issues,
+        'FAIL',
+        `${label}: could not parse event_agenda_item INSERT rows (expected image_url column) — dump format changed?`
+      );
+      return { rows, fingerprints };
+    }
+  }
+
+  if (withUrl.length < minWithUrl) {
+    pushIssue(
+      issues,
+      'FAIL',
+      `${label}: event_agenda_item rows with non-empty image_url = ${withUrl.length}, required >= ${minWithUrl} (re-export after uploading agenda images; SQL stores S3 URL strings, not blobs)`
+    );
+  } else {
+    console.log(
+      ` [GUARDRAIL OK] ${label}: event_agenda_item image_url — ${withUrl.length}/${rows.length} row(s) have URLs`
+    );
+  }
+
+  if (checks.failIfPublishedMissingImageUrl !== false && publishedMissing.length) {
+    const sample = publishedMissing
+      .slice(0, 5)
+      .map((r) => `id=${r.id}/event=${r.eventId}`)
+      .join(', ');
+    pushIssue(
+      issues,
+      'FAIL',
+      `${label}: ${publishedMissing.length} published event_agenda_item row(s) missing image_url (${sample}${publishedMissing.length > 5 ? ', ...' : ''})`
+    );
+  }
+
+  return { rows, fingerprints };
+}
+
+function fetchLiveAgendaFingerprints(containerId, dbUser, dbName) {
+  const sql =
+    "SELECT id::text || '|' || COALESCE(image_url, '') FROM event_agenda_item ORDER BY id;";
+  const out = execFileSync(
+    'docker',
+    ['exec', containerId, 'psql', '-U', dbUser, '-d', dbName, '-t', '-A', '-c', sql],
+    { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }
+  );
+  return new Set(
+    out
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean)
+  );
+}
+
+/**
+ * Compare SQL dump agenda id|image_url fingerprints to live Docker Postgres.
+ * Catches "exported before re-upload" stale dumps.
+ */
+function validateAgendaUrlsMatchLiveDocker(label, sqlFingerprints, args, manifest, issues) {
+  const liveCfg = manifest.contentChecks?.liveDockerCompare;
+  if (!liveCfg || liveCfg.enabled === false || liveCfg.compareAgendaImageUrls === false) return;
+  if (!args.dockerContainer) {
+    console.log(
+      ` [GUARDRAIL OK] ${label}: live Docker agenda URL compare skipped (no --docker-container)`
+    );
+    return;
+  }
+  if (!sqlFingerprints) {
+    pushIssue(issues, 'WARN', `${label}: live Docker compare skipped (no SQL fingerprints)`);
+    return;
+  }
+
+  let live;
+  try {
+    live = fetchLiveAgendaFingerprints(args.dockerContainer, args.dbUser, args.dbName);
+  } catch (err) {
+    pushIssue(
+      issues,
+      'FAIL',
+      `${label}: live Docker agenda URL compare failed: ${err.message || err}`
+    );
+    return;
+  }
+
+  const onlyLive = [...live].filter((f) => !sqlFingerprints.has(f));
+  const onlySql = [...sqlFingerprints].filter((f) => !live.has(f));
+  if (onlyLive.length || onlySql.length) {
+    const sampleLive = onlyLive.slice(0, 3).join(' || ');
+    const sampleSql = onlySql.slice(0, 3).join(' || ');
+    pushIssue(
+      issues,
+      'FAIL',
+      `${label}: event_agenda_item image_url mismatch vs live Docker DB (live-only=${onlyLive.length}, sql-only=${onlySql.length}). Re-export after media/agenda uploads before copying SQL. samples live-only=[${sampleLive}] sql-only=[${sampleSql}]`
+    );
+  } else {
+    console.log(
+      ` [GUARDRAIL OK] ${label}: event_agenda_item image_url fingerprints match live Docker (${live.size} row(s))`
+    );
+  }
+}
+
 function summarizeAndExit(issues, strictWarnings) {
   const fails = issues.filter((i) => i.level === 'FAIL');
   const warns = issues.filter((i) => i.level === 'WARN');
@@ -321,22 +543,31 @@ function backupFiles(sqlsDir, keep) {
   return copied;
 }
 
-function cmdPostExport(sqlsDir, strictWarnings) {
+function cmdPostExport(sqlsDir, args) {
   const { manifest } = loadManifest(sqlsDir);
   const issues = [];
   const exportPath = absFromSqls(sqlsDir, manifest.files['export.sql'].relativePath);
   const analysis = analyzeSqlFile(exportPath);
   validateFileAgainstSpec('export.sql', analysis, manifest.files['export.sql'], issues);
   validateCriticalAndTracked('export.sql', analysis, manifest, issues);
-  summarizeAndExit(issues, strictWarnings);
+  const agenda = validateAgendaMediaContent('export.sql', exportPath, manifest, issues);
+  validateAgendaUrlsMatchLiveDocker(
+    'export.sql',
+    agenda?.fingerprints,
+    args,
+    manifest,
+    issues
+  );
+  summarizeAndExit(issues, args.strictWarnings);
 }
 
-function cmdPostPrepare(sqlsDir, strictWarnings) {
+function cmdPostPrepare(sqlsDir, args) {
   const { manifest } = loadManifest(sqlsDir);
   const issues = [];
   for (const key of ['ordered.sql', 'renumbered.sql', 'ordered_PROD.sql']) {
     const spec = manifest.files[key];
-    const analysis = analyzeSqlFile(absFromSqls(sqlsDir, spec.relativePath));
+    const filePath = absFromSqls(sqlsDir, spec.relativePath);
+    const analysis = analyzeSqlFile(filePath);
     // PROD may be absent mid-pipeline; only fail if missing when validating after step 3
     if (key === 'ordered_PROD.sql' && !analysis.exists) {
       pushIssue(issues, 'WARN', 'ordered_PROD.sql not present yet (OK mid-pipeline)');
@@ -344,11 +575,21 @@ function cmdPostPrepare(sqlsDir, strictWarnings) {
     }
     validateFileAgainstSpec(key, analysis, spec, issues);
     validateCriticalAndTracked(key, analysis, manifest, issues);
+    validateAgendaMediaContent(key, filePath, manifest, issues);
   }
-  summarizeAndExit(issues, strictWarnings);
+  // Live id|url compare must use export/ordered (pre-renumber) — renumbered PKs differ from live
+  const exportPath = absFromSqls(sqlsDir, manifest.files['export.sql'].relativePath);
+  const orderedPath = absFromSqls(sqlsDir, manifest.files['ordered.sql'].relativePath);
+  const liveSourcePath = fs.existsSync(exportPath) ? exportPath : orderedPath;
+  const liveSourceLabel = fs.existsSync(exportPath) ? 'export.sql' : 'ordered.sql';
+  const fingerprints = fs.existsSync(liveSourcePath)
+    ? extractAgendaItemRowsFromSql(fs.readFileSync(liveSourcePath, 'utf8')).fingerprints
+    : null;
+  validateAgendaUrlsMatchLiveDocker(liveSourceLabel, fingerprints, args, manifest, issues);
+  summarizeAndExit(issues, args.strictWarnings);
 }
 
-function cmdPreImport(sqlsDir, importFile, strictWarnings) {
+function cmdPreImport(sqlsDir, importFile, args) {
   const { manifest } = loadManifest(sqlsDir);
   const issues = [];
 
@@ -366,12 +607,15 @@ function cmdPreImport(sqlsDir, importFile, strictWarnings) {
   }
 
   // Always validate export + ordered baselines when present
-  const exportAnalysis = analyzeSqlFile(absFromSqls(sqlsDir, manifest.files['export.sql'].relativePath));
+  const exportPath = absFromSqls(sqlsDir, manifest.files['export.sql'].relativePath);
+  const exportAnalysis = analyzeSqlFile(exportPath);
   for (const key of ['export.sql', 'ordered.sql']) {
     const spec = manifest.files[key];
-    const analysis = key === 'export.sql' ? exportAnalysis : analyzeSqlFile(absFromSqls(sqlsDir, spec.relativePath));
+    const filePath = absFromSqls(sqlsDir, spec.relativePath);
+    const analysis = key === 'export.sql' ? exportAnalysis : analyzeSqlFile(filePath);
     validateFileAgainstSpec(key, analysis, spec, issues);
     validateCriticalAndTracked(key, analysis, manifest, issues);
+    validateAgendaMediaContent(key, filePath, manifest, issues);
   }
 
   let importAnalysis = null;
@@ -392,6 +636,7 @@ function cmdPreImport(sqlsDir, importFile, strictWarnings) {
     // Tenant/MOSC partial dumps: do not enforce full critical table set on the import file itself
     if (isFullDump) {
       validateCriticalAndTracked(`import-file(${path.basename(resolvedImport)})`, importAnalysis, manifest, issues);
+      validateAgendaMediaContent(`import-file(${path.basename(resolvedImport)})`, resolvedImport, manifest, issues);
     } else {
       console.log(
         ` [GUARDRAIL OK] import-file is a partial/custom dump (${path.basename(resolvedImport)}); critical-table mins applied to export/ordered only`
@@ -399,12 +644,22 @@ function cmdPreImport(sqlsDir, importFile, strictWarnings) {
     }
   } else {
     // Prefer renumbered for local, else ordered
-    const ren = analyzeSqlFile(absFromSqls(sqlsDir, manifest.files['renumbered.sql'].relativePath));
-    const ord = analyzeSqlFile(absFromSqls(sqlsDir, manifest.files['ordered.sql'].relativePath));
+    const renPath = absFromSqls(sqlsDir, manifest.files['renumbered.sql'].relativePath);
+    const ordPath = absFromSqls(sqlsDir, manifest.files['ordered.sql'].relativePath);
+    const ren = analyzeSqlFile(renPath);
+    const ord = analyzeSqlFile(ordPath);
     importAnalysis = ren.exists ? ren : ord;
     const key = ren.exists ? 'renumbered.sql' : 'ordered.sql';
+    const importPathForAgenda = ren.exists ? renPath : ordPath;
     validateFileAgainstSpec(key, importAnalysis, manifest.files[key], issues);
     validateCriticalAndTracked(key, importAnalysis, manifest, issues);
+    validateAgendaMediaContent(key, importPathForAgenda, manifest, issues);
+  }
+
+  // Live compare uses export.sql ids (never renumbered PKs); skipped when no --docker-container
+  if (exportAnalysis.exists) {
+    const fingerprints = extractAgendaItemRowsFromSql(fs.readFileSync(exportPath, 'utf8')).fingerprints;
+    validateAgendaUrlsMatchLiveDocker('export.sql', fingerprints, args, manifest, issues);
   }
 
   const schemaCols = parseSchemaCreateColumns(schemaPath);
@@ -413,7 +668,7 @@ function cmdPreImport(sqlsDir, importFile, strictWarnings) {
   const schemaRel = manifest.files['schema.sql']?.relativePath || 'Current_Sqls/Event_Site_Manager_Latest_Schema.sql';
   validateSchemaColumnSync(syncSource, schemaCols, syncTables, issues, path.basename(schemaRel));
 
-  summarizeAndExit(issues, strictWarnings);
+  summarizeAndExit(issues, args.strictWarnings);
 }
 
 function cmdUpdateManifest(sqlsDir) {
@@ -453,9 +708,9 @@ function main() {
   if (!args.cmd || ['-h', '--help', 'help'].includes(args.cmd)) {
     console.log(`Usage:
   node scripts/sql_export_import_guardrails.cjs backup [--sqls-dir PATH] [--keep 5]
-  node scripts/sql_export_import_guardrails.cjs post-export [--sqls-dir PATH]
-  node scripts/sql_export_import_guardrails.cjs post-prepare [--sqls-dir PATH]
-  node scripts/sql_export_import_guardrails.cjs pre-import [--sqls-dir PATH] [--import-file PATH]
+  node scripts/sql_export_import_guardrails.cjs post-export [--sqls-dir PATH] [--docker-container ID]
+  node scripts/sql_export_import_guardrails.cjs post-prepare [--sqls-dir PATH] [--docker-container ID]
+  node scripts/sql_export_import_guardrails.cjs pre-import [--sqls-dir PATH] [--import-file PATH] [--docker-container ID]
   node scripts/sql_export_import_guardrails.cjs update-manifest [--sqls-dir PATH]`);
     process.exit(args.cmd ? 0 : 1);
   }
@@ -474,13 +729,13 @@ function main() {
         process.exit(0);
         break;
       case 'post-export':
-        cmdPostExport(sqlsDir, args.strictWarnings);
+        cmdPostExport(sqlsDir, args);
         break;
       case 'post-prepare':
-        cmdPostPrepare(sqlsDir, args.strictWarnings);
+        cmdPostPrepare(sqlsDir, args);
         break;
       case 'pre-import':
-        cmdPreImport(sqlsDir, args.importFile, args.strictWarnings);
+        cmdPreImport(sqlsDir, args.importFile, args);
         break;
       case 'update-manifest':
         cmdUpdateManifest(sqlsDir);

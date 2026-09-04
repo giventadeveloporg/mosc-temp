@@ -951,20 +951,28 @@ if not exist "%GUARDRAIL_SCRIPT%" (
 set "GR_PHASE=%~1"
 set "GR_IMPORT=%~2"
 call :log_step "G" "SQL guardrails (%GR_PHASE%)"
+REM Optional live Docker agenda URL compare (catches stale dumps exported before re-upload).
+REM Skip for backup phase and when no local container (e.g. /REMOTE + /SKIP-EXPORT with no Docker).
+set "GR_DOCKER_ARGS="
+if /i not "%GR_PHASE%"=="backup" (
+  if defined CONTAINER_ID (
+    set "GR_DOCKER_ARGS=--docker-container !CONTAINER_ID! --db-user %DB_USER% --db-name %DB_NAME%"
+  )
+)
 REM NOTE: Do NOT nest "if A if B (...) else (...)" — CMD binds else to the inner if,
 REM so backup/post-export/post-prepare never ran node and still reported OK.
 if /i "%GR_PHASE%"=="pre-import" (
   if not "%GR_IMPORT%"=="" (
-    node "%GUARDRAIL_SCRIPT%" pre-import --sqls-dir "%SQLS_DIR%" --import-file "%GR_IMPORT%"
+    node "%GUARDRAIL_SCRIPT%" pre-import --sqls-dir "%SQLS_DIR%" --import-file "%GR_IMPORT%" !GR_DOCKER_ARGS!
   ) else (
-    node "%GUARDRAIL_SCRIPT%" pre-import --sqls-dir "%SQLS_DIR%"
+    node "%GUARDRAIL_SCRIPT%" pre-import --sqls-dir "%SQLS_DIR%" !GR_DOCKER_ARGS!
   )
 ) else (
-  node "%GUARDRAIL_SCRIPT%" %GR_PHASE% --sqls-dir "%SQLS_DIR%"
+  node "%GUARDRAIL_SCRIPT%" %GR_PHASE% --sqls-dir "%SQLS_DIR%" !GR_DOCKER_ARGS!
 )
 set "GR_ERR=!errorlevel!"
 if !GR_ERR! neq 0 (
-  call :log_err "Guardrails failed during %GR_PHASE% (exit !GR_ERR!). Fix export.sql / ordered SQL / Event_Site_Manager_Latest_Schema.sql, or restore from SQLS\guardrails\backups. Emergency: /SKIP-GUARDRAILS"
+  call :log_err "Guardrails failed during %GR_PHASE% (exit !GR_ERR!). Fix export.sql / ordered SQL / Event_Site_Manager_Latest_Schema.sql, or restore from SQLS\guardrails\backups. If agenda image_url mismatch vs live DB: re-export after media uploads. Emergency: /SKIP-GUARDRAILS"
   exit /b 1
 )
 call :log_ok "Guardrails passed (%GR_PHASE%)"
