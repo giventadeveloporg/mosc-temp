@@ -6763,6 +6763,8 @@ CREATE TABLE public.event_competition_result (
     points_awarded integer DEFAULT 0 NOT NULL,
     winner_photo_url character varying(1024),
     winner_media_id bigint,
+    work_photo_url character varying(1024),
+    work_media_id bigint,
     notes text,
     is_published boolean DEFAULT false NOT NULL,
     published_at timestamp without time zone,
@@ -6778,7 +6780,9 @@ CREATE TABLE public.event_competition_result (
     CONSTRAINT fk_event_comp_result__registration
         FOREIGN KEY (registration_id) REFERENCES public.event_competition_registration(id),
     CONSTRAINT fk_event_comp_result__winner_media
-        FOREIGN KEY (winner_media_id) REFERENCES public.event_media(id) ON DELETE SET NULL
+        FOREIGN KEY (winner_media_id) REFERENCES public.event_media(id) ON DELETE SET NULL,
+    CONSTRAINT fk_event_comp_result__work_media
+        FOREIGN KEY (work_media_id) REFERENCES public.event_media(id) ON DELETE SET NULL
 );
 
 CREATE INDEX idx_event_comp_result__event_published
@@ -6787,7 +6791,7 @@ CREATE INDEX idx_event_comp_result__competition_placement
     ON public.event_competition_result(competition_id, placement)
     WHERE is_published = true;
 
-COMMENT ON TABLE public.event_competition_result IS 'Competition results (placement, prizes, winner photo via event_media).';
+COMMENT ON TABLE public.event_competition_result IS 'Competition results (placement, prizes, winner portrait and winning-work photo via event_media).';
 
 -- event_competition_content_block: Markdown content blocks per event (rules, FAQ, etc.).
 CREATE TABLE public.event_competition_content_block (
