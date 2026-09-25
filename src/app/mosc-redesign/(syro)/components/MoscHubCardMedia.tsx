@@ -15,16 +15,16 @@ import { cn } from '@/lib/utils';
 const HUB_FRAME_BASE =
   'mosc-hub-card-media relative w-full rounded-xl overflow-hidden bg-white shadow-sm ring-1 ring-black/5';
 
-/** Portrait photos — height follows image (no bottom letterbox gap). */
-export const HUB_FRAME_PORTRAIT = `${HUB_FRAME_BASE} max-w-[220px] mosc-hub-card-media--portrait mosc-hub-card-media--intrinsic`;
+/** Portrait photos — taller/wider on mobile; desktop keeps 220px. */
+export const HUB_FRAME_PORTRAIT = `${HUB_FRAME_BASE} max-w-[290px] md:max-w-[220px] mosc-hub-card-media--portrait mosc-hub-card-media--intrinsic`;
 
 /** Equal-height portrait tiles for multi-column grids (same size regardless of source ratio). */
-export const HUB_FRAME_PORTRAIT_UNIFORM = `${HUB_FRAME_BASE} max-w-[220px] aspect-[2/3] mosc-hub-card-media--portrait`;
+export const HUB_FRAME_PORTRAIT_UNIFORM = `${HUB_FRAME_BASE} max-w-[290px] md:max-w-[220px] aspect-[2/3] mosc-hub-card-media--portrait`;
 
 /** Placeholder / empty state — fixed ratio when no image. */
-export const HUB_FRAME_PORTRAIT_PLACEHOLDER = `${HUB_FRAME_BASE} max-w-[220px] aspect-[2/3] mosc-hub-card-media--portrait`;
+export const HUB_FRAME_PORTRAIT_PLACEHOLDER = `${HUB_FRAME_BASE} max-w-[290px] md:max-w-[220px] aspect-[2/3] mosc-hub-card-media--portrait`;
 
-export const HUB_FRAME_LANDSCAPE = `${HUB_FRAME_BASE} max-w-[280px] aspect-[280/168] mosc-hub-card-media--landscape`;
+export const HUB_FRAME_LANDSCAPE = `${HUB_FRAME_BASE} max-w-[calc(100%-2rem)] md:max-w-[280px] aspect-[280/168] mosc-hub-card-media--landscape`;
 
 export type MoscHubCardFrame = 'portrait' | 'portraitUniform' | 'landscape';
 
@@ -64,8 +64,8 @@ export function MoscHubCardMedia({
   const resolvedSizes =
     sizes ??
     (frame === 'landscape'
-      ? '(max-width: 768px) 100vw, 280px'
-      : '(max-width: 768px) 50vw, 220px');
+      ? '(max-width: 768px) calc(100vw - 4rem), 280px'
+      : '(max-width: 768px) 290px, 220px');
 
   const positionClass =
     objectPosition === 'top'

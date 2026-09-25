@@ -134,7 +134,7 @@ export default async function ManagingCommitteeMembersPage({
                             />
                           ) : null}
                           <div
-                            className={`p-8 flex flex-col flex-1 ${hasPhoto ? 'pt-0' : ''}`}
+                            className={`px-4 py-8 md:p-8 flex flex-col flex-1 ${hasPhoto ? 'pt-0 md:pt-0' : ''}`}
                           >
                             <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-2 leading-snug">
                               {member.name}

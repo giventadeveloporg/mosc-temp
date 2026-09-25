@@ -76,7 +76,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-syro-xl min-w-0">
             {/* Main content - white card like other MOSC content pages */}
-            <article className="lg:col-span-2 min-w-0 overflow-x-hidden max-w-full bg-white rounded-xl shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
+            <article className="lg:col-span-2 min-w-0 overflow-x-hidden max-w-full bg-white rounded-xl shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] px-4 py-8 md:p-8">
               <header className="mb-6">
               <h1 className="font-syro-display text-[2.2rem] font-bold text-black leading-tight">
                 {article.title}
