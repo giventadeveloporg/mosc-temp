@@ -220,6 +220,8 @@ DROP TABLE IF EXISTS public.public_profile CASCADE;
 DROP TABLE IF EXISTS public.tenant_settings CASCADE;
 DROP TABLE IF EXISTS public.tmp_tenant_clone_map CASCADE;
 DROP TABLE IF EXISTS public.user_profile CASCADE;
+-- Last match cards (references tenant_organization)
+DROP TABLE IF EXISTS public.last_matches CASCADE;
 DROP TABLE IF EXISTS public.tenant_organization CASCADE;
 DROP TABLE IF EXISTS public.databasechangeloglock CASCADE;
 DROP TABLE IF EXISTS public.databasechangelog CASCADE;
@@ -676,6 +678,13 @@ CREATE SEQUENCE IF NOT EXISTS public.focus_group_members_id_seq
     CACHE 1;
 
 CREATE SEQUENCE IF NOT EXISTS public.event_focus_groups_id_seq
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    START WITH 1
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.last_matches_id_seq
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -1769,6 +1778,38 @@ CREATE TABLE public.event_focus_groups (
 );
 
 COMMENT ON TABLE public.event_focus_groups IS 'Join table mapping events to one or more focus groups';
+
+
+-- ===================================================
+-- Last match cards (Liquibase 20260915140000 + 20260918120000)
+-- ===================================================
+
+CREATE TABLE public.last_matches (
+                                     id bigint DEFAULT nextval('public.last_matches_id_seq'::regclass) NOT NULL,
+                                     tenant_id character varying(255) NOT NULL,
+                                     home_logo_url character varying(500) NOT NULL,
+                                     away_logo_url character varying(500) NOT NULL,
+                                     match_date_label character varying(64) NOT NULL,
+                                     home_score integer NOT NULL,
+                                     away_score integer NOT NULL,
+                                     league_name character varying(255) NOT NULL,
+                                     title character varying(255) NOT NULL,
+                                     match_kind character varying(32) DEFAULT 'PAST' NOT NULL,
+                                     priority_order integer,
+                                     is_active boolean DEFAULT true,
+                                     created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                     updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                     CONSTRAINT last_matches_pkey PRIMARY KEY (id),
+                                     CONSTRAINT fk_last_matches__tenant_id FOREIGN KEY (tenant_id) REFERENCES public.tenant_organization(tenant_id) ON DELETE CASCADE
+);
+
+COMMENT ON TABLE public.last_matches IS 'Tenant-scoped match result and upcoming match cards.';
+COMMENT ON COLUMN public.last_matches.match_kind IS 'PAST = completed result cards; UPCOMING = scheduled match cards.';
+
+CREATE INDEX IF NOT EXISTS idx_last_matches_tenant_id ON public.last_matches (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_last_matches_is_active ON public.last_matches (is_active);
+CREATE INDEX IF NOT EXISTS idx_last_matches_priority_order ON public.last_matches (priority_order);
+CREATE INDEX IF NOT EXISTS idx_last_matches_match_kind ON public.last_matches (match_kind);
 
 
 
@@ -7045,6 +7086,12 @@ SELECT pg_catalog.setval(
 SELECT pg_catalog.setval(
     'public.event_focus_groups_id_seq',
     GREATEST(COALESCE((SELECT MAX(id) FROM public.event_focus_groups), 1), 1),
+    true
+);
+-- last_matches
+SELECT pg_catalog.setval(
+    'public.last_matches_id_seq',
+    GREATEST(COALESCE((SELECT MAX(id) FROM public.last_matches), 1), 1),
     true
 );
 -- event_guest_pricing
