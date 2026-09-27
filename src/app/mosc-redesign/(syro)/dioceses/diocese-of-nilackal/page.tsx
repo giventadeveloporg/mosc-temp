@@ -79,7 +79,6 @@ The Diocese purchased a building of about 12000 Sq.feet in Ranni Town andÂ  made
                       </p>
                 </div>
               </div>
- Â
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}
