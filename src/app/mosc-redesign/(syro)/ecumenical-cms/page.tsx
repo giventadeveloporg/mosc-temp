@@ -75,30 +75,34 @@ export default async function EcumenicalCmsPage({
             </p>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-4">
                 {articles.map((article) => {
                   const href = `/mosc-redesign/ecumenical-cms/${article.slug}`;
                   return (
                     <div
                       key={article.documentId || article.slug}
-                      className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full"
+                      className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden lg:overflow-visible mosc-hub-listing-card--desktop flex flex-col h-full"
                     >
                       {article.imageUrl ? (
                         <MoscHubCardMedia
                           src={article.imageUrl}
                           alt={article.imageAlt ?? article.name}
                           frame="landscape"
-                          frameClassName="max-w-[calc(100%-2rem)] md:max-w-[280px]"
-                          sizes="(max-width: 768px) calc(100vw - 4rem), 280px"
+                          padded={false}
+                          outerClassName="pt-8 lg:pt-0 lg:-mx-1"
+                          frameClassName="max-w-[calc(100%-2rem)] md:max-w-[280px] lg:!max-w-none lg:w-full lg:ring-0 lg:!aspect-auto lg:!h-[330px]"
+                          sizes="(max-width: 1023px) 280px, 380px"
                           unoptimized={Boolean(article.imageUrl.startsWith('http'))}
                         />
                       ) : (
                         <MoscHubCardMediaPlaceholder
                           frame="landscape"
-                          frameClassName="max-w-[calc(100%-2rem)] md:max-w-[280px]"
+                          padded={false}
+                          outerClassName="pt-8 lg:pt-0 lg:-mx-1"
+                          frameClassName="max-w-[calc(100%-2rem)] md:max-w-[280px] lg:!max-w-none lg:w-full lg:ring-0 lg:!aspect-auto lg:!h-[330px]"
                         />
                       )}
-                      <div className="px-4 pb-8 pt-0 md:p-8 md:pt-0 flex flex-col flex-1">
+                      <div className="mosc-hub-listing-card-body flex flex-col flex-1">
                         <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug line-clamp-3">
                           {article.name}
                         </h3>

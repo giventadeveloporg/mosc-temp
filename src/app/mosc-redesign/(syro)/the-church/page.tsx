@@ -112,6 +112,7 @@ const TheChurchPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {churchSections.map((item) => {
+              const isThronePortrait = item.image.endsWith('throne_of_st_thomas.jpg');
               return (
                 <div
                   key={item.title}
@@ -121,10 +122,12 @@ const TheChurchPage = () => {
                   <MoscHubCardMedia
                     src={item.image}
                     alt={item.title}
+                    frame="uniformContain"
                     padded={false}
                     outerClassName="-mx-1"
-                    frameClassName="max-w-none md:max-w-[220px] bg-white"
-                    sizes="(max-width: 767px) 100vw, 220px"
+                    unoptimized
+                    sizes="300px"
+                    frameClassName={isThronePortrait ? 'mosc-hub-card-media--fill-sides' : undefined}
                   />
                   <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                     {item.title}
