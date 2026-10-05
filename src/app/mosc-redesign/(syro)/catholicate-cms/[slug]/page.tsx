@@ -69,13 +69,13 @@ export default async function CatholicateCmsEntryPage({ params }: PageProps) {
                 ) : null}
 
                 {!isCatholicateIntroEntry(entry) && entry.imageUrl ? (
-                  <div className="mb-8 flex justify-center">
+                  <div className="mb-8">
                     <Image
                       src={entry.imageUrl}
                       alt={entry.imageAlt ?? entry.name}
                       width={508}
                       height={586}
-                      className="rounded-lg object-contain w-full max-w-full md:max-w-[32rem] h-auto"
+                      className="rounded-lg object-contain w-full h-auto"
                       priority
                       unoptimized
                       sizes="(max-width: 768px) 100vw, 32rem"

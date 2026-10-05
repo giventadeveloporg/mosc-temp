@@ -4,6 +4,7 @@ import Link from 'next/link';
 import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
 import LiveUrlSearch from '../components/LiveUrlSearch';
+import { MOSC_LISTING_CARD_CLASS, MOSC_LISTING_GRID_CLASS } from '../components/MoscCmsHubCard';
 import { MoscHubCardMedia } from '../components/MoscHubCardMedia';
 import DirectoryPagination from '../directory/components/DirectoryPagination';
 import { DIRECTORY_PAGE_SIZE } from '../directory/types/listPagination';
@@ -81,13 +82,13 @@ export default async function AdministrationPage({
             </p>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-4">
+              <div className={MOSC_LISTING_GRID_CLASS}>
                 {adminCards.map((card, index) => {
                   const absoluteIndex = start + index;
                   return (
                     <div
                       key={card.title}
-                      className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 px-4 py-8 md:p-8 lg:px-0 lg:py-0 mosc-hub-listing-card--desktop flex flex-col h-full"
+                      className={MOSC_LISTING_CARD_CLASS}
                     >
                       {absoluteIndex === 0 && !hasSearch ? (
                         <div className="mb-5 flex justify-center lg:-mx-1">
@@ -128,6 +129,7 @@ export default async function AdministrationPage({
                           </div>
                         </>
                       ) : null}
+                      <div className="mosc-hub-listing-card-body flex flex-col flex-1">
                       <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                         {card.title}
                       </h3>
@@ -148,6 +150,7 @@ export default async function AdministrationPage({
                           />
                         </svg>
                       </Link>
+                      </div>
                     </div>
                   );
                 })}
