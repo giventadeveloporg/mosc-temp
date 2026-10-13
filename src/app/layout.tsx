@@ -22,15 +22,16 @@ import { isAdminRole } from "@/lib/utils";
 import { resolveIsTenantAdmin } from "@/lib/resolveTenantAdminStatus";
 import { getClerkSatelliteHost, isSatelliteHostname } from "@/lib/clerkSatellite";
 import { getSharedAdsensePublisherIdForMeta } from "@/lib/adsense/sharedPublisherId";
+import { BRAND_NAME, BRAND_PRIMARY_HOST } from "@/lib/brand";
 
 /** Default tab / SEO titles; pages may override. BrowserTabTitle fills unique titles per route. */
 export const metadata: Metadata = {
   title: {
-    default: 'Home | Event Site Manager',
-    template: '%s | Event Site Manager',
+    default: `Home | ${BRAND_NAME}`,
+    template: `%s | ${BRAND_NAME}`,
   },
   description: 'Event management, ticketing, membership, and church website for your organization.',
-  applicationName: 'Event Site Manager',
+  applicationName: BRAND_NAME,
 };
 
 const DEBUG_LAYOUT = process.env.NEXT_PUBLIC_DEBUG_LAYOUT === 'true';
@@ -53,7 +54,7 @@ export default async function RootLayout({
 }) {
   debugLog('[LAYOUT] Root layout executing');
   let isTenantAdmin = false;
-  const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || process.env.AMPLIFY_NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
+  const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || process.env.AMPLIFY_NEXT_PUBLIC_PRIMARY_DOMAIN || BRAND_PRIMARY_HOST;
   const satelliteDomain = getClerkSatelliteHost() || process.env.NEXT_PUBLIC_CLERK_DOMAIN || process.env.AMPLIFY_NEXT_PUBLIC_CLERK_DOMAIN || 'www.mosc-temp.com';
   let clerkProps: { isSatellite?: boolean; domain?: string; signInUrl?: string; signUpUrl?: string; allowedRedirectOrigins?: string[] } = {};
 

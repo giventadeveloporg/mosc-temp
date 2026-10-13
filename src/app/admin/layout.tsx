@@ -6,16 +6,17 @@ import { fetchAdminProfileServer } from './manage-usage/ApiServerActions';
 import { bootstrapUserProfile } from '@/components/ProfileBootstrapperApiServerActions';
 import { isAdminRole } from '@/lib/utils';
 import { canAccessGasStationAdminModule } from '@/lib/gasStationAccess';
+import { BRAND_NAME } from '@/lib/brand';
 
 const CLERK_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? process.env.AMPLIFY_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? '';
 
 export const metadata: Metadata = {
   title: {
     default: 'Admin Home',
-    template: '%s | Admin | Event Site Manager',
+    template: `%s | Admin | ${BRAND_NAME}`,
   },
   description: 'Administration console for events, users, media, tenant settings, and communications.',
-  keywords: ['admin', 'event management', 'tenant settings', 'Event Site Manager'],
+  keywords: ['admin', 'event management', 'tenant settings', BRAND_NAME],
 };
 
 /**

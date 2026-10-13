@@ -3,8 +3,10 @@
  * and hover tooltips can identify pages when many tabs are open.
  */
 
+import { BRAND_NAME } from '@/lib/brand';
+
 const MOSC_BRAND = 'Malankara Orthodox Syrian Church';
-const APP_BRAND = 'Event Site Manager';
+const APP_BRAND = BRAND_NAME;
 const ADMIN_BRAND = 'Admin';
 
 /** Known path segments → searchable labels (keywords for tab search / hover). */

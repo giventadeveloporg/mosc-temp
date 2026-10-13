@@ -8,6 +8,7 @@ import { useAuth, useClerk, useUser } from '@clerk/nextjs';
 import { useTenantSettings } from '@/components/TenantSettingsProvider';
 import { isPrimaryHostname, isSatelliteHostname } from '@/lib/clerkSatellite';
 import Image from 'next/image';
+import { BRAND_PRIMARY_HOST } from '@/lib/brand';
 
 const navItemCatalog = [
   {
@@ -932,7 +933,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
     localStorage.setItem('clerk_signout_broadcast', Date.now().toString());
 
     const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
-    const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
+    const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || BRAND_PRIMARY_HOST;
     const primaryHost = primaryDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
     if (isPrimaryHostname(hostname)) {
