@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-07-30T15:43:54.443Z",
+  "generatedAt": "2026-10-09T16:22:01.967Z",
   "root": "src/app",
-  "totalPages": 990,
-  "totalUniqueRoutes": 990,
+  "totalPages": 995,
+  "totalUniqueRoutes": 995,
   "byKind": {
-    "public": 82,
-    "admin": 104,
+    "public": 83,
+    "admin": 107,
     "mosc": 264,
     "mosc-old": 233,
-    "mosc-redesign": 307
+    "mosc-redesign": 308
   },
   "routes": [
     {
@@ -236,6 +236,15 @@
         "id"
       ],
       "sourceFile": "src/app/admin/events/[id]/page.tsx"
+    },
+    {
+      "path": "/admin/events/[id]/agenda",
+      "kind": "admin",
+      "dynamic": true,
+      "dynamicParams": [
+        "id"
+      ],
+      "sourceFile": "src/app/admin/events/[id]/agenda/page.tsx"
     },
     {
       "path": "/admin/events/[id]/competitions/[compId]/edit",
@@ -502,6 +511,13 @@
       "sourceFile": "src/app/admin/focus-groups/new/page.tsx"
     },
     {
+      "path": "/admin/gallery-youtube-videos",
+      "kind": "admin",
+      "dynamic": false,
+      "dynamicParams": [],
+      "sourceFile": "src/app/admin/gallery-youtube-videos/page.tsx"
+    },
+    {
       "path": "/admin/gallery/albums",
       "kind": "admin",
       "dynamic": false,
@@ -574,6 +590,13 @@
       "dynamic": false,
       "dynamicParams": [],
       "sourceFile": "src/app/admin/homepage-cache/page.tsx"
+    },
+    {
+      "path": "/admin/homepage-youtube-live",
+      "kind": "admin",
+      "dynamic": false,
+      "dynamicParams": [],
+      "sourceFile": "src/app/admin/homepage-youtube-live/page.tsx"
     },
     {
       "path": "/admin/manage-events",
@@ -1007,6 +1030,15 @@
         "compId"
       ],
       "sourceFile": "src/app/events/[id]/competitions/[compId]/page.tsx"
+    },
+    {
+      "path": "/events/[id]/competitions/catalog",
+      "kind": "public",
+      "dynamic": true,
+      "dynamicParams": [
+        "id"
+      ],
+      "sourceFile": "src/app/events/[id]/competitions/catalog/page.tsx"
     },
     {
       "path": "/events/[id]/competitions/my-registrations",
@@ -2949,6 +2981,13 @@
       "dynamic": false,
       "dynamicParams": [],
       "sourceFile": "src/app/mosc-redesign/(syro)/administration/malankara-association/page.tsx"
+    },
+    {
+      "path": "/mosc-redesign/administration/managing-committee-members",
+      "kind": "mosc-redesign",
+      "dynamic": false,
+      "dynamicParams": [],
+      "sourceFile": "src/app/mosc-redesign/(syro)/administration/managing-committee-members/page.tsx"
     },
     {
       "path": "/mosc-redesign/administration/the-diocesan-general-body",
