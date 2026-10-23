@@ -5,6 +5,7 @@
  */
 
 import { BRAND_PRIMARY_HOST } from '@/lib/brand';
+import { isDevClerkPool } from './clerkProfileIdentity';
 
 function normalizeHostname(value: string): string {
   const withoutProtocol = value.replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -18,6 +19,14 @@ export function getPrimaryHost(): string {
     process.env.AMPLIFY_NEXT_PUBLIC_PRIMARY_DOMAIN ||
     BRAND_PRIMARY_HOST;
   return normalizeHostname(raw);
+}
+
+/** Dev-pool satellites sign in through https://dev.adwiiseagent.ai. Production satellites keep the configured primary host. */
+export function getAuthPrimaryHost(): string {
+  if (isDevClerkPool()) {
+    return 'dev.adwiiseagent.ai';
+  }
+  return getPrimaryHost();
 }
 
 export function getClerkSatelliteHost(): string | null {
@@ -43,7 +52,13 @@ export function isClerkSatelliteEnv(): boolean {
 
 export function isPrimaryHostname(hostname: string): boolean {
   const h = normalizeHostname(hostname);
-  const primary = getPrimaryHost();
+  if (h === 'dev-satellite.adwiiseagent.ai') {
+    return false;
+  }
+  if (h === 'dev.adwiiseagent.ai') {
+    return isDevClerkPool();
+  }
+  const primary = getAuthPrimaryHost();
   const bare = primary.replace(/^www\./, '');
   return h === primary || h === bare || h.endsWith(`.${bare}`) || h === bare;
 }
@@ -51,6 +66,9 @@ export function isPrimaryHostname(hostname: string): boolean {
 export function isSatelliteHostname(hostname: string): boolean {
   if (!hostname || hostname === 'localhost' || hostname === '127.0.0.1') {
     return false;
+  }
+  if (normalizeHostname(hostname) === 'dev-satellite.adwiiseagent.ai' && isDevClerkPool()) {
+    return true;
   }
   if (isPrimaryHostname(hostname)) {
     return false;
