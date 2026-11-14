@@ -14,6 +14,8 @@ import HomeParticleBackground from '@/components/HomeParticleBackground';
 import { HomeSectionEyebrow } from '@/components/HomeSectionEyebrow';
 import { HomeSectionTitle } from '@/components/HomeSectionTitle';
 import EventCardResultsPanel from '@/components/competitions/EventCardResultsPanel';
+import PublicListSearchCombobox from '@/components/public/PublicListSearchCombobox';
+import { fetchPublicTypeahead } from '@/lib/publicTypeaheadSearch';
 // import { formatInTimeZone } from 'date-fns-tz';
 
 const EVENTS_PAGE_SIZE = 20; // Minimum events to display per page
@@ -63,6 +65,7 @@ export default function EventsPage() {
   const [fetchError, setFetchError] = useState(false);
   const [showPastEvents, setShowPastEvents] = useState(false);
   const [searchTitle, setSearchTitle] = useState("");
+  const [searchTitleDraft, setSearchTitleDraft] = useState("");
   const [searchDateFrom, setSearchDateFrom] = useState("");
   const [searchDateTo, setSearchDateTo] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -383,15 +386,22 @@ export default function EventsPage() {
     return formatInTimeZone(dateString, timezone, 'EEEE, MMMM d, yyyy');
   }
 
-  // Search functionality
-  const handleSearch = async () => {
+  const commitTitleSearch = (value: string) => {
+    const next = value.trim();
+    setSearchTitleDraft(next);
+    setSearchTitle(next);
     setIsSearching(true);
-    setPage(0); // Reset to first page when searching
-    // The useEffect will trigger automatically due to dependency changes
+    setPage(0);
+  };
+
+  // Search functionality — commit draft title (typeahead) + date range
+  const handleSearch = async () => {
+    commitTitleSearch(searchTitleDraft);
   };
 
   const clearSearch = () => {
     setSearchTitle("");
+    setSearchTitleDraft("");
     setSearchDateFrom("");
     setSearchDateTo("");
     setPage(0);
@@ -793,18 +803,34 @@ export default function EventsPage() {
           <div className="homepage-glass-card services-glass-card-face rounded-2xl p-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center">Search Events</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Title Search */}
+              {/* Title Search — typeahead; listing refetch only on commit */}
               <div className="space-y-2">
                 <label htmlFor="searchTitle" className="block text-sm font-medium text-gray-700">
                   Search by Title
                 </label>
-                <input
-                  type="text"
-                  id="searchTitle"
-                  value={searchTitle}
-                  onChange={(e) => setSearchTitle(e.target.value)}
+                <PublicListSearchCombobox<EventDetailsDTO & Record<string, unknown>>
+                  items={events as unknown as (EventDetailsDTO & Record<string, unknown>)[]}
+                  committedValue={searchTitle}
+                  onCommit={commitTitleSearch}
+                  onInputChange={setSearchTitleDraft}
+                  inputId="searchTitle"
                   placeholder="Enter event title..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  searchRemote={(query) =>
+                    fetchPublicTypeahead<EventDetailsDTO & Record<string, unknown>>({
+                      resource: 'event-details',
+                      query,
+                      containsFields: ['title', 'caption'],
+                      extraParams: { 'isActive.equals': 'true', sort: 'startDate,asc' },
+                    })
+                  }
+                  getSearchFields={(e) => [e.title, e.caption, e.id]}
+                  getCommitValue={(e) => e.title || ''}
+                  formatPrimary={(e) => e.title || 'Untitled event'}
+                  formatSecondary={(e) =>
+                    [e.caption, e.id != null ? `ID: ${e.id}` : null]
+                      .filter(Boolean)
+                      .join(' · ')
+                  }
                 />
               </div>
 

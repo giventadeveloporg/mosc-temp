@@ -214,7 +214,14 @@ export function GalleryContent() {
             eventsCount={eventsCount}
             loading={true}
           />
-          <GallerySearch onSearch={handleSearch} loading={loading} />
+          <GallerySearch
+            onSearch={handleSearch}
+            loading={loading}
+            mode={activeTab}
+            committedSearchTerm={searchFilters.searchTerm}
+            committedStartDate={searchFilters.startDate}
+            committedEndDate={searchFilters.endDate}
+          />
         </GalleryControlsPanel>
 
         <GalleryGridShell>
@@ -251,7 +258,15 @@ export function GalleryContent() {
               eventsCount={eventsCount}
               loading={loading}
             />
-            <GallerySearch onSearch={handleSearch} loading={loading} />
+            <GallerySearch
+              onSearch={handleSearch}
+              loading={loading}
+              mode="albums"
+              localItems={(albumsData?.albumsWithMedia ?? []) as unknown as Array<Record<string, unknown>>}
+              committedSearchTerm={searchFilters.searchTerm}
+              committedStartDate={searchFilters.startDate}
+              committedEndDate={searchFilters.endDate}
+            />
           </GalleryControlsPanel>
           <div className="text-center py-12">
             <div className="text-6xl mb-4 opacity-70">📸</div>
@@ -297,7 +312,15 @@ export function GalleryContent() {
             eventsCount={eventsCount}
             loading={loading}
           />
-          <GallerySearch onSearch={handleSearch} loading={loading} />
+          <GallerySearch
+            onSearch={handleSearch}
+            loading={loading}
+            mode="albums"
+            localItems={(albumsData?.albumsWithMedia ?? []).map((a) => a.album as unknown as Record<string, unknown>)}
+            committedSearchTerm={searchFilters.searchTerm}
+            committedStartDate={searchFilters.startDate}
+            committedEndDate={searchFilters.endDate}
+          />
         </GalleryControlsPanel>
 
         <GalleryGridShell>
@@ -339,7 +362,15 @@ export function GalleryContent() {
             eventsCount={eventsCount}
             loading={loading}
           />
-          <GallerySearch onSearch={handleSearch} loading={loading} />
+          <GallerySearch
+            onSearch={handleSearch}
+            loading={loading}
+            mode="events"
+            localItems={(galleryData?.eventsWithMedia ?? []).map((e) => e.event as unknown as Record<string, unknown>)}
+            committedSearchTerm={searchFilters.searchTerm}
+            committedStartDate={searchFilters.startDate}
+            committedEndDate={searchFilters.endDate}
+          />
         </GalleryControlsPanel>
         <div className="text-center py-12">
           <div className="text-6xl mb-4 opacity-70">📸</div>
@@ -387,7 +418,15 @@ export function GalleryContent() {
           eventsCount={eventsCount}
           loading={loading}
         />
-        <GallerySearch onSearch={handleSearch} loading={loading} />
+        <GallerySearch
+          onSearch={handleSearch}
+          loading={loading}
+          mode="events"
+          localItems={(eventsWithMedia ?? []).map((e) => e.event as unknown as Record<string, unknown>)}
+          committedSearchTerm={searchFilters.searchTerm}
+          committedStartDate={searchFilters.startDate}
+          committedEndDate={searchFilters.endDate}
+        />
       </GalleryControlsPanel>
 
       <GalleryGridShell>

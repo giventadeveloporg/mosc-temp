@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { EventSponsorsDTO } from "@/types";
 import { proxyApiPath } from '@/lib/proxyApiPath';
 import { SponsorCard } from '@/components/sponsors/SponsorCard';
+import SponsorsCatalogSearch from '@/components/sponsors/SponsorsCatalogSearch';
 import HomeParticleBackground from '@/components/HomeParticleBackground';
 import pageStyles from './SponsorsPage.module.css';
 
@@ -12,6 +13,7 @@ export default function SponsorsPage() {
   const [sponsors, setSponsors] = useState<EventSponsorsDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
+  const [searchDraft, setSearchDraft] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredSponsors, setFilteredSponsors] = useState<EventSponsorsDTO[]>([]);
 
@@ -128,8 +130,9 @@ export default function SponsorsPage() {
     }
   };
 
-  const handleSearch = (newSearchTerm: string) => {
-    setSearchTerm(newSearchTerm);
+  const commitSearch = (newSearchTerm: string) => {
+    setSearchDraft(newSearchTerm);
+    setSearchTerm(newSearchTerm.trim());
     setCurrentPage(1); // Reset to first page when searching
   };
 
@@ -171,20 +174,17 @@ export default function SponsorsPage() {
       {/* Main Content Section - MOSC Styling */}
       <section className={`${pageStyles.mainSection} py-16`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Search Bar - MOSC Styling */}
+          {/* Search Bar — typeahead; catalog refetch only on commit */}
           <div className="mb-12">
             <div className="relative max-w-md mx-auto">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
+              <SponsorsCatalogSearch
+                committedValue={searchTerm}
+                onCommit={commitSearch}
+                onInputChange={setSearchDraft}
+                inputId="sponsorSearch"
                 placeholder="Search sponsors..."
-                className={`${pageStyles.searchInput} block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 reverent-transition`}
+                disabled={loading}
+                inputClassName={`${pageStyles.searchInput} block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 reverent-transition`}
               />
             </div>
           </div>

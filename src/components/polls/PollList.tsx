@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Search, Users, Clock, MessageSquare } from 'lucide-react';
+import { Users, Clock, MessageSquare } from 'lucide-react';
 import type { EventPollDTO, EventPollOptionDTO } from '@/types';
 import { fetchEventPollsServer, fetchEventPollOptionsServer } from '@/app/admin/polls/ApiServerActions';
+import PublicListSearchCombobox from '@/components/public/PublicListSearchCombobox';
+import { fetchPublicTypeahead } from '@/lib/publicTypeaheadSearch';
 
 interface PollListProps {
   eventId?: number;
@@ -19,6 +20,7 @@ export function PollList({ eventId, userId, onPollSelect }: PollListProps) {
   const [polls, setPolls] = useState<EventPollDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [selectedPoll, setSelectedPoll] = useState<EventPollDTO | null>(null);
   const [pollOptions, setPollOptions] = useState<EventPollOptionDTO[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -59,9 +61,10 @@ export function PollList({ eventId, userId, onPollSelect }: PollListProps) {
     loadPolls();
   }, [eventId, currentPage, searchTerm]);
 
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(0); // Reset to first page on search
+  const commitSearch = (value: string) => {
+    setSearchInput(value);
+    setSearchTerm(value.trim());
+    setCurrentPage(0);
   };
 
   const handlePollClick = async (poll: EventPollDTO) => {
@@ -209,14 +212,61 @@ export function PollList({ eventId, userId, onPollSelect }: PollListProps) {
             )}
           </div>
 
-          <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <Input
+          <div className="mb-6 max-w-xl space-y-3">
+            <label htmlFor="pollSearchTitle" className="block text-sm font-medium text-gray-700">
+              Search by Title
+            </label>
+            <PublicListSearchCombobox<EventPollDTO & Record<string, unknown>>
+              items={polls as (EventPollDTO & Record<string, unknown>)[]}
+              committedValue={searchTerm}
+              onCommit={commitSearch}
+              onInputChange={setSearchInput}
+              inputId="pollSearchTitle"
               placeholder="Search polls..."
-              value={searchTerm}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-12 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 transition-all"
+              searchRemote={(query) => {
+                const extraParams: Record<string, string> = {
+                  'isActive.equals': 'true',
+                  sort: 'createdAt,desc',
+                };
+                if (eventId != null) {
+                  extraParams['eventId.equals'] = String(eventId);
+                }
+                return fetchPublicTypeahead<EventPollDTO & Record<string, unknown>>({
+                  resource: 'event-polls',
+                  query,
+                  containsFields: ['title', 'description'],
+                  extraParams,
+                });
+              }}
+              getSearchFields={(p) => [p.title, p.description, p.id]}
+              getCommitValue={(p) => p.title || ''}
+              formatPrimary={(p) => p.title || 'Untitled poll'}
+              formatSecondary={(p) =>
+                [p.description, p.id != null ? `ID: ${p.id}` : null]
+                  .filter(Boolean)
+                  .join(' · ')
+              }
             />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => commitSearch(searchInput)}
+                className="flex-shrink-0 h-12 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 px-4"
+                title="Search"
+                aria-label="Search"
+              >
+                <span className="font-semibold text-blue-700 text-sm">Search</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => commitSearch('')}
+                className="flex-shrink-0 h-12 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 px-4"
+                title="Clear"
+                aria-label="Clear search"
+              >
+                <span className="font-semibold text-gray-700 text-sm">Clear</span>
+              </button>
+            </div>
           </div>
         </>
       )}
