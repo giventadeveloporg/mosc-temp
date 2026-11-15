@@ -15,7 +15,12 @@ import { HomeSectionEyebrow } from '@/components/HomeSectionEyebrow';
 import { HomeSectionTitle } from '@/components/HomeSectionTitle';
 import EventCardResultsPanel from '@/components/competitions/EventCardResultsPanel';
 import PublicListSearchCombobox from '@/components/public/PublicListSearchCombobox';
-import { fetchPublicTypeahead } from '@/lib/publicTypeaheadSearch';
+import {
+  fetchPublicSearchPage,
+  fetchPublicTypeahead,
+  parseProxyList,
+  PUBLIC_EVENT_SEARCH_FIELDS,
+} from '@/lib/publicTypeaheadSearch';
 // import { formatInTimeZone } from 'date-fns-tz';
 
 const EVENTS_PAGE_SIZE = 20; // Minimum events to display per page
@@ -163,54 +168,57 @@ export default function EventsPage() {
           }
         }
 
-        const queryParams = new URLSearchParams({
+        const extraParams: Record<string, string> = {
           sort: loadingPastEvents ? 'startDate,desc' : 'startDate,asc',
-          page: page.toString(),
-          size: BACKEND_FETCH_SIZE.toString(), // Fetch more to account for filtering
-          'isActive.equals': 'true' // Only show active events
-        });
-
-        // Add search filters
-        if (searchTitle.trim()) {
-          queryParams.append('title.contains', searchTitle.trim());
-        }
+          'isActive.equals': 'true',
+        };
 
         // Handle date filtering - prioritize search date range over toggle
         if (searchDateFrom || searchDateTo) {
-          // If user has specified date range, use that instead of toggle logic
           if (searchDateFrom) {
-            queryParams.append('startDate.greaterThanOrEqual', searchDateFrom);
+            extraParams['startDate.greaterThanOrEqual'] = searchDateFrom;
           }
           if (searchDateTo) {
-            queryParams.append('startDate.lessThanOrEqual', searchDateTo);
+            extraParams['startDate.lessThanOrEqual'] = searchDateTo;
           }
+        } else if (loadingPastEvents) {
+          extraParams['endDate.lessThan'] = today;
         } else {
-          // No search date range specified, use toggle logic (use loadingPastEvents which respects auto-switch)
-          if (loadingPastEvents) {
-            // Show events that ended before today
-            queryParams.append('endDate.lessThan', today);
-          } else {
-            // Show events that start today or later (future events including today)
-            queryParams.append('startDate.greaterThanOrEqual', today);
-          }
+          extraParams['startDate.greaterThanOrEqual'] = today;
         }
 
-        // Fetch paginated events with date filtering
-        const eventsRes = await fetch(`/api/proxy/event-details?${queryParams.toString()}`, { cache: 'no-store' });
-        if (!eventsRes.ok) throw new Error('Failed to fetch events');
+        let eventList: EventDetailsDTO[] = [];
+        let totalCountValue = 0;
 
-        // Get total count from response header (as per UI style guide)
-        const totalCountHeader = eventsRes.headers.get('x-total-count');
-        const totalCountValue = totalCountHeader ? parseInt(totalCountHeader, 10) : 0;
+        if (searchTitle.trim()) {
+          const pageResult = await fetchPublicSearchPage<EventDetailsDTO>({
+            resource: 'event-details',
+            query: searchTitle.trim(),
+            containsFields: PUBLIC_EVENT_SEARCH_FIELDS,
+            extraParams,
+            page,
+            size: BACKEND_FETCH_SIZE,
+          });
+          eventList = pageResult.items;
+          totalCountValue = pageResult.totalCount;
+        } else {
+          const queryParams = new URLSearchParams({
+            ...extraParams,
+            page: page.toString(),
+            size: BACKEND_FETCH_SIZE.toString(),
+          });
+          const eventsRes = await fetch(`/api/proxy/event-details?${queryParams.toString()}`, { cache: 'no-store' });
+          if (!eventsRes.ok) throw new Error('Failed to fetch events');
+          const totalCountHeader = eventsRes.headers.get('x-total-count');
+          totalCountValue = totalCountHeader ? parseInt(totalCountHeader, 10) : 0;
+          eventList = parseProxyList<EventDetailsDTO>(await eventsRes.json());
+        }
+
         setTotalCount(totalCountValue);
 
         // Calculate total pages based on backend fetch size (not displayed size)
-        // This accounts for the fact that we fetch more than we display
         const calculatedTotalPages = Math.max(1, Math.ceil(totalCountValue / BACKEND_FETCH_SIZE));
         setTotalPages(calculatedTotalPages);
-
-        const events: EventDetailsDTO[] = await eventsRes.json();
-        let eventList = Array.isArray(events) ? events : [events];
 
         // Check if we got a full page of events (indicates there might be more)
         setHasMoreEvents(eventList.length === BACKEND_FETCH_SIZE);
@@ -408,6 +416,28 @@ export default function EventsPage() {
     setIsSearching(false);
     // Reset to future events when clearing search
     setShowPastEvents(false);
+  };
+
+  const searchEventsRemote = (query: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    const extraParams: Record<string, string> = {
+      'isActive.equals': 'true',
+      sort: showPastEvents ? 'startDate,desc' : 'startDate,asc',
+    };
+    if (searchDateFrom || searchDateTo) {
+      if (searchDateFrom) extraParams['startDate.greaterThanOrEqual'] = searchDateFrom;
+      if (searchDateTo) extraParams['startDate.lessThanOrEqual'] = searchDateTo;
+    } else if (showPastEvents) {
+      extraParams['endDate.lessThan'] = today;
+    } else {
+      extraParams['startDate.greaterThanOrEqual'] = today;
+    }
+    return fetchPublicTypeahead<EventDetailsDTO>({
+      resource: 'event-details',
+      query,
+      containsFields: PUBLIC_EVENT_SEARCH_FIELDS,
+      extraParams,
+    });
   };
 
   return (
@@ -815,15 +845,15 @@ export default function EventsPage() {
                   onInputChange={setSearchTitleDraft}
                   inputId="searchTitle"
                   placeholder="Enter event title..."
-                  searchRemote={(query) =>
-                    fetchPublicTypeahead<EventDetailsDTO & Record<string, unknown>>({
-                      resource: 'event-details',
-                      query,
-                      containsFields: ['title', 'caption'],
-                      extraParams: { 'isActive.equals': 'true', sort: 'startDate,asc' },
-                    })
-                  }
-                  getSearchFields={(e) => [e.title, e.caption, e.id]}
+                  searchRemote={searchEventsRemote}
+                  getSearchFields={(e) => [
+                    e.searchText,
+                    e.title,
+                    e.caption,
+                    e.description,
+                    e.location,
+                    e.id,
+                  ]}
                   getCommitValue={(e) => e.title || ''}
                   formatPrimary={(e) => e.title || 'Untitled event'}
                   formatSecondary={(e) =>

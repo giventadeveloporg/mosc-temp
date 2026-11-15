@@ -4,6 +4,11 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { EventSponsorsDTO } from "@/types";
 import { proxyApiPath } from '@/lib/proxyApiPath';
+import {
+  fetchPublicSearchPage,
+  parseProxyList,
+  PUBLIC_SPONSOR_SEARCH_FIELDS,
+} from '@/lib/publicTypeaheadSearch';
 import { SponsorCard } from '@/components/sponsors/SponsorCard';
 import SponsorsCatalogSearch from '@/components/sponsors/SponsorsCatalogSearch';
 import HomeParticleBackground from '@/components/HomeParticleBackground';
@@ -40,49 +45,58 @@ export default function SponsorsPage() {
     setLoading(true);
     setFetchError(false);
     try {
-      // Fetch sponsors with pagination and search
-      const params = new URLSearchParams({
+      const extraParams = {
         sort: 'priorityRanking,asc',
-        page: (currentPage - 1).toString(), // Convert to 0-based for backend
-        size: pageSize.toString(),
-        'isActive.equals': 'true'
-      });
+        'isActive.equals': 'true',
+      };
 
-      // Add search filter if provided
+      let sponsorsList: EventSponsorsDTO[] = [];
+      let count = 0;
+
       if (searchTerm.trim()) {
-        params.append('name.contains', searchTerm.trim());
-      }
-
-      const response = await fetch(proxyApiPath(`/api/proxy/event-sponsors?${params.toString()}`), {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        cache: 'no-store',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const sponsorsList = Array.isArray(data) ? data : [];
-
-        // Get total count from x-total-count header as per UI style guide
-        const totalCountHeader = response.headers.get('x-total-count');
-        const count = totalCountHeader ? parseInt(totalCountHeader, 10) : sponsorsList.length;
-        const pages = Math.ceil(count / pageSize);
-
-        console.log('✅ Fetched sponsors:', {
-          page: currentPage,
-          count: sponsorsList.length,
-          totalCount: count,
-          totalPages: pages
+        const pageResult = await fetchPublicSearchPage<EventSponsorsDTO>({
+          resource: 'event-sponsors',
+          query: searchTerm.trim(),
+          containsFields: PUBLIC_SPONSOR_SEARCH_FIELDS,
+          extraParams,
+          page: currentPage - 1,
+          size: pageSize,
+        });
+        sponsorsList = pageResult.items;
+        count = pageResult.totalCount;
+      } else {
+        const params = new URLSearchParams({
+          ...extraParams,
+          page: (currentPage - 1).toString(),
+          size: pageSize.toString(),
+        });
+        const response = await fetch(proxyApiPath(`/api/proxy/event-sponsors?${params.toString()}`), {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
         });
 
-        setSponsors(sponsorsList);
-        setFilteredSponsors(sponsorsList);
-        setTotalCount(count);
-        setTotalPages(pages);
-      } else {
-        console.warn('Failed to fetch sponsors:', response.status);
-        setFetchError(true);
+        if (!response.ok) {
+          console.warn('Failed to fetch sponsors:', response.status);
+          setFetchError(true);
+          setSponsors([]);
+          setFilteredSponsors([]);
+          setTotalCount(0);
+          setTotalPages(0);
+          return;
+        }
+
+        sponsorsList = parseProxyList<EventSponsorsDTO>(await response.json());
+        const totalCountHeader = response.headers.get('x-total-count');
+        count = totalCountHeader ? parseInt(totalCountHeader, 10) : sponsorsList.length;
       }
+
+      const pages = Math.ceil(count / pageSize);
+
+      setSponsors(sponsorsList);
+      setFilteredSponsors(sponsorsList);
+      setTotalCount(count);
+      setTotalPages(pages);
     } catch (error) {
       console.error('Error fetching sponsors:', error);
       setFetchError(true);
@@ -176,17 +190,24 @@ export default function SponsorsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Search Bar — typeahead; catalog refetch only on commit */}
           <div className="mb-12">
-            <div className="relative max-w-md mx-auto">
+            <form
+              className="relative max-w-md mx-auto"
+              onSubmit={(e) => {
+                e.preventDefault();
+                commitSearch(searchDraft);
+              }}
+            >
               <SponsorsCatalogSearch
                 committedValue={searchTerm}
                 onCommit={commitSearch}
                 onInputChange={setSearchDraft}
+                localItems={sponsors}
                 inputId="sponsorSearch"
                 placeholder="Search sponsors..."
                 disabled={loading}
                 inputClassName={`${pageStyles.searchInput} block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 reverent-transition`}
               />
-            </div>
+            </form>
           </div>
 
           {loading ? (
