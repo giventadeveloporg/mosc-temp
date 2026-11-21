@@ -162,6 +162,10 @@ export default function SponsorsCatalogSearch({
           className={inputClassName}
           onChange={(e) => {
             const next = e.target.value;
+            if (!next.trim()) {
+              handleClear();
+              return;
+            }
             setInputValue(next);
             onInputChange?.(next);
             setOpen(true);
