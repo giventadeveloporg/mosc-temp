@@ -1171,6 +1171,8 @@ export interface EventSponsorsDTO {
   tenantId?: string;
   name: string;
   type: string;
+  /** Denormalized search blob, including text read from uploaded images */
+  searchText?: string;
   companyName?: string;
   tagline?: string;
   description?: string;
